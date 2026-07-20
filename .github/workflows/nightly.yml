@@ -1,0 +1,26 @@
+name: Nightly
+
+on:
+  schedule:
+    # 02:00 UTC daily. Note: GitHub only runs scheduled workflows from the
+    # DEFAULT branch (currently dev), regardless of which branches hold this file.
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    name: nightly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full test suite
+        run: npm test
