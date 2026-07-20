@@ -1,0 +1,197 @@
+.forum-answers {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.forum-answers__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 64px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 40px 96px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .forum-answers__heading,
+  .forum-answers__list > li,
+  .forum-answers .forum-sidebar {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .forum-answers.is-in .forum-answers__heading {
+    opacity: 1;
+    transform: none;
+  }
+  /* Cards stagger top to bottom via their --i index. */
+  .forum-answers.is-in .forum-answers__list > li {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(0.1s + var(--i) * 0.1s);
+  }
+  .forum-answers.is-in .forum-sidebar {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.15s;
+  }
+}
+
+.forum-answers__heading {
+  margin: 0 0 26px;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+/* --- answer cards --- */
+.forum-answers__list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Glass box — same edge treatment as the Contact page field boxes. */
+.forum-card {
+  display: block;
+  padding: 24px 26px;
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  transition: box-shadow 0.15s ease;
+}
+
+.forum-card:hover {
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.18);
+}
+
+.forum-card__title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.forum-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.forum-card__date {
+  font-size: 13px;
+  color: #fff;
+}
+
+.forum-card__body {
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+/* --- in-card tag: same filled box as the sidebar categories --- */
+.forum-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+}
+
+.forum-answers :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+  .forum-answers__inner {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  /* On phones and tablets the sidebar lives in the hero's categories panel
+     instead, so it isn't repeated in the flow here. */
+  .forum-answers .forum-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+
+  .forum-answers__inner {
+    padding: 86px 16px 56px;
+  }
+
+  /* A quiet label above the cards rather than a display heading. */
+  .forum-answers__heading {
+    margin-bottom: 18px;
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+
+  .forum-answers__list {
+    gap: 18px;
+  }
+
+  .forum-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
+
+  .forum-card__title {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .forum-card__meta {
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  /* Cap the preview at three lines so every card stays the same shape.
+     Body size matches the footer blurb. */
+  .forum-card__body {
+    margin-top: 16px;
+    font-size: 18px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .forum-tag {
+    padding: 7px 14px;
+    border-radius: 8px;
+  }
+}

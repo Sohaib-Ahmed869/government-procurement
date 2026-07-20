@@ -1,0 +1,68 @@
+import { useEffect, useState } from 'react';
+import arrowIcon from '../../../assets/icons/Arrow outward.png';
+import callIcon from '../../../assets/icons/Call.png';
+import photo from '../../../assets/images/ExpertiseImage.png';
+import wave from '../../../assets/images/waves.png';
+import phoneWave from '../../../assets/images/WaveSmallerScreen.png';
+import './ExpertiseHero.css';
+
+function CircleIcon({ src, size = 30 }) {
+  return (
+    <span className="xp__circle" aria-hidden="true">
+      <img src={src} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
+    </span>
+  );
+}
+
+export default function ExpertiseHero() {
+  // Mount animation: reveal after the first paint.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  return (
+    <section className={`xp${mounted ? ' is-in' : ''}`}>
+      {/* Glass refraction filter driving the buttons' backdrop-filter.
+          feDisplacementMap = refraction, feGaussianBlur = frost. Renders in
+          Chromium; other engines fall back to the plain translucent glass. */}
+      <svg className="xp__filters" aria-hidden="true" width="0" height="0">
+        <filter id="xp-glass" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.007 0.013" numOctaves="2" seed="7" result="noise" />
+          <feGaussianBlur in="noise" stdDeviation="1.4" result="smoothNoise" />
+          <feDisplacementMap in="SourceGraphic" in2="smoothNoise" scale="26" xChannelSelector="R" yChannelSelector="G" result="refracted" />
+          <feGaussianBlur in="refracted" stdDeviation="1.4" />
+        </filter>
+      </svg>
+
+      {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
+      <img className="xp__wave" src={wave} alt="" aria-hidden="true" />
+      <img
+        className="xp__wave xp__wave--phone"
+        src={phoneWave}
+        alt=""
+        aria-hidden="true"
+      />
+      <img className="xp__photo" src={photo} alt="Mohammed Kheir" />
+
+      <div className="xp__inner">
+        <div className="xp__text">
+          <h1 className="xp__name">Mohammed Kheir</h1>
+          <p className="xp__role">Founder, Government Procurement</p>
+
+          <div className="xp__actions">
+            <a className="xp__btn" href="/book-a-consultation">
+              <CircleIcon src={arrowIcon} />
+              Book a Consultation
+            </a>
+            <a className="xp__btn" href="tel:+123456789">
+              <CircleIcon src={callIcon} />
+              Whatsapp +123 456 789
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
