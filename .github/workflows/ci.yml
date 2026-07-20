@@ -11,14 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---------------------------------------------------------------
-      # TODO(stack): PLACEHOLDER — replace with real commands.
-      # At setup time this repo contained no dependency manifest
-      # (no package.json, requirements.txt, pyproject.toml, pom.xml,
-      # go.mod), so the install/test commands could not be detected.
-      # ---------------------------------------------------------------
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: echo "TODO: replace with real install command (e.g. npm ci)"
+        run: npm ci
 
       - name: Run tests
-        run: echo "TODO: replace with real test command (e.g. npm test)"
+        run: npm test

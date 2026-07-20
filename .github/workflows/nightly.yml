@@ -14,11 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---------------------------------------------------------------
-      # TODO(stack): PLACEHOLDER — see ci.yml. Replace with real commands.
-      # ---------------------------------------------------------------
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install dependencies
-        run: echo "TODO: replace with real install command (e.g. npm ci)"
+        run: npm ci
 
       - name: Run full test suite
-        run: echo "TODO: replace with real test command (e.g. npm test)"
+        run: npm test
