@@ -1,0 +1,24 @@
+name: Nightly
+
+on:
+  schedule:
+    # 02:00 UTC daily. Note: GitHub only runs scheduled workflows from the
+    # DEFAULT branch (currently dev), regardless of which branches hold this file.
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly:
+    name: nightly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # TODO(stack): PLACEHOLDER — see ci.yml. Replace with real commands.
+      # ---------------------------------------------------------------
+      - name: Install dependencies
+        run: echo "TODO: replace with real install command (e.g. npm ci)"
+
+      - name: Run full test suite
+        run: echo "TODO: replace with real test command (e.g. npm test)"
