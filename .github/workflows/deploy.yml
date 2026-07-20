@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches: [dev, review, qa, live]
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    # Ties each push to the GitHub Environment named after the branch.
+    # The "live" environment has a required reviewer, so production
+    # deploys pause here until that approval is granted.
+    environment: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # TODO(deploy): PLACEHOLDER — wire your host here.
+      # Add host credentials as Environment secrets (per environment,
+      # under Settings > Environments), then reference them as
+      # ${{ secrets.YOUR_SECRET }} below.
+      # ---------------------------------------------------------------
+      - name: Deploy
+        run: |
+          echo "TODO: real deploy command for environment '${{ github.ref_name }}'"
