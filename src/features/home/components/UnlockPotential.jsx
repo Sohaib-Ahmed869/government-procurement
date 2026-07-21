@@ -1,0 +1,144 @@
+import { useRef, useState } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useInView } from '../../../hooks/useInView.js';
+import arrowIcon from '../../../assets/icons/Arrow outward.png';
+import cardImage from '../../../assets/images/MainPictureHomepage.png';
+import './UnlockPotential.css';
+
+// White circle with the dark arrow glyph, scaled to crop the PNG's padding.
+function ArrowCircle({ size = 36 }) {
+  return (
+    <span className="uy__arrow" aria-hidden="true">
+      <img src={arrowIcon} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
+    </span>
+  );
+}
+
+const COURSE_CARDS = [
+  { label: 'Courses', title: 'Introduction to Government Procurement' },
+  { label: 'Courses', title: 'Introduction to Government Procurement' },
+  { label: 'Courses', title: 'Introduction to Government Procurement' },
+];
+
+// Cards shown in the mobile carousel: 2 feature + 3 course + 1 wide.
+const CARD_COUNT = COURSE_CARDS.length + 3;
+
+export default function UnlockPotential() {
+  const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
+  const bentoRef = useRef(null);
+  const [activeCard, setActiveCard] = useState(0);
+
+  // On mobile the bento is a horizontal snap carousel; track which card is centred
+  // so the pagination dots stay in sync.
+  const onBentoScroll = () => {
+    const el = bentoRef.current;
+    const card = el?.querySelector('.uy__card');
+    if (!el || !card) return;
+    const gap = parseFloat(getComputedStyle(el).columnGap || '0') || 0;
+    const step = card.getBoundingClientRect().width + gap;
+    const idx = step ? Math.round(el.scrollLeft / step) : 0;
+    setActiveCard(Math.max(0, Math.min(CARD_COUNT - 1, idx)));
+  };
+
+  const scrollToCard = (i) => {
+    const cards = bentoRef.current?.querySelectorAll('.uy__card');
+    cards?.[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  };
+
+  return (
+    <section
+      ref={ref}
+      className={`uy${inView ? ' is-in' : ''}`}
+      data-audience={audience}
+    >
+      <div className="uy__inner">
+        <p className="uy__eyebrow">Courses &amp; Artefacts</p>
+        <h2 className="uy__heading">Unlock Your Potential</h2>
+
+        {/* Featured banner */}
+        <div className="uy__banner">
+          <img src={cardImage} alt="" className="uy__banner-img" />
+          <div className="uy__banner-body">
+            <h3 className="uy__banner-title">
+              Helping procurement officers unlock their potential
+            </h3>
+            <p className="uy__banner-sub">Join our academy to get ahead in your career.</p>
+            <a className="uy__watch" href="/academy">
+              <span className="uy__watch-dot" aria-hidden="true" />
+              Watch video
+            </a>
+          </div>
+        </div>
+
+        {/* Bento grid (desktop) / swipeable carousel (mobile) */}
+        <div className="uy__bento" ref={bentoRef} onScroll={onBentoScroll}>
+          <div className="uy__left">
+            <a className="uy__card uy__card--feature uy__card--neutral" href="/artefacts">
+              <img src={cardImage} alt="" className="uy__card-img" />
+              <div className="uy__card-tint" />
+              <div className="uy__card-body">
+                <p className="uy__card-label">Artefacts</p>
+                <h4 className="uy__card-title">Steps in the Procurement Cycle</h4>
+              </div>
+              <ArrowCircle />
+            </a>
+
+            <a className="uy__card uy__card--feature uy__card--short" href="/artefacts">
+              <img src={cardImage} alt="" className="uy__card-img" />
+              <div className="uy__card-tint" />
+              <div className="uy__card-body">
+                <p className="uy__card-label">Artefacts</p>
+                <h4 className="uy__card-title">Steps in the Procurement Cycle</h4>
+              </div>
+              <ArrowCircle />
+            </a>
+          </div>
+
+          <div className="uy__right">
+            <div className="uy__courses">
+              {COURSE_CARDS.map((c, i) => (
+                <a className="uy__card uy__card--course" href="/courses" key={i}>
+                  <img src={cardImage} alt="" className="uy__card-img" />
+                  <div className="uy__card-tint" />
+                  <div className="uy__card-body">
+                    <p className="uy__card-label">{c.label}</p>
+                    <h4 className="uy__card-title uy__card-title--sm">{c.title}</h4>
+                  </div>
+                  <ArrowCircle size={32} />
+                </a>
+              ))}
+            </div>
+
+            <a className="uy__card uy__card--wide uy__card--neutral" href="/courses">
+              <img src={cardImage} alt="" className="uy__card-img" />
+              <div className="uy__card-tint" />
+              <div className="uy__card-body">
+                <div className="uy__wide-row">
+                  <h4 className="uy__card-title uy__card-title--sm">
+                    Steps in the Procurement Cycle
+                  </h4>
+                  <ArrowCircle size={32} />
+                </div>
+                <p className="uy__card-label">Courses</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        {/* Pagination dots (mobile carousel only) */}
+        <div className="uy__dots">
+          {Array.from({ length: CARD_COUNT }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`uy__dot${i === activeCard ? ' is-active' : ''}`}
+              aria-label={`Go to card ${i + 1}`}
+              onClick={() => scrollToCard(i)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

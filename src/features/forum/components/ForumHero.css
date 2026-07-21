@@ -1,0 +1,333 @@
+.forum-hero {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+/* `.forum-answers` is also `z-index: 1` and comes later in the DOM, so it would
+   paint over the panel. Lift the whole hero while the panel is open. */
+.forum-hero.is-panel-open {
+  z-index: 90;
+}
+
+/* --- reveal on mount --- */
+@media (prefers-reduced-motion: no-preference) {
+  .forum-hero__title,
+  .forum-hero__sub,
+  .forum-hero__tools {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .forum-hero.is-in .forum-hero__title {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.05s;
+  }
+  .forum-hero.is-in .forum-hero__sub {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.15s;
+  }
+  .forum-hero.is-in .forum-hero__tools {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.25s;
+  }
+}
+
+.forum-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 72px 40px 40px;
+  text-align: center;
+}
+
+.forum-hero__title {
+  margin: 0;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.forum-hero__sub {
+  max-width: 560px;
+  margin: 22px auto 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #fff;
+}
+
+/* --- search + submit row --- */
+.forum-hero__tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 44px;
+}
+
+/* Glass field box — same edge treatment as the Contact page fields. */
+.forum-hero__search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  max-width: 560px;
+  padding: 15px 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.forum-hero__search-icon {
+  display: inline-flex;
+  flex: none;
+  color: #fff;
+}
+
+.forum-hero__search-input {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 15px;
+  color: #fff;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.forum-hero__search-input::placeholder {
+  color: #fff;
+}
+
+/* strip the native search clear button */
+.forum-hero__search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+/* --- submit-a-question pill --- */
+.forum-hero__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+  padding: 8px 24px 8px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  transition: box-shadow 0.15s ease;
+}
+
+.forum-hero__submit:hover {
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+}
+
+.forum-hero__submit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.forum-hero__submit-icon img {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.forum-hero :is(a, input):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Hidden on desktop; the compact circular variants are mobile-only. */
+.forum-hero__submit-plus,
+.forum-hero__categories,
+.forum-hero__panel {
+  display: none;
+}
+
+/* --- mobile categories panel --- */
+.forum-hero__panel-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #fff;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+
+/* --- categories button + panel: tablets get the same treatment as phones,
+   since the sidebar is out of the flow at these widths too. --- */
+@media (max-width: 1024px) {
+  /* Panel holding the categories + featured questions. */
+  .forum-hero__panel {
+    display: block;
+    position: fixed;
+    /* Starts below the site header. `.forum-hero` is a stacking context
+       (position: relative; z-index: 1), so this panel can never paint above the
+       header however high its z-index — sitting below it keeps the close button
+       clickable. */
+    inset: 64px 0 0;
+    z-index: 200;
+    overflow-y: auto;
+    padding: 20px 24px 40px;
+    text-align: left;
+    background: #0a3114;
+    /* Slides up from the bottom of the screen. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100%);
+    transition:
+      opacity 0.3s ease,
+      transform 0.34s cubic-bezier(0.22, 0.61, 0.36, 1),
+      visibility 0.34s;
+  }
+
+  .forum-hero__panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* Same glass circle as the submit button. */
+  .forum-hero__categories {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.02)
+    );
+    /* No UA button border — the glass edge comes from the inset shadows, same
+       as the "+" button. */
+    border: 0;
+    border-radius: 50%;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+      inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+      inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  }
+}
+
+@media (max-width: 720px) {
+  /* Top padding clears the corner wave (≈155px tall at its mobile width) and
+     leaves a gap between it and the title. */
+  .forum-hero__inner {
+    padding: 210px 20px 36px;
+  }
+
+  .forum-hero__title {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    /* Shared with the article and submit page headings. */
+    font-size: clamp(34px, 10vw, 46px);
+  }
+
+  /* Matches the footer blurb. */
+  .forum-hero__sub {
+    max-width: 420px;
+    margin-top: 18px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  /* Article page: the article's own title follows the search row, so the hero
+     copy is dropped and the row moves up under the wave. */
+  .forum-hero--compact .forum-hero__title,
+  .forum-hero--compact .forum-hero__sub {
+    display: none;
+  }
+
+  .forum-hero--compact .forum-hero__inner {
+    padding-top: 115px;
+    padding-bottom: 8px;
+  }
+
+  .forum-hero--compact .forum-hero__tools {
+    margin-top: 0;
+  }
+
+  /* Search field plus two circular action buttons, all on one row. */
+  .forum-hero__tools {
+    gap: 10px;
+    margin-top: 34px;
+  }
+
+  .forum-hero__search {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+  }
+
+  /* The submit pill collapses to a "+" circle. */
+  .forum-hero__submit {
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+  }
+
+  .forum-hero__submit-icon,
+  .forum-hero__submit-label {
+    display: none;
+  }
+
+  .forum-hero__submit-plus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+  }
+
+}

@@ -1,0 +1,258 @@
+.adv-hero {
+  --adv-bg: #1a1a1a;
+
+  position: relative;
+  overflow: hidden;
+  background: var(--adv-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.adv-hero[data-audience='award'] {
+  --adv-bg: #0a3114;
+}
+
+.adv-hero[data-audience='win'] {
+  --adv-bg: #1a1a1a;
+}
+
+/* --- reveal on mount --- */
+@media (prefers-reduced-motion: no-preference) {
+  .adv-hero__eyebrow,
+  .adv-hero__title,
+  .adv-hero__copy,
+  .adv-hero__actions {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .adv-hero.is-in .adv-hero__eyebrow {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.05s;
+  }
+  .adv-hero.is-in .adv-hero__title {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.15s;
+  }
+  .adv-hero.is-in .adv-hero__copy {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.25s;
+  }
+  .adv-hero.is-in .adv-hero__actions {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.35s;
+  }
+}
+
+/* Corner wave, top-right. */
+.adv-hero__wave {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: auto;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.adv-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 72px 40px 48px;
+}
+
+.adv-hero__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.adv-hero__title {
+  margin: 26px 0 0;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(44px, 6vw, 84px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+}
+
+.adv-hero__copy {
+  max-width: 575px;
+  margin: 26px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.adv-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+/* --- glass buttons --- */
+.adv-hero__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 22px 6px 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 100px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.adv-hero__btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.adv-hero__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.adv-hero__circle img {
+  display: block;
+}
+
+.adv-hero :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* --- mobile-only audience toggle (top of hero) --- */
+.adv-hero__toggle {
+  display: none;
+  justify-content: center;
+  margin: 0 0 26px;
+}
+
+/* The active pill sits on a white fill; its text takes the hero's own
+   background colour. */
+.adv-hero__toggle .audience-toggle__option.is-active {
+  color: var(--adv-bg);
+}
+
+.adv-hero__toggle .audience-toggle__option {
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.adv-hero__toggle .audience-toggle__icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 860px) {
+  /* Centred stack: toggle, title, copy, buttons — with the wave anchored to the
+     bottom of the hero the way the homepage hero does it. */
+  .adv-hero__toggle {
+    display: flex;
+  }
+
+  /* The toggle already states the audience, so the eyebrow is redundant. */
+  .adv-hero__eyebrow {
+    display: none;
+  }
+
+  /* The wide corner wave is replaced by a background wave anchored to the
+     hero's bottom, so its distance to the buttons stays constant however the
+     text wraps. */
+  .adv-hero__wave {
+    display: none;
+  }
+
+  .adv-hero__inner {
+    padding: 100px 24px 180px;
+    text-align: center;
+    background-image: url('../../../assets/images/EnhanceExpWave.png');
+    background-repeat: no-repeat;
+    /* Anchored bottom-right and oversized so the rising curve sweeps up the
+       right-hand side, as it does in the Enhance section. */
+    background-position: right bottom;
+    background-size: 100% auto;
+  }
+
+  .adv-hero__title {
+    margin-top: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    /* Shared page-title size on small screens. */
+    font-size: clamp(38px, 11vw, 52px);
+  }
+
+  /* Only the first sentence runs on phones; the rest is dropped and the lead
+     picks up a trailing dot so it reads as truncated. */
+  .adv-hero__copy-rest {
+    display: none;
+  }
+
+  .adv-hero__copy-lead::after {
+    content: '.';
+  }
+
+  /* Matches the footer blurb. */
+  .adv-hero__copy {
+    max-width: 420px;
+    margin: 22px auto 0;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #fff;
+  }
+
+  .adv-hero__actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  /* Pinned width so the longer "Whatsapp …" label can't stretch the box wider
+     than "Book a Consultation"; icon pinned left so the label stays centred. */
+  .adv-hero__btn {
+    position: relative;
+    flex: none;
+    width: 237px;
+    min-width: 237px;
+    max-width: 237px;
+    height: 54px;
+    justify-content: center;
+    padding: 12px 18px 12px 50px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .adv-hero__circle {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
