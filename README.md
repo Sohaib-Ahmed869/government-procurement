@@ -1,16 +1,30 @@
-# React + Vite
+# Government Procurement
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Monorepo for the Government Procurement website.
 
-Currently, two official plugins are available:
+```
+.
+├── fe/     Frontend — Vite + React 19 SPA (public site + admin/CMS UI)
+├── be/     Backend — CMS API server (scaffold pending scope sign-off)
+├── docs/   Client deck, design gap analysis, workflow guide
+└── .github/workflows/   CI, nightly, deploy
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Frontend (`fe/`)
 
-## React Compiler
+```bash
+cd fe
+npm ci
+npm run dev      # Vite dev server
+npm run build    # production build
+npm run lint     # oxlint
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Backend (`be/`)
 
-## Expanding the Oxlint configuration
+Not yet scaffolded — see [`be/README.md`](be/README.md).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Branching
+
+`dev` → `review` → `qa` → `live`. Feature branches open PRs into `dev`; review
+gatekeeper approves before merge. See `docs/workflow-guide.pdf`.

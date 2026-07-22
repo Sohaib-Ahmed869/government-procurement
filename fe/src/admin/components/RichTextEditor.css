@@ -1,0 +1,139 @@
+/* Rich-text editor — styled to match the admin form controls
+   (.admin-input look: bordered, rounded, green focus ring). */
+.rte {
+  border: 1px solid var(--admin-border);
+  border-radius: 9px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.rte:focus-within {
+  border-color: var(--admin-green);
+  box-shadow: 0 0 0 3px rgba(10, 49, 20, 0.08);
+}
+
+.rte__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 7px 8px;
+  background: #fafcfb;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.rte__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--admin-text);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.rte__btn:hover {
+  background: #eef2f0;
+  border-color: var(--admin-border);
+}
+.rte__btn:active {
+  background: var(--admin-mint);
+  color: var(--admin-green);
+}
+.rte__btn.is-active {
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+  color: #fff;
+}
+.rte__btn--wide {
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.rte__sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background: var(--admin-border);
+}
+
+.rte__editable {
+  min-height: 220px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--admin-text);
+  outline: none;
+  overflow-y: auto;
+}
+
+/* Placeholder shown only when the editable region is empty. */
+.rte__editable:empty:before {
+  content: attr(data-placeholder);
+  color: var(--admin-muted);
+  pointer-events: none;
+}
+
+/* Light styling for content typed inside the editor. */
+.rte__editable h2 {
+  margin: 0.6em 0 0.3em;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--admin-green);
+}
+.rte__editable h3 {
+  margin: 0.6em 0 0.3em;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--admin-green);
+}
+.rte__editable p {
+  margin: 0 0 0.7em;
+}
+.rte__editable ul,
+.rte__editable ol {
+  margin: 0 0 0.7em;
+  padding-left: 1.5em;
+}
+.rte__editable a {
+  color: var(--admin-green);
+  text-decoration: underline;
+}
+.rte__editable blockquote {
+  margin: 0 0 0.7em;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--admin-mint);
+  color: var(--admin-muted);
+  font-style: italic;
+}
+.rte__editable img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 14px 0;
+}
+
+/* Word-count footer */
+.rte__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--admin-border);
+  background: #fafcfb;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+.rte__uploading {
+  margin-left: auto;
+  color: var(--admin-green);
+  font-weight: 500;
+}

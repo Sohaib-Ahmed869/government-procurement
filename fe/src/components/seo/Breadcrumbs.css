@@ -1,0 +1,38 @@
+.breadcrumbs {
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.breadcrumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.breadcrumbs__item {
+  display: inline-flex;
+}
+
+.breadcrumbs__link {
+  color: currentColor;
+  opacity: 0.7;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.breadcrumbs__link:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.breadcrumbs__current {
+  font-weight: 500;
+}
+
+.breadcrumbs__sep {
+  opacity: 0.4;
+}

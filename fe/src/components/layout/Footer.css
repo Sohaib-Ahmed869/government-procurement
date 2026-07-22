@@ -1,0 +1,197 @@
+/* Geist for everything except the wordmark (Segoe UI, matched to the header). */
+.site-footer {
+  --footer-bg: #1a1a1a;
+
+  background: var(--footer-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.site-footer[data-audience='award'] {
+  --footer-bg: #0a3114;
+}
+
+.site-footer[data-audience='win'] {
+  --footer-bg: #1a1a1a;
+}
+
+/* --- newsletter subscribe block (top of footer) --- */
+.site-footer__subscribe {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 48px 40px 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-footer__inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 64px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 56px 40px;
+}
+
+/* --- brand column --- */
+.site-footer__brand-col {
+  max-width: 420px;
+}
+
+.site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.site-footer__logo {
+  display: block;
+}
+
+.site-footer__wordmark {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.site-footer__blurb {
+  margin: 20px 0 0;
+  max-width: 380px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+/* --- link columns --- */
+.site-footer__links {
+  display: flex;
+  gap: 72px;
+}
+
+.site-footer__heading {
+  margin: 0 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.site-footer__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.site-footer__link {
+  font-size: 13.5px;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
+  color: #fff;
+}
+
+/* --- flat link run (small screens only) --- */
+.site-footer__flat {
+  display: none;
+}
+
+.site-footer__flat-row {
+  display: flex;
+  /* Each row is one line, always — the font size below is what gives. */
+  flex-wrap: nowrap;
+  gap: 1.1em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.site-footer__flat-row + .site-footer__flat-row {
+  margin-top: 1.1em;
+}
+
+.site-footer :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+  .site-footer__inner {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .site-footer__links {
+    flex-wrap: wrap;
+    gap: 40px 56px;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Headed columns give way to a single wrapped run of links. */
+  .site-footer__links {
+    display: none;
+  }
+
+  .site-footer__flat {
+    display: block;
+  }
+
+  .site-footer__subscribe {
+    padding: 40px 24px 36px;
+  }
+
+  .site-footer__inner {
+    gap: 48px;
+    padding: 56px 24px 72px;
+  }
+
+  .site-footer__brand-col {
+    max-width: none;
+  }
+
+  .site-footer__brand {
+    gap: 14px;
+  }
+
+  .site-footer__logo {
+    width: 34px;
+    height: auto;
+  }
+
+  /* "Government Procurement" stays on one line: ~11.4em wide at this weight,
+     sharing the row with a 34px logo + 14px gap inside 48px of side padding. */
+  .site-footer__wordmark {
+    font-size: min(24px, calc((100vw - 96px) / 11.4));
+    white-space: nowrap;
+  }
+
+  .site-footer__blurb {
+    max-width: none;
+    margin-top: 28px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #fff;
+  }
+
+  /* The widest row is "Forum / Explore Tender Websites / Contact": ~17.5em of
+     text plus two 1.1em gaps ≈ 20em, inside 48px of side padding. Sizing off
+     that keeps all three rows on one line down to the narrowest phones. */
+  .site-footer__flat {
+    font-size: min(18px, calc((100vw - 48px) / 20));
+  }
+
+  .site-footer__flat-row .site-footer__link {
+    font-size: inherit;
+    color: #fff;
+  }
+}
