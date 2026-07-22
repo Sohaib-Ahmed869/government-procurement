@@ -183,7 +183,7 @@ export default function ForumSubmit() {
 
             {sent && (
               <p className="forum-submit__sent" role="status">
-                Thanks — your question has been received. We&rsquo;ll be in touch shortly.
+                Thanks! Your question has been received. We&rsquo;ll be in touch shortly.
               </p>
             )}
           </form>

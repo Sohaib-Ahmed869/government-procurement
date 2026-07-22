@@ -39,7 +39,7 @@ export default function SubscribeForm() {
         Stay in the loop
       </h2>
       <p className="subscribe-form__copy">
-        Procurement insights, new courses, and tender tips — straight to your inbox.
+        Procurement insights, new courses, and tender tips, straight to your inbox.
       </p>
 
       {status === 'success' ? (

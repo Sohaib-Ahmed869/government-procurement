@@ -41,7 +41,7 @@ export default function ForumHero({ compact = false }) {
         <h1 className="forum-hero__title">Get your answers</h1>
         <p className="forum-hero__sub">
           Your guide to navigating complex tenders, compliance challenges, and
-          contract decisions — practical insights for both agencies and suppliers.
+          contract decisions. Practical insights for both agencies and suppliers.
         </p>
 
         <div className="forum-hero__tools">

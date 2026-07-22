@@ -64,6 +64,55 @@
   color: #fff;
 }
 
+/* --- social links --- */
+.site-footer__social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #fff;
+  /* Glass pill — matches the Subscribe button above. */
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.site-footer__social-link:hover,
+.site-footer__social-link:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Hover polish — matches the Subscribe button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .site-footer__social-link {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .site-footer__social-link:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
 /* --- link columns --- */
 .site-footer__links {
   display: flex;
@@ -181,6 +230,16 @@
     font-size: 18px;
     line-height: 1.5;
     color: #fff;
+  }
+
+  .site-footer__social {
+    margin-top: 28px;
+    gap: 14px;
+  }
+
+  .site-footer__social-link {
+    width: 44px;
+    height: 44px;
   }
 
   /* The widest row is "Forum / Explore Tender Websites / Contact": ~17.5em of

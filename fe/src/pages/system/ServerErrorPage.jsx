@@ -8,7 +8,7 @@ export default function ServerErrorPage() {
         code="500"
         eyebrow="Something went wrong"
         title="An unexpected error occurred"
-        message="Our team has been notified. Please try again in a few moments — if the problem persists, get in touch and we'll help."
+        message="Our team has been notified. Please try again in a few moments. If the problem persists, get in touch and we'll help."
         actions={[
           { label: 'Try again', href: '/', variant: 'primary' },
           { label: 'Contact us', to: '/contact', variant: 'ghost' },

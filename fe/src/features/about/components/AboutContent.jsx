@@ -10,14 +10,14 @@ import './AboutContent.css';
 const HERO = {
   title: 'About Government Procurement',
   subtitle:
-    'We help public sector organisations run fair, transparent, and outcome-driven tenders — turning complex procurement into clear, confident decisions.',
+    'We help public sector organisations run fair, transparent, and outcome-driven tenders, turning complex procurement into clear, confident decisions.',
 };
 
 const STORY = {
   heading: 'Our story',
   paragraphs: [
     'Government Procurement was founded on a simple belief: public money deserves rigorous, impartial stewardship. For two decades we have partnered with agencies, councils, and departments to design tender processes that hold up to scrutiny and deliver genuine value.',
-    'What began as a small advisory practice has grown into a trusted team of specialists spanning strategy, probity, evaluation, and capability building. Along the way we have kept our focus on the outcome that matters most — better services for the communities our clients serve.',
+    'What began as a small advisory practice has grown into a trusted team of specialists spanning strategy, probity, evaluation, and capability building. Along the way we have kept our focus on the outcome that matters most: better services for the communities our clients serve.',
     'Today we support procurement leaders end to end, from early market engagement through to contract award and beyond, combining hands-on delivery with the practical training that leaves teams stronger than we found them.',
   ],
 };

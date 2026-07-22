@@ -62,6 +62,54 @@ const FLAT_ROWS = [
   ],
 ];
 
+const SOCIAL_LINKS = [
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M7 10.5V17M7 7.4v.01M10.5 17v-3.6c0-1.4.9-2.4 2.2-2.4s2.3 1 2.3 2.4V17"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M14.5 7.7h-1.7c-1 0-1.6.6-1.6 1.7v1.5m-1.6 0h4.5m-2.9 0V17"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+];
+
 // Pages that carry the win/award toggle — the only place the win-only
 // "Explore Tender Websites" link is relevant.
 const TOGGLE_PATHS = ['/', '/advisory'];
@@ -105,6 +153,21 @@ export default function Footer({ audience: audienceProp }) {
             For over two decades, we've helped top organisations worldwide transform
             procurement through platforms, training, and consulting.
           </p>
+          <ul className="site-footer__social" aria-label="Social media">
+            {SOCIAL_LINKS.map(({ label, href, icon }) => (
+              <li key={label}>
+                <a
+                  className="site-footer__social-link"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                >
+                  {icon}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <nav className="site-footer__links" aria-label="Footer">

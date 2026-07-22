@@ -15,7 +15,7 @@ export default function FaqHero() {
         <h1 className="faq-hero__title">Frequently asked questions</h1>
         <p className="faq-hero__sub">
           Everything you need to know about finding, preparing, and winning government
-          procurement opportunities. Can&rsquo;t find an answer? Reach out — we&rsquo;re happy to help.
+          procurement opportunities. Can&rsquo;t find an answer? Reach out, we&rsquo;re happy to help.
         </p>
       </div>
     </section>
