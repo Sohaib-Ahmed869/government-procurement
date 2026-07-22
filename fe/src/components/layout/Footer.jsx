@@ -9,7 +9,6 @@ const LINK_COLUMNS = [
     links: [
       { label: 'Courses', href: '/courses' },
       { label: 'Resources', href: '/resources' },
-      { label: 'Videos', href: '/videos' },
       { label: 'FAQ', href: '/faq' },
       { label: 'About', href: '/about' },
       { label: 'Contact Us', href: '/contact' },
@@ -52,7 +51,6 @@ const FLAT_ROWS = [
     { label: 'Contact', href: '/contact' },
   ],
   [
-    { label: 'Videos', href: '/videos' },
     { label: 'FAQ', href: '/faq' },
     { label: 'About', href: '/about' },
     { label: 'Privacy', href: '/privacy' },

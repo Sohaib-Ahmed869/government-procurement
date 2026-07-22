@@ -17,7 +17,6 @@ import { Page } from '../models/Page.js';
 import { Faq } from '../models/Faq.js';
 import { Article } from '../models/Article.js';
 import { Course } from '../models/Course.js';
-import { Video } from '../models/Video.js';
 import { Question } from '../models/Question.js';
 import { Link } from '../models/Link.js';
 import { Testimonial } from '../models/Testimonial.js';
@@ -201,7 +200,7 @@ async function run() {
         body:
           "<p>A practical foundation course for anyone responsible for responding to government tenders. Learn how buyers evaluate submissions and how to give them exactly what they're looking for.</p>" +
           '<ul><li>Decode tender documents, selection criteria and weightings</li><li>Write clear, compliant, evidence-backed responses</li><li>Avoid the common mistakes that get bids marked down or disqualified</li></ul>',
-        image: { url: STOCK.foundations }, priceLabel: 'A$1,200', durationLabel: '6 weeks',
+        image: { url: STOCK.foundations }, durationLabel: '6 weeks',
         availability: COURSE_STATE.OPEN, featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
       {
@@ -211,7 +210,7 @@ async function run() {
         body:
           '<p>Move from reactive buying to a deliberate sourcing strategy. This masterclass covers category management, market analysis and stakeholder alignment.</p>' +
           '<ul><li>Build category and sourcing strategies from the ground up</li><li>Run robust market and spend analysis</li><li>Balance value for money with risk and social outcomes</li></ul>',
-        image: { url: STOCK.strategy }, priceLabel: 'A$1,800', durationLabel: '4 weeks',
+        image: { url: STOCK.strategy }, durationLabel: '4 weeks',
         availability: COURSE_STATE.OPEN, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
       {
@@ -221,7 +220,7 @@ async function run() {
         body:
           '<p>Probity is what makes a procurement decision defensible. Learn how to run processes that stand up to scrutiny from bidders, auditors and the public.</p>' +
           '<ul><li>Manage conflicts of interest and confidentiality</li><li>Document decisions so they withstand challenge</li><li>Apply governance frameworks across the procurement lifecycle</li></ul>',
-        image: { url: STOCK.probity }, priceLabel: 'A$950', durationLabel: '3 weeks',
+        image: { url: STOCK.probity }, durationLabel: '3 weeks',
         availability: COURSE_STATE.COMING_SOON, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
       {
@@ -231,7 +230,7 @@ async function run() {
         body:
           '<p>Procurement is becoming a data discipline. This course shows you how to turn spend and performance data into better, faster decisions.</p>' +
           '<ul><li>Build dashboards that surface spend and savings</li><li>Use analytics to manage supplier performance and risk</li><li>Understand where AI genuinely helps in the procurement cycle</li></ul>',
-        image: { url: STOCK.digital }, priceLabel: 'A$1,500', durationLabel: '5 weeks',
+        image: { url: STOCK.digital }, durationLabel: '5 weeks',
         availability: COURSE_STATE.COMING_SOON, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
     ]);
@@ -248,7 +247,7 @@ async function run() {
           '<p>A clear, printable reference that walks through each phase of the procurement cycle — need identification, market analysis, sourcing strategy, tendering, evaluation, award and contract management.</p>' +
           '<p>Use it to onboard new team members or to keep a live project on track.</p>',
         image: { url: STOCK.steps }, resourceType: 'artefacts', segment: 'general',
-        priceLabel: 'Free', availability: COURSE_STATE.OPEN,
+        availability: COURSE_STATE.OPEN,
         featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
       {
@@ -258,7 +257,7 @@ async function run() {
           '<p>A structured scorecard that helps panels evaluate tenders consistently and defensibly. Set your criteria, assign weightings, and let the sheet calculate a transparent overall score.</p>' +
           '<ul><li>Configurable criteria and weightings</li><li>Separate price and quality scoring</li><li>Built-in guidance notes for evaluators</li></ul>',
         image: { url: STOCK.scorecard }, resourceType: 'artefacts', segment: 'award',
-        priceLabel: 'A$49', availability: COURSE_STATE.OPEN,
+        availability: COURSE_STATE.OPEN,
         status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
       {
@@ -268,7 +267,7 @@ async function run() {
           '<p>A short, structured checklist to decide whether an opportunity is worth pursuing. Weigh fit, capability, competition and commercial return before you invest in a full response.</p>' +
           '<ul><li>Score strategic fit and win probability</li><li>Flag resourcing and compliance risks early</li><li>Make go/no-go calls with confidence</li></ul>',
         image: { url: STOCK.checklist }, resourceType: 'artefacts', segment: 'win',
-        priceLabel: 'Free', availability: COURSE_STATE.OPEN,
+        availability: COURSE_STATE.OPEN,
         status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
     ]);
@@ -284,29 +283,14 @@ async function run() {
           '<p>Our most popular courses and artefacts, packaged together at a discount. Everything a bidding team needs to go from opportunity to submitted, competitive tender.</p>' +
           '<ul><li>Foundations and strategy courses</li><li>Evaluation scorecard and decision checklists</li><li>The full procurement-cycle reference</li></ul>',
         image: { url: STOCK.toolkit }, resourceType: 'bundles', segment: 'win', level: 'intermediate',
-        priceLabel: 'A$2,400', availability: COURSE_STATE.OPEN,
+        availability: COURSE_STATE.OPEN,
         featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
       },
     ]);
     console.log('[seed] created 1 bundle');
   }
 
-  // 7. Videos (YouTube — play immediately without S3) -----------------------
-  if ((await Video.countDocuments()) === 0) {
-    const yt = (title, slug, videoId, category, description) => ({
-      title, slug, description, category, source: 'youtube',
-      youtube: { url: `https://www.youtube.com/watch?v=${videoId}`, videoId },
-      status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-    });
-    await Video.create([
-      yt('What Government Procurement Actually Is', 'what-government-procurement-is', 'ScMzIvxBSi4', catP101._id, 'A plain-English introduction to how public procurement works.'),
-      yt('Building a Category Strategy That Delivers', 'category-strategy-delivers', 'aqz-KE-bpKQ', catWebinars._id, 'A recorded webinar on category management.'),
-      yt('Probity & Governance in Fair Tendering', 'probity-governance-webinar', 'M7lc1UVf-VE', catCase._id, 'A full session on probity in evaluation panels.'),
-    ]);
-    console.log('[seed] created 3 videos');
-  }
-
-  // 8. Forum Q&A ------------------------------------------------------------
+  // 7. Forum Q&A ------------------------------------------------------------
   if ((await Question.countDocuments()) === 0) {
     await Question.create([
       {

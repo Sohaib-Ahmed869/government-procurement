@@ -4,7 +4,6 @@ import { CONTENT_STATUS, QUESTION_STATUS } from '../../constants/statuses.js';
 import { Article } from '../../models/Article.js';
 import { Question } from '../../models/Question.js';
 import { Course } from '../../models/Course.js';
-import { Video } from '../../models/Video.js';
 
 // Escapes user input so it can be used safely inside a RegExp.
 function escapeRegex(text) {
@@ -36,10 +35,10 @@ export const search = asyncHandler(async (req, res) => {
   const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 10));
 
   if (!query) {
-    return ok(res, { query: '', articles: [], questions: [], courses: [], videos: [] });
+    return ok(res, { query: '', articles: [], questions: [], courses: [] });
   }
 
-  const [articles, questions, courses, videos] = await Promise.all([
+  const [articles, questions, courses] = await Promise.all([
     searchModel(
       Article,
       query,
@@ -60,14 +59,6 @@ export const search = asyncHandler(async (req, res) => {
       Course,
       query,
       ['title', 'summary', 'body'],
-      { status: CONTENT_STATUS.PUBLISHED },
-      limit,
-      '-publishedAt',
-    ),
-    searchModel(
-      Video,
-      query,
-      ['title', 'description'],
       { status: CONTENT_STATUS.PUBLISHED },
       limit,
       '-publishedAt',
@@ -98,13 +89,6 @@ export const search = asyncHandler(async (req, res) => {
       title: c.title,
       excerpt: c.summary || '',
       date: c.publishedAt || c.createdAt,
-    })),
-    videos: videos.map((v) => ({
-      id: v._id,
-      slug: v.slug,
-      title: v.title,
-      excerpt: v.description || '',
-      date: v.publishedAt || v.createdAt,
     })),
   });
 });

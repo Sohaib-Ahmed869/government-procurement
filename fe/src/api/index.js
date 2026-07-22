@@ -1,5 +1,5 @@
 // Single entry point for the CMS API. Import the resource you need:
-//   import { videosApi, authApi } from '../api';
+//   import { coursesApi, authApi } from '../api';
 import { api } from './client.js';
 import { createResource } from './resource.js';
 
@@ -11,18 +11,14 @@ export const articlesApi = {
 
 export const categoriesApi = createResource('categories');
 
-export const videosApi = {
-  ...createResource('videos'),
-  // Plain video files on S3. Small files: server-side upload.
-  uploadFile: (id, file) => api.upload(`/videos/${id}/file`, file),
-  uploadThumbnail: (id, file) => api.upload(`/videos/${id}/thumbnail`, file),
-  // Large files: get a presigned URL and PUT straight to S3 from the browser.
-  createUploadUrl: (filename, mimeType) => api.post('/videos/upload-url', { filename, mimeType }),
-};
-
 export const coursesApi = {
   ...createResource('courses'),
   uploadImage: (id, file) => api.upload(`/courses/${id}/image`, file),
+  // Course materials attached directly to a course: uploaded video/pdf/image,
+  // or a pasted YouTube link.
+  addMedia: (id, file, fields) => api.upload(`/courses/${id}/media`, file, { fields }),
+  addMediaLink: (id, body) => api.post(`/courses/${id}/media/link`, body),
+  removeMedia: (id, mediaId) => api.del(`/courses/${id}/media/${mediaId}`),
 };
 
 export const faqsApi = createResource('faqs');
@@ -73,10 +69,6 @@ export const mediaApi = {
 export const announcementsApi = {
   ...createResource('announcements'),
   active: () => api.get('/announcements/active'),
-};
-export const homepageRailsApi = {
-  ...createResource('homepage-rails'),
-  resolved: () => api.get('/homepage-rails/resolved'),
 };
 export const settingsApi = {
   getPublic: () => api.get('/settings/public'),

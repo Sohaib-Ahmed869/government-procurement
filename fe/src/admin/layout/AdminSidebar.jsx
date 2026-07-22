@@ -55,7 +55,6 @@ const NAV = [
     group: 'Content',
     items: [
       { to: '/admin/articles', label: 'Articles', icon: 'doc' },
-      { to: '/admin/videos', label: 'Videos', icon: 'video' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
       { to: '/admin/pages', label: 'Pages', icon: 'page' },
@@ -79,7 +78,6 @@ const NAV = [
   {
     group: 'Site',
     items: [
-      { to: '/admin/homepage-rails', label: 'Homepage rails', icon: 'rails' },
       { to: '/admin/announcements', label: 'Announcements', icon: 'megaphone' },
       { to: '/admin/links', label: 'Links', icon: 'link' },
       { to: '/admin/media', label: 'Media library', icon: 'media' },

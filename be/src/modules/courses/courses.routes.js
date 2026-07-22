@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { protect, optionalAuth } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
 import { CONTENT_ROLES } from '../../constants/roles.js';
-import { uploadImage } from '../../middleware/upload.js';
+import { uploadImage, uploadMedia } from '../../middleware/upload.js';
 import {
   list,
   getBySlug,
@@ -11,6 +11,9 @@ import {
   update,
   remove,
   uploadCourseImage,
+  addCourseMedia,
+  addCourseMediaLink,
+  removeCourseMedia,
 } from './courses.controller.js';
 
 const router = Router();
@@ -22,6 +25,11 @@ router.post('/', protect, authorize(...CONTENT_ROLES), create);
 router.get('/slug/:slug', optionalAuth, getBySlug);
 
 router.post('/:id/image', protect, authorize(...CONTENT_ROLES), uploadImage.single('file'), uploadCourseImage);
+
+// Course materials (videos / pdfs / images / youtube links).
+router.post('/:id/media', protect, authorize(...CONTENT_ROLES), uploadMedia.single('file'), addCourseMedia);
+router.post('/:id/media/link', protect, authorize(...CONTENT_ROLES), addCourseMediaLink);
+router.delete('/:id/media/:mediaId', protect, authorize(...CONTENT_ROLES), removeCourseMedia);
 
 router.get('/:id', optionalAuth, getById);
 router.patch('/:id', protect, authorize(...CONTENT_ROLES), update);

@@ -43,7 +43,25 @@ const courseSchema = new mongoose.Schema(
       key: { type: String, default: '' },
       url: { type: String, default: '' },
     },
-    priceLabel: { type: String, default: '' }, // e.g. "A$1,200" or "Free"
+    // Course materials attached directly to the course. Each item is one of:
+    //  - 'video'    an uploaded video file (key/url/mimeType/sizeBytes)
+    //  - 'youtube'  a pasted YouTube link (youtubeUrl/youtubeId)
+    //  - 'pdf'      an uploaded PDF document (key/url)
+    //  - 'image'    an uploaded image (key/url)
+    // (Videos used to be a standalone collection; they now live here.)
+    media: [
+      {
+        kind: { type: String, enum: ['video', 'youtube', 'pdf', 'image'], required: true },
+        title: { type: String, default: '' },
+        key: { type: String, default: '' },
+        url: { type: String, default: '' },
+        mimeType: { type: String, default: '' },
+        sizeBytes: { type: Number, default: 0 },
+        youtubeUrl: { type: String, default: '' },
+        youtubeId: { type: String, default: '' },
+        order: { type: Number, default: 0 },
+      },
+    ],
     durationLabel: { type: String, default: '' }, // e.g. "6 weeks"
     availability: { type: String, enum: COURSE_STATES, default: COURSE_STATE.COMING_SOON },
     startDate: { type: Date },

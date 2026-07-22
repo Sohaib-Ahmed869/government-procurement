@@ -22,13 +22,19 @@ export default function CoursesAdminPage() {
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [q, setQ] = useState('');
   const [type, setType] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [confirmId, setConfirmId] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const load = () => {
     setStatus('loading');
     coursesApi
-      .list({ q, limit: 100, ...(type !== 'all' ? { resourceType: type } : {}) })
+      .list({
+        q,
+        limit: 100,
+        ...(type !== 'all' ? { resourceType: type } : {}),
+        ...(statusFilter !== 'all' ? { status: statusFilter } : {}),
+      })
       .then((items) => {
         setRows(items);
         setStatus('ready');
@@ -36,7 +42,7 @@ export default function CoursesAdminPage() {
       .catch(() => setStatus('error'));
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [q, type]);
+  useEffect(load, [q, type, statusFilter]);
 
   const onDelete = async () => {
     setBusy(true);
@@ -128,6 +134,18 @@ export default function CoursesAdminPage() {
             </button>
           ))}
         </div>
+        <select
+          className="admin-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by status"
+          style={{ maxWidth: 190 }}
+        >
+          <option value="all">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
       </div>
 
       <DataTable

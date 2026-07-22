@@ -5,15 +5,14 @@ import { searchApi } from '../../../api';
 import './SearchResults.css';
 
 // Tab order and labels. Each key maps to a group in the API response
-// ({ articles, questions, courses, videos }) via normaliseGroups below.
+// ({ articles, questions, courses }) via normaliseGroups below.
 const TABS = [
   { key: 'articles', label: 'Articles' },
   { key: 'qa', label: 'Q&A' },
   { key: 'courses', label: 'Courses' },
-  { key: 'videos', label: 'Videos' },
 ];
 
-const EMPTY_GROUPS = { articles: [], qa: [], courses: [], videos: [] };
+const EMPTY_GROUPS = { articles: [], qa: [], courses: [] };
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -50,14 +49,6 @@ function normaliseGroups(res) {
       date: formatDate(c.date),
       title: c.title,
       excerpt: c.excerpt,
-    })),
-    videos: (res.videos || []).map((v) => ({
-      id: v.id,
-      to: '/videos',
-      topic: 'Video',
-      date: formatDate(v.date),
-      title: v.title,
-      excerpt: v.excerpt,
     })),
   };
 }
@@ -108,7 +99,7 @@ export default function SearchResults() {
   }, [q]);
 
   const total =
-    groups.articles.length + groups.qa.length + groups.courses.length + groups.videos.length;
+    groups.articles.length + groups.qa.length + groups.courses.length;
   const activeHits = groups[tab] || [];
 
   const onSubmit = (e) => {
@@ -119,7 +110,7 @@ export default function SearchResults() {
 
   let summary;
   if (!q) {
-    summary = 'Enter a term to search articles, Q&A, courses and videos.';
+    summary = 'Enter a term to search articles, Q&A and courses.';
   } else if (status === 'loading') {
     summary = `Searching for “${q}”…`;
   } else if (status === 'error') {
@@ -140,8 +131,8 @@ export default function SearchResults() {
               className="search__input"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Search articles, Q&A, courses and videos…"
-              aria-label="Search articles, Q&A, courses and videos"
+              placeholder="Search articles, Q&A and courses…"
+              aria-label="Search articles, Q&A and courses"
             />
             <button type="submit" className="search__submit">
               Search

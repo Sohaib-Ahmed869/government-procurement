@@ -15,7 +15,6 @@ import CoursesPage from './pages/public/CoursesPage.jsx';
 import CourseDetailPage from './pages/public/CourseDetailPage.jsx';
 import InsightsPage from './pages/public/InsightsPage.jsx';
 import ArticleDetailPage from './pages/public/ArticleDetailPage.jsx';
-import VideosPage from './pages/public/VideosPage.jsx';
 import FaqPage from './pages/public/FaqPage.jsx';
 import SearchResultsPage from './pages/public/SearchResultsPage.jsx';
 // System / utility pages
@@ -29,11 +28,13 @@ import UnsubscribePage from './pages/system/UnsubscribePage.jsx';
 import ServerErrorPage from './pages/system/ServerErrorPage.jsx';
 import NotFoundPage from './pages/system/NotFoundPage.jsx';
 import AdminRoutes from './routes/AdminRoutes.jsx';
+import ScrollToTop from './components/shared/ScrollToTop.jsx';
 import { AudienceProvider } from './context/AudienceContext.jsx';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Admin CMS — its own auth + layout, outside the public chrome. */}
         <Route path="/admin/*" element={<AdminRoutes />} />
@@ -60,7 +61,6 @@ function PublicSite() {
           {/* Navbar "Resources" points here; it shows the Insights listing. */}
           <Route path="/resources" element={<InsightsPage />} />
           <Route path="/insights/:slug" element={<ArticleDetailPage />} />
-          <Route path="/videos" element={<VideosPage />} />
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/contact" element={<ContactPage />} />

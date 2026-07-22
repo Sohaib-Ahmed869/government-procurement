@@ -31,7 +31,11 @@ export const optionalAuth = asyncHandler(async (req, _res, next) => {
   if (token) {
     try {
       const decoded = verifyAuthToken(token);
-      const user = await User.findById(decoded.sub);
+      // `active` is `select: false` on the schema, so it must be explicitly
+      // selected — otherwise `user.active` is undefined and every signed-in
+      // staff member is silently treated as anonymous (content endpoints then
+      // hide drafts/archived and ignore the ?status filter).
+      const user = await User.findById(decoded.sub).select('+active');
       if (user && user.active) req.user = user;
     } catch {
       /* ignore — treated as anonymous */

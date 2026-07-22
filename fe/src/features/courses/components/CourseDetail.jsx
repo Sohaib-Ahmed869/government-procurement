@@ -81,6 +81,19 @@ export default function CourseDetail({ course, status = 'ready' }) {
             </div>
           )}
 
+          {/* Course materials attached in the CMS: videos, YouTube links,
+              images and PDFs. */}
+          {course.media?.length > 0 && (
+            <div className="cd-materials">
+              <h2 className="cd-materials__title">Course materials</h2>
+              <div className="cd-materials__grid">
+                {course.media.map((m) => (
+                  <CourseMediaItem key={m._id || m.id} item={m} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Coming-soon courses take interest registrations here. Rendered in
               the main column so it stays reachable on small screens, where the
               sidebar is hidden in favour of the sticky bar. */}
@@ -96,9 +109,6 @@ export default function CourseDetail({ course, status = 'ready' }) {
           <div className="cd-buy">
             <h2 className="cd-buy__title">{course.title}</h2>
             {course.summary && <p className="cd-buy__blurb">{course.summary}</p>}
-            {course.priceLabel && (
-              <p className="cd-buy__price">{course.priceLabel}</p>
-            )}
             {isComingSoon ? (
               <a className="cd-buy__cta" href="#register-interest">
                 {ctaLabel}
@@ -131,7 +141,6 @@ export default function CourseDetail({ course, status = 'ready' }) {
       {/* Small screens replace the pricing sidebar with a sticky bottom bar. */}
       <div className="cd-bar">
         <span className="cd-bar__title">{course.title}</span>
-        {course.priceLabel && <span className="cd-bar__price">{course.priceLabel}</span>}
         {isComingSoon ? (
           <a className="cd-bar__cta" href="#register-interest">
             {ctaLabel}
@@ -143,5 +152,66 @@ export default function CourseDetail({ course, status = 'ready' }) {
         )}
       </div>
     </section>
+  );
+}
+
+// Renders one attached course material by kind: a YouTube embed, an uploaded
+// video player, an image, or a link to a PDF.
+function CourseMediaItem({ item }) {
+  if (item.kind === 'youtube') {
+    return (
+      <figure className="cd-media cd-media--player">
+        <div className="cd-media__frame">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${item.youtubeId}`}
+            title={item.title || 'Course video'}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+        {item.title && <figcaption className="cd-media__cap">{item.title}</figcaption>}
+      </figure>
+    );
+  }
+
+  if (item.kind === 'video') {
+    return (
+      <figure className="cd-media cd-media--player">
+        <div className="cd-media__frame">
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+          <video src={item.url} controls preload="metadata" />
+        </div>
+        {item.title && <figcaption className="cd-media__cap">{item.title}</figcaption>}
+      </figure>
+    );
+  }
+
+  if (item.kind === 'image') {
+    return (
+      <figure className="cd-media cd-media--image">
+        <a href={item.url} target="_blank" rel="noreferrer">
+          <img src={item.url} alt={item.title || 'Course image'} loading="lazy" />
+        </a>
+        {item.title && <figcaption className="cd-media__cap">{item.title}</figcaption>}
+      </figure>
+    );
+  }
+
+  // pdf (or any document)
+  return (
+    <a className="cd-media cd-media--pdf" href={item.url} target="_blank" rel="noreferrer">
+      <span className="cd-media__pdf-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+          strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+          <path d="M14 3v5h5M9 13h6M9 17h6" />
+        </svg>
+      </span>
+      <span className="cd-media__pdf-text">
+        <strong>{item.title || 'Document'}</strong>
+        <span>PDF · Open</span>
+      </span>
+    </a>
   );
 }

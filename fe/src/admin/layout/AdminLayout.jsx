@@ -10,7 +10,6 @@ const STORAGE_KEY = 'gp.admin.sidebar.collapsed';
 const SECTION_TITLES = {
   '': 'Dashboard',
   articles: 'Articles',
-  videos: 'Videos',
   courses: 'Courses',
   faqs: 'FAQ',
   pages: 'Pages',
@@ -21,7 +20,6 @@ const SECTION_TITLES = {
   contact: 'Contact inbox',
   consultations: 'Consultations',
   'register-interest': 'Register interest',
-  'homepage-rails': 'Homepage rails',
   announcements: 'Announcements',
   links: 'Links',
   media: 'Media library',
@@ -31,7 +29,7 @@ const SECTION_TITLES = {
 };
 
 // Sections with New/Edit sub-routes get a refined title.
-const SINGULAR = { articles: 'article', videos: 'video', courses: 'course' };
+const SINGULAR = { articles: 'article', courses: 'course' };
 
 function deriveTitle(pathname) {
   const [section, sub] = pathname.replace(/^\/admin\/?/, '').split('/');

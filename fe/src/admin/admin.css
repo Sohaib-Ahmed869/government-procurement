@@ -1117,48 +1117,180 @@
 }
 
 /* Login ----------------------------------------------------------------- */
+/* Stripe-style: white page with flowing gradient art bleeding in from both
+   the left and right edges, white through the middle, and a soft centered
+   sign-in card carrying the full logo. */
 .admin-login {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; padding: 20px;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--admin-surface);
+}
+
+/* Flowing aurora artwork — layered radial blooms, blurred, bleeding in from an
+   edge and masked so it fades out before it reaches the centered card. */
+.admin-login__art {
+  position: absolute;
+  top: -18%;
+  width: 62%;
+  height: 128%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(28px) saturate(118%);
+  opacity: 0.9;
   background:
-    radial-gradient(90% 70% at 15% 10%, rgba(126, 226, 168, 0.22), transparent 55%),
-    radial-gradient(80% 80% at 100% 100%, rgba(126, 226, 168, 0.14), transparent 60%),
-    linear-gradient(155deg, #0b3717 0%, var(--admin-green) 55%, #061f0d 100%);
+    radial-gradient(38% 52% at 62% 4%, #d9f99d 0%, transparent 58%),
+    radial-gradient(46% 60% at 78% 20%, #6ee7b7 0%, transparent 60%),
+    radial-gradient(52% 66% at 92% 40%, #34d399 0%, transparent 62%),
+    radial-gradient(48% 60% at 66% 58%, #5eead4 0%, transparent 60%),
+    radial-gradient(44% 58% at 96% 74%, #10b981 0%, transparent 62%),
+    radial-gradient(40% 54% at 74% 92%, #a7f3d0 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(120% 100% at 90% 30%, #000 30%, transparent 72%);
+  mask-image: radial-gradient(120% 100% at 90% 30%, #000 30%, transparent 72%);
+  animation: admin-login-art 1s var(--admin-ease);
+}
+.admin-login__art--right { right: -6%; }
+/* The left bloom is the right one mirrored horizontally. */
+.admin-login__art--left { left: -6%; transform: scaleX(-1); }
+
+/* Centered stage holding the card. */
+.admin-login__stage {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 48px 20px 64px;
 }
 .admin-login__card {
-  background: #fff; border-radius: 20px; padding: 40px 36px;
-  width: 100%; max-width: 410px;
-  box-shadow: 0 30px 70px -22px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  animation: admin-pop 0.28s var(--admin-ease);
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 40px 44px;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 2px rgba(16, 40, 24, 0.04),
+    0 24px 48px -20px rgba(16, 40, 24, 0.22),
+    0 8px 20px -12px rgba(16, 40, 24, 0.12);
+  animation: admin-login-rise 0.4s var(--admin-ease);
 }
+/* Full brand logo, centered above the heading. */
 .admin-login__brand {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 22px;
+  justify-content: center;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--admin-border);
+  text-decoration: none;
 }
-/* On the white login card the light logo needs a dark backing for contrast. */
+/* The logo art is recoloured to a solid brand-green silhouette via a mask, so
+   it reads cleanly on the white card. Swap the background-color to #000 (or a
+   var) to render it black instead. */
 .admin-login__logo {
+  display: block;
+  width: 230px;
+  max-width: 100%;
+  height: 44px;
+  background-color: var(--admin-green);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.admin-login__title {
+  margin: 0 0 26px;
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--admin-text);
+}
+
+.admin-login__alert { display: flex; align-items: center; gap: 9px; }
+.admin-login__alert svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Soft filled inputs, à la Stripe — no visible border until focus. */
+.admin-login__input {
   height: 46px;
-  width: 46px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  background: linear-gradient(155deg, var(--admin-green-600), var(--admin-green));
-  padding: 9px;
-  object-fit: contain;
-  box-shadow: 0 6px 16px -8px rgba(10, 49, 20, 0.5);
+  background: var(--admin-surface-3);
+  border-color: transparent;
 }
-.admin-login__brand-text { display: flex; flex-direction: column; line-height: 1.2; }
-.admin-login__brand-text strong { font-size: 15px; font-weight: 600; color: var(--admin-green); }
-.admin-login__brand-text span {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.16em;
-  text-transform: uppercase; color: var(--admin-muted);
+.admin-login__input:hover { background: #e8eeeb; border-color: transparent; }
+.admin-login__input:focus {
+  background: #fff;
+  border-color: var(--admin-green);
+  box-shadow: var(--admin-ring);
 }
-.admin-login__title { margin: 0 0 6px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: var(--admin-green); }
-.admin-login__sub { margin: 0 0 24px; color: var(--admin-muted); font-size: 14px; }
+
+.admin-login__input-wrap { position: relative; }
+.admin-login__input-wrap .admin-input { padding-right: 44px; }
+.admin-login__reveal {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition: background 0.14s var(--admin-ease), color 0.14s var(--admin-ease);
+}
+.admin-login__reveal:hover { background: rgba(16, 40, 24, 0.06); color: var(--admin-green); }
+.admin-login__reveal svg { width: 18px; height: 18px; }
+
+.admin-login__submit {
+  width: 100%;
+  height: 48px;
+  margin-top: 8px;
+  font-size: 15px;
+}
+.admin-login__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: admin-spin 0.7s linear infinite;
+}
+
+.admin-login__foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--admin-muted);
+}
+.admin-login__foot svg { width: 15px; height: 15px; flex-shrink: 0; color: var(--admin-green); opacity: 0.7; }
+
+@keyframes admin-login-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes admin-login-art {
+  from { opacity: 0; }
+  to { opacity: 0.9; }
+}
+@keyframes admin-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 560px) {
+  .admin-login__card { padding: 28px 24px 32px; border-radius: 16px; }
+  .admin-login__art { width: 90%; height: 60%; top: -6%; }
+  .admin-login__art--right { right: -30%; }
+  .admin-login__art--left { left: -30%; }
+}
 
 /* Content library (card grid for Articles / Videos) --------------------- */
 .admin-lib { min-height: 200px; }
@@ -1433,4 +1565,235 @@
     scroll-behavior: auto !important;
   }
   .admin-stat:hover, .admin-btn:active { transform: none; }
+}
+
+/* Media library ---------------------------------------------------------- */
+/* Drag-and-drop upload zone */
+.admin-media__drop {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1.5px dashed var(--admin-border-strong);
+  border-radius: var(--admin-radius);
+  background:
+    linear-gradient(180deg, var(--admin-surface-2), var(--admin-surface));
+  cursor: pointer;
+  transition: border-color 0.16s var(--admin-ease), background 0.16s var(--admin-ease),
+    box-shadow 0.16s var(--admin-ease);
+}
+.admin-media__drop:hover {
+  border-color: var(--admin-mint);
+  background: linear-gradient(180deg, var(--admin-mint-soft), var(--admin-surface));
+}
+.admin-media__drop.is-drag {
+  border-color: var(--admin-green);
+  background: var(--admin-mint-soft);
+  box-shadow: var(--admin-ring);
+}
+.admin-media__drop:focus-visible { outline: none; box-shadow: var(--admin-ring); }
+
+.admin-media__drop-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--admin-mint-soft);
+  color: var(--admin-green);
+}
+.admin-media__drop-icon svg { width: 26px; height: 26px; }
+.admin-media__drop-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.admin-media__drop-title { font-size: 14.5px; font-weight: 600; color: var(--admin-text); }
+.admin-media__drop-title strong { color: var(--admin-green); }
+.admin-media__drop-hint { font-size: 12.5px; color: var(--admin-muted); }
+.admin-media__drop-hint--file {
+  color: var(--admin-green);
+  font-weight: 600;
+  word-break: break-all;
+}
+.admin-media__drop-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.admin-media__folder { max-width: 190px; }
+
+/* Count line above the grid */
+.admin-media__count {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--admin-muted);
+}
+
+/* Asset grid */
+.admin-media__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+.admin-mediacard {
+  display: flex;
+  flex-direction: column;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+  box-shadow: var(--admin-shadow-sm);
+  transition: transform 0.16s var(--admin-ease), box-shadow 0.16s var(--admin-ease),
+    border-color 0.16s var(--admin-ease);
+}
+.admin-mediacard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--admin-shadow-md);
+  border-color: var(--admin-border-strong);
+}
+
+.admin-mediacard__thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background:
+    repeating-conic-gradient(#eef2f0 0% 25%, #f7f9f8 0% 50%) 50% / 18px 18px;
+  overflow: hidden;
+}
+.admin-mediacard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Non-image placeholder tile (video / document) */
+.admin-mediacard__ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.admin-mediacard__ph svg { width: 40px; height: 40px; }
+.admin-mediacard__ph--video { background: linear-gradient(150deg, #b23b34, #7c241f); }
+.admin-mediacard__ph--document { background: linear-gradient(150deg, var(--admin-green-600), var(--admin-green)); }
+
+/* Kind badge, top-left */
+.admin-mediacard__kind {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  z-index: 2;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  color: var(--admin-text);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 4px rgba(16, 40, 24, 0.18);
+  backdrop-filter: blur(4px);
+}
+/* Dimensions chip, bottom-right of images */
+.admin-mediacard__dims {
+  position: absolute;
+  bottom: 9px;
+  right: 9px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(6, 25, 12, 0.72);
+}
+
+/* Hover overlay with quick actions */
+.admin-mediacard__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  background: rgba(6, 25, 12, 0.4);
+  transition: opacity 0.16s var(--admin-ease);
+}
+.admin-mediacard:hover .admin-mediacard__overlay,
+.admin-mediacard__overlay:focus-within { opacity: 1; }
+.admin-mediacard__ovbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(6, 25, 12, 0.3);
+  transition: background 0.14s var(--admin-ease), color 0.14s var(--admin-ease);
+}
+.admin-mediacard__ovbtn svg { width: 15px; height: 15px; }
+.admin-mediacard__ovbtn:hover { background: var(--admin-mint-soft); color: var(--admin-green); }
+.admin-mediacard__ovbtn--danger:hover { background: #fbecea; color: var(--admin-danger); }
+.admin-mediacard__ovbtn.is-copied { background: var(--admin-green); color: #fff; }
+
+.admin-mediacard__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+.admin-mediacard__name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--admin-text);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-mediacard__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+.admin-mediacard__folder {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--admin-surface-3);
+  color: var(--admin-text-2);
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-mediacard__folder svg { width: 12px; height: 12px; opacity: 0.7; }
+.admin-mediacard__dot { opacity: 0.5; }
+
+/* Skeleton tiles while loading */
+.admin-mediacard--skeleton { pointer-events: none; }
+.admin-mediacard--skeleton .admin-mediacard__thumb { background: none; }
+
+@media (max-width: 560px) {
+  .admin-media__drop { flex-wrap: wrap; }
+  .admin-media__drop-actions { margin-left: 0; width: 100%; }
+  .admin-media__folder { max-width: none; flex: 1; }
+  .admin-media__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 }

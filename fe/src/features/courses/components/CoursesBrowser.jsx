@@ -8,8 +8,6 @@ import './CoursesBrowser.css';
 const SORT_OPTIONS = [
   { value: 'popular', label: 'Popular' },
   { value: 'newest', label: 'Newest' },
-  { value: 'price-low', label: 'Price: Low to High' },
-  { value: 'price-high', label: 'Price: High to Low' },
 ];
 
 // Availability badge copy keyed on the course's `availability` state.
@@ -37,12 +35,6 @@ const LEVEL_OPTS = [
   { value: 'intermediate', label: 'Intermediate' },
   { value: 'advanced', label: 'Advanced' },
 ];
-
-// "A$1,200" → 1200, "Free" → 0. Used only for price sorting.
-function priceValue(label) {
-  const n = parseFloat(String(label || '').replace(/[^0-9.]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-}
 
 function CategoriesIcon() {
   return (
@@ -217,12 +209,6 @@ export default function CoursesBrowser() {
       case 'newest':
         sorted.sort(byNewest);
         break;
-      case 'price-low':
-        sorted.sort((a, b) => priceValue(a.priceLabel) - priceValue(b.priceLabel));
-        break;
-      case 'price-high':
-        sorted.sort((a, b) => priceValue(b.priceLabel) - priceValue(a.priceLabel));
-        break;
       case 'popular':
       default:
         // Featured first, then newest.
@@ -341,9 +327,6 @@ export default function CoursesBrowser() {
                       </div>
                       <h3 className="courses-card__title">{course.title}</h3>
                       {course.summary && <p className="courses-card__desc">{course.summary}</p>}
-                      {course.priceLabel && (
-                        <p className="courses-card__price">{course.priceLabel}</p>
-                      )}
                     </div>
                   </Link>
                 </li>

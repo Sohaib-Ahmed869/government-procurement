@@ -93,14 +93,7 @@ export default function FaqAccordion() {
   return (
     <section ref={ref} className={`faq${inView ? ' is-in' : ''}`}>
       <div className="faq__inner">
-        <header className="faq__header">
-          <h1 className="faq__title">Frequently asked questions</h1>
-          <p className="faq__subtitle">
-            Everything you need to know about finding, preparing, and winning government
-            procurement opportunities. Can&rsquo;t find an answer? Reach out — we&rsquo;re happy to help.
-          </p>
-        </header>
-
+       <div className="faq__column">
         {categories.length > 1 && (
           <div className="faq__filters" role="group" aria-label="Filter questions by category">
             {categories.map((cat) => (
@@ -149,6 +142,7 @@ export default function FaqAccordion() {
             Contact our team
           </Link>
         </div>
+       </div>
       </div>
     </section>
   );

@@ -18,6 +18,7 @@ const EMPTY = { question: '', answer: '', category: '', order: 0, status: 'draft
 export default function FaqAdminPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [statusFilter, setStatusFilter] = useState('all');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingId, setEditingId] = useState(null); // null = create mode
   const [form, setForm] = useState(EMPTY);
@@ -28,14 +29,15 @@ export default function FaqAdminPage() {
   const load = () => {
     setStatus('loading');
     faqsApi
-      .list({ limit: 100 })
+      .list({ limit: 100, ...(statusFilter !== 'all' ? { status: statusFilter } : {}) })
       .then((items) => {
         setRows(items);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
   };
-  useEffect(load, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(load, [statusFilter]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -137,6 +139,21 @@ export default function FaqAdminPage() {
             New FAQ
           </button>
         </div>
+      </div>
+
+      <div className="admin-toolbar">
+        <select
+          className="admin-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by status"
+          style={{ maxWidth: 190 }}
+        >
+          <option value="all">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
       </div>
 
       <DataTable

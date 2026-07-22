@@ -4,7 +4,6 @@ import { CONTENT_STATUS, QUESTION_STATUS, SUBSCRIBER_STATUS } from '../../consta
 import { Question } from '../../models/Question.js';
 import { Subscriber } from '../../models/Subscriber.js';
 import { Article } from '../../models/Article.js';
-import { Video } from '../../models/Video.js';
 import { Course } from '../../models/Course.js';
 import { ContactMessage } from '../../models/ContactMessage.js';
 import { Consultation } from '../../models/Consultation.js';
@@ -18,8 +17,6 @@ export const overview = asyncHandler(async (req, res) => {
     subscriberCount,
     articlesPublished,
     articlesDraft,
-    videosPublished,
-    videosDraft,
     coursesPublished,
     coursesDraft,
     newContact,
@@ -38,8 +35,6 @@ export const overview = asyncHandler(async (req, res) => {
     Subscriber.countDocuments({ status: SUBSCRIBER_STATUS.CONFIRMED }),
     Article.countDocuments({ status: CONTENT_STATUS.PUBLISHED }),
     Article.countDocuments({ status: CONTENT_STATUS.DRAFT }),
-    Video.countDocuments({ status: CONTENT_STATUS.PUBLISHED }),
-    Video.countDocuments({ status: CONTENT_STATUS.DRAFT }),
     Course.countDocuments({ status: CONTENT_STATUS.PUBLISHED }),
     Course.countDocuments({ status: CONTENT_STATUS.DRAFT }),
     ContactMessage.countDocuments({ status: 'new' }),
@@ -57,7 +52,6 @@ export const overview = asyncHandler(async (req, res) => {
     subscriberCount,
     content: {
       articles: { published: articlesPublished, draft: articlesDraft },
-      videos: { published: videosPublished, draft: videosDraft },
       courses: { published: coursesPublished, draft: coursesDraft },
     },
     newContact,

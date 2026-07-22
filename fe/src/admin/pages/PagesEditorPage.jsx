@@ -42,6 +42,7 @@ function slugify(s) {
 export default function PagesEditorPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const [editing, setEditing] = useState(false); // false = list view
   const [isNew, setIsNew] = useState(true);
@@ -57,14 +58,15 @@ export default function PagesEditorPage() {
   const load = () => {
     setStatus('loading');
     pagesApi
-      .list()
+      .list(statusFilter !== 'all' ? { status: statusFilter } : undefined)
       .then((items) => {
         setRows(items);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
   };
-  useEffect(load, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(load, [statusFilter]);
 
   const dirty = useMemo(() => JSON.stringify(form) !== snapshot.current, [form]);
 
@@ -252,6 +254,21 @@ export default function PagesEditorPage() {
             New page
           </button>
         </div>
+      </div>
+
+      <div className="admin-toolbar">
+        <select
+          className="admin-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by status"
+          style={{ maxWidth: 190 }}
+        >
+          <option value="all">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
       </div>
 
       <DataTable

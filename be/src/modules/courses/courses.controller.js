@@ -12,7 +12,17 @@ import {
 } from '../../constants/statuses.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
+import { parseYouTubeId } from '../../utils/youtube.js';
 import { Course } from '../../models/Course.js';
+
+// Derives a course-media `kind` from an uploaded file's mimetype. uploadMedia's
+// fileFilter already restricts to image/video/pdf, so the throw is defensive.
+function mediaKindFromMime(mime) {
+  if (mime.startsWith('image/')) return 'image';
+  if (mime.startsWith('video/')) return 'video';
+  if (mime === 'application/pdf') return 'pdf';
+  throw ApiError.badRequest(`Unsupported file type: ${mime}`);
+}
 
 // Public content module: anonymous users see only published courses, while
 // signed-in staff (optionalAuth attaches req.user) can list everything and use
@@ -123,7 +133,6 @@ export const update = asyncHandler(async (req, res) => {
     'resourceType',
     'segment',
     'level',
-    'priceLabel',
     'durationLabel',
     'availability',
     'startDate',
@@ -153,10 +162,12 @@ export const remove = asyncHandler(async (req, res) => {
   const course = await Course.findById(req.params.id);
   if (!course) throw ApiError.notFound('Course not found');
 
-  // Best-effort cleanup of the owned S3 image.
-  if (course.image?.key) {
+  // Best-effort cleanup of the owned S3 objects: hero image + any uploaded media.
+  const keys = [course.image?.key, ...(course.media || []).map((m) => m.key)].filter(Boolean);
+  for (const key of keys) {
     try {
-      await deleteObject(course.image.key);
+      // eslint-disable-next-line no-await-in-loop
+      await deleteObject(key);
     } catch {
       /* ignore — orphaned object is acceptable */
     }
@@ -203,6 +214,98 @@ export const uploadCourseImage = asyncHandler(async (req, res) => {
     entity: 'Course',
     entityId: course._id,
     summary: `Updated image for course "${course.title}"`,
+  });
+  return ok(res, course);
+});
+
+// POST /:id/media — attach an uploaded file (video / pdf / image) to a course.
+export const addCourseMedia = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) throw ApiError.notFound('Course not found');
+  if (!req.file) throw ApiError.badRequest('File is required');
+
+  const kind = mediaKindFromMime(req.file.mimetype);
+  const { key, url } = await uploadBuffer({
+    buffer: req.file.buffer,
+    mimeType: req.file.mimetype,
+    folder: 'courses/media',
+    originalName: req.file.originalname,
+  });
+
+  course.media.push({
+    kind,
+    title: req.body.title?.trim() || req.file.originalname || '',
+    key,
+    url,
+    mimeType: req.file.mimetype,
+    sizeBytes: req.file.size || 0,
+    order: course.media.length,
+  });
+  await course.save();
+
+  recordAudit({
+    req,
+    action: 'course.media.add',
+    entity: 'Course',
+    entityId: course._id,
+    summary: `Added ${kind} to course "${course.title}"`,
+  });
+  return created(res, course);
+});
+
+// POST /:id/media/link — attach a YouTube link to a course.
+export const addCourseMediaLink = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) throw ApiError.notFound('Course not found');
+
+  const youtubeId = parseYouTubeId(req.body.url);
+  if (!youtubeId) throw ApiError.badRequest('A valid YouTube URL is required');
+
+  course.media.push({
+    kind: 'youtube',
+    title: req.body.title?.trim() || '',
+    youtubeUrl: String(req.body.url).trim(),
+    youtubeId,
+    order: course.media.length,
+  });
+  await course.save();
+
+  recordAudit({
+    req,
+    action: 'course.media.add',
+    entity: 'Course',
+    entityId: course._id,
+    summary: `Added YouTube link to course "${course.title}"`,
+  });
+  return created(res, course);
+});
+
+// DELETE /:id/media/:mediaId — remove one attached media item (and its S3 file).
+export const removeCourseMedia = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) throw ApiError.notFound('Course not found');
+
+  const item = course.media.id(req.params.mediaId);
+  if (!item) throw ApiError.notFound('Media item not found');
+
+  const { key } = item;
+  item.deleteOne();
+  await course.save();
+
+  if (key) {
+    try {
+      await deleteObject(key);
+    } catch {
+      /* ignore — orphaned object is acceptable */
+    }
+  }
+
+  recordAudit({
+    req,
+    action: 'course.media.remove',
+    entity: 'Course',
+    entityId: course._id,
+    summary: `Removed media from course "${course.title}"`,
   });
   return ok(res, course);
 });

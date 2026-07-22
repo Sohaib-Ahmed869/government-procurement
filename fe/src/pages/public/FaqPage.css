@@ -1,0 +1,19 @@
+/* Big-screen scaling — same approach as the other inner pages (courses,
+   insights): lay the page out at exactly 1440px and `zoom` the whole thing up
+   so every size grows in proportion, rather than leaving wide empty margins. */
+@media (min-width: 1441px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .faq-scale {
+    width: 1440px;
+    zoom: calc(100vw / 1440px);
+  }
+
+  /* `vh` inside a zoomed subtree resolves against the real viewport and is then
+     magnified, so divide it back down to keep the footer flush. */
+  .faq-scale .page-layout {
+    min-height: calc(100vh / (100vw / 1440px));
+  }
+}

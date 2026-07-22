@@ -144,14 +144,6 @@ export default function DashboardPage() {
       cta: 'Open',
     },
     {
-      label: 'Videos',
-      value: c.videos?.published ?? 0,
-      to: '/admin/videos',
-      icon: 'video',
-      foot: draftFoot(c.videos),
-      cta: 'Open',
-    },
-    {
       label: 'Courses',
       value: c.courses?.published ?? 0,
       to: '/admin/courses',

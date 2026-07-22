@@ -8,8 +8,6 @@ import DashboardPage from '../admin/pages/DashboardPage.jsx';
 import ArticlesAdminPage from '../admin/pages/ArticlesAdminPage.jsx';
 import ArticleEditorPage from '../admin/pages/ArticleEditorPage.jsx';
 import CategoriesPage from '../admin/pages/CategoriesPage.jsx';
-import VideosAdminPage from '../admin/pages/VideosAdminPage.jsx';
-import VideoImportPage from '../admin/pages/VideoImportPage.jsx';
 import CoursesAdminPage from '../admin/pages/CoursesAdminPage.jsx';
 import CourseEditorPage from '../admin/pages/CourseEditorPage.jsx';
 import FaqAdminPage from '../admin/pages/FaqAdminPage.jsx';
@@ -20,7 +18,6 @@ import SubscribersPage from '../admin/pages/SubscribersPage.jsx';
 import ContactInboxPage from '../admin/pages/ContactInboxPage.jsx';
 import ConsultationQueuePage from '../admin/pages/ConsultationQueuePage.jsx';
 import RegisterInterestPage from '../admin/pages/RegisterInterestPage.jsx';
-import HomepageRailsPage from '../admin/pages/HomepageRailsPage.jsx';
 import AnnouncementPage from '../admin/pages/AnnouncementPage.jsx';
 import LinksManagerPage from '../admin/pages/LinksManagerPage.jsx';
 import MediaLibraryPage from '../admin/pages/MediaLibraryPage.jsx';
@@ -51,9 +48,6 @@ export default function AdminRoutes() {
           <Route path="articles" element={<ArticlesAdminPage />} />
           <Route path="articles/new" element={<ArticleEditorPage />} />
           <Route path="articles/:id" element={<ArticleEditorPage />} />
-          <Route path="videos" element={<VideosAdminPage />} />
-          <Route path="videos/new" element={<VideoImportPage />} />
-          <Route path="videos/:id" element={<VideoImportPage />} />
           <Route path="courses" element={<CoursesAdminPage />} />
           <Route path="courses/new" element={<CourseEditorPage />} />
           <Route path="courses/:id" element={<CourseEditorPage />} />
@@ -72,7 +66,6 @@ export default function AdminRoutes() {
           <Route path="register-interest" element={<RegisterInterestPage />} />
 
           {/* Site */}
-          <Route path="homepage-rails" element={<HomepageRailsPage />} />
           <Route path="announcements" element={<AnnouncementPage />} />
           <Route path="links" element={<LinksManagerPage />} />
           <Route path="media" element={<MediaLibraryPage />} />

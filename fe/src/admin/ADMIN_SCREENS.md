@@ -14,14 +14,14 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import FormField from '../components/FormField.jsx';
 // API — import only what you need:
-import { articlesApi, videosApi, /* … */ } from '../../api';
+import { articlesApi, coursesApi, /* … */ } from '../../api';
 ```
 
 ### API shape
 - `resource.list(params)` → returns the **array** of items (unwrapped).
 - `resource.page(params)` → returns the **full** `{ data, meta }` (meta has `page,totalPages,total,hasNext,hasPrev`). Use for paginated tables.
 - `resource.get(id)`, `resource.getBySlug(slug)`, `resource.create(body)`, `resource.update(id, body)`, `resource.remove(id)`.
-- Uploads: e.g. `articlesApi.uploadHero(id, file)`, `videosApi.uploadFile(id, file)`, `videosApi.uploadThumbnail(id, file)`, `coursesApi.uploadImage(id, file)`, `mediaApi.upload(file, { folder })`.
+- Uploads: e.g. `articlesApi.uploadHero(id, file)`, `coursesApi.uploadImage(id, file)`, `coursesApi.addMedia(id, file)`, `mediaApi.upload(file, { folder })`.
 - Errors throw an `ApiError` with `.message` and `.status` — catch and show via `admin-alert admin-alert--error`.
 - Mongo ids are on `item._id` (fallback `item.id`).
 

@@ -8,7 +8,7 @@ import EditorShell from '../components/EditorShell.jsx';
 const BLANK = {
   title: '', summary: '', body: '',
   category: '', resourceType: 'courses', segment: 'general', level: 'beginner',
-  priceLabel: '', durationLabel: '',
+  durationLabel: '',
   availability: 'coming_soon', startDate: '',
   featured: 'false', status: 'draft',
 };
@@ -53,6 +53,13 @@ export default function CourseEditorPage() {
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [dragging, setDragging] = useState(false);
+  // Course materials (videos / pdfs / images / youtube links) attached to the
+  // saved course. These persist immediately (they need an existing course id).
+  const [media, setMedia] = useState([]);
+  const [mediaBusy, setMediaBusy] = useState(false);
+  const [ytUrl, setYtUrl] = useState('');
+  const [ytTitle, setYtTitle] = useState('');
+  const mediaInputRef = useRef(null);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -75,13 +82,14 @@ export default function CourseEditorPage() {
           resourceType: c.resourceType ?? 'courses',
           segment: c.segment ?? 'general',
           level: c.level ?? 'beginner',
-          priceLabel: c.priceLabel ?? '', durationLabel: c.durationLabel ?? '',
+          durationLabel: c.durationLabel ?? '',
           availability: c.availability ?? 'coming_soon', startDate: toDateInput(c.startDate),
           featured: c.featured ? 'true' : 'false', status: c.status ?? 'draft',
         };
         setForm(next);
         snapshot.current = JSON.stringify(next);
-        setImageUrl(c.imageUrl ?? c.image ?? '');
+        setImageUrl(c.image?.url ?? c.imageUrl ?? '');
+        setMedia(c.media || []);
         setLoading(false);
       })
       .catch((err) => { setError(err.message || 'Failed to load'); setLoading(false); });
@@ -107,7 +115,7 @@ export default function CourseEditorPage() {
     title: form.title, summary: form.summary, body: form.body,
     category: form.category || undefined,
     resourceType: form.resourceType, segment: form.segment, level: form.level,
-    priceLabel: form.priceLabel, durationLabel: form.durationLabel,
+    durationLabel: form.durationLabel,
     availability: form.availability,
     startDate: form.startDate || undefined,
     featured: form.featured === 'true',
@@ -144,6 +152,55 @@ export default function CourseEditorPage() {
     } catch (err) {
       setError(err.message || 'Failed to save');
       setSaving(false);
+    }
+  };
+
+  // --- Course materials (persist immediately against the saved course) ------
+  const addMediaFile = async (file) => {
+    if (!file || !currentId) return;
+    setMediaBusy(true);
+    setError(null);
+    try {
+      const updated = await coursesApi.addMedia(currentId, file, {});
+      setMedia(updated.media || []);
+    } catch (err) {
+      setError(err.message || 'Failed to upload material');
+    } finally {
+      setMediaBusy(false);
+      if (mediaInputRef.current) mediaInputRef.current.value = '';
+    }
+  };
+
+  const addYoutube = async () => {
+    if (!ytUrl.trim() || !currentId) return;
+    setMediaBusy(true);
+    setError(null);
+    try {
+      const updated = await coursesApi.addMediaLink(currentId, {
+        url: ytUrl.trim(),
+        title: ytTitle.trim(),
+      });
+      setMedia(updated.media || []);
+      setYtUrl('');
+      setYtTitle('');
+    } catch (err) {
+      setError(err.message || 'Failed to add YouTube link');
+    } finally {
+      setMediaBusy(false);
+    }
+  };
+
+  const removeMedia = async (mediaId) => {
+    if (!currentId) return;
+    setMediaBusy(true);
+    setError(null);
+    try {
+      const updated = await coursesApi.removeMedia(currentId, mediaId);
+      setMedia(updated.media || []);
+    } catch (err) {
+      setError(err.message || 'Failed to remove material');
+    } finally {
+      setMediaBusy(false);
     }
   };
 
@@ -199,7 +256,6 @@ export default function CourseEditorPage() {
               options={LEVEL_OPTS}
             />
             <FormField label="Summary" name="summary" as="textarea" rows={3} value={form.summary} onChange={onChange} />
-            <FormField label="Price label" name="priceLabel" value={form.priceLabel} onChange={onChange} />
             <FormField label="Duration label" name="durationLabel" value={form.durationLabel} onChange={onChange} />
             <FormField
               label="Availability" name="availability" as="select" value={form.availability} onChange={onChange}
@@ -251,6 +307,113 @@ export default function CourseEditorPage() {
         onChange={(html) => set('body', html)}
         placeholder="Describe this course…"
       />
+
+      <div className="editor-media">
+        <span className="editor-body-label">Course materials</span>
+        {isNew ? (
+          <p className="editor-media__hint">
+            Save the course first to attach videos, PDFs, images or YouTube links.
+          </p>
+        ) : (
+          <>
+            <div className="editor-media__add">
+              <span className="admin-btn admin-btn--sm editor-media__upload">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                  strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 16V4m0 0L7 9m5-5 5 5" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+                {mediaBusy ? 'Working…' : 'Upload video / PDF / image'}
+                <input
+                  ref={mediaInputRef}
+                  type="file"
+                  accept="video/*,application/pdf,image/*"
+                  disabled={mediaBusy}
+                  onChange={(e) => addMediaFile(e.target.files?.[0])}
+                />
+              </span>
+              <span className="editor-media__yt">
+                <input
+                  className="admin-input"
+                  placeholder="Paste a YouTube URL…"
+                  value={ytUrl}
+                  onChange={(e) => setYtUrl(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--sm admin-btn--primary"
+                  disabled={mediaBusy || !ytUrl.trim()}
+                  onClick={addYoutube}
+                >
+                  Add link
+                </button>
+              </span>
+            </div>
+
+            {media.length === 0 ? (
+              <p className="editor-media__empty">No materials attached yet.</p>
+            ) : (
+              <ul className="editor-media__list">
+                {media.map((m) => {
+                  const mid = m._id || m.id;
+                  return (
+                    <li key={mid} className="editor-media__item">
+                      <span className={`editor-media__thumb editor-media__thumb--${m.kind}`}>
+                        {m.kind === 'image' && m.url ? (
+                          <img src={m.url} alt="" />
+                        ) : (
+                          <MediaGlyph kind={m.kind} />
+                        )}
+                      </span>
+                      <span className="editor-media__body">
+                        <span className="editor-media__name" title={m.title || m.youtubeUrl}>
+                          {m.title || (m.kind === 'youtube' ? m.youtubeUrl : 'Untitled')}
+                        </span>
+                        <span className="editor-media__kind">
+                          {m.kind === 'youtube' ? 'YouTube link' : m.kind}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        className="editor-media__remove"
+                        onClick={() => removeMedia(mid)}
+                        disabled={mediaBusy}
+                        aria-label="Remove material"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+                          strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+                        </svg>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
     </EditorShell>
+  );
+}
+
+// Icon for a non-image course-material tile.
+function MediaGlyph({ kind }) {
+  if (kind === 'pdf') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+        strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+        <path d="M14 3v5h5M9 13h6M9 17h6" />
+      </svg>
+    );
+  }
+  // video / youtube
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"
+      strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none" />
+    </svg>
   );
 }

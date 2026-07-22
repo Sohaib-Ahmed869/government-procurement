@@ -5,11 +5,10 @@ import { CONTENT_STATUS } from '../../constants/statuses.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { HomepageRail } from '../../models/HomepageRail.js';
 import { Article } from '../../models/Article.js';
-import { Video } from '../../models/Video.js';
 import { Course } from '../../models/Course.js';
 
 // Maps a rail's `kind` to the Mongoose model it draws items from.
-const KIND_MODEL = { article: Article, video: Video, course: Course };
+const KIND_MODEL = { article: Article, course: Course };
 
 // GET /resolved — PUBLIC. Return active rails (by order), each with its item
 // list resolved: curated items first, then — if short and a fallback is set —
