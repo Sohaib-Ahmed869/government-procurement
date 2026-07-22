@@ -207,7 +207,7 @@ export default function ContactSection() {
 
             {sent && (
               <p className="contact__sent" role="status">
-                Thanks — your message has been received. We&rsquo;ll be in touch shortly.
+                Thanks! Your message has been received. We&rsquo;ll be in touch shortly.
               </p>
             )}
           </form>

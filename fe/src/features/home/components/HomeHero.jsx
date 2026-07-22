@@ -59,7 +59,7 @@ export default function HomeHero() {
         <h1 className="home-hero__title">Procure with Confidence</h1>
         <p className="home-hero__lede">
           Supporting government agencies and public sector organisations with end-to-end
-          procurement advisory — ensuring that contracts are awarded fairly, efficiently, and
+          procurement advisory, ensuring that contracts are awarded fairly, efficiently, and
           in line with best practice.
         </p>
 
@@ -85,7 +85,7 @@ export default function HomeHero() {
           <p className="home-hero__advisory-copy">
             We help private sector organisations and suppliers strengthen their bids and win
             more contracts. Our end-to-end advisory services ensure your proposals are
-            competitive, compliant, and compelling — giving you the edge in a highly contested
+            competitive, compliant, and compelling, giving you the edge in a highly contested
             marketplace.
           </p>
 

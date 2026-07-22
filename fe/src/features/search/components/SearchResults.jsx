@@ -166,10 +166,10 @@ export default function SearchResults() {
             {activeHits.length === 0 ? (
               <p className="search__empty">
                 {!q
-                  ? 'No results yet — enter a term above.'
+                  ? 'No results yet. Enter a term above.'
                   : status === 'loading'
                     ? 'Searching…'
-                    : `No results for “${q}” — try a different term.`}
+                    : `No results for “${q}”. Try a different term.`}
               </p>
             ) : (
               <ul className="search__results">

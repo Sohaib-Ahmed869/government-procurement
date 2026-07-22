@@ -47,7 +47,7 @@ export default function AdvisoryHero() {
             reducing risk.
           </span>{' '}
           <span className="adv-hero__copy-rest">
-            For suppliers, we turn complexity into opportunity — helping you craft stronger
+            For suppliers, we turn complexity into opportunity, helping you craft stronger
             proposals, win more contracts, and achieve sustainable growth.
           </span>
         </p>

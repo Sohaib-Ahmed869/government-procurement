@@ -4,7 +4,7 @@ import docsIcon from '../../../assets/icons/Google Docs.png';
 import './AboutExpertise.css';
 
 const PARAGRAPHS = [
-  'We help public sector teams and suppliers get government procurement right — from shaping a sourcing strategy to running fair, defensible tenders that stand up to scrutiny.',
+  'We help public sector teams and suppliers get government procurement right, from shaping a sourcing strategy to running fair, defensible tenders that stand up to scrutiny.',
   'Our advisors have sat on both sides of the table, evaluating bids and writing them. That experience shapes practical guidance you can act on, not theory.',
   'Whether you are building capability across a procurement function or preparing a single high-stakes tender, we tailor our support to where you are and what you need to achieve.',
   'The result is stronger competition, better value for money, and outcomes that are transparent and easy to justify to stakeholders and auditors alike.',

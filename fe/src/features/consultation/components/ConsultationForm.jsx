@@ -9,7 +9,7 @@ import './ConsultationForm.css';
 const EXPECTATIONS = [
   'A 30-minute call with one of our procurement specialists.',
   'A tailored view of where we can add value to your bids.',
-  'Clear next steps — no obligation, no hard sell.',
+  'Clear next steps, no obligation, no hard sell.',
 ];
 
 const SERVICE_OPTIONS = [
