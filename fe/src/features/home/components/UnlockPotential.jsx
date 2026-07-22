@@ -4,6 +4,7 @@ import { useInView } from '../../../hooks/useInView.js';
 import { coursesApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import cardImage from '../../../assets/images/MainPictureHomepage.png';
+import bannerImage from '../../../assets/images/HomepageCourse.png';
 import './UnlockPotential.css';
 
 // White circle with the dark arrow glyph, scaled to crop the PNG's padding.
@@ -87,7 +88,7 @@ export default function UnlockPotential() {
 
         {/* Featured banner */}
         <div className="uy__banner">
-          <img src={cardImage} alt="" className="uy__banner-img" />
+          <img src={bannerImage} alt="" className="uy__banner-img" />
           <div className="uy__banner-body">
             <h3 className="uy__banner-title">
               Helping procurement officers unlock their potential

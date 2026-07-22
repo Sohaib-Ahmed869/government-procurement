@@ -29,6 +29,7 @@ import UnsubscribePage from './pages/system/UnsubscribePage.jsx';
 import ServerErrorPage from './pages/system/ServerErrorPage.jsx';
 import NotFoundPage from './pages/system/NotFoundPage.jsx';
 import AdminRoutes from './routes/AdminRoutes.jsx';
+import ScrollToTop from './components/system/ScrollToTop.jsx';
 import { AudienceProvider } from './context/AudienceContext.jsx';
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
 function PublicSite() {
   return (
     <AudienceProvider>
+      <ScrollToTop />
       <Routes>
           {/* Public */}
           <Route path="/" element={<HomePage />} />

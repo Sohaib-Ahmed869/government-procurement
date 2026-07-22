@@ -1,6 +1,7 @@
 .search {
-  background: #fff;
-  color: #33463b;
+  /* Pinned to the award theme — always green. */
+  background: #0a3114;
+  color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
@@ -16,7 +17,7 @@
   font-size: clamp(34px, 5vw, 56px);
   font-weight: 400;
   line-height: 1.05;
-  color: #0a3114;
+  color: #fff;
 }
 
 .search__form {
@@ -31,43 +32,66 @@
   padding: 12px 18px;
   font: inherit;
   font-size: 16px;
-  color: #0a3114;
-  background: #fff;
-  border: 1px solid #e4eae6;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .search__input::placeholder {
-  color: #5a6b61;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .search__input:focus {
-  border-color: #7ee2a8;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
 }
 
+/* Glass pill — matches the subscribe button. */
 .search__submit {
   flex: 0 0 auto;
   padding: 12px 24px;
   font: inherit;
   font-size: 15px;
-  color: #0a3114;
-  background: #7ee2a8;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
   border: 0;
   border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: filter 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
 .search__submit:hover {
-  filter: brightness(0.96);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Hover polish — matches the subscribe button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .search__submit {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .search__submit:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
 }
 
 .search__summary {
   margin: 0 0 24px;
   font-size: 15px;
-  color: #5a6b61;
+  color: #fff;
 }
 
 /* --- tabs --- */
@@ -75,7 +99,7 @@
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
-  border-bottom: 1px solid #e4eae6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .search__tab {
@@ -86,7 +110,7 @@
   margin-bottom: -1px;
   font: inherit;
   font-size: 15px;
-  color: #5a6b61;
+  color: rgba(255, 255, 255, 0.7);
   background: none;
   border: 0;
   border-bottom: 2px solid transparent;
@@ -97,12 +121,12 @@
 }
 
 .search__tab:hover {
-  color: #0a3114;
+  color: #fff;
 }
 
 .search__tab.is-active {
-  color: #0a3114;
-  border-bottom-color: #0a3114;
+  color: #fff;
+  border-bottom-color: #fff;
 }
 
 .search__count {
@@ -113,14 +137,14 @@
   padding: 0 7px;
   height: 20px;
   font-size: 12px;
-  color: #33463b;
-  background: #eef4f0;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 
 .search__tab.is-active .search__count {
-  color: #0a3114;
-  background: #7ee2a8;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 /* --- empty state --- */
@@ -128,7 +152,7 @@
   margin: 8px 0;
   padding: 40px 0;
   font-size: 17px;
-  color: #5a6b61;
+  color: #fff;
   text-align: center;
 }
 
@@ -146,8 +170,8 @@
   display: block;
   padding: 20px 24px;
   text-decoration: none;
-  background: #fff;
-  border: 1px solid #e4eae6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 16px;
   transition:
     border-color 0.15s ease,
@@ -155,8 +179,8 @@
 }
 
 .search-card__link:hover {
-  border-color: #7ee2a8;
-  box-shadow: 0 6px 20px rgba(10, 49, 20, 0.06);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .search-card__meta {
@@ -165,11 +189,11 @@
   gap: 12px;
   margin-bottom: 10px;
   font-size: 13px;
-  color: #5a6b61;
+  color: #fff;
 }
 
 .search-card__topic {
-  color: #0a3114;
+  color: #fff;
   font-weight: 500;
 }
 
@@ -178,14 +202,14 @@
   font-size: 20px;
   font-weight: 400;
   line-height: 1.25;
-  color: #0a3114;
+  color: #fff;
 }
 
 .search-card__excerpt {
   margin: 0;
   font-size: 15px;
   line-height: 1.5;
-  color: #33463b;
+  color: #fff;
 }
 
 @media (max-width: 760px) {

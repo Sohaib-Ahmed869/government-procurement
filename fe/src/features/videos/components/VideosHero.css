@@ -1,4 +1,6 @@
 .videos-hero {
+  /* The videos page is always award-themed, so the strap stays green even when
+     the global toggle is set to win. */
   background: #0a3114;
   color: #fff;
 }
@@ -24,7 +26,7 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(16px, 1.6vw, 19px);
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.82);
+  color: #fff;
 }
 
 /* Reveal animation — gated so reduced-motion users see the final state at once. */

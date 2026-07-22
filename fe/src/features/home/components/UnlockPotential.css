@@ -99,6 +99,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Shift the framing down so more of the top of the photo shows. */
+  object-position: center 12%;
 }
 
 .uy__banner::after {

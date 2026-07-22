@@ -1,6 +1,8 @@
 .faq {
-  background: #fff;
-  color: #33463b;
+  /* The FAQ page is always award-themed, so it stays green even when the global
+     toggle is set to win. */
+  background: #0a3114;
+  color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
@@ -21,7 +23,7 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: #0a3114;
+  color: #fff;
 }
 
 .faq__subtitle {
@@ -29,7 +31,7 @@
   margin: 18px auto 0;
   font-size: 16px;
   line-height: 1.6;
-  color: #5a6b61;
+  color: #fff;
 }
 
 /* --- category filter pills --- */
@@ -45,21 +47,25 @@
   padding: 9px 18px;
   font: inherit;
   font-size: 14px;
-  color: #33463b;
+  color: #fff;
   cursor: pointer;
-  background: #fff;
-  border: 1px solid #e4eae6;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
 }
 
 .faq__pill:hover {
-  border-color: #7ee2a8;
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .faq__pill.is-active {
-  color: #0a3114;
-  background: #7ee2a8;
-  border-color: #7ee2a8;
+  /* Glass pill — matches the subscribe button. */
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* --- accordion list --- */
@@ -67,11 +73,11 @@
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid #e4eae6;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .faq-item {
-  border-bottom: 1px solid #e4eae6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .faq-item__heading {
@@ -98,13 +104,13 @@
   font-size: 18px;
   font-weight: 500;
   line-height: 1.4;
-  color: #0a3114;
+  color: #fff;
 }
 
 .faq-item__chevron {
   display: inline-flex;
   flex-shrink: 0;
-  color: #5a6b61;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Collapsible panel: grid-rows 0fr -> 1fr gives a height animation the browser
@@ -130,7 +136,7 @@
   padding: 0 4px 24px;
   font-size: 15.5px;
   line-height: 1.7;
-  color: #33463b;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -159,8 +165,8 @@
   margin-top: 48px;
   padding: 28px;
   text-align: center;
-  background: #f4f8f5;
-  border: 1px solid #e4eae6;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
 }
 
@@ -168,7 +174,7 @@
   margin: 0;
   font-size: 17px;
   font-weight: 500;
-  color: #0a3114;
+  color: #fff;
 }
 
 .faq__cta-link {
@@ -176,20 +182,24 @@
   align-items: center;
   padding: 11px 24px;
   font-size: 14px;
-  font-weight: 500;
-  color: #0a3114;
+  font-weight: 600;
   text-decoration: none;
-  background: #7ee2a8;
+  /* Glass pill — matches the subscribe button. */
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease;
 }
 
 .faq__cta-link:hover {
-  background: #6bd196;
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .faq :is(button, a):focus-visible {
-  outline: 2px solid #0a3114;
+  outline: 2px solid #fff;
   outline-offset: 3px;
 }
 

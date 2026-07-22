@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { videosApi, categoriesApi } from '../../../api';
 import './VideosBrowser.css';
@@ -158,7 +159,8 @@ function VideoCard({ video }) {
 }
 
 export default function VideosBrowser() {
-  const { ref, inView } = useInView();
+  const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
   const [category, setCategory] = useState('all');
   const [page, setPage] = useState(1);
 
@@ -213,7 +215,7 @@ export default function VideosBrowser() {
   };
 
   return (
-    <section ref={ref} className={`videos${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`videos${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="videos__inner">
         {catOptions.length > 1 && (
           <div className="videos__filters">
