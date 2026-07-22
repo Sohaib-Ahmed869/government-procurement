@@ -1,0 +1,198 @@
+.ts {
+  --ts-bg: #1a1a1a;
+
+  background: var(--ts-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.ts[data-audience='award'] {
+  --ts-bg: #0a3114;
+}
+
+.ts[data-audience='win'] {
+  --ts-bg: #1a1a1a;
+}
+
+.ts__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 56px 40px;
+}
+
+/* --- header --- */
+.ts__head {
+  text-align: center;
+}
+
+.ts__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.ts__heading {
+  margin: 12px 0 0;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+/* --- grid --- */
+.ts__grid {
+  list-style: none;
+  margin: 44px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.ts-card {
+  display: flex;
+}
+
+.ts-card__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 32px 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Glass border ring — matches the course cards in the Unlock Your Potential
+   section: a 1px gradient, brighter at the top and fading toward the bottom. */
+.ts-card__inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 35%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.ts-card__mark {
+  font-size: 56px;
+  line-height: 0.6;
+  color: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.ts-card__quote {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  flex: 1 1 auto;
+}
+
+.ts-card__cite {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-style: normal;
+}
+
+.ts-card__author {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.ts-card__meta {
+  font-size: 13px;
+  color: #fff;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .ts__eyebrow,
+  .ts__heading,
+  .ts-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .ts.is-in .ts__eyebrow,
+  .ts.is-in .ts__heading,
+  .ts.is-in .ts-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ts.is-in .ts__heading {
+    transition-delay: 0.06s;
+  }
+  .ts.is-in .ts-card:nth-child(1) {
+    transition-delay: 0.14s;
+  }
+  .ts.is-in .ts-card:nth-child(2) {
+    transition-delay: 0.22s;
+  }
+  .ts.is-in .ts-card:nth-child(3) {
+    transition-delay: 0.3s;
+  }
+  .ts.is-in .ts-card:nth-child(n + 4) {
+    transition-delay: 0.36s;
+  }
+}
+
+/* --- hover polish (pointer devices only) --- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ts-card__inner {
+    transition:
+      transform 0.24s ease-out,
+      background-color 0.24s ease-out,
+      border-color 0.24s ease-out;
+  }
+
+  .ts-card__inner:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(126, 226, 168, 0.35);
+  }
+}
+
+@media (max-width: 860px) {
+  .ts__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .ts__inner {
+    padding: 40px 24px;
+  }
+
+  .ts__grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}

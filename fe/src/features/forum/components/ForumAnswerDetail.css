@@ -1,0 +1,107 @@
+/* Additions layered on top of ForumArticle.css for the single-answer view.
+   Breadcrumbs, the "Related questions" block, and the not-found state. */
+
+.forum-article__main .breadcrumbs {
+  margin-bottom: 20px;
+}
+
+.forum-article__main .breadcrumbs__link,
+.forum-article__main .breadcrumbs__current,
+.forum-article__main .breadcrumbs__sep {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.forum-article__main .breadcrumbs__current {
+  color: #fff;
+}
+
+/* --- related questions --- */
+.forum-related {
+  margin-top: 36px;
+}
+
+.forum-related__heading {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.forum-related__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.forum-related__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.forum-related__link:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(126, 226, 168, 0.5);
+  transform: translateY(-2px);
+}
+
+.forum-related__title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.forum-related__tag {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #7ee2a8;
+}
+
+/* --- not found --- */
+.forum-answer-missing__text {
+  margin: 18px 0 24px;
+  max-width: 46ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.forum-answer-missing__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0a3114;
+  background: #7ee2a8;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.25s ease;
+}
+
+.forum-answer-missing__link:hover {
+  opacity: 0.88;
+}
+
+@media (max-width: 720px) {
+  .forum-related__title {
+    font-size: 17px;
+  }
+
+  .forum-answer-missing__text {
+    font-size: 18px;
+  }
+}

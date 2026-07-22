@@ -1,0 +1,493 @@
+.uy {
+  --uy-bg: #1a1a1a;
+
+  background: var(--uy-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.uy[data-audience='award'] {
+  --uy-bg: #0a3114;
+}
+
+.uy[data-audience='win'] {
+  --uy-bg: #1a1a1a;
+}
+
+.uy__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 40px 96px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .uy__eyebrow,
+  .uy__heading,
+  .uy__banner,
+  .uy__card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .uy.is-in .uy__eyebrow,
+  .uy.is-in .uy__heading,
+  .uy.is-in .uy__banner,
+  .uy.is-in .uy__card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .uy.is-in .uy__heading {
+    transition-delay: 0.08s;
+  }
+  .uy.is-in .uy__banner {
+    transition-delay: 0.16s;
+  }
+  .uy.is-in .uy__left .uy__card:nth-child(1) {
+    transition-delay: 0.24s;
+  }
+  .uy.is-in .uy__left .uy__card:nth-child(2) {
+    transition-delay: 0.32s;
+  }
+  .uy.is-in .uy__courses .uy__card:nth-child(1) {
+    transition-delay: 0.26s;
+  }
+  .uy.is-in .uy__courses .uy__card:nth-child(2) {
+    transition-delay: 0.32s;
+  }
+  .uy.is-in .uy__courses .uy__card:nth-child(3) {
+    transition-delay: 0.38s;
+  }
+  .uy.is-in .uy__card--wide {
+    transition-delay: 0.36s;
+  }
+}
+
+.uy__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.uy__heading {
+  margin: 14px 0 0;
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+/* --- featured banner --- */
+.uy__banner {
+  position: relative;
+  overflow: hidden;
+  margin-top: 32px;
+  border-radius: 14px;
+  min-height: 300px;
+}
+
+.uy__banner-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Shift the framing down so more of the top of the photo shows. */
+  object-position: center 12%;
+}
+
+.uy__banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+.uy__banner-body {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 32px;
+  max-width: 460px;
+}
+
+.uy__banner-title {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.uy__banner-sub {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: #fff;
+}
+
+.uy__watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 100px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.uy__watch-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  flex: none;
+}
+
+/* --- bento grid --- */
+.uy__bento {
+  display: grid;
+  grid-template-columns: 1.5fr 3fr;
+  gap: 18px;
+  margin-top: 64px;
+  align-items: stretch;
+}
+
+.uy__left {
+  display: grid;
+  grid-template-rows: 1.1fr 1fr;
+  gap: 30px;
+}
+
+.uy__right {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+}
+
+.uy__courses {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* --- cards --- */
+.uy__card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #fff;
+  min-height: 150px;
+}
+
+/* Subtle glass border: a 1px gradient ring, brighter at the top and fading
+   toward the bottom. */
+.uy__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 35%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.uy__card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Green wash so the placeholder photo reads on-brand. */
+.uy__card-tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 49, 20, 0.55) 0%, rgba(10, 49, 20, 0.8) 100%);
+}
+
+/* Neutral (non-green) cards — matches the top-left and wide cards in the design. */
+.uy__card--neutral .uy__card-tint {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+/* Award variant green cards (Figma): black 80% + green #0E9813 20% over the
+   image. The win variant keeps the lighter wash. */
+.uy[data-audience='award'] .uy__card:not(.uy__card--neutral) .uy__card-tint {
+  background:
+    linear-gradient(rgba(20, 168, 30, 0.34), rgba(20, 168, 30, 0.34)),
+    linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.58));
+}
+
+.uy__card-body {
+  position: relative;
+  z-index: 1;
+  padding: 22px;
+}
+
+.uy__card-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: #fff;
+}
+
+.uy__card-title {
+  margin: 10px 0 0;
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 500;
+  line-height: 1.15;
+  max-width: 14ch;
+}
+
+.uy__card-title--sm {
+  font-size: 17px;
+  max-width: 16ch;
+}
+
+.uy__card--course {
+  min-height: 243px;
+}
+
+/* course cards: arrow sits at the bottom-left */
+.uy__card--course .uy__arrow {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  z-index: 1;
+}
+
+/* feature cards: arrow sits at the right, vertically centred */
+.uy__card--feature .uy__arrow {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.uy__card--wide {
+  min-height: 86px;
+}
+
+.uy__card--wide .uy__card-body {
+  max-width: 70%;
+  padding: 18px 22px;
+}
+
+/* wide card: title and arrow sit inline, label below */
+.uy__wide-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.uy__card--wide .uy__card-title {
+  max-width: none;
+}
+
+/* --- arrow circle --- */
+.uy__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.uy__arrow img {
+  display: block;
+}
+
+/* --- card + button hover polish (pointer devices only) --- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .uy__card {
+    transition:
+      transform 0.24s ease-out,
+      box-shadow 0.24s ease-out;
+  }
+
+  .uy__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
+  }
+
+  /* Slow zoom on the card photo, clipped by the card's overflow. */
+  .uy__card-img {
+    transition: transform 0.4s ease-out;
+  }
+
+  .uy__card:hover .uy__card-img {
+    transform: scale(1.05);
+  }
+
+  /* Arrow disc nudges toward its edge; feature arrows keep their vertical centring. */
+  .uy__arrow {
+    transition: transform 0.24s ease-out;
+  }
+
+  .uy__card--course:hover .uy__arrow,
+  .uy__card--wide:hover .uy__arrow {
+    transform: translateX(3px);
+  }
+
+  .uy__card--feature:hover .uy__arrow {
+    transform: translateY(-50%) translateX(3px);
+  }
+
+  /* Featured-banner "watch" pill: gentle lift + brighten. */
+  .uy__watch {
+    transition:
+      transform 0.2s ease-out,
+      background-color 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .uy__watch:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.26);
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+.uy :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Pagination dots — shown only in the mobile carousel. */
+.uy__dots {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .uy__inner {
+    padding: 20px 24px 56px;
+  }
+
+  .uy__heading {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(36px, 10.5vw, 48px);
+  }
+
+  .uy__banner-body {
+    padding: 24px;
+    max-width: none;
+  }
+
+  /* --- bento becomes a horizontal snap carousel --- */
+  .uy__bento {
+    display: flex;
+    grid-template-columns: none;
+    gap: 16px;
+    margin-top: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .uy__bento::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Flatten the nested grids so every card is a direct carousel item. */
+  .uy__left,
+  .uy__right,
+  .uy__courses {
+    display: contents;
+  }
+
+  /* Uniform cards: fixed slice of the width (peek of the next), content pinned
+     to the bottom, arrow bottom-right. */
+  .uy__card,
+  .uy__card--course,
+  .uy__card--wide {
+    flex: 0 0 86%;
+    min-height: 300px;
+    scroll-snap-align: start;
+  }
+
+  .uy__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .uy__card .uy__arrow {
+    position: absolute;
+    right: 22px;
+    bottom: 22px;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+
+  .uy__card--wide .uy__card-body {
+    max-width: none;
+  }
+
+  /* --- pagination dots --- */
+  .uy__dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .uy__dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition:
+      width 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .uy__dot.is-active {
+    width: 28px;
+    background: #fff;
+  }
+}

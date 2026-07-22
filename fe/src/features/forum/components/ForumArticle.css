@@ -1,0 +1,213 @@
+.forum-article {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.forum-article__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 64px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 40px 40px 96px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .forum-article__title,
+  .forum-article__meta,
+  .forum-article__box,
+  .forum-article .forum-sidebar {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .forum-article.is-in .forum-article__title {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.05s;
+  }
+  .forum-article.is-in .forum-article__meta {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.12s;
+  }
+  .forum-article.is-in .forum-article__box:nth-of-type(1) {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.2s;
+  }
+  .forum-article.is-in .forum-article__box:nth-of-type(2) {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.3s;
+  }
+  .forum-article.is-in .forum-sidebar {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.15s;
+  }
+}
+
+.forum-article__title {
+  margin: 0;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.forum-article__meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.forum-article__date {
+  font-size: 13px;
+  color: #fff;
+}
+
+/* --- filled tag box (matches the sidebar category boxes) --- */
+.forum-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+}
+
+/* --- glass boxes: same edge treatment as the Contact page field boxes --- */
+.forum-article__box {
+  margin-top: 20px;
+  padding: 26px 28px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.forum-article__box-heading {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.forum-article__q {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.forum-article__p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.forum-article__lesson-label {
+  margin: 20px 0 8px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.forum-article__lesson {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.forum-article__lesson li {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .forum-article__inner {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  /* The sidebar is reachable from the hero's categories button at these widths,
+     so it isn't repeated in the flow. */
+  .forum-article .forum-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .forum-article__inner {
+    padding: 24px 16px 56px;
+  }
+
+  /* Shared with the forum hero and submit page headings. */
+  .forum-article__title {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(34px, 10vw, 46px);
+    line-height: 1.12;
+  }
+
+  /* The tag and date are already implied by the question card below. */
+  .forum-article__meta {
+    display: none;
+  }
+
+  .forum-article__box {
+    margin-top: 40px;
+    padding: 22px 20px 26px;
+    border-radius: 22px;
+  }
+
+  .forum-article__box-heading {
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+
+  /* Body copy matches the footer blurb. */
+  .forum-article__q,
+  .forum-article__p,
+  .forum-article__lesson-label,
+  .forum-article__lesson li {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  /* Answer body: paragraphs separated by a blank line. */
+  .forum-article__p {
+    margin-bottom: 20px;
+  }
+
+  .forum-article__lesson-label {
+    margin: 24px 0 0;
+  }
+
+  /* The lesson reads as running lines rather than a bulleted list. */
+  .forum-article__lesson {
+    padding-left: 0;
+    gap: 0;
+    list-style: none;
+  }
+}

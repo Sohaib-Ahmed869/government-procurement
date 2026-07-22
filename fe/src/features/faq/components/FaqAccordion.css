@@ -1,0 +1,281 @@
+/* FAQ content section — matches the site's inner pages: dark-green surface,
+   Geist type, glass filter pills and the shared 1440 layout. The page hero
+   (title + subtitle) lives in FaqHero. */
+.faq {
+  background: #0a3114;
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.faq__inner {
+  /* Content is left-aligned to the hero, held to a readable measure. */
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 40px 88px;
+}
+
+.faq__column {
+  max-width: 860px;
+}
+
+/* --- category filter pills (glass, matching Insights/Forum) --- */
+.faq__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 28px;
+}
+
+.faq__pill {
+  padding: 8px 18px;
+  font: inherit;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 0;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  transition:
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.faq__pill:hover {
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+}
+
+.faq__pill.is-active {
+  color: #0a3114;
+  background: #7ee2a8;
+  box-shadow: none;
+}
+
+/* Status messages (loading / error / empty). */
+.faq__subtitle {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* --- accordion list --- */
+.faq__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.faq-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.faq-item__heading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.faq-item__button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 22px 4px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.faq-item__question {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #fff;
+}
+
+.faq-item__chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.faq-item__button:hover .faq-item__question {
+  color: #7ee2a8;
+}
+
+/* Collapsible panel: grid-rows 0fr -> 1fr gives a height animation the browser
+   can interpolate. The inner wrapper hides overflow while it collapses. */
+.faq-item__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.faq-item.is-open .faq-item__panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.faq-item.is-open .faq-item__question {
+  color: #7ee2a8;
+}
+
+.faq-item__answer {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.faq-item__answer p {
+  margin: 0;
+  padding: 0 4px 24px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .faq-item__chevron {
+    transition: transform 0.22s ease;
+  }
+
+  .faq-item.is-open .faq-item__chevron {
+    transform: rotate(180deg);
+    color: #7ee2a8;
+  }
+
+  .faq-item__panel {
+    transition:
+      grid-template-rows 0.3s ease,
+      opacity 0.3s ease;
+  }
+}
+
+/* --- CTA --- */
+.faq__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  margin-top: 48px;
+  padding: 26px 30px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+.faq__cta-text {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.faq__cta-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  /* Glass pill — matches the Subscribe button in the footer. */
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.faq__cta-link:hover,
+.faq__cta-link:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Hover polish — matches the Subscribe button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .faq__cta-link {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .faq__cta-link:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+.faq :is(button, a):focus-visible {
+  outline: 2px solid #7ee2a8;
+  outline-offset: 3px;
+}
+
+/* --- on-enter reveal --- */
+@media (prefers-reduced-motion: no-preference) {
+  .faq__filters,
+  .faq__list,
+  .faq__cta {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .faq__filters {
+    transition-delay: 0.04s;
+  }
+
+  .faq__list {
+    transition-delay: 0.12s;
+  }
+
+  .faq__cta {
+    transition-delay: 0.2s;
+  }
+
+  .faq.is-in .faq__filters,
+  .faq.is-in .faq__list,
+  .faq.is-in .faq__cta {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .faq__inner {
+    padding: 8px 24px 64px;
+  }
+
+  .faq-item__question {
+    font-size: 16.5px;
+  }
+
+  .faq__cta {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+}

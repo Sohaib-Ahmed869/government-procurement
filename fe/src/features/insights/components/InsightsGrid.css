@@ -1,0 +1,453 @@
+.insights {
+  background: #0a3114;
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.insights__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px 88px;
+}
+
+/* --- filter pills --- */
+.insights__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.insights-pill {
+  position: relative;
+}
+
+.insights-pill__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  /* Same glass pill as the forum "Submit a question" button. */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 0;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  transition: box-shadow 0.15s ease;
+}
+
+.insights-pill__button:hover {
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+}
+
+.insights-pill__chevron {
+  display: inline-flex;
+  transition: transform 0.18s ease;
+}
+
+.insights-pill__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.insights-pill__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 190px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #0e3e1b;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.insights-pill__option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+}
+
+.insights-pill__option:hover,
+.insights-pill__option.is-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* --- grid --- */
+.insights__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insights-card {
+  /* Portrait tiles, matching the design's 4-up rhythm. */
+  aspect-ratio: 0.72;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .insights-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Stagger down the grid as it scrolls in. */
+    transition-delay: calc(var(--i) * 60ms);
+  }
+
+  .insights.is-in .insights-card {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.insights-card__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Content anchored to the bottom; the reveal grows the block upward. */
+  justify-content: flex-end;
+  height: 100%;
+  padding: 20px;
+  overflow: hidden;
+  background: #0e3e1b;
+  border-radius: 20px;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Status / empty message shown while insights load or when none exist. */
+.insights__empty {
+  margin: 0;
+  padding: 40px 0;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.insights-card__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Two stacked scrims: a base bottom-gradient that keeps the title legible on
+   the photo by default, and a full-card dark scrim that fades in on hover so
+   every tile "becomes" the rich dark card. */
+.insights-card__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.insights-card__scrim--base {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.74) 0%,
+    rgba(0, 0, 0, 0.28) 38%,
+    rgba(0, 0, 0, 0) 66%
+  );
+}
+.insights-card__scrim--full {
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.82),
+    rgba(0, 0, 0, 0.68) 45%,
+    rgba(0, 0, 0, 0.82)
+  );
+}
+
+.insights-card__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.insights-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+
+.insights-card__topic {
+  padding: 4px 10px;
+  color: #fff;
+  /* Figma: FFFFFF @ 20%. */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+.insights-card__date {
+  color: #fff;
+}
+
+.insights-card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.32;
+  color: #fff;
+}
+
+.insights-card__excerpt {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.65;
+  color: #fff;
+}
+
+/* Meta sits above the title. */
+.insights-card__meta-slot {
+  order: -1;
+}
+
+/* --- default → hover morph: title always shows; meta/excerpt/CTA expand and
+   the full scrim fades in so the whole card darkens. --- */
+.insights-card__reveal {
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.insights-card__inner:hover .insights-card__reveal,
+.insights-card__inner:focus-visible .insights-card__reveal,
+.insights-card__inner:focus-within .insights-card__reveal {
+  max-height: 180px;
+  opacity: 1;
+}
+.insights-card__inner:hover .insights-card__scrim--full,
+.insights-card__inner:focus-within .insights-card__scrim--full {
+  opacity: 1;
+}
+
+/* Spacing only applies once revealed, so the collapsed state stays tight. */
+.insights-card__inner:hover .insights-card__meta-slot,
+.insights-card__inner:focus-within .insights-card__meta-slot {
+  margin-bottom: 10px;
+}
+.insights-card__inner:hover .insights-card__excerpt,
+.insights-card__inner:focus-within .insights-card__excerpt {
+  margin-top: 12px;
+}
+.insights-card__inner:hover .insights-card__cta,
+.insights-card__inner:focus-within .insights-card__cta {
+  margin-top: 16px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .insights-card__inner {
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+  }
+  .insights-card__art {
+    transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .insights-card__scrim--full {
+    transition: opacity 0.35s ease;
+  }
+  .insights-card__reveal {
+    transform: translateY(6px);
+    transition: max-height 0.32s ease, opacity 0.28s ease, transform 0.32s ease,
+      margin 0.28s ease;
+  }
+  .insights-card__inner:hover .insights-card__reveal,
+  .insights-card__inner:focus-within .insights-card__reveal {
+    transform: none;
+  }
+  .insights-card__inner:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -14px rgba(0, 0, 0, 0.55);
+  }
+  .insights-card__inner:hover .insights-card__art {
+    transform: scale(1.06);
+  }
+}
+
+.insights-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 7px 7px 7px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  /* Matches the contact page "Send now" button: white 20% fill, radius 100,
+     glass blur + top highlight. */
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.insights-card__cta:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.insights-card__cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.insights-card__cta-icon img {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.insights :is(button):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .insights__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .insights__inner {
+    padding: 0 24px 64px;
+  }
+
+  .insights-card {
+    aspect-ratio: 0.85;
+  }
+
+  .insights-card__excerpt {
+    font-size: 12px;
+  }
+}
+
+/* Pagination dots — shown only in the mobile carousel. */
+.insights__dots {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .insights__inner {
+    padding: 0 16px 56px;
+  }
+
+  /* Filter pills stack on their own rows. */
+  .insights__filters {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* --- grid becomes a horizontal snap carousel --- */
+  .insights__grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .insights__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .insights-card {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    aspect-ratio: 0.78;
+  }
+
+  /* Touch has no hover, so show the full rich state by default in the
+     carousel — every card reads like the darkened hover tile. */
+  .insights-card__reveal {
+    max-height: 220px;
+    opacity: 1;
+    transform: none;
+  }
+  .insights-card__scrim--full {
+    opacity: 1;
+  }
+  .insights-card__meta-slot {
+    margin-bottom: 10px;
+  }
+  .insights-card__excerpt {
+    margin-top: 12px;
+  }
+  .insights-card__cta {
+    margin-top: 16px;
+  }
+  .insights-card__title {
+    font-size: 24px;
+  }
+
+  .insights__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .insights__dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.32);
+    border: 0;
+    border-radius: 100px;
+    transition:
+      width 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .insights__dot.is-active {
+    width: 26px;
+    background: #fff;
+  }
+}

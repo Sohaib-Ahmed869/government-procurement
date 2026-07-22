@@ -1,0 +1,76 @@
+.forum-sidebar__heading {
+  margin: 0 0 18px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.forum-sidebar__cats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* Filled, softly-rounded category boxes. */
+.forum-cat {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+  transition: background-color 0.15s ease;
+}
+
+.forum-cat:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.forum-cat.is-active {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* Separators above and below the Featured Questions list. */
+.forum-sidebar__divider {
+  height: 0;
+  margin: 28px 0;
+  border: 0;
+  border-top: 2px solid #fff;
+}
+
+.forum-sidebar__featured {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.forum-sidebar__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.forum-sidebar__link:hover {
+  opacity: 0.8;
+}
+
+.forum-sidebar__arrow {
+  flex: none;
+  color: #fff;
+}
+
+.forum-sidebar :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}

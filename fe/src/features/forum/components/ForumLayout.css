@@ -1,0 +1,39 @@
+.forum-page {
+  position: relative;
+  overflow: hidden;
+  background: #0a3114;
+}
+
+/* Corner wave, top-right — same placement as the Contact page. */
+.forum-page__wave {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: auto;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+/* The phone wave is the mobile-only variant. */
+.forum-page__wave--phone {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  /* Swap in the phone wave; the hero's top padding below clears it. */
+  .forum-page__wave {
+    display: none;
+  }
+
+  .forum-page__wave--phone {
+    display: block;
+    width: 230px;
+    /* Above the hero (z-index 1) so the wave sweeps over the search row and
+       buttons rather than behind them. It's pointer-events: none, so the
+       controls underneath stay clickable. */
+    z-index: 2;
+  }
+}
