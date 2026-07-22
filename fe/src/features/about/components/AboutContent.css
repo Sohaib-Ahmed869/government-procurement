@@ -79,13 +79,13 @@
   max-width: 720px;
   font-size: clamp(18px, 2.2vw, 22px);
   line-height: 1.55;
-  color: #7ee2a8;
+  color: #fff;
 }
 
-/* ===== our story (light) ===== */
+/* ===== our story (dark green) ===== */
 .about-story {
-  background: #fff;
-  color: #33463b;
+  background: #0a3114;
+  color: #fff;
 }
 
 .about-story__inner {
@@ -108,7 +108,7 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: #0a3114;
+  color: #fff;
 }
 
 .about-story__body {
@@ -119,7 +119,7 @@
   margin: 0 0 22px;
   font-size: 19px;
   line-height: 1.6;
-  color: #33463b;
+  color: #fff;
 }
 
 .about-story__para:last-child {
@@ -140,7 +140,7 @@
   margin: 0 0 22px;
   font-size: 19px;
   line-height: 1.6;
-  color: #33463b;
+  color: #fff;
 }
 
 .about-story__html h2,
@@ -149,7 +149,7 @@
   font-weight: 400;
   line-height: 1.15;
   letter-spacing: -0.01em;
-  color: #0a3114;
+  color: #fff;
 }
 
 .about-story__html h2 {
@@ -161,7 +161,7 @@
 }
 
 .about-story__html a {
-  color: #0a3114;
+  color: #fff;
   text-decoration: underline;
 }
 
@@ -214,19 +214,19 @@
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: #7ee2a8;
+  color: #fff;
 }
 
 .about-stat__label {
   font-size: 16px;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff;
 }
 
-/* ===== what we value (light) ===== */
+/* ===== what we value (dark green) ===== */
 .about-values {
-  background: #fff;
-  color: #33463b;
+  background: #0a3114;
+  color: #fff;
 }
 
 .about-values__inner {
@@ -242,7 +242,7 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
-  color: #0a3114;
+  color: #fff;
 }
 
 .about-values__grid {
@@ -258,8 +258,11 @@
 .about-value {
   padding: 32px;
   border-radius: 16px;
-  border: 1px solid #e4eae6;
-  background: #fff;
+  /* Glass card — matches the impact stat cards above. */
+  background: rgba(241, 238, 234, 0.05);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
 }
 
 .about-value__title {
@@ -267,14 +270,14 @@
   font-size: 22px;
   font-weight: 500;
   line-height: 1.2;
-  color: #0a3114;
+  color: #fff;
 }
 
 .about-value__body {
   margin: 0;
   font-size: 17px;
   line-height: 1.55;
-  color: #5a6b61;
+  color: #fff;
 }
 
 /* ===== closing CTA band (dark green) ===== */
@@ -303,27 +306,72 @@
   max-width: 620px;
   font-size: 19px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff;
 }
 
+/* Glass pill with a leading arrow disc — exactly like the homepage
+   "Book a Consultation" button. */
 .about-cta__button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 16px;
   margin-top: 32px;
-  padding: 16px 32px;
-  border-radius: 999px;
-  background: #7ee2a8;
-  color: #0a3114;
-  font-size: 17px;
+  padding: 10px 30px 10px 10px;
+  font-size: 18px;
   font-weight: 500;
+  color: #fff;
   text-decoration: none;
-  transition: transform 0.2s ease, background 0.2s ease;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  border-radius: 100px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
 }
 
 .about-cta__button:hover {
-  background: #6ad294;
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.about-cta__circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.about-cta__circle img {
+  display: block;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .about-cta__button {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .about-cta__button:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .about-cta__circle {
+    transition: transform 0.2s ease-out;
+  }
+
+  .about-cta__button:hover .about-cta__circle {
+    transform: translateX(-2px);
+  }
 }
 
 /* ===== responsive ===== */

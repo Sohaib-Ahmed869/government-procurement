@@ -1,7 +1,17 @@
 .li {
-  background: #fff;
-  color: #33463b;
+  --li-bg: #1a1a1a;
+
+  background: var(--li-bg);
+  color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.li[data-audience='award'] {
+  --li-bg: #0a3114;
+}
+
+.li[data-audience='win'] {
+  --li-bg: #1a1a1a;
 }
 
 .li__inner {
@@ -24,7 +34,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #0a3114;
+  color: #fff;
 }
 
 .li__heading {
@@ -33,7 +43,7 @@
   font-weight: 400;
   line-height: 1.06;
   letter-spacing: -0.01em;
-  color: #0a3114;
+  color: #fff;
 }
 
 .li__viewall {
@@ -44,7 +54,7 @@
   padding-bottom: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: #0a3114;
+  color: #fff;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -74,9 +84,19 @@
   border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
-  color: inherit;
-  background: #fff;
-  border: 1px solid rgba(10, 49, 20, 0.1);
+  color: #fff;
+  /* Grey card for the win-contract audience (default). */
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Award-contract audience: match the translucent glass boxes on the Courses page. */
+.li[data-audience='award'] .li-card__inner {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
 }
 
 .li-card__media {
@@ -116,11 +136,11 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #0a3114;
+  color: #fff;
 }
 
 .li-card__date {
-  color: #6a7d72;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .li-card__title {
@@ -128,14 +148,14 @@
   font-size: 19px;
   font-weight: 500;
   line-height: 1.25;
-  color: #0a3114;
+  color: #fff;
 }
 
 .li-card__excerpt {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: #4c5f54;
+  color: rgba(255, 255, 255, 0.75);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -192,8 +212,8 @@
 
   .li-card__inner:hover {
     transform: translateY(-4px);
-    border-color: rgba(10, 49, 20, 0.2);
-    box-shadow: 0 14px 32px rgba(10, 49, 20, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
   }
 
   .li-card__art {
@@ -214,7 +234,7 @@
 }
 
 .li a:focus-visible {
-  outline: 2px solid #0a3114;
+  outline: 2px solid #fff;
   outline-offset: 3px;
 }
 

@@ -9,7 +9,9 @@ export default function TenderPortalsPage() {
 
   return (
     <div className="tenders-scale">
-      <PageLayout>
+      {/* Tender portals are only relevant to the Win Contracts segment, so the
+          page is pinned to win and the win/award toggle is hidden. */}
+      <PageLayout showToggle={false} audience="win">
         <TenderPortals key={audience} />
       </PageLayout>
     </div>

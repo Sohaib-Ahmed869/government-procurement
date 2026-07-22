@@ -1,5 +1,7 @@
+import { useLocation } from 'react-router-dom';
 import logo from '../../assets/images/GovProcurementLogo.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
+import { AUDIENCE } from '../../constants/audiences.js';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
 import './Footer.css';
 
@@ -12,6 +14,8 @@ const LINK_COLUMNS = [
       { label: 'FAQ', href: '/faq' },
       { label: 'About', href: '/about' },
       { label: 'Contact Us', href: '/contact' },
+      { label: 'Privacy', href: '/privacy' },
+      { label: 'Terms', href: '/terms' },
     ],
   },
   {
@@ -58,9 +62,33 @@ const FLAT_ROWS = [
   ],
 ];
 
+// Pages that carry the win/award toggle — the only place the win-only
+// "Explore Tender Websites" link is relevant.
+const TOGGLE_PATHS = ['/', '/advisory'];
+
 export default function Footer({ audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
+  const { pathname } = useLocation();
+
+  // The "Explore Tender Websites" link only makes sense to the Win Contracts
+  // audience, and only on a page where they can actually switch segment (home /
+  // advisory). Everywhere else it's filtered out of the mobile flat rows.
+  const showTenderPortals = audience === AUDIENCE.WIN && TOGGLE_PATHS.includes(pathname);
+
+  // Re-flow the remaining links into rows using the full layout's row sizes as
+  // the target line lengths, so when the tender link is removed the links below
+  // pull up to fill its line rather than leaving a short, gappy row.
+  const links = FLAT_ROWS.flat().filter(
+    ({ href }) => href !== '/tender-portals' || showTenderPortals,
+  );
+  const flatRows = [];
+  let cursor = 0;
+  for (const size of FLAT_ROWS.map((row) => row.length)) {
+    if (cursor >= links.length) break;
+    flatRows.push(links.slice(cursor, cursor + size));
+    cursor += size;
+  }
 
   return (
     <footer className="site-footer" data-audience={audience}>
@@ -97,7 +125,7 @@ export default function Footer({ audience: audienceProp }) {
         </nav>
 
         <nav className="site-footer__flat" aria-label="Footer">
-          {FLAT_ROWS.map((row) => (
+          {flatRows.map((row) => (
             <ul className="site-footer__flat-row" key={row[0].label}>
               {row.map(({ label, href }) => (
                 <li key={label}>

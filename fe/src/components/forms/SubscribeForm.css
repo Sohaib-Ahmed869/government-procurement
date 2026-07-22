@@ -19,7 +19,7 @@
   margin: 8px 0 18px;
   font-size: 13.5px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.78);
+  color: #fff;
 }
 
 .subscribe-form__form {
@@ -82,17 +82,39 @@
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  color: #0a3114;
-  background: var(--mint);
-  border: 1px solid var(--mint);
+  /* Glass pill — matches the WhatsApp / Book a Consultation buttons on the homepage. */
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
   border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: filter 0.15s ease, opacity 0.15s ease;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
 }
 
 .subscribe-form__button:hover:not(:disabled),
 .subscribe-form__button:focus-visible:not(:disabled) {
-  filter: brightness(1.06);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Hover polish — matches the homepage "Book a Consultation" button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .subscribe-form__button {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out,
+      opacity 0.15s ease;
+  }
+
+  .subscribe-form__button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
 }
 
 .subscribe-form__button:focus-visible {
@@ -116,10 +138,16 @@
   padding: 12px 16px;
   font-size: 13.5px;
   line-height: 1.5;
-  color: var(--mint);
-  background: rgba(126, 226, 168, 0.1);
-  border: 1px solid rgba(126, 226, 168, 0.32);
+  color: #fff;
+  /* Glass edge — matches the boxes below Expertise on the Our Expertise page. */
+  background: rgba(241, 238, 234, 0.05);
+  border: 0;
   border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
 }
 
 @media (max-width: 480px) {

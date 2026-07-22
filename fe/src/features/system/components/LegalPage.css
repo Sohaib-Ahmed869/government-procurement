@@ -1,7 +1,7 @@
 .legal {
   flex: 1 0 auto;
   background: #0a3114;
-  color: rgba(255, 255, 255, 0.86);
+  color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
@@ -32,14 +32,14 @@
 .legal__updated {
   margin: 14px 0 0;
   font-size: 13px;
-  color: #7ee2a8;
+  color: #fff;
 }
 
 .legal__intro {
   margin: 18px 0 0;
   font-size: 17px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 
 .legal__body {
@@ -54,14 +54,14 @@
   margin: 0 0 12px;
   font-size: 22px;
   font-weight: 500;
-  color: #7ee2a8;
+  color: #fff;
 }
 
 .legal__p {
   margin: 0 0 14px;
   font-size: 15px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
+  color: #fff;
 }
 
 .legal__list {
@@ -73,7 +73,7 @@
   margin-bottom: 8px;
   font-size: 15px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
+  color: #fff;
 }
 
 @media (max-width: 760px) {

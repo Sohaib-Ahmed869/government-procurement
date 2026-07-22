@@ -1,9 +1,17 @@
 .ts {
-  --ts-bg: #0a3114;
+  --ts-bg: #1a1a1a;
 
   background: var(--ts-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.ts[data-audience='award'] {
+  --ts-bg: #0a3114;
+}
+
+.ts[data-audience='win'] {
+  --ts-bg: #1a1a1a;
 }
 
 .ts__inner {
@@ -23,7 +31,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #7ee2a8;
+  color: #fff;
 }
 
 .ts__heading {
@@ -59,13 +67,38 @@
   padding: 32px 28px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(126, 226, 168, 0.18);
+}
+
+/* Glass border ring — matches the course cards in the Unlock Your Potential
+   section: a 1px gradient, brighter at the top and fading toward the bottom. */
+.ts-card__inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 35%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .ts-card__mark {
   font-size: 56px;
   line-height: 0.6;
-  color: #7ee2a8;
+  color: #fff;
   font-family: Georgia, 'Times New Roman', serif;
 }
 
@@ -92,7 +125,7 @@
 
 .ts-card__meta {
   font-size: 13px;
-  color: #7ee2a8;
+  color: #fff;
 }
 
 /* --- reveal on scroll-in --- */

@@ -1,7 +1,7 @@
 import { useInView } from '../../../hooks/useInView.js';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
-import bg from '../../../assets/images/MainPictureHomepage.png';
+import bg from '../../../assets/images/OurexpertiseEnhance.png';
 import wave from '../../../assets/images/EnhanceExpWave.png';
 import './EnhanceBanner.css';
 

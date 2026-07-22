@@ -615,7 +615,17 @@
     display: flex;
   }
 
+  /* Anchor the overlay directly below the top bar (rather than to the viewport
+     with a hardcoded top padding), so a taller bar — e.g. when the CMS
+     announcement banner pushes the header down — can't overlap the search bar. */
   .site-header__mobile {
     display: block;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    height: 100vh;
+    padding: 28px 28px 48px;
   }
 }
