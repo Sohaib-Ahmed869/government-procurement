@@ -115,6 +115,11 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
+/* --- primary media (the main video/image at the top of the page) --- */
+.cd-primary { margin-top: 24px; }
+.cd-primary .cd-media__frame { border-radius: 16px; }
+.cd-primary .cd-media__cap { font-size: 14px; }
+
 /* --- course materials (videos / youtube / images / pdfs) --- */
 .cd-materials { margin-top: 32px; }
 .cd-materials__title {
@@ -124,16 +129,16 @@
   letter-spacing: -0.01em;
   color: #fff;
 }
-.cd-materials__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Materials stack vertically for a clear, readable list. */
+.cd-materials__list {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 .cd-media { margin: 0; min-width: 0; }
-/* Video/YouTube span the full width for comfortable viewing. */
-.cd-media--player { grid-column: 1 / -1; }
 .cd-media__frame {
   position: relative;
+  display: block;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
   overflow: hidden;
@@ -141,7 +146,8 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .cd-media__frame iframe,
-.cd-media__frame video {
+.cd-media__frame video,
+.cd-media__frame img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -151,17 +157,12 @@
   object-fit: contain;
   background: #000;
 }
-.cd-media--image a { display: block; }
-.cd-media--image img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
+/* Images use cover for a fuller look, and gently zoom on hover. */
+.cd-media--image .cd-media__frame img {
   object-fit: cover;
-  border-radius: 14px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   transition: transform 0.3s ease;
 }
-.cd-media--image a:hover img { transform: scale(1.02); }
+.cd-media--image .cd-media__frame:hover img { transform: scale(1.02); }
 .cd-media__cap {
   margin-top: 8px;
   font-size: 13.5px;
@@ -194,7 +195,7 @@
   background: var(--admin-mint, #7ee2a8);
 }
 .cd-media__pdf-icon svg { width: 22px; height: 22px; }
-.cd-media__pdf-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cd-media__pdf-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .cd-media__pdf-text strong {
   font-size: 14.5px;
   font-weight: 600;
@@ -204,9 +205,17 @@
   white-space: nowrap;
 }
 .cd-media__pdf-text span { font-size: 12.5px; color: rgba(255, 255, 255, 0.6); }
+.cd-media__pdf-arrow {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.cd-media--pdf:hover .cd-media__pdf-arrow { color: #7ee2a8; transform: translate(2px, -2px); }
 
 @media (max-width: 640px) {
-  .cd-materials__grid { grid-template-columns: 1fr; }
+  /* materials already stack vertically at all sizes */
 }
 
 /* --- info panels (What you'll learn / Requirements) --- */
@@ -320,10 +329,21 @@
     inset -1px -1px 1px rgba(255, 255, 255, 0.06);
 }
 
+.cd-buy__eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7ee2a8;
+}
+
 .cd-buy__title {
   margin: 0;
   font-size: 26px;
   font-weight: 700;
+  line-height: 1.15;
 }
 
 .cd-buy__blurb {
@@ -378,15 +398,20 @@
 }
 
 .cd-buy__group-label {
-  margin: 18px 0 10px;
-  font-size: 13px;
-  font-weight: 600;
+  margin: 20px 0 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .cd-buy__list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 11px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -395,9 +420,15 @@
 .cd-buy__row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 13.5px;
+  gap: 11px;
+  font-size: 14px;
   color: #fff;
+}
+.cd-buy__row svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  color: #7ee2a8;
 }
 
 .cd-book {
