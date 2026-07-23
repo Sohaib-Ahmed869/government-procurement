@@ -52,7 +52,10 @@ function PublicSite() {
           {/* Public */}
           <Route path="/" element={<HomePage />} />
           <Route path="/advisory" element={<AdvisoryServicesPage />} />
+          {/* Tender portals: one page, two lists driven by the URL. */}
           <Route path="/tender-portals" element={<TenderPortalsPage />} />
+          <Route path="/aus-list" element={<TenderPortalsPage />} />
+          <Route path="/featured-list" element={<TenderPortalsPage />} />
           <Route path="/our-expertise" element={<ExpertisePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/courses" element={<CoursesPage />} />

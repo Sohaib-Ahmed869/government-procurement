@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { label: 'Courses', href: '/courses' },
   { label: 'Resources', href: '/resources' },
   { label: 'Forum', href: '/forum' },
-  { label: 'Explore Tender Websites', href: '/tender-portals' },
+  { label: 'Explore Tender Websites', href: '/aus-list' },
 ];
 
 export default function Header({ showToggle = true, audience: audienceProp }) {

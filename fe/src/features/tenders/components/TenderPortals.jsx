@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { linksApi } from '../../../api';
 import wave from '../../../assets/images/WaveAdvisoryPage.png';
@@ -6,11 +7,17 @@ import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './TenderPortals.css';
 
 // Tender portal links come from the CMS API (group: 'tender'). Each link =
-// { label, url, region ('global'|'australia'), description }. We group by region
-// with a heading per group.
-const REGION_LABEL = { global: 'Global', australia: 'Australia' };
-// Preferred display order for region groups; anything else follows.
-const REGION_ORDER = ['global', 'australia'];
+// { label, url, region ('featured'|'australia'), description }. The page shows
+// one list at a time — Australian (default) or Featured — driven by the URL.
+const REGION_LABEL = { featured: 'Featured', australia: 'Australian' };
+// The two lists and their URLs. Australian is the default (shown on top).
+const CATEGORY_PATH = { australia: '/aus-list', featured: '/featured-list' };
+const CATEGORIES = ['australia', 'featured'];
+
+// Which list the current URL is showing (defaults to Australian).
+function categoryFromPath(pathname) {
+  return pathname === CATEGORY_PATH.featured ? 'featured' : 'australia';
+}
 
 function regionLabel(region) {
   return REGION_LABEL[region] || (region ? region.charAt(0).toUpperCase() + region.slice(1) : 'Other');
@@ -34,7 +41,7 @@ function TenderList({ links }) {
             {t.description && <span className="tp__desc">{t.description}</span>}
           </span>
           <span className="tp__country">
-            <span className="tp__country-label">Region</span>
+            <span className="tp__country-label">List</span>
             <span className="tp__country-value">{regionLabel(t.region)}</span>
           </span>
           <a
@@ -128,7 +135,10 @@ function ChevronSelect({ value, onChange, options, variant, label }) {
 
 export default function TenderPortals() {
   const { audience } = useAudience();
-  const [region, setRegion] = useState('all');
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const category = categoryFromPath(pathname); // 'australia' | 'featured'
+
   const [sort, setSort] = useState('asc');
   const [query, setQuery] = useState('');
 
@@ -159,46 +169,27 @@ export default function TenderPortals() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Distinct regions present in the data, in preferred order.
-  const regionsInData = useMemo(() => {
-    const seen = new Set(links.map((l) => l.region || 'other'));
-    const ordered = REGION_ORDER.filter((r) => seen.has(r));
-    const rest = [...seen].filter((r) => !REGION_ORDER.includes(r));
-    return [...ordered, ...rest];
-  }, [links]);
+  // The filter switches lists by navigating to that list's URL.
+  const categoryOptions = CATEGORIES.map((c) => ({ value: c, label: regionLabel(c) }));
+  const onCategoryChange = (value) => {
+    const to = CATEGORY_PATH[value] || CATEGORY_PATH.australia;
+    if (to !== pathname) navigate(to);
+  };
 
-  const regionOptions = useMemo(
-    () => [
-      { value: 'all', label: 'Region: All' },
-      ...regionsInData.map((r) => ({ value: r, label: `Region: ${regionLabel(r)}` })),
-    ],
-    [regionsInData],
-  );
-
-  // Search + sort applied across the whole set before grouping.
+  // Links for the active list, then search + sort.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const base = q
-      ? links.filter(
-          (l) =>
-            (l.label || '').toLowerCase().includes(q) ||
-            (l.description || '').toLowerCase().includes(q),
-        )
-      : links;
+    const base = links
+      .filter((l) => (l.region || '') === category)
+      .filter(
+        (l) =>
+          !q ||
+          (l.label || '').toLowerCase().includes(q) ||
+          (l.description || '').toLowerCase().includes(q),
+      );
     const sorted = [...base].sort((a, b) => (a.label || '').localeCompare(b.label || ''));
     return sort === 'desc' ? sorted.reverse() : sorted;
-  }, [links, query, sort]);
-
-  // Group into ordered { region, links } buckets, honouring the region filter.
-  const groups = useMemo(() => {
-    const activeRegions = region === 'all' ? regionsInData : [region];
-    return activeRegions
-      .map((r) => ({
-        region: r,
-        links: filtered.filter((l) => (l.region || 'other') === r),
-      }))
-      .filter((g) => g.links.length > 0);
-  }, [filtered, region, regionsInData]);
+  }, [links, query, sort, category]);
 
   return (
     <section
@@ -211,18 +202,10 @@ export default function TenderPortals() {
 
       <div className="tp__inner">
         <h1 className="tp__title">
-          Explore Tender Websites{' '}
-          {region === 'all' ? (
-            <strong>Globally</strong>
-          ) : (
-            <>
-              in <strong>{regionLabel(region)}</strong>
-            </>
-          )}
+          Explore <strong>{regionLabel(category)}</strong> Tenders
         </h1>
         <p className="tp__sub">
-          Government tender opportunities from every country, updated across all sectors
-          worldwide.
+          Government tender opportunities, updated regularly across all sectors.
         </p>
 
         <form className="tp__controls" onSubmit={(e) => e.preventDefault()}>
@@ -243,10 +226,10 @@ export default function TenderPortals() {
 
           <ChevronSelect
             variant="country"
-            label="Region"
-            value={region}
-            onChange={setRegion}
-            options={regionOptions}
+            label="List"
+            value={category}
+            onChange={onCategoryChange}
+            options={categoryOptions}
           />
 
           <ChevronSelect
@@ -271,17 +254,12 @@ export default function TenderPortals() {
             We couldn&apos;t load the tender portals right now. Please try again shortly.
           </p>
         )}
-        {status === 'ready' && groups.length === 0 && (
-          <p className="tp__featured">No tender portals match your search.</p>
+        {status === 'ready' && (
+          <>
+            <p className="tp__featured">{regionLabel(category)} Tenders</p>
+            <TenderList key={`${category}-${sort}`} links={filtered} />
+          </>
         )}
-
-        {status === 'ready' &&
-          groups.map((g) => (
-            <div key={g.region}>
-              <p className="tp__featured">{regionLabel(g.region)} Tenders</p>
-              <TenderList key={`${g.region}-${sort}`} links={g.links} />
-            </div>
-          ))}
       </div>
     </section>
   );

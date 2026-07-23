@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 
 // Managed external links: tender portals (S9) and social profiles. `group`
-// separates the two sets; `region` supports the Global/Australia tender split.
+// separates the two sets; `region` supports the Featured/Australian tender split.
 const linkSchema = new mongoose.Schema(
   {
     group: { type: String, enum: ['tender', 'social'], required: true, index: true },
     label: { type: String, required: true },
     url: { type: String, required: true },
-    // tender-only: which region tab it belongs to.
-    region: { type: String, enum: ['global', 'australia', ''], default: '' },
+    // tender-only: which list it belongs to — Featured or Australian.
+    region: { type: String, enum: ['featured', 'australia', ''], default: '' },
     // social-only: platform key for icon rendering.
     platform: { type: String, default: '' },
     description: { type: String, default: '' },

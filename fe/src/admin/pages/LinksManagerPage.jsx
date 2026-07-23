@@ -13,7 +13,7 @@ const EMPTY = {
   group: 'tender',
   label: '',
   url: '',
-  region: 'global',
+  region: 'australia',
   platform: '',
   order: 0,
   active: true,
@@ -210,15 +210,15 @@ export default function LinksManagerPage() {
           <FormField label="URL" name="url" value={form.url} onChange={onChange} required />
           <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <FormField
-              label="Region"
+              label="List"
               name="region"
               as="select"
               hint="tender links"
               value={form.region}
               onChange={onChange}
               options={[
-                { value: 'global', label: 'Global' },
-                { value: 'australia', label: 'Australia' },
+                { value: 'australia', label: 'Australian' },
+                { value: 'featured', label: 'Featured' },
                 { value: '', label: '(none)' },
               ]}
             />
