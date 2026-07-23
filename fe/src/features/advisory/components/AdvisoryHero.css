@@ -66,7 +66,7 @@
 .adv-hero__inner {
   position: relative;
   z-index: 1;
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 72px 40px 48px;
 }
@@ -92,7 +92,7 @@
 .adv-hero__copy {
   max-width: 575px;
   margin: 26px 0 0;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.6;
   color: #fff;
 }
