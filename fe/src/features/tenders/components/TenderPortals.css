@@ -1,5 +1,7 @@
 .tp {
   --tp-bg: #1a1a1a;
+  /* Dropdown panel follows the segment: green for Award, grey for Win. */
+  --tp-menu-bg: #1c1c1c;
 
   position: relative;
   overflow: hidden;
@@ -10,10 +12,12 @@
 
 .tp[data-audience='award'] {
   --tp-bg: #0a3114;
+  --tp-menu-bg: #0e3e1b;
 }
 
 .tp[data-audience='win'] {
   --tp-bg: #1a1a1a;
+  --tp-menu-bg: #1c1c1c;
 }
 
 .tp__wave {
@@ -220,7 +224,7 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: #1c1c1c;
+  background: var(--tp-menu-bg);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 14px;
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.5);
@@ -522,18 +526,31 @@
     pointer-events: none;
   }
 
-  /* Sort drops the pill and reads as plain text with a chevron. */
+  /* Sort drops the pill entirely and reads as plain text: "Sort by:" in the
+     regular weight, the value in bold, chevron sitting right beside it. */
   .tp__select--sort {
     flex-basis: 100%;
+    align-items: center;
+    gap: 8px;
   }
 
   .tp__select--sort .tp__select-button {
     height: auto;
-    padding: 0 22px 0 0;
+    padding: 0;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 400;
     background: none;
     border: 0;
+    /* The base pill's inset glass edges read as a border here. */
+    box-shadow: none;
+  }
+
+  .tp__select--sort .tp__select-button:hover {
+    box-shadow: none;
+  }
+
+  .tp__select--sort .tp__select-value {
+    font-weight: 700;
   }
 
   /* Country menu opens right-aligned so it can't run off the screen edge. */
@@ -542,8 +559,18 @@
     right: 0;
   }
 
+  /* Out of absolute positioning so it trails the label instead of pinning to
+     the far edge of the full-width row. */
   .tp__select--sort .tp__chevron {
-    right: 0;
+    position: static;
+    flex: none;
+    width: 14px;
+    height: 9px;
+    transform: none;
     color: #fff;
+  }
+
+  .tp__select--sort .tp__chevron.is-open {
+    transform: rotate(180deg);
   }
 }

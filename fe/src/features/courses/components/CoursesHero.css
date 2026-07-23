@@ -79,9 +79,10 @@
     width: 230px;
   }
 
-  /* Top padding clears the wave. */
+  /* The wave is cleared by the header's toggle overlay space above; this is
+     just the gap from the toggle down to the title. */
   .courses-hero__inner {
-    padding: 150px 20px 24px;
+    padding: 32px 20px 24px;
   }
 
   .courses-hero__title {

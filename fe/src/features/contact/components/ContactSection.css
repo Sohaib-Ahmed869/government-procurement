@@ -1,5 +1,7 @@
 .contact {
   --contact-bg: #1a1a1a;
+  /* Dropdown panel follows the segment: green for Award, grey for Win. */
+  --contact-menu-bg: #242424;
 
   position: relative;
   overflow: hidden;
@@ -10,10 +12,12 @@
 
 .contact[data-audience='award'] {
   --contact-bg: #0a3114;
+  --contact-menu-bg: #0e3e1b;
 }
 
 .contact[data-audience='win'] {
   --contact-bg: #1a1a1a;
+  --contact-menu-bg: #242424;
 }
 
 /* --- reveal on mount --- */
@@ -323,7 +327,7 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: #0e3e1b;
+  background: var(--contact-menu-bg);
   border-radius: 14px;
   box-shadow:
     0 16px 36px rgba(0, 0, 0, 0.38),

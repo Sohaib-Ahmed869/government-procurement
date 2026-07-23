@@ -1,5 +1,16 @@
 .about {
+  /* Every band on the page shares one surface colour, keyed to the segment. */
+  --about-bg: #1a1a1a;
+
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.about[data-audience='award'] {
+  --about-bg: #0a3114;
+}
+
+.about[data-audience='win'] {
+  --about-bg: #1a1a1a;
 }
 
 /* ===== reveal on scroll-in (shared) ===== */
@@ -55,7 +66,7 @@
 
 /* ===== hero (dark green) ===== */
 .about-hero {
-  background: #0a3114;
+  background: var(--about-bg);
   color: #fff;
 }
 
@@ -84,7 +95,7 @@
 
 /* ===== our story (dark green) ===== */
 .about-story {
-  background: #0a3114;
+  background: var(--about-bg);
   color: #fff;
 }
 
@@ -177,7 +188,7 @@
 
 /* ===== stats / impact (dark green) ===== */
 .about-stats {
-  background: #0a3114;
+  background: var(--about-bg);
   color: #fff;
 }
 
@@ -225,7 +236,7 @@
 
 /* ===== what we value (dark green) ===== */
 .about-values {
-  background: #0a3114;
+  background: var(--about-bg);
   color: #fff;
 }
 
@@ -282,7 +293,7 @@
 
 /* ===== closing CTA band (dark green) ===== */
 .about-cta {
-  background: #0a3114;
+  background: var(--about-bg);
   color: #fff;
 }
 

@@ -311,42 +311,43 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* --- mobile search --- */
-.site-header__mobile-search {
-  display: flex;
-  align-items: center;
+/* --- mobile-only toggle row (sits under the top bar) --- */
+.site-header__toggle-row {
+  display: none;
+  justify-content: center;
+  /* Sits well clear of the bar above; the gap below it comes from the page
+     section's own top padding, which is deliberately much tighter. */
+  padding: 80px 24px 0;
+}
+
+/* Belongs to the bar, not the menu — so it goes away while the menu is open,
+   letting the overlay sit flush under the top bar. */
+.site-header__toggle-row.is-hidden {
+  display: none;
+}
+
+/* Larger pills than the compact desktop header toggle, matching the treatment
+   the homepage hero used. */
+.site-header__toggle-row .audience-toggle__option {
   gap: 8px;
-  margin-bottom: 28px;
-  padding: 6px 6px 6px 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border-radius: 999px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 16px;
+  font-size: 14px;
 }
 
-.site-header__mobile-search-input {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: 18px;
-  color: #fff;
-  background: transparent;
-  border: 0;
-  outline: none;
+.site-header__toggle-row .audience-toggle__icon {
+  width: 18px;
+  height: 18px;
 }
 
-.site-header__mobile-search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+/* --- mobile search + hamburger pair (mobile only) --- */
+.site-header__mobile-actions {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
 }
 
-.site-header__mobile-search-btn {
+.site-header__mobile-search-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -357,7 +358,6 @@
   background: transparent;
   border: 0;
   border-radius: 999px;
-  cursor: pointer;
 }
 
 /* WCAG 2.1 AA: keyboard operability needs a visible focus state (Bible §07). */
@@ -376,7 +376,6 @@
   width: 44px;
   height: 44px;
   padding: 10px 9px;
-  margin-left: auto;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -611,13 +610,29 @@
     font-size: 14px;
   }
 
+  .site-header__mobile-actions {
+    display: flex;
+  }
+
+  /* Floats over the top of the page rather than taking flow space, so a hero's
+     corner wave can reach the header bar and pass behind the toggle. The
+     clearance for page content comes from --mobile-toggle-space. */
+  .site-header__toggle-row {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 95;
+  }
+
   .site-header__burger {
     display: flex;
   }
 
   /* Anchor the overlay directly below the top bar (rather than to the viewport
      with a hardcoded top padding), so a taller bar — e.g. when the CMS
-     announcement banner pushes the header down — can't overlap the search bar. */
+     announcement banner pushes the header down — can't overlap the menu. */
   .site-header__mobile {
     display: block;
     position: absolute;

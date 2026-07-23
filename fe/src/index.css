@@ -28,3 +28,22 @@ body {
 .page-layout__main > * {
   flex: 1 0 auto;
 }
+
+/* Height the mobile audience toggle occupies. It's painted as an overlay (see
+   .site-header__toggle-row) rather than taking up flow space, so the first
+   section of every page starts flush under the header bar — corner waves
+   anchored to `top: 0` then run up behind the toggle — and this padding is what
+   keeps that section's own content clear of it. */
+.page-layout {
+  --mobile-toggle-space: 0px;
+}
+
+@media (max-width: 860px) {
+  .page-layout {
+    --mobile-toggle-space: 118px;
+  }
+
+  .page-layout__main > :first-child {
+    padding-top: var(--mobile-toggle-space);
+  }
+}

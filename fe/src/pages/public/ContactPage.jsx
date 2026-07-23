@@ -2,7 +2,7 @@ import PageLayout from '../../components/layout/PageLayout.jsx';
 import ContactSection from '../../features/contact/components/ContactSection.jsx';
 
 export default function ContactPage() {
-  // Contact page has no win/award toggle and is pinned to the green theme.
+  // Contact follows the win/award toggle: green for Award, grey for Win.
   return (
     <PageLayout>
       <ContactSection />

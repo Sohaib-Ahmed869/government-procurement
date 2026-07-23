@@ -263,32 +263,6 @@
   border-radius: 999px;
 }
 
-/* --- mobile-only audience toggle (top of hero) --- */
-.home-hero__toggle {
-  display: none;
-  justify-content: center;
-  margin: 0 0 22px;
-}
-
-/* The active pill sits on a white fill; its text takes the hero's own
-   background colour (the header's `--header-bg` var isn't set out here). */
-.home-hero__toggle .audience-toggle__option.is-active {
-  color: var(--home-bg);
-}
-
-/* Larger pills in the hero than the compact desktop header toggle; both options
-   share the same height. Narrower than the header via reduced side padding. */
-.home-hero__toggle .audience-toggle__option {
-  padding: 10px 16px;
-  font-size: 14px;
-  gap: 8px;
-}
-
-.home-hero__toggle .audience-toggle__icon {
-  width: 18px;
-  height: 18px;
-}
-
 @media (max-width: 900px) {
   .home-hero__advisory {
     grid-template-columns: 1fr;
@@ -315,10 +289,6 @@
     display: none;
   }
 
-  .home-hero__toggle {
-    display: flex;
-  }
-
   /* The toggle already states the audience, so drop the redundant intro eyebrow
      (the advisory section keeps its own "Advisory Services" eyebrow). */
   .home-hero__intro .home-hero__eyebrow {
@@ -330,7 +300,9 @@
      (via padding-bottom) and the advisory image follows in normal flow, so the
      wave↔buttons and wave↔image gaps look the same at every width ≤768. */
   .home-hero__intro {
-    padding: 100px 24px 200px;
+    /* Tight to the header toggle above it; the 100px here was the room the
+       toggle used to occupy inside the hero. */
+    padding: 38px 24px 200px;
     background-image: url('../../../assets/images/WaveSmallerScreen.png');
     background-repeat: no-repeat;
     background-position: left bottom;

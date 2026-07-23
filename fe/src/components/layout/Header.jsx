@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/images/GovProcurementLogo.png';
 import arrowOutward from '../../assets/icons/Arrow outward.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
@@ -21,21 +21,9 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
 
   // "Explore Tender Websites" is shown to both audiences (Win and Award).
   const navLinks = NAV_LINKS;
-  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mobileTerm, setMobileTerm] = useState('');
 
   const closeMenu = () => setMenuOpen(false);
-
-  // Mobile search submits to the results page and closes the menu.
-  const onMobileSubmit = (e) => {
-    e.preventDefault();
-    const q = mobileTerm.trim();
-    if (!q) return;
-    navigate(`/search?q=${encodeURIComponent(q)}`);
-    setMobileTerm('');
-    closeMenu();
-  };
 
   // Lock background scroll while the mobile menu is open, and let Escape close it.
   useEffect(() => {
@@ -123,45 +111,18 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
           </a>
         </div>
 
-        <button
-          type="button"
-          className={`site-header__burger${menuOpen ? ' is-open' : ''}`}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          aria-controls="site-mobile-menu"
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <span className="site-header__burger-line" />
-          <span className="site-header__burger-line" />
-          <span className="site-header__burger-line" />
-        </button>
-      </div>
-
-      <div
-        id="site-mobile-menu"
-        className={`site-header__mobile${menuOpen ? ' is-open' : ''}`}
-      >
-        <form
-          className="site-header__mobile-search"
-          role="search"
-          onSubmit={onMobileSubmit}
-        >
-          <input
-            type="search"
-            className="site-header__mobile-search-input"
-            value={mobileTerm}
-            onChange={(e) => setMobileTerm(e.target.value)}
-            placeholder="Search…"
+        {/* Mobile-only pair: the magnifier goes straight to the search page,
+            so the menu itself carries no search field. */}
+        <div className="site-header__mobile-actions">
+          <Link
+            className="site-header__mobile-search-link"
+            to="/search"
             aria-label="Search the site"
-          />
-          <button
-            type="submit"
-            className="site-header__mobile-search-btn"
-            aria-label="Submit search"
+            onClick={closeMenu}
           >
             <svg
-              width="20"
-              height="20"
+              width="22"
+              height="22"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -173,9 +134,37 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
               <circle cx="11" cy="11" r="7" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-          </button>
-        </form>
+          </Link>
 
+          <button
+            type="button"
+            className={`site-header__burger${menuOpen ? ' is-open' : ''}`}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="site-mobile-menu"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <span className="site-header__burger-line" />
+            <span className="site-header__burger-line" />
+            <span className="site-header__burger-line" />
+          </button>
+        </div>
+      </div>
+
+      {/* The toggle sits in the top bar on desktop; on mobile the bar only has
+          room for the logo, search and hamburger, so it moves to its own row
+          directly beneath — on every page, the way the homepage hero used to
+          carry it. */}
+      {showToggle && (
+        <div className={`site-header__toggle-row${menuOpen ? ' is-hidden' : ''}`}>
+          <AudienceToggle />
+        </div>
+      )}
+
+      <div
+        id="site-mobile-menu"
+        className={`site-header__mobile${menuOpen ? ' is-open' : ''}`}
+      >
         <nav className="site-header__mobile-nav" aria-label="Mobile">
           <ul className="site-header__mobile-list">
             {navLinks.map(({ label, href }) => (

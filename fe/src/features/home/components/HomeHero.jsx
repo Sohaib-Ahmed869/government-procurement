@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
-import AudienceToggle from '../../../components/layout/AudienceToggle.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
 import mainImage from '../../../assets/images/MainPictureHomepage.png';
@@ -49,12 +48,6 @@ export default function HomeHero() {
       <img className="home-hero__waves" src={wavesImage} alt="" aria-hidden="true" />
 
       <div className="home-hero__intro">
-        {/* Audience toggle lives in the header on desktop; on mobile it moves to
-            the top of the hero (the header only keeps the logo + hamburger). */}
-        <div className="home-hero__toggle">
-          <AudienceToggle />
-        </div>
-
         <p className="home-hero__eyebrow">Award Government Contracts</p>
         <h1 className="home-hero__title">Procure with Confidence</h1>
         <p className="home-hero__lede">

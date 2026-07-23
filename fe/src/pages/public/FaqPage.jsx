@@ -4,8 +4,8 @@ import FaqAccordion from '../../features/faq/components/FaqAccordion.jsx';
 import './FaqPage.css';
 
 export default function FaqPage() {
-  // Like the other inner pages, FAQ has no win/award toggle and is pinned to
-  // the green theme.
+  // Like the other inner pages, FAQ follows the win/award toggle: green for
+  // Award, grey for Win.
   return (
     <div className="faq-scale">
       <PageLayout>
