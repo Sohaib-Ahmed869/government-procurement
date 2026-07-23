@@ -100,7 +100,15 @@ async function run() {
   settings.seo.defaultDescription =
     'Advisory, training and tools to help you win and manage government contracts.';
   settings.contact.email = 'hello@governmentprocurement.example';
-  settings.contact.phone = '+61 2 5555 0100';
+  settings.contact.phone = '+61 478 669 922';
+  settings.social = {
+    instagram: 'https://www.instagram.com/govprocurement/?hl=en',
+    facebook: 'https://www.facebook.com/profile.php?id=61585039209265',
+    linkedin: 'https://www.linkedin.com/company/governmentprocurement/',
+    youtube: 'https://www.youtube.com/@GovernmentProcurement',
+    tiktok: 'https://www.tiktok.com/@govprocurement',
+    threads: 'https://www.threads.com/@govprocurement',
+  };
   await settings.save();
 
   // 3. Categories -----------------------------------------------------------
@@ -191,103 +199,11 @@ async function run() {
   }
 
   // 6. Courses --------------------------------------------------------------
+  // A single, fully-populated course matching the marketing course-detail
+  // layout. Shared with `npm run reset:courses` via course-data.js.
   if ((await Course.countDocuments()) === 0) {
-    await Course.create([
-      {
-        title: 'Winning Government Tenders: Foundations', slug: 'winning-government-tenders-foundations',
-        category: catTraining._id,
-        summary: 'Everything you need to submit competitive, compliant bids that score well.',
-        body:
-          "<p>A practical foundation course for anyone responsible for responding to government tenders. Learn how buyers evaluate submissions and how to give them exactly what they're looking for.</p>" +
-          '<ul><li>Decode tender documents, selection criteria and weightings</li><li>Write clear, compliant, evidence-backed responses</li><li>Avoid the common mistakes that get bids marked down or disqualified</li></ul>',
-        image: { url: STOCK.foundations }, durationLabel: '6 weeks',
-        availability: COURSE_STATE.OPEN, featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-      {
-        title: 'Procurement Strategy Masterclass', slug: 'procurement-strategy-masterclass',
-        category: catTraining._id,
-        summary: 'Design category strategies that deliver measurable, defensible value.',
-        body:
-          '<p>Move from reactive buying to a deliberate sourcing strategy. This masterclass covers category management, market analysis and stakeholder alignment.</p>' +
-          '<ul><li>Build category and sourcing strategies from the ground up</li><li>Run robust market and spend analysis</li><li>Balance value for money with risk and social outcomes</li></ul>',
-        image: { url: STOCK.strategy }, durationLabel: '4 weeks',
-        availability: COURSE_STATE.OPEN, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-      {
-        title: 'Probity & Governance in Public Procurement', slug: 'probity-governance-public-procurement',
-        category: catTraining._id,
-        summary: 'Keep your evaluations fair, transparent and audit-ready.',
-        body:
-          '<p>Probity is what makes a procurement decision defensible. Learn how to run processes that stand up to scrutiny from bidders, auditors and the public.</p>' +
-          '<ul><li>Manage conflicts of interest and confidentiality</li><li>Document decisions so they withstand challenge</li><li>Apply governance frameworks across the procurement lifecycle</li></ul>',
-        image: { url: STOCK.probity }, durationLabel: '3 weeks',
-        availability: COURSE_STATE.COMING_SOON, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-      {
-        title: 'Digital Procurement & Analytics', slug: 'digital-procurement-analytics',
-        category: catTraining._id,
-        summary: 'Use data and AI to sharpen every sourcing decision.',
-        body:
-          '<p>Procurement is becoming a data discipline. This course shows you how to turn spend and performance data into better, faster decisions.</p>' +
-          '<ul><li>Build dashboards that surface spend and savings</li><li>Use analytics to manage supplier performance and risk</li><li>Understand where AI genuinely helps in the procurement cycle</li></ul>',
-        image: { url: STOCK.digital }, durationLabel: '5 weeks',
-        availability: COURSE_STATE.COMING_SOON, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-    ]);
-    console.log('[seed] created 4 courses');
-  }
-
-  // 6b. Artefacts & bundles (also Courses, distinguished by resourceType) ----
-  if ((await Course.countDocuments({ resourceType: 'artefacts' })) === 0) {
-    await Course.create([
-      {
-        title: 'Steps in the Procurement Cycle', slug: 'steps-in-the-procurement-cycle',
-        summary: 'A one-page map of every stage from identifying a need to awarding a contract.',
-        body:
-          '<p>A clear, printable reference that walks through each phase of the procurement cycle — need identification, market analysis, sourcing strategy, tendering, evaluation, award and contract management.</p>' +
-          '<p>Use it to onboard new team members or to keep a live project on track.</p>',
-        image: { url: STOCK.steps }, resourceType: 'artefacts', segment: 'general',
-        availability: COURSE_STATE.OPEN,
-        featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-      {
-        title: 'Tender Evaluation Scorecard', slug: 'tender-evaluation-scorecard',
-        summary: 'A weighted price-vs-quality scoring sheet, ready for your evaluation panel.',
-        body:
-          '<p>A structured scorecard that helps panels evaluate tenders consistently and defensibly. Set your criteria, assign weightings, and let the sheet calculate a transparent overall score.</p>' +
-          '<ul><li>Configurable criteria and weightings</li><li>Separate price and quality scoring</li><li>Built-in guidance notes for evaluators</li></ul>',
-        image: { url: STOCK.scorecard }, resourceType: 'artefacts', segment: 'award',
-        availability: COURSE_STATE.OPEN,
-        status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-      {
-        title: 'Bid/No-Bid Decision Checklist', slug: 'bid-no-bid-decision-checklist',
-        summary: 'Qualify opportunities fast — before you commit time and resources.',
-        body:
-          '<p>A short, structured checklist to decide whether an opportunity is worth pursuing. Weigh fit, capability, competition and commercial return before you invest in a full response.</p>' +
-          '<ul><li>Score strategic fit and win probability</li><li>Flag resourcing and compliance risks early</li><li>Make go/no-go calls with confidence</li></ul>',
-        image: { url: STOCK.checklist }, resourceType: 'artefacts', segment: 'win',
-        availability: COURSE_STATE.OPEN,
-        status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-    ]);
-    console.log('[seed] created 3 artefacts');
-  }
-
-  if ((await Course.countDocuments({ resourceType: 'bundles' })) === 0) {
-    await Course.create([
-      {
-        title: 'Complete Tendering Toolkit', slug: 'complete-tendering-toolkit',
-        summary: 'Every template, checklist and course you need to win work — bundled at a saving.',
-        body:
-          '<p>Our most popular courses and artefacts, packaged together at a discount. Everything a bidding team needs to go from opportunity to submitted, competitive tender.</p>' +
-          '<ul><li>Foundations and strategy courses</li><li>Evaluation scorecard and decision checklists</li><li>The full procurement-cycle reference</li></ul>',
-        image: { url: STOCK.toolkit }, resourceType: 'bundles', segment: 'win', level: 'intermediate',
-        availability: COURSE_STATE.OPEN,
-        featured: true, status: CONTENT_STATUS.PUBLISHED, publishedAt: now,
-      },
-    ]);
-    console.log('[seed] created 1 bundle');
+    await Course.create({ ...FEATURED_COURSE, category: catTraining._id, publishedAt: now });
+    console.log('[seed] created 1 course');
   }
 
   // 7. Forum Q&A ------------------------------------------------------------

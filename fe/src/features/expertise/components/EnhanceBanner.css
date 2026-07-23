@@ -1,11 +1,21 @@
 .eb {
-  background: #0a3114;
+  --eb-bg: #1a1a1a;
+
+  background: var(--eb-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+.eb[data-audience='award'] {
+  --eb-bg: #0a3114;
+}
+
+.eb[data-audience='win'] {
+  --eb-bg: #1a1a1a;
+}
+
 .eb__inner {
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 40px 96px;
 }

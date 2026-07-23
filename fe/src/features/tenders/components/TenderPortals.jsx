@@ -200,11 +200,6 @@ export default function TenderPortals() {
       .filter((g) => g.links.length > 0);
   }, [filtered, region, regionsInData]);
 
-  // Award contract is intentionally empty for now.
-  if (audience !== 'win') {
-    return <section className="tp tp--empty" data-audience={audience} />;
-  }
-
   return (
     <section
       className={`tp${mounted ? ' is-in' : ''}`}

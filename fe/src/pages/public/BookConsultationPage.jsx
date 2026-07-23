@@ -3,7 +3,7 @@ import ConsultationForm from '../../features/consultation/components/Consultatio
 
 export default function BookConsultationPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <ConsultationForm />
     </PageLayout>
   );

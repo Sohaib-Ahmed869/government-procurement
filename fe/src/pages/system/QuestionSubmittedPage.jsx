@@ -3,7 +3,7 @@ import SystemMessage from '../../features/system/components/SystemMessage.jsx';
 
 export default function QuestionSubmittedPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         eyebrow="Question submitted"
         title="Your question is in the queue"

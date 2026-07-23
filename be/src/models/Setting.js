@@ -22,6 +22,15 @@ const settingSchema = new mongoose.Schema(
       phone: { type: String, default: '' },
       address: { type: String, default: '' },
     },
+    // Official social profiles, surfaced in the site footer.
+    social: {
+      instagram: { type: String, default: '' },
+      facebook: { type: String, default: '' },
+      linkedin: { type: String, default: '' },
+      youtube: { type: String, default: '' },
+      tiktok: { type: String, default: '' },
+      threads: { type: String, default: '' },
+    },
     analytics: {
       gtmId: { type: String, default: '' },
       ga4Id: { type: String, default: '' },

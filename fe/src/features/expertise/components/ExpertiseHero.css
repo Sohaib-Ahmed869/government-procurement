@@ -1,10 +1,20 @@
 .xp {
+  --xp-bg: #1a1a1a;
+
   position: relative;
   overflow: hidden;
   min-height: 460px;
-  background: #0a3114;
+  background: var(--xp-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.xp[data-audience='award'] {
+  --xp-bg: #0a3114;
+}
+
+.xp[data-audience='win'] {
+  --xp-bg: #1a1a1a;
 }
 
 /* --- reveal on mount --- */
@@ -76,7 +86,7 @@
 .xp__inner {
   position: relative;
   z-index: 2;
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 40px;
   min-height: 460px;

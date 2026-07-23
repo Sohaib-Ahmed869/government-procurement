@@ -40,7 +40,7 @@ export default function CourseDetailPage() {
 
   // Pinned to the green theme, matching the Courses listing page.
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <CourseDetail course={course} status={status} />
     </PageLayout>
   );

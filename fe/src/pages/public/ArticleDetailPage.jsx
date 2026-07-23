@@ -8,7 +8,7 @@ export default function ArticleDetailPage() {
   const { slug } = useParams();
 
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <ArticleDetail slug={slug} />
     </PageLayout>
   );

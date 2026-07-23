@@ -13,7 +13,7 @@ export default function UnsubscribePage() {
 
   if (done) {
     return (
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <SystemMessage
           eyebrow="Unsubscribed"
           title="You've been removed"
@@ -29,7 +29,7 @@ export default function UnsubscribePage() {
   }
 
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         eyebrow="Unsubscribe"
         title="Sorry to see you go"

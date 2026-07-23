@@ -138,6 +138,17 @@ export const update = asyncHandler(async (req, res) => {
     'startDate',
     'featured',
     'status',
+    // Course detail page fields.
+    'instructor',
+    'price',
+    'currency',
+    'sidebarSummary',
+    'levelLabel',
+    'learnPoints',
+    'requirements',
+    'whoShouldTake',
+    'includes',
+    'access',
   ];
   for (const f of fields) {
     if (req.body[f] !== undefined) course[f] = req.body[f];

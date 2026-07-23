@@ -1,9 +1,19 @@
 .courses-hero {
+  --courses-hero-bg: #1a1a1a;
+
   position: relative;
   overflow: hidden;
-  background: #0a3114;
+  background: var(--courses-hero-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.courses-hero[data-audience='award'] {
+  --courses-hero-bg: #0a3114;
+}
+
+.courses-hero[data-audience='win'] {
+  --courses-hero-bg: #1a1a1a;
 }
 
 /* Corner wave — small screens only. */
@@ -41,7 +51,7 @@
 }
 
 .courses-hero__inner {
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 56px 40px 32px;
 }
@@ -49,16 +59,16 @@
 .courses-hero__title {
   margin: 0;
   font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(34px, 4vw, 52px);
+  font-size: clamp(36px, 3.6vw, 60px);
   font-weight: 400;
-  line-height: 1.05;
+  line-height: 1.02;
   letter-spacing: -0.015em;
 }
 
 .courses-hero__sub {
   max-width: 520px;
   margin: 20px 0 0;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.65;
   color: #fff;
 }
@@ -76,7 +86,7 @@
 
   .courses-hero__title {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(34px, 10vw, 46px);
+    font-size: clamp(38px, 11vw, 52px);
     line-height: 1.12;
   }
 

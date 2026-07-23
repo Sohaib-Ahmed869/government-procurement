@@ -1,11 +1,27 @@
 .insights {
-  background: #0a3114;
+  --insights-bg: #1a1a1a;
+
+  background: var(--insights-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+.insights[data-audience='award'] {
+  --insights-bg: #0a3114;
+}
+
+.insights[data-audience='win'] {
+  --insights-bg: #1a1a1a;
+}
+
+/* Secondary panels (dropdown menu + card faces) go from green to gray in win. */
+.insights[data-audience='win'] .insights-pill__menu,
+.insights[data-audience='win'] .insights-card__inner {
+  background: #242424;
+}
+
 .insights__inner {
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 40px 88px;
 }

@@ -8,7 +8,7 @@ export default function ExpertisePage() {
   // Expertise page has no win/award toggle and is pinned to the green theme.
   return (
     <div className="expertise-scale">
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <ExpertiseHero />
         <AboutExpertise />
         <EnhanceBanner />

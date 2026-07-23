@@ -7,7 +7,7 @@ export default function InsightsPage() {
   // Like courses, insights has no win/award toggle and is pinned to the green theme.
   return (
     <div className="insights-scale">
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <InsightsHero />
         <InsightsGrid />
       </PageLayout>

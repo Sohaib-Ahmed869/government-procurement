@@ -9,6 +9,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed/seed.js",
+    "reset:courses": "node src/seed/reset-courses.js",
     "check": "node --check src/server.js"
   },
   "dependencies": {

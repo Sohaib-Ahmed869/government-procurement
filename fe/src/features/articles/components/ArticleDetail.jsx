@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi } from '../../../api';
 import './ArticleDetail.css';
 
@@ -59,6 +60,7 @@ export default function ArticleDetail({ slug }) {
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound | error
+  const { audience } = useAudience();
 
   // resetKey includes status so the reveal observer re-attaches once the
   // content mounts (the ref isn't rendered during the loading state).
@@ -94,7 +96,7 @@ export default function ArticleDetail({ slug }) {
 
   if (status === 'loading') {
     return (
-      <section className="article">
+      <section className="article" data-audience={audience}>
         <div className="article-body">
           <p className="article-prose__lead">Loading article…</p>
         </div>
@@ -104,9 +106,9 @@ export default function ArticleDetail({ slug }) {
 
   if (status === 'notfound' || status === 'error') {
     return (
-      <section className="article">
+      <section className="article" data-audience={audience}>
         <div className="article-body">
-          <h1 className="article-hero__title" style={{ color: '#0a3114' }}>
+          <h1 className="article-hero__title">
             {status === 'notfound' ? 'Article not found' : 'Something went wrong'}
           </h1>
           <p className="article-prose__lead">
@@ -129,7 +131,7 @@ export default function ArticleDetail({ slug }) {
   const heroUrl = article.heroImage?.url;
 
   return (
-    <article ref={ref} className={`article${inView ? ' is-in' : ''}`}>
+    <article ref={ref} className={`article${inView ? ' is-in' : ''}`} data-audience={audience}>
       <header className="article-hero">
         <div className="article-hero__inner">
           <div className="article-hero__meta">

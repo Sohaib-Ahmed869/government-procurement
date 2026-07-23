@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { coursesApi } from '../../../api';
 import resourcesIcon from '../../../assets/icons/ResourcesIcon.png';
 import './CoursesBrowser.css';
@@ -144,6 +145,7 @@ function SortDropdown({ value, onChange }) {
 
 export default function CoursesBrowser() {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
   const [resource, setResource] = useState('all');
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
@@ -219,7 +221,7 @@ export default function CoursesBrowser() {
   }, [courses, resource, category, level, sort]);
 
   return (
-    <section ref={ref} className={`courses-browse${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="courses-browse__inner">
         {/* Sidebar on desktop; a slide-up panel on phones. */}
         <div

@@ -8,7 +8,7 @@ export default function FaqPage() {
   // the green theme.
   return (
     <div className="faq-scale">
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <FaqHero />
         <FaqAccordion />
       </PageLayout>

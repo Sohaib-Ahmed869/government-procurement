@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './CoursesHero.css';
 
 export default function CoursesHero() {
+  const { audience } = useAudience();
+
   // Mount animation: reveal after the first paint.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -11,7 +14,7 @@ export default function CoursesHero() {
   }, []);
 
   return (
-    <section className={`courses-hero${mounted ? ' is-in' : ''}`}>
+    <section className={`courses-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       {/* Corner wave, small screens only. */}
       <img className="courses-hero__wave" src={phoneWave} alt="" aria-hidden="true" />
 

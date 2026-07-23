@@ -3,7 +3,7 @@ import SystemMessage from '../../features/system/components/SystemMessage.jsx';
 
 export default function NotFoundPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         code="404"
         eyebrow="Page not found"

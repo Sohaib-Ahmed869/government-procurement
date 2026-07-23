@@ -9,7 +9,7 @@ export default function ForumArticlePage() {
   // ForumArticle sources a published question from the CMS itself.
   return (
     <div className="forum-scale">
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <ForumLayout>
           <ForumHero compact />
           <ForumArticle />

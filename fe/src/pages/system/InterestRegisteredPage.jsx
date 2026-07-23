@@ -3,7 +3,7 @@ import SystemMessage from '../../features/system/components/SystemMessage.jsx';
 
 export default function InterestRegisteredPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         eyebrow="Interest registered"
         title="You're on the list"

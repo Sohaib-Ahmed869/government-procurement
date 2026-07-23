@@ -7,8 +7,8 @@ import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './ContactSection.css';
 
 const CONTACT_METHODS = [
-  { key: 'phone', label: 'Phone', value: '+123 456 789', href: 'tel:+123456789' },
-  { key: 'whatsapp', label: 'Whatsapp', value: '+123 456 789', href: 'https://wa.me/123456789' },
+  { key: 'phone', label: 'Phone', value: '+61 478 669 922', href: 'tel:+61478669922' },
+  { key: 'whatsapp', label: 'Whatsapp', value: '+61 478 669 922', href: 'https://wa.me/61478669922' },
   { key: 'email', label: 'Email', value: 'johnsmith@gmail.com', href: 'mailto:johnsmith@gmail.com' },
 ];
 

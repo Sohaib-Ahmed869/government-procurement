@@ -1,30 +1,23 @@
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import RegisterInterestForm from '../../../components/forms/RegisterInterestForm.jsx';
 import './CourseDetail.css';
 
 // Course data (title, summary, body, image, media, availability) comes from the
 // CMS API — fetched by slug in CourseDetailPage and passed in as a prop.
 
-const AVAILABILITY_LABEL = {
-  open: 'Open',
-  coming_soon: 'Coming soon',
-  closed: 'Closed',
-};
-
-const RESOURCE_LABEL = { courses: 'Course', artefacts: 'Artefact', bundles: 'Bundle' };
+const SEGMENT_LABEL = { win: 'Win Contracts', award: 'Award Contracts', general: 'General' };
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
 
-function formatDate(value) {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
 /* --- small sidebar icons --- */
 const Icon = {
+  item: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="2" /><path d="M8 9h8M8 13h5" />
+    </svg>
+  ),
   status: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" />
@@ -64,6 +57,7 @@ const Icon = {
 
 export default function CourseDetail({ course, status = 'ready' }) {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
 
   // Loading / error / not-found states, themed to match the detail page.
   if (status !== 'ready' || !course) {
@@ -74,7 +68,7 @@ export default function CourseDetail({ course, status = 'ready' }) {
       message = "We couldn't find that course.";
     }
     return (
-      <section ref={ref} className={`cd${inView ? ' is-in' : ''}`}>
+      <section ref={ref} className={`cd${inView ? ' is-in' : ''}`} data-audience={audience}>
         <div className="cd__inner">
           <div className="cd__main">
             <h1 className="cd__title">{status === 'notfound' ? 'Course not found' : 'Course'}</h1>
@@ -88,35 +82,63 @@ export default function CourseDetail({ course, status = 'ready' }) {
     );
   }
 
-  const availabilityLabel = AVAILABILITY_LABEL[course.availability] || course.availability;
   const isComingSoon = course.availability === 'coming_soon';
-  const ctaLabel = isComingSoon ? 'Register interest' : 'Book a consultation';
 
   const media = course.media || [];
-  // The first video / YouTube link becomes the page's main player at the top,
-  // so an attached video opens in place rather than only showing the thumbnail.
+  // The first video / YouTube link becomes the page's main player.
   const featured = media.find((m) => m.kind === 'video' || m.kind === 'youtube') || null;
   const featuredId = featured && (featured._id || featured.id);
   const rest = featured ? media.filter((m) => (m._id || m.id) !== featuredId) : media;
 
-  // Counts for the "This course includes" sidebar breakdown.
-  const videoCount = media.filter((m) => m.kind === 'video' || m.kind === 'youtube').length;
-  const pdfCount = media.filter((m) => m.kind === 'pdf').length;
-  const imageCount = media.filter((m) => m.kind === 'image').length;
+  const learnPoints = course.learnPoints || [];
+  const requirements = course.requirements || [];
+  const whoShouldTake = course.whoShouldTake || [];
+  const includes = course.includes || [];
+  const access = course.access || [];
 
-  const CTA = isComingSoon ? (
+  const segmentLabel = SEGMENT_LABEL[course.segment];
+  const levelLabel = course.levelLabel || (course.level ? `${cap(course.level)} level` : '');
+  const priceLabel =
+    typeof course.price === 'number' && course.price > 0
+      ? `$${course.price.toLocaleString()}`
+      : 'Free';
+
+  // Purchase CTA. Coming-soon courses collect interest; open courses buy/enrol.
+  const ctaLabel = isComingSoon ? 'Register interest' : 'Buy course';
+  const PrimaryCta = isComingSoon ? (
     <a className="cd-buy__cta" href="#register-interest">{ctaLabel}</a>
   ) : (
     <Link className="cd-buy__cta" to="/book-a-consultation">{ctaLabel}</Link>
   );
 
   return (
-    <section ref={ref} className={`cd${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`cd${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="cd__inner">
         {/* --- main column --- */}
         <div className="cd__main">
           <h1 className="cd__title">{course.title}</h1>
           {course.summary && <p className="cd__subtitle">{course.summary}</p>}
+
+          {/* Instructor byline + audience / level tags. */}
+          <div className="cd-instructor">
+            {course.instructor?.avatarUrl ? (
+              <img
+                className="cd-instructor__avatar"
+                src={course.instructor.avatarUrl}
+                alt=""
+                loading="lazy"
+              />
+            ) : (
+              <span className="cd-instructor__avatar" aria-hidden="true" />
+            )}
+            <span className="cd-instructor__name">
+              {course.instructor?.name || 'Instructor'}
+            </span>
+            <span className="cd-instructor__tags">
+              {segmentLabel && <span className="cd-instructor__tag">{segmentLabel}</span>}
+              {levelLabel && <span className="cd-instructor__level">{levelLabel}</span>}
+            </span>
+          </div>
 
           {/* Primary media: play the attached video/YouTube in place; otherwise
               fall back to the course hero image. */}
@@ -130,13 +152,58 @@ export default function CourseDetail({ course, status = 'ready' }) {
             )
           )}
 
-          {course.body && (
+          {/* What you'll learn — two-column checklist. */}
+          {learnPoints.length > 0 && (
             <div className="cd-panel">
-              <div
-                className="cd-section"
-                // Body is trusted rich HTML authored in the CMS.
-                dangerouslySetInnerHTML={{ __html: course.body }}
-              />
+              <h2 className="cd-panel__title">What you&rsquo;ll learn</h2>
+              <ul className="cd-learn">
+                {learnPoints.map((point, i) => (
+                  <li className="cd-learn__item" key={i}>
+                    <span className="cd-check" aria-hidden="true">✓</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Requirements + description + audience, in one card. */}
+          {(requirements.length > 0 || course.body || whoShouldTake.length > 0) && (
+            <div className="cd-panel">
+              {requirements.length > 0 && (
+                <div className="cd-section cd-section--first">
+                  <h2 className="cd-section__title">Requirements</h2>
+                  <ul className="cd-bullets">
+                    {requirements.map((r, i) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {course.body && (
+                <div className="cd-section">
+                  <h2 className="cd-section__title">Course description</h2>
+                  <div
+                    className="cd-prose"
+                    // Body is trusted rich HTML authored in the CMS.
+                    dangerouslySetInnerHTML={{ __html: course.body }}
+                  />
+                </div>
+              )}
+
+              {whoShouldTake.length > 0 && (
+                <div className="cd-section">
+                  <h2 className="cd-section__title">Who should take this course?</h2>
+                  <ul className="cd-rich-list">
+                    {whoShouldTake.map((who, i) => (
+                      <li key={i}>
+                        <strong>{who.title}:</strong> {who.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
@@ -160,43 +227,39 @@ export default function CourseDetail({ course, status = 'ready' }) {
           )}
         </div>
 
-        {/* --- details sidebar --- */}
+        {/* --- purchase sidebar --- */}
         <aside className="cd__aside">
           <div className="cd-buy">
-            <span className="cd-buy__eyebrow">{RESOURCE_LABEL[course.resourceType] || 'Course'}</span>
-            <h2 className="cd-buy__title">{course.title}</h2>
-            {course.summary && <p className="cd-buy__blurb">{course.summary}</p>}
-            {CTA}
+            <h2 className="cd-buy__title">Start learning today!</h2>
+            {course.sidebarSummary && <p className="cd-buy__blurb">{course.sidebarSummary}</p>}
 
-            <p className="cd-buy__group-label">Details</p>
-            <ul className="cd-buy__list">
-              {availabilityLabel && (
-                <li className="cd-buy__row">{Icon.status}<span>{availabilityLabel}</span></li>
+            <p className="cd-buy__price">
+              {priceLabel}
+              {course.currency && course.price > 0 && (
+                <span className="cd-buy__currency"> {course.currency}</span>
               )}
-              {course.level && (
-                <li className="cd-buy__row">{Icon.level}<span>{cap(course.level)} level</span></li>
-              )}
-              {course.durationLabel && (
-                <li className="cd-buy__row">{Icon.clock}<span>{course.durationLabel}</span></li>
-              )}
-              {formatDate(course.startDate) && (
-                <li className="cd-buy__row">{Icon.calendar}<span>Starts {formatDate(course.startDate)}</span></li>
-              )}
-            </ul>
+            </p>
 
-            {media.length > 0 && (
+            {PrimaryCta}
+
+            {includes.length > 0 && (
               <>
-                <p className="cd-buy__group-label">This {(RESOURCE_LABEL[course.resourceType] || 'Course').toLowerCase()} includes</p>
+                <p className="cd-buy__group-label">This includes</p>
                 <ul className="cd-buy__list">
-                  {videoCount > 0 && (
-                    <li className="cd-buy__row">{Icon.video}<span>{videoCount} {videoCount === 1 ? 'video' : 'videos'}</span></li>
-                  )}
-                  {pdfCount > 0 && (
-                    <li className="cd-buy__row">{Icon.pdf}<span>{pdfCount} {pdfCount === 1 ? 'PDF resource' : 'PDF resources'}</span></li>
-                  )}
-                  {imageCount > 0 && (
-                    <li className="cd-buy__row">{Icon.image}<span>{imageCount} {imageCount === 1 ? 'image' : 'images'}</span></li>
-                  )}
+                  {includes.map((item, i) => (
+                    <li className="cd-buy__row" key={i}>{Icon.item}<span>{item}</span></li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            {access.length > 0 && (
+              <>
+                <p className="cd-buy__group-label">Access</p>
+                <ul className="cd-buy__list">
+                  {access.map((item, i) => (
+                    <li className="cd-buy__row" key={i}>{Icon.item}<span>{item}</span></li>
+                  ))}
                 </ul>
               </>
             )}
@@ -207,6 +270,7 @@ export default function CourseDetail({ course, status = 'ready' }) {
       {/* Small screens replace the sidebar with a sticky bottom bar. */}
       <div className="cd-bar">
         <span className="cd-bar__title">{course.title}</span>
+        {course.price > 0 && <span className="cd-bar__price">{priceLabel}</span>}
         {isComingSoon ? (
           <a className="cd-bar__cta" href="#register-interest">{ctaLabel}</a>
         ) : (

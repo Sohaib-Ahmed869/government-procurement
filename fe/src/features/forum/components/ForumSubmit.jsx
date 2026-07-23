@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { questionsApi } from '../../../api';
 import ForumSidebar from './ForumSidebar.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
@@ -80,6 +81,7 @@ function TopicSelect({ value, onChange }) {
 
 export default function ForumSubmit() {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
   const [sent, setSent] = useState(false);
   const [topic, setTopic] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -113,7 +115,7 @@ export default function ForumSubmit() {
   }
 
   return (
-    <section ref={ref} className={`forum-submit${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`forum-submit${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="forum-submit__inner">
         <div className="forum-submit__main">
           <h1 className="forum-submit__heading">Submit a Question</h1>

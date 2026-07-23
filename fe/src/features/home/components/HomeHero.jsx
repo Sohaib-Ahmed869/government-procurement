@@ -68,9 +68,9 @@ export default function HomeHero() {
             <CircleIcon src={arrowIcon} size={30} />
             Book a Consultation
           </a>
-          <a className="home-hero__btn" href="tel:+123456789">
+          <a className="home-hero__btn" href="tel:+61478669922">
             <CircleIcon src={callIcon} size={30} />
-            Whatsapp +123 456 789
+            Whatsapp +61 478 669 922
           </a>
         </div>
       </div>

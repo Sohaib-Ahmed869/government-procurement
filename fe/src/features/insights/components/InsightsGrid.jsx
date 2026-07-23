@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import photoA from '../../../assets/images/MainPictureHomepage.png';
@@ -104,6 +105,7 @@ function CardMeta({ topic, date }) {
 
 export default function InsightsGrid() {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
   const [topic, setTopic] = useState('all');
   const [sort, setSort] = useState('none');
 
@@ -166,7 +168,7 @@ export default function InsightsGrid() {
   };
 
   return (
-    <section ref={ref} className={`insights${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`insights${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="insights__inner">
         {status === 'ready' && articles.length > 0 && (
           <div className="insights__filters">

@@ -16,11 +16,6 @@
   --tp-bg: #1a1a1a;
 }
 
-/* Award state kept empty for now — hold height so the footer stays put. */
-.tp--empty {
-  min-height: 60vh;
-}
-
 .tp__wave {
   position: absolute;
   top: 0;
@@ -40,7 +35,7 @@
 .tp__inner {
   position: relative;
   z-index: 1;
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 56px 40px 96px;
 }

@@ -3,7 +3,7 @@ import SystemMessage from '../../features/system/components/SystemMessage.jsx';
 
 export default function ServerErrorPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         code="500"
         eyebrow="Something went wrong"

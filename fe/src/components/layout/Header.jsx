@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/GovProcurementLogo.png';
 import arrowOutward from '../../assets/icons/Arrow outward.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
-import { AUDIENCE } from '../../constants/audiences.js';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
@@ -20,12 +19,8 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
 
-  // The "Explore Tender Websites" link is only relevant to the Win Contracts
-  // audience; hide it when the visitor is in the Award Contracts segment.
-  const navLinks =
-    audience === AUDIENCE.AWARD
-      ? NAV_LINKS.filter(({ href }) => href !== '/tender-portals')
-      : NAV_LINKS;
+  // "Explore Tender Websites" is shown to both audiences (Win and Award).
+  const navLinks = NAV_LINKS;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);

@@ -1,7 +1,17 @@
 .cd {
-  background: #0a3114;
+  --cd-bg: #1a1a1a;
+
+  background: var(--cd-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.cd[data-audience='award'] {
+  --cd-bg: #0a3114;
+}
+
+.cd[data-audience='win'] {
+  --cd-bg: #1a1a1a;
 }
 
 .cd__inner {
@@ -9,7 +19,7 @@
   grid-template-columns: minmax(0, 1fr) 470px;
   align-items: start;
   gap: 40px;
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 40px 40px 96px;
 }
@@ -40,18 +50,19 @@
 /* --- main column --- */
 .cd__title {
   margin: 0;
-  font-size: clamp(32px, 3.4vw, 44px);
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(36px, 4.4vw, 60px);
   font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
 }
 
 .cd__subtitle {
   margin: 20px 0 0;
-  max-width: 62ch;
-  font-size: 15px;
-  line-height: 1.45;
-  color: #fff;
+  max-width: 60ch;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 /* --- instructor row --- */
@@ -238,7 +249,7 @@
 .cd-learn {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 32px;
+  gap: 14px 40px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -248,17 +259,17 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  font-size: 14px;
-  line-height: 1.15;
-  color: #fff;
+  font-size: 14.5px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .cd-check {
   flex: none;
-  color: #fff;
+  color: #7ee2a8;
   font-size: 15px;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 
 .cd-bullets {
@@ -274,13 +285,56 @@
 
 /* --- long-form sections (description / audience), nested in the panel --- */
 .cd-section {
-  margin-top: 28px;
+  margin-top: 32px;
+}
+
+.cd-section--first {
+  margin-top: 0;
 }
 
 .cd-section__title {
   margin: 0 0 14px;
   font-size: 22px;
   font-weight: 600;
+}
+
+/* Rich HTML authored in the CMS (course description). */
+.cd-prose {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.cd-prose p {
+  margin: 0 0 14px;
+}
+
+.cd-prose ul,
+.cd-prose ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cd-prose li {
+  line-height: 1.5;
+}
+
+.cd-prose li::marker {
+  color: #7ee2a8;
+}
+
+.cd-prose strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.cd-prose a {
+  color: #7ee2a8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .cd-section__para {

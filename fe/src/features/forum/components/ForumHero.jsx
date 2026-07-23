@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import callIcon from '../../../assets/icons/Call.png';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumHero.css';
@@ -6,6 +7,8 @@ import './ForumHero.css';
 // `compact` drops the hero title/intro on small screens — used on the article
 // page, where the article's own title takes over directly below the search row.
 export default function ForumHero({ compact = false }) {
+  const { audience } = useAudience();
+
   // Mount animation: reveal after the first paint.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -35,7 +38,7 @@ export default function ForumHero({ compact = false }) {
   return (
     <section
       className={`forum-hero${compact ? ' forum-hero--compact' : ''}${mounted ? ' is-in' : ''}${panelOpen ? ' is-panel-open' : ''}`}
-      data-audience="award"
+      data-audience={audience}
     >
       <div className="forum-hero__inner">
         <h1 className="forum-hero__title">Get your answers</h1>

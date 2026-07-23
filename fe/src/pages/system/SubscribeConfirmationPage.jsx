@@ -10,7 +10,7 @@ export default function SubscribeConfirmationPage() {
   const email = params.get('email');
 
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <SystemMessage
         eyebrow="Subscription confirmed"
         title="You're all subscribed"

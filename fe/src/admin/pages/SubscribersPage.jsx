@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { subscribersApi, getToken } from '../../api';
 import { BASE_URL } from '../../api/client.js';
 import DataTable from '../components/DataTable.jsx';
-import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
 // Format an ISO date/timestamp into a short, readable label for the table.
@@ -18,7 +17,6 @@ export default function SubscribersPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [q, setQ] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [confirmId, setConfirmId] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -26,14 +24,14 @@ export default function SubscribersPage() {
   const load = () => {
     setStatus('loading');
     subscribersApi
-      .list({ q, status: statusFilter === 'all' ? undefined : statusFilter, limit: 100 })
+      .list({ q, limit: 100 })
       .then((items) => {
         setRows(items);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
   };
-  useEffect(load, [q, statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(load, [q]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onDelete = async () => {
     setBusy(true);
@@ -72,9 +70,6 @@ export default function SubscribersPage() {
 
   const columns = [
     { key: 'email', header: 'Email' },
-    { key: 'name', header: 'Name', render: (r) => r.name || '—' },
-    { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    { key: 'confirmedAt', header: 'Confirmed', render: (r) => formatDate(r.confirmedAt) },
     { key: 'createdAt', header: 'Created', render: (r) => formatDate(r.createdAt) },
     {
       key: 'actions',
@@ -114,17 +109,6 @@ export default function SubscribersPage() {
           onChange={(e) => setQ(e.target.value)}
           style={{ maxWidth: 280 }}
         />
-        <select
-          className="admin-select"
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ maxWidth: 200 }}
-        >
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="unsubscribed">Unsubscribed</option>
-        </select>
       </div>
 
       <DataTable

@@ -1,4 +1,5 @@
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
 import bg from '../../../assets/images/OurexpertiseEnhance.png';
@@ -15,9 +16,10 @@ function CircleIcon({ src, size = 30 }) {
 
 export default function EnhanceBanner() {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
 
   return (
-    <section ref={ref} className={`eb${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`eb${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="eb__inner">
         <div className="eb__card">
           <img className="eb__bg" src={bg} alt="" aria-hidden="true" />
@@ -36,9 +38,9 @@ export default function EnhanceBanner() {
                 <CircleIcon src={arrowIcon} />
                 Book a Consultation
               </a>
-              <a className="eb__btn" href="tel:+123456789">
+              <a className="eb__btn" href="tel:+61478669922">
                 <CircleIcon src={callIcon} />
-                Whatsapp +123 456 789
+                Whatsapp +61 478 669 922
               </a>
             </div>
           </div>

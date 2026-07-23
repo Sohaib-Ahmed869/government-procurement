@@ -1,4 +1,5 @@
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import targetIcon from '../../../assets/icons/Target.png';
 import docsIcon from '../../../assets/icons/Google Docs.png';
 import './AboutExpertise.css';
@@ -19,9 +20,10 @@ const EXPERTISE = [
 
 export default function AboutExpertise() {
   const { ref, inView } = useInView();
+  const { audience } = useAudience();
 
   return (
-    <section ref={ref} className={`ab${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`ab${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="ab__inner">
         <div className="ab__content">
           <h2 className="ab__heading">About</h2>

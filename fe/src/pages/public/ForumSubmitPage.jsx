@@ -8,7 +8,7 @@ export default function ForumSubmitPage() {
   // Forum has no win/award toggle and is pinned to the green theme.
   return (
     <div className="forum-scale">
-      <PageLayout showToggle={false} audience="award">
+      <PageLayout>
         <ForumLayout>
           <ForumHero compact />
           <ForumSubmit />

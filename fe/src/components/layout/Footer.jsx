@@ -1,7 +1,5 @@
-import { useLocation } from 'react-router-dom';
 import logo from '../../assets/images/GovProcurementLogo.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
-import { AUDIENCE } from '../../constants/audiences.js';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
 import './Footer.css';
 
@@ -62,10 +60,12 @@ const FLAT_ROWS = [
   ],
 ];
 
+// Official social profiles. Kept in sync with the `social` block seeded into
+// site Settings (settings.social) so the CMS and footer show the same links.
 const SOCIAL_LINKS = [
   {
     label: 'Instagram',
-    href: 'https://www.instagram.com/',
+    href: 'https://www.instagram.com/govprocurement/?hl=en',
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
         <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -75,8 +75,25 @@ const SOCIAL_LINKS = [
     ),
   },
   {
+    label: 'Facebook',
+    href: 'https://www.facebook.com/profile.php?id=61585039209265',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M14.5 7.7h-1.7c-1 0-1.6.6-1.6 1.7v1.5m-1.6 0h4.5m-2.9 0V17"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
     label: 'LinkedIn',
-    href: 'https://www.linkedin.com/',
+    href: 'https://www.linkedin.com/company/governmentprocurement/',
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
         <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -92,13 +109,38 @@ const SOCIAL_LINKS = [
     ),
   },
   {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/',
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@GovernmentProcurement',
     icon: (
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-        <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M10.5 9.2v5.6l4.8-2.8-4.8-2.8Z" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    label: 'TikTok',
+    href: 'https://www.tiktok.com/@govprocurement',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
         <path
-          d="M14.5 7.7h-1.7c-1 0-1.6.6-1.6 1.7v1.5m-1.6 0h4.5m-2.9 0V17"
+          d="M13.5 3.5v9.8a3.2 3.2 0 1 1-2.4-3.1M13.5 6.2A4.7 4.7 0 0 0 18 9"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: 'Threads',
+    href: 'https://www.threads.com/@govprocurement',
+    icon: (
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+        <path
+          d="M12 21c-4.6 0-8-3.3-8-9s3.4-9 8-9c3.4 0 5.8 1.8 6.7 4.4M9 13.2c.4 2 1.8 3 3.4 3 1.8 0 3-1.2 3-3s-1.4-3-3.4-3c-2.6 0-3.8 1.4-3.8 3.2 0 2.6 2.2 3.6 4.2 3.6 2.8 0 4.4-1.8 4.4-4.6"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
@@ -110,19 +152,12 @@ const SOCIAL_LINKS = [
   },
 ];
 
-// Pages that carry the win/award toggle — the only place the win-only
-// "Explore Tender Websites" link is relevant.
-const TOGGLE_PATHS = ['/', '/advisory'];
-
 export default function Footer({ audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
-  const { pathname } = useLocation();
 
-  // The "Explore Tender Websites" link only makes sense to the Win Contracts
-  // audience, and only on a page where they can actually switch segment (home /
-  // advisory). Everywhere else it's filtered out of the mobile flat rows.
-  const showTenderPortals = audience === AUDIENCE.WIN && TOGGLE_PATHS.includes(pathname);
+  // "Explore Tender Websites" is shown to both audiences (Win and Award).
+  const showTenderPortals = true;
 
   // Re-flow the remaining links into rows using the full layout's row sizes as
   // the target line lengths, so when the tender link is removed the links below

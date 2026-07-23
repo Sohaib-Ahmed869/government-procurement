@@ -1,7 +1,17 @@
 .forum-page {
+  --forum-page-bg: #1a1a1a;
+
   position: relative;
   overflow: hidden;
-  background: #0a3114;
+  background: var(--forum-page-bg);
+}
+
+.forum-page[data-audience='award'] {
+  --forum-page-bg: #0a3114;
+}
+
+.forum-page[data-audience='win'] {
+  --forum-page-bg: #1a1a1a;
 }
 
 /* Corner wave, top-right — same placement as the Contact page. */

@@ -57,7 +57,6 @@ const NAV = [
       { to: '/admin/articles', label: 'Articles', icon: 'doc' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
-      { to: '/admin/pages', label: 'Pages', icon: 'page' },
       { to: '/admin/testimonials', label: 'Testimonials', icon: 'quote' },
       { to: '/admin/categories', label: 'Categories', icon: 'tag' },
     ],

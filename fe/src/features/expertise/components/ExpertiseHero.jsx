@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
 import photo from '../../../assets/images/ExpertiseImage.png';
@@ -15,6 +16,8 @@ function CircleIcon({ src, size = 30 }) {
 }
 
 export default function ExpertiseHero() {
+  const { audience } = useAudience();
+
   // Mount animation: reveal after the first paint.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -23,7 +26,7 @@ export default function ExpertiseHero() {
   }, []);
 
   return (
-    <section className={`xp${mounted ? ' is-in' : ''}`}>
+    <section className={`xp${mounted ? ' is-in' : ''}`} data-audience={audience}>
       {/* Glass refraction filter driving the buttons' backdrop-filter.
           feDisplacementMap = refraction, feGaussianBlur = frost. Renders in
           Chromium; other engines fall back to the plain translucent glass. */}
@@ -56,9 +59,9 @@ export default function ExpertiseHero() {
               <CircleIcon src={arrowIcon} />
               Book a Consultation
             </a>
-            <a className="xp__btn" href="tel:+123456789">
+            <a className="xp__btn" href="tel:+61478669922">
               <CircleIcon src={callIcon} />
-              Whatsapp +123 456 789
+              Whatsapp +61 478 669 922
             </a>
           </div>
         </div>

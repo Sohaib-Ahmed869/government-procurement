@@ -1,11 +1,21 @@
 .ab {
-  background: #0a3114;
+  --ab-bg: #1a1a1a;
+
+  background: var(--ab-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+.ab[data-audience='award'] {
+  --ab-bg: #0a3114;
+}
+
+.ab[data-audience='win'] {
+  --ab-bg: #1a1a1a;
+}
+
 .ab__inner {
-  max-width: 1440px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 64px 40px 96px;
 }

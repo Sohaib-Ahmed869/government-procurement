@@ -11,7 +11,6 @@ import CategoriesPage from '../admin/pages/CategoriesPage.jsx';
 import CoursesAdminPage from '../admin/pages/CoursesAdminPage.jsx';
 import CourseEditorPage from '../admin/pages/CourseEditorPage.jsx';
 import FaqAdminPage from '../admin/pages/FaqAdminPage.jsx';
-import PagesEditorPage from '../admin/pages/PagesEditorPage.jsx';
 import TestimonialsPage from '../admin/pages/TestimonialsPage.jsx';
 import ModerationQueuePage from '../admin/pages/ModerationQueuePage.jsx';
 import SubscribersPage from '../admin/pages/SubscribersPage.jsx';
@@ -52,7 +51,6 @@ export default function AdminRoutes() {
           <Route path="courses/new" element={<CourseEditorPage />} />
           <Route path="courses/:id" element={<CourseEditorPage />} />
           <Route path="faqs" element={<FaqAdminPage />} />
-          <Route path="pages" element={<PagesEditorPage />} />
           <Route path="testimonials" element={<TestimonialsPage />} />
           <Route path="categories" element={<CategoriesPage />} />
 

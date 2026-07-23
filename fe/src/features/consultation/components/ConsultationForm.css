@@ -63,15 +63,16 @@
 
 .consult__title {
   margin: 18px 0 0;
-  font-size: clamp(34px, 5vw, 56px);
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(36px, 3.6vw, 60px);
   font-weight: 400;
-  line-height: 1.04;
+  line-height: 1.02;
   letter-spacing: -0.015em;
 }
 
 .consult__lead {
   margin: 22px 0 0;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.6;
   color: #fff;
   max-width: 420px;
@@ -282,11 +283,20 @@
   .consult__form {
     max-width: none;
   }
+
+  /* Shared page-title breakpoint, matching the homepage / contact heroes. */
+  .consult__title {
+    font-size: clamp(38px, 11vw, 52px);
+  }
 }
 
 @media (max-width: 760px) {
   .consult__inner {
     padding: 24px;
+  }
+
+  .consult__title {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   }
 
   .consult__row {

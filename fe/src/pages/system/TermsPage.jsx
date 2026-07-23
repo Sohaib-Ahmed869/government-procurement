@@ -57,7 +57,7 @@ const SECTIONS = [
 
 export default function TermsPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <LegalPage
         title="Terms of Use"
         updated="September 2025"

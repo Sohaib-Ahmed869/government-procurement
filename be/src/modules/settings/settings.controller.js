@@ -27,7 +27,7 @@ function deepMerge(target, patch) {
 // (server-side routing config) are deliberately excluded.
 export const getPublic = asyncHandler(async (req, res) => {
   const doc = await Setting.getSingleton();
-  return ok(res, { seo: doc.seo, contact: doc.contact, analytics: doc.analytics });
+  return ok(res, { seo: doc.seo, contact: doc.contact, analytics: doc.analytics, social: doc.social });
 });
 
 // GET / — admin only. The full settings document.
@@ -41,14 +41,15 @@ export const getAll = asyncHandler(async (req, res) => {
 export const update = asyncHandler(async (req, res) => {
   const doc = await Setting.getSingleton();
 
-  const { seo, contact, analytics, redirects } = req.body;
-  deepMerge(doc, { seo, contact, analytics });
+  const { seo, contact, analytics, social, redirects } = req.body;
+  deepMerge(doc, { seo, contact, analytics, social });
   if (redirects !== undefined) doc.redirects = redirects;
 
   // Nested Mixed/subdocument mutations can go undetected — mark them dirty.
   doc.markModified('seo');
   doc.markModified('contact');
   doc.markModified('analytics');
+  doc.markModified('social');
   await doc.save();
 
   recordAudit({

@@ -17,9 +17,42 @@ const courseSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
-    summary: { type: String, default: '' },
-    body: { type: String, default: '' }, // rich HTML
+    summary: { type: String, default: '' }, // short intro shown under the title
+    body: { type: String, default: '' }, // rich HTML — "Course description"
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
+
+    // --- Course detail page (mirrors the marketing layout) ---
+    // Instructor shown in the byline bar under the title.
+    instructor: {
+      name: { type: String, default: '' },
+      role: { type: String, default: '' },
+      avatarUrl: { type: String, default: '' },
+    },
+    // Purchase box.
+    price: { type: Number, default: 0 },
+    currency: { type: String, default: 'AUD' },
+    // Short blurb inside the "Start learning today!" purchase card.
+    sidebarSummary: { type: String, default: '' },
+    // Display label for the level chip, e.g. "Foundational" (free-text; the
+    // enum `level` above still drives filtering).
+    levelLabel: { type: String, default: '' },
+    // "What you'll learn" — a flat list of outcome bullet points.
+    learnPoints: { type: [String], default: [] },
+    // "Requirements" — a flat list of prerequisites.
+    requirements: { type: [String], default: [] },
+    // "Who should take this course?" — title + description per audience.
+    whoShouldTake: {
+      type: [
+        {
+          title: { type: String, default: '' },
+          text: { type: String, default: '' },
+        },
+      ],
+      default: [],
+    },
+    // Purchase-card breakdown lists (plain strings, e.g. "20+ hours of content").
+    includes: { type: [String], default: [] },
+    access: { type: [String], default: [] },
     // Taxonomy for the public /courses side filters.
     resourceType: {
       type: String,

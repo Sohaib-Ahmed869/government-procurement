@@ -60,7 +60,7 @@ const SECTIONS = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <PageLayout showToggle={false} audience="award">
+    <PageLayout>
       <LegalPage
         title="Privacy Policy"
         updated="September 2025"
