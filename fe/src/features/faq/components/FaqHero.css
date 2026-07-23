@@ -1,7 +1,17 @@
 .faq-hero {
-  background: #0a3114;
+  --faq-hero-bg: #1a1a1a;
+
+  background: var(--faq-hero-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.faq-hero[data-audience='award'] {
+  --faq-hero-bg: #0a3114;
+}
+
+.faq-hero[data-audience='win'] {
+  --faq-hero-bg: #1a1a1a;
 }
 
 @media (prefers-reduced-motion: no-preference) {

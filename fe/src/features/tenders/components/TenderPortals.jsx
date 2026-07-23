@@ -63,7 +63,7 @@ function TenderList({ links }) {
 
 // Custom listbox rather than a native <select>: the OS-drawn popup can't be
 // rounded or themed. Used for both the country and sort pickers.
-function ChevronSelect({ value, onChange, options, variant, label }) {
+function ChevronSelect({ value, onChange, options, variant, label, prefix }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -95,7 +95,8 @@ function ChevronSelect({ value, onChange, options, variant, label }) {
         aria-label={label}
         onClick={() => setOpen((o) => !o)}
       >
-        {current.label}
+        {prefix && <span className="tp__select-prefix">{prefix} </span>}
+        <span className="tp__select-value">{current.label}</span>
       </button>
 
       <svg className={`tp__chevron${open ? ' is-open' : ''}`} viewBox="0 0 12 8" aria-hidden="true">
@@ -235,11 +236,12 @@ export default function TenderPortals() {
           <ChevronSelect
             variant="sort"
             label="Sort by"
+            prefix="Sort by:"
             value={sort}
             onChange={setSort}
             options={[
-              { value: 'asc', label: 'Sort by: Alphabetical (Ascending)' },
-              { value: 'desc', label: 'Sort by: Alphabetical (Descending)' },
+              { value: 'asc', label: 'Alphabetical (Ascending)' },
+              { value: 'desc', label: 'Alphabetical (Descending)' },
             ]}
           />
 

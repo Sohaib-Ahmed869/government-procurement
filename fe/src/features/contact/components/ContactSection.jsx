@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { contactApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
@@ -86,6 +87,8 @@ function TopicSelect({ value, onChange }) {
 }
 
 export default function ContactSection() {
+  const { audience } = useAudience();
+
   // Mount animation: reveal after the first paint.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -125,7 +128,7 @@ export default function ContactSection() {
   return (
     <section
       className={`contact${mounted ? ' is-in' : ''}`}
-      data-audience="award"
+      data-audience={audience}
     >
       {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
       <img className="contact__wave" src={wave} alt="" aria-hidden="true" />

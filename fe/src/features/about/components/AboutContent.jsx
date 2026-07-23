@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { pagesApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
@@ -57,6 +58,7 @@ const CTA = {
 };
 
 export default function AboutContent() {
+  const { audience } = useAudience();
   const hero = useInView();
   const story = useInView();
   const stats = useInView();
@@ -87,7 +89,7 @@ export default function AboutContent() {
   const storyHtml = page?.body?.trim() ? page.body : null;
 
   return (
-    <div className="about">
+    <div className="about" data-audience={audience}>
       <section
         ref={hero.ref}
         className={`about-hero${hero.inView ? ' is-in' : ''}`}

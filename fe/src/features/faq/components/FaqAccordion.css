@@ -2,9 +2,19 @@
    Geist type, glass filter pills and the shared 1440 layout. The page hero
    (title + subtitle) lives in FaqHero. */
 .faq {
-  background: #0a3114;
+  --faq-bg: #1a1a1a;
+
+  background: var(--faq-bg);
   color: rgba(255, 255, 255, 0.85);
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.faq[data-audience='award'] {
+  --faq-bg: #0a3114;
+}
+
+.faq[data-audience='win'] {
+  --faq-bg: #1a1a1a;
 }
 
 .faq__inner {
@@ -50,15 +60,17 @@
     color 0.15s ease;
 }
 
+/* Hovered and selected pills both take the same green as the article topic pill
+   / author circle and the "Buy course" button. */
 .faq__pill:hover {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  box-shadow: none;
 }
 
 .faq__pill.is-active {
-  color: #0a3114;
-  background: #7ee2a8;
+  color: #fff;
+  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
   box-shadow: none;
 }
 

@@ -274,10 +274,11 @@
 }
 
 @media (max-width: 720px) {
-  /* Top padding clears the corner wave (≈155px tall at its mobile width) and
-     leaves a gap between it and the title. */
+  /* Clears the rest of the corner wave (≈155px tall at its mobile width) and
+     leaves a gap before the title. The first ~118px of that wave is already
+     covered by the header's toggle overlay space above this section. */
   .forum-hero__inner {
-    padding: 210px 20px 36px;
+    padding: 92px 20px 36px;
   }
 
   .forum-hero__title {
@@ -302,7 +303,7 @@
   }
 
   .forum-hero--compact .forum-hero__inner {
-    padding-top: 115px;
+    padding-top: 0;
     padding-bottom: 8px;
   }
 

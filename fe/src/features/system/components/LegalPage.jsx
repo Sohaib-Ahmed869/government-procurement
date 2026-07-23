@@ -1,4 +1,5 @@
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import './LegalPage.css';
 
 // Shared long-form template for the legal / policy pages (Privacy Policy,
@@ -6,8 +7,10 @@ import './LegalPage.css';
 // where body is an array of paragraph strings or { list: [...] }. Real copy is
 // managed in the CMS Pages editor later; these hold the placeholder text.
 export default function LegalPage({ title, updated, intro, sections = [], crumbs = [] }) {
+  const { audience } = useAudience();
+
   return (
-    <article className="legal">
+    <article className="legal" data-audience={audience}>
       <div className="legal__inner">
         {crumbs.length > 0 && <Breadcrumbs items={crumbs} />}
 

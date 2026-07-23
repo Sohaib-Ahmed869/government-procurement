@@ -1,8 +1,18 @@
 .legal {
+  --legal-bg: #1a1a1a;
+
   flex: 1 0 auto;
-  background: #0a3114;
+  background: var(--legal-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.legal[data-audience='award'] {
+  --legal-bg: #0a3114;
+}
+
+.legal[data-audience='win'] {
+  --legal-bg: #1a1a1a;
 }
 
 .legal__inner {

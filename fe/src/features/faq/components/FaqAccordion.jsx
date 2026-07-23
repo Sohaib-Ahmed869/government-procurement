@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { faqsApi } from '../../../api';
 import './FaqAccordion.css';
 
@@ -52,6 +53,7 @@ function FaqRow({ item, open, onToggle }) {
 }
 
 export default function FaqAccordion() {
+  const { audience } = useAudience();
   const { ref, inView } = useInView();
   const [category, setCategory] = useState('all');
   // Single-open accordion: track the id of the one expanded row (null = none).
@@ -91,7 +93,7 @@ export default function FaqAccordion() {
   const visible = category === 'all' ? faqs : faqs.filter((f) => (f.category || 'General') === category);
 
   return (
-    <section ref={ref} className={`faq${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`faq${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="faq__inner">
        <div className="faq__column">
         {categories.length > 1 && (

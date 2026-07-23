@@ -147,38 +147,11 @@
   outline-offset: 3px;
 }
 
-/* --- mobile-only audience toggle (top of hero) --- */
-.adv-hero__toggle {
-  display: none;
-  justify-content: center;
-  margin: 0 0 26px;
-}
-
-/* The active pill sits on a white fill; its text takes the hero's own
-   background colour. */
-.adv-hero__toggle .audience-toggle__option.is-active {
-  color: var(--adv-bg);
-}
-
-.adv-hero__toggle .audience-toggle__option {
-  gap: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
-}
-
-.adv-hero__toggle .audience-toggle__icon {
-  width: 18px;
-  height: 18px;
-}
-
 @media (max-width: 860px) {
-  /* Centred stack: toggle, title, copy, buttons — with the wave anchored to the
+  /* Centred stack: title, copy, buttons — with the wave anchored to the
      bottom of the hero the way the homepage hero does it. */
-  .adv-hero__toggle {
-    display: flex;
-  }
 
-  /* The toggle already states the audience, so the eyebrow is redundant. */
+  /* The header toggle already states the audience, so the eyebrow is redundant. */
   .adv-hero__eyebrow {
     display: none;
   }
@@ -191,7 +164,9 @@
   }
 
   .adv-hero__inner {
-    padding: 100px 24px 180px;
+    /* Tight to the header toggle above it; the 100px here was the room the
+       toggle used to occupy inside the hero. */
+    padding: 38px 24px 180px;
     text-align: center;
     background-image: url('../../../assets/images/EnhanceExpWave.png');
     background-repeat: no-repeat;

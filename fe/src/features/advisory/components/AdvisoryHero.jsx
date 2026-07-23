@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import AudienceToggle from '../../../components/layout/AudienceToggle.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
 import wave from '../../../assets/images/WaveAdvisoryPage.png';
@@ -32,11 +31,6 @@ export default function AdvisoryHero() {
       <img className="adv-hero__wave" src={wave} alt="" aria-hidden="true" />
 
       <div className="adv-hero__inner">
-        {/* Header keeps the toggle on desktop; on mobile it moves up here. */}
-        <div className="adv-hero__toggle">
-          <AudienceToggle />
-        </div>
-
         <p className="adv-hero__eyebrow">Award Government Contracts</p>
         <h1 className="adv-hero__title">Advisory Services</h1>
         {/* Small screens show only the first sentence, trailed by an ellipsis. */}

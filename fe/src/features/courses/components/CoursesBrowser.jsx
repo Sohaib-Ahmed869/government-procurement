@@ -4,6 +4,8 @@ import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { coursesApi } from '../../../api';
 import resourcesIcon from '../../../assets/icons/ResourcesIcon.png';
+import menuIcon from '../../../assets/icons/Menu.png';
+import levelIcon from '../../../assets/icons/LevelIcon.png';
 import './CoursesBrowser.css';
 
 const SORT_OPTIONS = [
@@ -36,28 +38,6 @@ const LEVEL_OPTS = [
   { value: 'intermediate', label: 'Intermediate' },
   { value: 'advanced', label: 'Advanced' },
 ];
-
-function CategoriesIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <line x1="8" y1="6" x2="21" y2="6" />
-      <line x1="8" y1="12" x2="21" y2="12" />
-      <line x1="8" y1="18" x2="21" y2="18" />
-      <circle cx="3.5" cy="6" r="1.3" fill="currentColor" stroke="none" />
-      <circle cx="3.5" cy="12" r="1.3" fill="currentColor" stroke="none" />
-      <circle cx="3.5" cy="18" r="1.3" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-function LevelIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-      <line x1="6" y1="20" x2="6" y2="14" />
-      <line x1="12" y1="20" x2="12" y2="9" />
-      <line x1="18" y1="20" x2="18" y2="4" />
-    </svg>
-  );
-}
 
 function FilterGroup({ icon, heading, name, options, value, onChange }) {
   return (
@@ -250,7 +230,7 @@ export default function CoursesBrowser() {
             onChange={setResource}
           />
           <FilterGroup
-            icon={<CategoriesIcon />}
+            icon={<img className="courses-filter__img" src={menuIcon} alt="" />}
             heading="Categories"
             name="category"
             options={CATEGORY_OPTS}
@@ -258,7 +238,7 @@ export default function CoursesBrowser() {
             onChange={setCategory}
           />
           <FilterGroup
-            icon={<LevelIcon />}
+            icon={<img className="courses-filter__img" src={levelIcon} alt="" />}
             heading="Level"
             name="level"
             options={LEVEL_OPTS}
