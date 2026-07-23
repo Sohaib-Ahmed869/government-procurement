@@ -57,14 +57,16 @@ const SECTIONS = [
 
 export default function TermsPage() {
   return (
-    <PageLayout>
-      <LegalPage
-        title="Terms of Use"
-        updated="September 2025"
-        intro="The terms governing your use of this website."
-        crumbs={[{ label: 'Terms of Use' }]}
-        sections={SECTIONS}
-      />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <LegalPage
+          title="Terms of Use"
+          updated="September 2025"
+          intro="The terms governing your use of this website."
+          crumbs={[{ label: 'Terms of Use' }]}
+          sections={SECTIONS}
+        />
+      </PageLayout>
+    </div>
   );
 }

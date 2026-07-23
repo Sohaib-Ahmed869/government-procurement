@@ -4,8 +4,10 @@ import ContactSection from '../../features/contact/components/ContactSection.jsx
 export default function ContactPage() {
   // Contact follows the win/award toggle: green for Award, grey for Win.
   return (
-    <PageLayout>
-      <ContactSection />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <ContactSection />
+      </PageLayout>
+    </div>
   );
 }

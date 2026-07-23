@@ -3,8 +3,10 @@ import AboutContent from '../../features/about/components/AboutContent.jsx';
 
 export default function AboutPage() {
   return (
-    <PageLayout>
-      <AboutContent />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <AboutContent />
+      </PageLayout>
+    </div>
   );
 }

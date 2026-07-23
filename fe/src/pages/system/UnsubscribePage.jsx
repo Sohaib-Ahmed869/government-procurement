@@ -13,40 +13,44 @@ export default function UnsubscribePage() {
 
   if (done) {
     return (
-      <PageLayout>
-        <SystemMessage
-          eyebrow="Unsubscribed"
-          title="You've been removed"
-          message={
-            email
-              ? `${email} has been unsubscribed. You won't receive any further marketing emails from us.`
-              : "You've been unsubscribed and won't receive any further marketing emails from us."
-          }
-          actions={[{ label: 'Back to home', to: '/', variant: 'primary' }]}
-        />
-      </PageLayout>
+      <div className="page-scale">
+        <PageLayout>
+          <SystemMessage
+            eyebrow="Unsubscribed"
+            title="You've been removed"
+            message={
+              email
+                ? `${email} has been unsubscribed. You won't receive any further marketing emails from us.`
+                : "You've been unsubscribed and won't receive any further marketing emails from us."
+            }
+            actions={[{ label: 'Back to home', to: '/', variant: 'primary' }]}
+          />
+        </PageLayout>
+      </div>
     );
   }
 
   return (
-    <PageLayout>
-      <SystemMessage
-        eyebrow="Unsubscribe"
-        title="Sorry to see you go"
-        message={
-          email
-            ? `Are you sure you want to unsubscribe ${email} from our mailing list?`
-            : 'Are you sure you want to unsubscribe from our mailing list?'
-        }
-      >
-        <button
-          type="button"
-          className="sysmsg__btn sysmsg__btn--primary"
-          onClick={() => setDone(true)}
+    <div className="page-scale">
+      <PageLayout>
+        <SystemMessage
+          eyebrow="Unsubscribe"
+          title="Sorry to see you go"
+          message={
+            email
+              ? `Are you sure you want to unsubscribe ${email} from our mailing list?`
+              : 'Are you sure you want to unsubscribe from our mailing list?'
+          }
         >
-          Yes, unsubscribe me
-        </button>
-      </SystemMessage>
-    </PageLayout>
+          <button
+            type="button"
+            className="sysmsg__btn sysmsg__btn--primary"
+            onClick={() => setDone(true)}
+          >
+            Yes, unsubscribe me
+          </button>
+        </SystemMessage>
+      </PageLayout>
+    </div>
   );
 }

@@ -3,8 +3,10 @@ import ConsultationForm from '../../features/consultation/components/Consultatio
 
 export default function BookConsultationPage() {
   return (
-    <PageLayout>
-      <ConsultationForm />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <ConsultationForm />
+      </PageLayout>
+    </div>
   );
 }

@@ -8,8 +8,10 @@ export default function ArticleDetailPage() {
   const { slug } = useParams();
 
   return (
-    <PageLayout>
-      <ArticleDetail slug={slug} />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <ArticleDetail slug={slug} />
+      </PageLayout>
+    </div>
   );
 }

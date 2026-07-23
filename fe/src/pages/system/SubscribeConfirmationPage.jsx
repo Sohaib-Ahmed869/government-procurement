@@ -10,20 +10,22 @@ export default function SubscribeConfirmationPage() {
   const email = params.get('email');
 
   return (
-    <PageLayout>
-      <SystemMessage
-        eyebrow="Subscription confirmed"
-        title="You're all subscribed"
-        message={
-          email
-            ? `Thanks for confirming ${email}. You'll now receive our latest insights, courses, and procurement updates.`
-            : "Thanks for confirming your subscription. You'll now receive our latest insights, courses, and procurement updates."
-        }
-        actions={[
-          { label: 'Read insights', to: '/insights', variant: 'primary' },
-          { label: 'Back to home', to: '/', variant: 'ghost' },
-        ]}
-      />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <SystemMessage
+          eyebrow="Subscription confirmed"
+          title="You're all subscribed"
+          message={
+            email
+              ? `Thanks for confirming ${email}. You'll now receive our latest insights, courses, and procurement updates.`
+              : "Thanks for confirming your subscription. You'll now receive our latest insights, courses, and procurement updates."
+          }
+          actions={[
+            { label: 'Read insights', to: '/insights', variant: 'primary' },
+            { label: 'Back to home', to: '/', variant: 'ghost' },
+          ]}
+        />
+      </PageLayout>
+    </div>
   );
 }

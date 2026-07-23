@@ -3,8 +3,10 @@ import SearchResults from '../../features/search/components/SearchResults.jsx';
 
 export default function SearchResultsPage() {
   return (
-    <PageLayout>
-      <SearchResults />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <SearchResults />
+      </PageLayout>
+    </div>
   );
 }

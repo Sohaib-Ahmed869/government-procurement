@@ -40,8 +40,10 @@ export default function CourseDetailPage() {
 
   // Pinned to the green theme, matching the Courses listing page.
   return (
-    <PageLayout>
-      <CourseDetail course={course} status={status} />
-    </PageLayout>
+    <div className="page-scale">
+      <PageLayout>
+        <CourseDetail course={course} status={status} />
+      </PageLayout>
+    </div>
   );
 }

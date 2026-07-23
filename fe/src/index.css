@@ -47,3 +47,37 @@ body {
     padding-top: var(--mobile-toggle-space);
   }
 }
+
+/* Big-screen scaling.
+   Pages are designed at a 1440px content width. On wider screens they would
+   otherwise sit in a fixed column with large empty margins. Instead we lay the
+   page out at exactly 1440px and use `zoom` to scale the whole thing up to fill
+   the viewport, so every text size, button, image and padding grows in the same
+   proportion — the laptop layout, just bigger. `zoom` (unlike transform) also
+   reflows, so nothing overlaps.
+
+   Wrap a page's <PageLayout> in `.page-scale` to opt in. This lives here rather
+   than in a per-page stylesheet so a new page only has to add the class; the
+   older `.<name>-scale` blocks in pages/public/*.css are the same rules under
+   per-page names and are being folded into this one. */
+@media (min-width: 1441px) {
+  body {
+    /* The scaled page spans exactly 100vw; hide the sub-pixel/scrollbar spill. */
+    overflow-x: hidden;
+  }
+
+  .page-scale {
+    width: 1440px;
+    zoom: calc(100vw / 1440px);
+  }
+
+  /* `.page-layout` sets `min-height: 100vh`, but `vh` inside a zoomed subtree
+     resolves to the real viewport and is then magnified by the zoom factor — so
+     the layout is forced to ~1.8 viewports tall. On a short page that stretches
+     the flex <main> and leaves a large empty gap above the footer. Divide the
+     height back down by the zoom factor so it targets exactly one real viewport,
+     keeping the footer at the bottom with no gap. */
+  .page-scale .page-layout {
+    min-height: calc(100vh / (100vw / 1440px));
+  }
+}
