@@ -36,7 +36,7 @@
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 40px;
+  padding: 40px 0;
 }
 
 /* --- two-column layout: intro + form --- */
