@@ -60,14 +60,14 @@
 }
 
 .about-hero__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 96px 40px 88px;
 }
 
 .about-hero__title {
   margin: 0;
-  max-width: 1100px;
+  max-width: 1440px;
   font-size: clamp(36px, 3.6vw, 60px);
   font-weight: 400;
   line-height: 1.05;
@@ -77,7 +77,7 @@
 .about-hero__subtitle {
   margin: 28px 0 0;
   max-width: 720px;
-  font-size: clamp(18px, 2.2vw, 22px);
+  font-size: 16px;
   line-height: 1.55;
   color: #fff;
 }
@@ -89,14 +89,14 @@
 }
 
 .about-story__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 56px 40px;
 }
 
 .about-story__grid {
   margin-top: 40px;
-  max-width: 1100px;
+  max-width: 1440px;
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   gap: 48px;
@@ -182,7 +182,7 @@
 }
 
 .about-stats__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 56px 40px;
 }
@@ -191,7 +191,7 @@
   list-style: none;
   margin: 0 auto;
   padding: 0;
-  max-width: 1100px;
+  max-width: 1440px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
@@ -230,14 +230,14 @@
 }
 
 .about-values__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 56px 40px;
 }
 
 .about-values__heading {
   margin: 0 0 40px;
-  max-width: 1100px;
+  max-width: 1440px;
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 400;
   line-height: 1.1;
@@ -249,7 +249,7 @@
   list-style: none;
   margin: 0 auto;
   padding: 0;
-  max-width: 1100px;
+  max-width: 1440px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -287,7 +287,7 @@
 }
 
 .about-cta__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 88px 40px;
   text-align: center;

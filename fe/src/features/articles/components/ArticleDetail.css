@@ -33,7 +33,7 @@
 }
 
 .article-hero__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -70,7 +70,7 @@
 .article-hero__title {
   margin: 0;
   font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(36px, 4.6vw, 60px);
+  font-size: clamp(36px, 3.6vw, 60px);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.015em;
@@ -117,7 +117,7 @@
 
 /* ---------- Hero image ---------- */
 .article-figure {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 8px auto 0;
   padding: 0 40px;
 }
@@ -133,7 +133,7 @@
 
 /* ---------- Body ---------- */
 .article-body {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 44px 40px 8px;
 }
@@ -335,7 +335,7 @@
 }
 
 .article-related__inner {
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
