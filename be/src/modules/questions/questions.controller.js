@@ -49,6 +49,7 @@ export const list = asyncHandler(async (req, res) => {
   const filter = {};
   if (req.query.category) filter.category = req.query.category;
   if (req.query.q) filter.$text = { $search: req.query.q };
+  if (req.query.featured === 'true') filter.featured = true;
 
   let sort;
   if (!isStaff) {
@@ -150,6 +151,25 @@ export const answer = asyncHandler(async (req, res) => {
     entity: 'Question',
     entityId: question._id,
     summary: `Answered question "${question.title}"`,
+  });
+
+  return ok(res, question);
+});
+
+// PATCH /:id/featured — toggle whether a question is featured in the sidebar.
+export const setFeatured = asyncHandler(async (req, res) => {
+  const question = await Question.findById(req.params.id);
+  if (!question) throw ApiError.notFound('Question not found');
+
+  question.featured = Boolean(req.body.featured);
+  await question.save();
+
+  recordAudit({
+    req,
+    action: 'question.featured',
+    entity: 'Question',
+    entityId: question._id,
+    summary: `Question "${question.title}" featured = ${question.featured}`,
   });
 
   return ok(res, question);

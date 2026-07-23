@@ -2,14 +2,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { CATEGORIES } from '../data.js';
 import './ForumSidebar.css';
 
-const DEFAULT_FEATURED = [
-  { label: 'Lowest Price vs. Best Value', href: '/forum/articles' },
-  { label: 'Missed Deadline', href: '/forum/articles' },
-  { label: 'Balancing Sustainable Impact', href: '/forum/articles' },
-  { label: 'Missed Deadline', href: '/forum/articles' },
-  { label: 'Tied Scores', href: '/forum/articles' },
-];
-
 function ArrowUpRight() {
   return (
     <svg
@@ -28,7 +20,7 @@ function ArrowUpRight() {
   );
 }
 
-export default function ForumSidebar({ featured = DEFAULT_FEATURED }) {
+export default function ForumSidebar({ featured = [] }) {
   const [params] = useSearchParams();
   const activeCategory = params.get('category');
 
@@ -47,19 +39,23 @@ export default function ForumSidebar({ featured = DEFAULT_FEATURED }) {
         ))}
       </div>
 
-      <hr className="forum-sidebar__divider" />
-
-      <h2 className="forum-sidebar__heading">Featured Questions</h2>
-      <ul className="forum-sidebar__featured">
-        {featured.map(({ label, href }, i) => (
-          <li key={`${label}-${i}`}>
-            <a className="forum-sidebar__link" href={href}>
-              {label}
-              <ArrowUpRight />
-            </a>
-          </li>
-        ))}
-      </ul>
+      {/* Only shown when there are featured questions — heading included. */}
+      {featured.length > 0 && (
+        <>
+          <hr className="forum-sidebar__divider" />
+          <h2 className="forum-sidebar__heading">Featured Questions</h2>
+          <ul className="forum-sidebar__featured">
+            {featured.map(({ label, href }, i) => (
+              <li key={`${label}-${i}`}>
+                <Link className="forum-sidebar__link" to={href}>
+                  {label}
+                  <ArrowUpRight />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <hr className="forum-sidebar__divider" />
     </aside>

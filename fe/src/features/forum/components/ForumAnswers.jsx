@@ -10,14 +10,6 @@ const CATEGORY_LABEL = {
   award: 'Award Contracts',
 };
 
-const FEATURED = [
-  { label: 'Lowest Price vs. Best Value', href: '/forum/articles' },
-  { label: 'Missed Deadline', href: '/forum/articles' },
-  { label: 'Balancing Sustainable Impact', href: '/forum/articles' },
-  { label: 'Missed Deadline', href: '/forum/articles' },
-  { label: 'Unrequested Innovation', href: '/forum/articles' },
-];
-
 function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -37,6 +29,9 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
 
   const [answers, setAnswers] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  // Featured questions for the sidebar (published + featured). Empty => the
+  // sidebar hides the whole "Featured Questions" block.
+  const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -55,6 +50,27 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
       alive = false;
     };
   }, [category]);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const list = await questionsApi.list({ featured: true, limit: 20 });
+        if (!alive) return;
+        setFeatured(
+          (list || []).map((q) => ({
+            label: q.title,
+            href: `/forum/answers/${q.slug || q._id}`,
+          })),
+        );
+      } catch {
+        /* sidebar just stays empty */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const tag = CATEGORY_LABEL[category] ?? CATEGORY_LABEL.win;
 
@@ -92,7 +108,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
           )}
         </div>
 
-        <ForumSidebar featured={FEATURED} />
+        <ForumSidebar featured={featured} />
       </div>
     </section>
   );

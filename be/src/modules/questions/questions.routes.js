@@ -6,6 +6,7 @@ import {
   getById,
   updateStatus,
   answer,
+  setFeatured,
   remove,
 } from './questions.controller.js';
 import { protect, optionalAuth } from '../../middleware/auth.js';
@@ -24,6 +25,7 @@ router.get('/slug/:slug', optionalAuth, getBySlug);
 // Moderation actions — moderator/editor/superadmin only.
 router.patch('/:id/status', protect, authorize(MODERATION_ROLES), updateStatus);
 router.patch('/:id/answer', protect, authorize(MODERATION_ROLES), answer);
+router.patch('/:id/featured', protect, authorize(MODERATION_ROLES), setFeatured);
 router.delete('/:id', protect, authorize(MODERATION_ROLES), remove);
 
 // Keep the catch-all id route last.

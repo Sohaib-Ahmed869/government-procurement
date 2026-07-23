@@ -34,6 +34,7 @@ export const questionsApi = {
   submit: (body) => api.post('/questions', body, { auth: false }),
   setStatus: (id, status, note) => api.patch(`/questions/${id}/status`, { status, note }),
   answer: (id, paragraphs, lessons) => api.patch(`/questions/${id}/answer`, { paragraphs, lessons }),
+  setFeatured: (id, featured) => api.patch(`/questions/${id}/featured`, { featured }),
 };
 
 // ---- Public submissions ----------------------------------------------------

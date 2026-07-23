@@ -12,6 +12,9 @@ const questionSchema = new mongoose.Schema(
     // Audience category: 'win' (supplier-side) or 'award' (buyer-side).
     category: { type: String, enum: ['win', 'award'], default: 'win', index: true },
 
+    // Curated flag: featured questions surface in the forum sidebar.
+    featured: { type: Boolean, default: false, index: true },
+
     // Submitter details (public submission — not an account).
     submitter: {
       name: { type: String, default: '' },

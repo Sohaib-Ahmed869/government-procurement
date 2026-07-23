@@ -94,6 +94,19 @@ export default function ModerationQueuePage() {
     }
   };
 
+  const toggleFeatured = async (id, next) => {
+    setBusy(true);
+    setError('');
+    try {
+      await questionsApi.setFeatured(id, next);
+      load();
+    } catch (err) {
+      setError(err?.message || 'Failed to update featured');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const columns = ['Title', 'Category', 'Status', 'Submitted'];
 
   const renderDetail = (row) => {
@@ -135,6 +148,15 @@ export default function ModerationQueuePage() {
             onClick={() => setStatusFor(id, 'published')}
           >
             Publish
+          </button>
+          <button
+            type="button"
+            className={`admin-btn admin-btn--sm${row.featured ? ' admin-btn--mint' : ''}`}
+            disabled={busy}
+            onClick={() => toggleFeatured(id, !row.featured)}
+            title="Featured questions show in the forum sidebar"
+          >
+            {row.featured ? '★ Featured' : '☆ Feature'}
           </button>
         </div>
 
