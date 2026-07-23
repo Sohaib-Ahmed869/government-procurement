@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { consultationsApi } from '../../../api';
 import './ConsultationForm.css';
 
@@ -51,6 +52,7 @@ export default function ConsultationForm() {
   // Reveal on scroll into view, matching the contact form's on-enter animation.
   const { ref, inView } = useInView();
   const navigate = useNavigate();
+  const { audience } = useAudience();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -112,7 +114,7 @@ export default function ConsultationForm() {
     <section
       ref={ref}
       className={`consult${inView ? ' is-in' : ''}`}
-      data-audience="award"
+      data-audience={audience}
     >
       <div className="consult__inner">
         <div className="consult__grid">

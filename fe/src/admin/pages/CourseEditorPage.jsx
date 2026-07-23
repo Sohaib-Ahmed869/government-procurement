@@ -11,7 +11,26 @@ const BLANK = {
   durationLabel: '',
   availability: 'coming_soon', startDate: '',
   featured: 'false', status: 'draft',
+  // Course detail page fields.
+  instructorName: '', instructorRole: '', instructorAvatarUrl: '',
+  price: '', currency: 'AUD', levelLabel: '', sidebarSummary: '',
+  learnPoints: '', requirements: '', includes: '', access: '', whoShouldTake: '',
 };
+
+// The list fields are edited as one-item-per-line textareas.
+const linesToArray = (str) =>
+  (str || '').split('\n').map((s) => s.trim()).filter(Boolean);
+const arrayToLines = (arr) => (arr || []).join('\n');
+// "Who should take" items are "Title: description" per line.
+const whoToLines = (arr) =>
+  (arr || []).map((w) => `${w.title}${w.text ? `: ${w.text}` : ''}`).join('\n');
+const linesToWho = (str) =>
+  linesToArray(str).map((line) => {
+    const i = line.indexOf(':');
+    return i === -1
+      ? { title: line, text: '' }
+      : { title: line.slice(0, i).trim(), text: line.slice(i + 1).trim() };
+  });
 
 // Options mirror the /courses public side filters.
 const RESOURCE_TYPE_OPTS = [
@@ -85,6 +104,18 @@ export default function CourseEditorPage() {
           durationLabel: c.durationLabel ?? '',
           availability: c.availability ?? 'coming_soon', startDate: toDateInput(c.startDate),
           featured: c.featured ? 'true' : 'false', status: c.status ?? 'draft',
+          instructorName: c.instructor?.name ?? '',
+          instructorRole: c.instructor?.role ?? '',
+          instructorAvatarUrl: c.instructor?.avatarUrl ?? '',
+          price: c.price != null ? String(c.price) : '',
+          currency: c.currency ?? 'AUD',
+          levelLabel: c.levelLabel ?? '',
+          sidebarSummary: c.sidebarSummary ?? '',
+          learnPoints: arrayToLines(c.learnPoints),
+          requirements: arrayToLines(c.requirements),
+          includes: arrayToLines(c.includes),
+          access: arrayToLines(c.access),
+          whoShouldTake: whoToLines(c.whoShouldTake),
         };
         setForm(next);
         snapshot.current = JSON.stringify(next);
@@ -120,6 +151,20 @@ export default function CourseEditorPage() {
     startDate: form.startDate || undefined,
     featured: form.featured === 'true',
     status: statusOverride || form.status,
+    instructor: {
+      name: form.instructorName,
+      role: form.instructorRole,
+      avatarUrl: form.instructorAvatarUrl,
+    },
+    price: form.price === '' ? 0 : Number(form.price),
+    currency: form.currency,
+    levelLabel: form.levelLabel,
+    sidebarSummary: form.sidebarSummary,
+    learnPoints: linesToArray(form.learnPoints),
+    requirements: linesToArray(form.requirements),
+    includes: linesToArray(form.includes),
+    access: linesToArray(form.access),
+    whoShouldTake: linesToWho(form.whoShouldTake),
   });
 
   const save = async (statusOverride) => {
@@ -269,6 +314,23 @@ export default function CourseEditorPage() {
           </div>
 
           <div className="editor-panel">
+            <h3 className="editor-panel__title">Instructor &amp; pricing</h3>
+            <FormField label="Instructor name" name="instructorName" value={form.instructorName} onChange={onChange} />
+            <FormField label="Instructor role" name="instructorRole" value={form.instructorRole} onChange={onChange} />
+            <FormField label="Instructor avatar URL" name="instructorAvatarUrl" value={form.instructorAvatarUrl} onChange={onChange} hint="image link" />
+            <FormField label="Price" name="price" type="number" value={form.price} onChange={onChange} hint="0 = Free" />
+            <FormField label="Currency" name="currency" value={form.currency} onChange={onChange} />
+            <FormField label="Level label" name="levelLabel" value={form.levelLabel} onChange={onChange} hint='e.g. "Foundational"' />
+          </div>
+
+          <div className="editor-panel">
+            <h3 className="editor-panel__title">Purchase box</h3>
+            <FormField label="Sidebar summary" name="sidebarSummary" as="textarea" rows={3} value={form.sidebarSummary} onChange={onChange} hint="blurb under “Start learning today!”" />
+            <FormField label="This includes" name="includes" as="textarea" rows={4} value={form.includes} onChange={onChange} hint="one item per line" />
+            <FormField label="Access" name="access" as="textarea" rows={3} value={form.access} onChange={onChange} hint="one item per line" />
+          </div>
+
+          <div className="editor-panel">
             <h3 className="editor-panel__title">Course image</h3>
             <label
               className={`editor-hero${dragging ? ' is-dragging' : ''}`}
@@ -307,6 +369,22 @@ export default function CourseEditorPage() {
         onChange={(html) => set('body', html)}
         placeholder="Describe this course…"
       />
+
+      <div className="editor-detail-fields">
+        <FormField
+          label="What you'll learn" name="learnPoints" as="textarea" rows={6}
+          value={form.learnPoints} onChange={onChange} hint="one point per line"
+        />
+        <FormField
+          label="Requirements" name="requirements" as="textarea" rows={4}
+          value={form.requirements} onChange={onChange} hint="one per line"
+        />
+        <FormField
+          label="Who should take this course?" name="whoShouldTake" as="textarea" rows={6}
+          value={form.whoShouldTake} onChange={onChange}
+          hint="one per line as “Title: description”"
+        />
+      </div>
 
       <div className="editor-media">
         <span className="editor-body-label">Course materials</span>

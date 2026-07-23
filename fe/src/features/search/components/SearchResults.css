@@ -1,8 +1,16 @@
 .search {
-  /* Pinned to the award theme — always green. */
-  background: #0a3114;
+  --search-bg: #1a1a1a;
+  background: var(--search-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.search[data-audience='award'] {
+  --search-bg: #0a3114;
+}
+
+.search[data-audience='win'] {
+  --search-bg: #1a1a1a;
 }
 
 .search__inner {

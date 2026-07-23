@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { searchApi } from '../../../api';
 import './SearchResults.css';
 
@@ -59,6 +60,7 @@ export default function SearchResults() {
 
   // Replay the reveal animation whenever the query changes.
   const { ref, inView } = useInView({ resetKey: q });
+  const { audience } = useAudience();
 
   // Local text-input state so the query is editable before submit.
   const [draft, setDraft] = useState(q);
@@ -120,7 +122,7 @@ export default function SearchResults() {
   }
 
   return (
-    <section ref={ref} className={`search${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`search${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="search__inner">
         <header className="search__header">
           <h1 className="search__title">Search</h1>

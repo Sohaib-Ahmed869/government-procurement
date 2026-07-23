@@ -1,11 +1,19 @@
 .consult {
-  --consult-bg: #0a3114;
+  --consult-bg: #1a1a1a;
 
   position: relative;
   overflow: hidden;
   background: var(--consult-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.consult[data-audience='award'] {
+  --consult-bg: #0a3114;
+}
+
+.consult[data-audience='win'] {
+  --consult-bg: #1a1a1a;
 }
 
 /* --- reveal on scroll into view --- */

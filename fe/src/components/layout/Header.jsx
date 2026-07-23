@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/GovProcurementLogo.png';
 import arrowOutward from '../../assets/icons/Arrow outward.png';
@@ -23,41 +23,19 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
   const navLinks = NAV_LINKS;
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [term, setTerm] = useState('');
   const [mobileTerm, setMobileTerm] = useState('');
-  const searchInputRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
 
-  // Navigate to the results page and reset the relevant search UI.
-  const goToSearch = (value, { fromMobile = false } = {}) => {
-    const q = value.trim();
-    if (!q) return;
-    navigate(`/search?q=${encodeURIComponent(q)}`);
-    if (fromMobile) {
-      setMobileTerm('');
-      closeMenu();
-    } else {
-      setTerm('');
-      setSearchOpen(false);
-    }
-  };
-
-  const onDesktopSubmit = (e) => {
-    e.preventDefault();
-    goToSearch(term);
-  };
-
+  // Mobile search submits to the results page and closes the menu.
   const onMobileSubmit = (e) => {
     e.preventDefault();
-    goToSearch(mobileTerm, { fromMobile: true });
+    const q = mobileTerm.trim();
+    if (!q) return;
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    setMobileTerm('');
+    closeMenu();
   };
-
-  // Focus the desktop search field as it expands.
-  useEffect(() => {
-    if (searchOpen) searchInputRef.current?.focus();
-  }, [searchOpen]);
 
   // Lock background scroll while the mobile menu is open, and let Escape close it.
   useEffect(() => {
@@ -113,49 +91,23 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         </nav>
 
         <div className="site-header__actions">
-          <form
-            className={`site-header__search${searchOpen ? ' is-open' : ''}`}
-            role="search"
-            onSubmit={onDesktopSubmit}
-          >
-            <input
-              ref={searchInputRef}
-              type="search"
-              className="site-header__search-input"
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') setSearchOpen(false);
-              }}
-              placeholder="Search…"
-              aria-label="Search the site"
-              tabIndex={searchOpen ? 0 : -1}
-            />
-            <button
-              type={searchOpen ? 'submit' : 'button'}
-              className="site-header__search-btn"
-              aria-label={searchOpen ? 'Submit search' : 'Open search'}
-              aria-expanded={searchOpen}
-              onClick={() => {
-                if (!searchOpen) setSearchOpen(true);
-              }}
+          {/* The magnifier goes straight to the search page — no inline field. */}
+          <Link className="site-header__search-btn" to="/search" aria-label="Search the site">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          </form>
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </Link>
 
           {showToggle && <AudienceToggle />}
 
