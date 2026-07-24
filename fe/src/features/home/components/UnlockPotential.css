@@ -189,6 +189,37 @@
   gap: 18px;
 }
 
+/* Courses-only layout: the course column (three-up grid + wide banner) spans the
+   full width, taking the space the artefact column would otherwise have filled. */
+.uy__bento--courses {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 901px) {
+  /* Portrait tiles spanning the whole width... */
+  .uy__bento--courses .uy__card--course {
+    min-height: 260px;
+  }
+
+  /* ...and a wide banner with its title/label centred vertically. */
+  .uy__bento--courses .uy__card--wide {
+    min-height: 104px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Artefacts-only layout: the two artefact cards stack vertically, each stretched
+   across the full width as a wide banner rather than a square tile. */
+.uy__bento--artefacts {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.uy__bento--artefacts .uy__card--feature {
+  min-height: 150px;
+}
+
 /* --- cards --- */
 .uy__card {
   position: relative;

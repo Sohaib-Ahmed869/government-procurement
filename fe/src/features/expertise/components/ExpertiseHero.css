@@ -233,14 +233,14 @@
     margin-top: 26px;
   }
 
-  /* Pinned width so the longer "Whatsapp …" label can't stretch the box wider
-     than "Book a Consultation"; icon pinned left, label centred. */
+  /* Pinned width so both buttons match; wide enough that the longer
+     "Whatsapp +61 478 669 922" label clears the left-pinned icon. */
   .xp__btn {
     position: relative;
     flex: none;
-    width: 240px;
-    min-width: 240px;
-    max-width: 240px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
     height: 52px;
     justify-content: center;
     padding: 12px 18px 12px 50px;

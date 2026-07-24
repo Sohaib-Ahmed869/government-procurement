@@ -340,11 +340,11 @@
   .home-hero__actions .home-hero__btn {
     position: relative;
     flex: none;
-    /* Pin the width so the longer "Whatsapp …" label can't stretch the box wider
-       than the "Book a Consultation" button. */
-    width: 237px;
-    min-width: 237px;
-    max-width: 237px;
+    /* Pin both buttons to the same width; wide enough that the longer
+       "Whatsapp +61 478 669 922" label clears the pinned icon on the left. */
+    width: 274px;
+    min-width: 274px;
+    max-width: 274px;
     height: 54px;
     justify-content: center;
     /* Extra left padding leaves room for the pinned icon; the label then centres

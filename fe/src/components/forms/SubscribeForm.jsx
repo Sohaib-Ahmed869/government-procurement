@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useAudience } from '../../context/AudienceContext.jsx';
 import { subscribersApi } from '../../api';
 import './SubscribeForm.css';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SubscribeForm() {
+  const { audience } = useAudience();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle | submitting | success | error
   const [error, setError] = useState('');
@@ -34,7 +36,7 @@ export default function SubscribeForm() {
   }
 
   return (
-    <section className="subscribe-form" aria-labelledby="subscribe-form-heading">
+    <section className="subscribe-form" data-audience={audience} aria-labelledby="subscribe-form-heading">
       <h2 className="subscribe-form__heading" id="subscribe-form-heading">
         Stay in the loop
       </h2>

@@ -481,6 +481,14 @@
     justify-content: flex-start;
     margin-bottom: 18px;
   }
+
+  /* The sort control sits at the left edge here, so anchor its dropdown to the
+     left (it defaults to right-aligned) — otherwise the 190px panel grows past
+     the left edge and off the screen. */
+  .courses-sort__menu {
+    right: auto;
+    left: 0;
+  }
 }
 
 @media (max-width: 560px) {

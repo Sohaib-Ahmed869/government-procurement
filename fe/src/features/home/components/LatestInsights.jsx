@@ -24,7 +24,9 @@ export default function LatestInsights() {
     let alive = true;
     (async () => {
       try {
-        const list = await articlesApi.list({ limit: 3, sort: '-publishedAt' });
+        // "Featured on homepage" articles come first; any of the 3 slots left
+        // over are filled with the most recently published of the rest.
+        const list = await articlesApi.list({ limit: 3, sort: '-featured -publishedAt' });
         if (!alive) return;
         setArticles((list || []).slice(0, 3));
         setStatus('ready');

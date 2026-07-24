@@ -1,4 +1,6 @@
 .subscribe-form {
+  /* Focus-glow accent, keyed to the segment: green for award, neutral grey for
+     win — so the input's focus ring matches the active theme. */
   --mint: #7ee2a8;
 
   max-width: 460px;
@@ -6,6 +8,14 @@
   text-align: center;
   font-family: 'Geist Variable', system-ui, sans-serif;
   color: #fff;
+}
+
+.subscribe-form[data-audience='award'] {
+  --mint: #7ee2a8;
+}
+
+.subscribe-form[data-audience='win'] {
+  --mint: #c9c9c9;
 }
 
 .subscribe-form__heading {

@@ -18,9 +18,11 @@
 }
 
 /* `.forum-answers` is also `z-index: 1` and comes later in the DOM, so it would
-   paint over the panel. Lift the whole hero while the panel is open. */
+   paint over the panel. Lift the whole hero while the panel is open — above the
+   site header (z-index 100 on mobile) so the header's floating audience toggle
+   can't paint in front of the open categories panel. */
 .forum-hero.is-panel-open {
-  z-index: 90;
+  z-index: 150;
 }
 
 /* --- reveal on mount --- */
@@ -302,8 +304,10 @@
     display: none;
   }
 
+  /* Compact hero (article / answer / submit pages): keep a little top space so
+     the search row isn't jammed against the header's floating audience toggle. */
   .forum-hero--compact .forum-hero__inner {
-    padding-top: 0;
+    padding-top: 24px;
     padding-bottom: 8px;
   }
 
