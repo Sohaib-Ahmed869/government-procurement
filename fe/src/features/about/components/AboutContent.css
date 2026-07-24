@@ -2,6 +2,11 @@
   /* Every band on the page shares one surface colour, keyed to the segment. */
   --about-bg: #1a1a1a;
 
+  /* Paint the wrapper too, so the mobile toggle-row clearance (the 118px
+     padding-top that .page-layout__main adds to the first child) reads as the
+     segment colour rather than the page's white background. */
+  background: var(--about-bg);
+
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 

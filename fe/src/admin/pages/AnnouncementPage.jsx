@@ -194,6 +194,9 @@ export default function AnnouncementPage() {
         subtitle="Leave the window blank to show it immediately and indefinitely."
         onClose={closeDrawer}
         busy={saving}
+        /* Wider than the 440px default so the two-column field grid — including
+           the datetime-local inputs — fits without a horizontal scrollbar. */
+        width="640px"
         footer={
           <>
             <button type="button" className="admin-btn" onClick={closeDrawer} disabled={saving}>

@@ -1,5 +1,8 @@
 .li {
   --li-bg: #1a1a1a;
+  /* Placeholder art for imageless cards — keyed to the segment (green for
+     award, grey for win), matching the section surface. */
+  --li-empty-art: linear-gradient(160deg, #242424 0%, #3a3a3a 100%);
 
   background: var(--li-bg);
   color: #fff;
@@ -8,10 +11,12 @@
 
 .li[data-audience='award'] {
   --li-bg: #0a3114;
+  --li-empty-art: linear-gradient(160deg, #0a3114 0%, #14572a 100%);
 }
 
 .li[data-audience='win'] {
   --li-bg: #1a1a1a;
+  --li-empty-art: linear-gradient(160deg, #242424 0%, #3a3a3a 100%);
 }
 
 .li__inner {
@@ -115,7 +120,7 @@
 }
 
 .li-card__art--empty {
-  background: linear-gradient(160deg, #0a3114 0%, #14572a 100%);
+  background: var(--li-empty-art);
 }
 
 .li-card__body {

@@ -16,9 +16,6 @@ function ArrowCircle({ size = 36 }) {
   );
 }
 
-// Fallbacks so the bento still renders if the API is empty or unreachable.
-const FALLBACK_COURSE = { title: 'Introduction to Government Procurement' };
-const FALLBACK_ARTEFACT = { title: 'Steps in the Procurement Cycle' };
 const imgOf = (item) => item?.image?.url || cardImage;
 const linkOf = (item, fallbackHref) => (item?.slug ? `/courses/${item.slug}` : fallbackHref);
 
@@ -34,8 +31,10 @@ export default function UnlockPotential() {
   useEffect(() => {
     let alive = true;
     Promise.all([
-      coursesApi.list({ resourceType: 'courses', limit: 4, sort: '-featured' }).catch(() => []),
-      coursesApi.list({ resourceType: 'artefacts', limit: 2, sort: '-featured' }).catch(() => []),
+      // "Featured on homepage" items come first; any remaining slots (up to 4
+      // courses / 2 artefacts) are filled with the most recent of the rest.
+      coursesApi.list({ resourceType: 'courses', limit: 4, sort: '-featured -createdAt' }).catch(() => []),
+      coursesApi.list({ resourceType: 'artefacts', limit: 2, sort: '-featured -createdAt' }).catch(() => []),
     ]).then(([c, a]) => {
       if (!alive) return;
       setCourses(c || []);
@@ -46,18 +45,78 @@ export default function UnlockPotential() {
     };
   }, []);
 
-  // Slot the fetched content into the bento, padding with fallbacks so the
-  // layout keeps its shape regardless of how many records exist.
-  const featureArtefacts = [artefacts[0] || FALLBACK_ARTEFACT, artefacts[1] || FALLBACK_ARTEFACT];
-  const gridCourses = [
-    courses[0] || FALLBACK_COURSE,
-    courses[1] || FALLBACK_COURSE,
-    courses[2] || FALLBACK_COURSE,
-  ];
-  const wideCourse = courses[3] || courses[0] || FALLBACK_COURSE;
+  // Everything below the heading is driven purely by what the CMS returns — no
+  // hardcoded placeholder boxes. Decide which layout to show from the counts:
+  //   • full      — 4+ courses AND 2+ artefacts: the standard bento.
+  //   • courses   — 4+ courses, <2 artefacts: 4 course cards fill the full width.
+  //   • artefacts — <4 courses, 2+ artefacts: 2 artefact cards fill the full width.
+  //   • none      — neither threshold met: heading + banner only, no boxes.
+  // (The API caps courses at 4 and artefacts at 2, so these lengths equal the
+  // thresholds exactly.)
+  const enoughCourses = courses.length >= 4;
+  const enoughArtefacts = artefacts.length >= 2;
+  let mode = 'none';
+  if (enoughCourses && enoughArtefacts) mode = 'full';
+  else if (enoughCourses) mode = 'courses';
+  else if (enoughArtefacts) mode = 'artefacts';
 
-  // Cards shown in the mobile carousel: 2 feature + 3 course + 1 wide.
-  const CARD_COUNT = 6;
+  const featureArtefacts = artefacts.slice(0, 2);
+  const gridCourses = courses.slice(0, 3);
+  const wideCourse = courses[3];
+
+  // Cards in the mobile carousel: full = 2 feature + 3 course + 1 wide, otherwise
+  // just the boxes that mode renders.
+  const cardCount = mode === 'full' ? 6 : mode === 'courses' ? 4 : mode === 'artefacts' ? 2 : 0;
+
+  // A single course / artefact card — reused by the courses-only and
+  // artefacts-only full-width layouts.
+  const renderCourseCard = (c, i) => (
+    <a
+      className="uy__card uy__card--course"
+      href={linkOf(c, '/courses')}
+      key={c._id || `course-${i}`}
+    >
+      <img src={imgOf(c)} alt="" className="uy__card-img" />
+      <div className="uy__card-tint" />
+      <div className="uy__card-body">
+        <p className="uy__card-label">Courses</p>
+        <h4 className="uy__card-title uy__card-title--sm">{c.title}</h4>
+      </div>
+      <ArrowCircle size={32} />
+    </a>
+  );
+
+  const renderArtefactCard = (a, i) => (
+    <a
+      key={a._id || `artefact-${i}`}
+      className="uy__card uy__card--feature uy__card--neutral"
+      href={linkOf(a, '/courses')}
+    >
+      <img src={imgOf(a)} alt="" className="uy__card-img" />
+      <div className="uy__card-tint" />
+      <div className="uy__card-body">
+        <p className="uy__card-label">Artefacts</p>
+        <h4 className="uy__card-title">{a.title}</h4>
+      </div>
+      <ArrowCircle />
+    </a>
+  );
+
+  // The wide course banner that sits under the 3-up course grid. `large` gives it
+  // the bigger title used when courses fill the whole section on their own.
+  const renderWideCourseCard = (c, large = false) => (
+    <a className="uy__card uy__card--wide uy__card--neutral" href={linkOf(c, '/courses')}>
+      <img src={imgOf(c)} alt="" className="uy__card-img" />
+      <div className="uy__card-tint" />
+      <div className="uy__card-body">
+        <div className="uy__wide-row">
+          <h4 className={`uy__card-title${large ? '' : ' uy__card-title--sm'}`}>{c.title}</h4>
+          <ArrowCircle size={32} />
+        </div>
+        <p className="uy__card-label">Courses</p>
+      </div>
+    </a>
+  );
 
   // On mobile the bento is a horizontal snap carousel; track which card is centred
   // so the pagination dots stay in sync.
@@ -68,7 +127,7 @@ export default function UnlockPotential() {
     const gap = parseFloat(getComputedStyle(el).columnGap || '0') || 0;
     const step = card.getBoundingClientRect().width + gap;
     const idx = step ? Math.round(el.scrollLeft / step) : 0;
-    setActiveCard(Math.max(0, Math.min(CARD_COUNT - 1, idx)));
+    setActiveCard(Math.max(0, Math.min(cardCount - 1, idx)));
   };
 
   const scrollToCard = (i) => {
@@ -94,81 +153,82 @@ export default function UnlockPotential() {
               Helping procurement officers unlock their potential
             </h3>
             <p className="uy__banner-sub">Join our academy to get ahead in your career.</p>
-            <a className="uy__watch" href="/academy">
+            <a className="uy__watch" href="/courses">
               <span className="uy__watch-dot" aria-hidden="true" />
               Watch video
             </a>
           </div>
         </div>
 
-        {/* Bento grid (desktop) / swipeable carousel (mobile) */}
-        <div className="uy__bento" ref={bentoRef} onScroll={onBentoScroll}>
-          <div className="uy__left">
-            {featureArtefacts.map((a, i) => (
-              <a
-                key={a._id || `artefact-${i}`}
-                className={`uy__card uy__card--feature uy__card--neutral${i === 1 ? ' uy__card--short' : ''}`}
-                href={linkOf(a, '/courses')}
-              >
-                <img src={imgOf(a)} alt="" className="uy__card-img" />
-                <div className="uy__card-tint" />
-                <div className="uy__card-body">
-                  <p className="uy__card-label">Artefacts</p>
-                  <h4 className="uy__card-title">{a.title}</h4>
+        {/* Bento grid (desktop) / swipeable carousel (mobile). The layout adapts
+            to how much content exists; see `mode` above. */}
+        {mode !== 'none' && (
+          <div
+            className={`uy__bento uy__bento--${mode}`}
+            ref={bentoRef}
+            onScroll={onBentoScroll}
+          >
+            {mode === 'full' && (
+              <>
+                <div className="uy__left">
+                  {featureArtefacts.map((a, i) => (
+                    <a
+                      key={a._id || `artefact-${i}`}
+                      className={`uy__card uy__card--feature uy__card--neutral${i === 1 ? ' uy__card--short' : ''}`}
+                      href={linkOf(a, '/courses')}
+                    >
+                      <img src={imgOf(a)} alt="" className="uy__card-img" />
+                      <div className="uy__card-tint" />
+                      <div className="uy__card-body">
+                        <p className="uy__card-label">Artefacts</p>
+                        <h4 className="uy__card-title">{a.title}</h4>
+                      </div>
+                      <ArrowCircle />
+                    </a>
+                  ))}
                 </div>
-                <ArrowCircle />
-              </a>
-            ))}
-          </div>
 
-          <div className="uy__right">
-            <div className="uy__courses">
-              {gridCourses.map((c, i) => (
-                <a
-                  className="uy__card uy__card--course"
-                  href={linkOf(c, '/courses')}
-                  key={c._id || `course-${i}`}
-                >
-                  <img src={imgOf(c)} alt="" className="uy__card-img" />
-                  <div className="uy__card-tint" />
-                  <div className="uy__card-body">
-                    <p className="uy__card-label">Courses</p>
-                    <h4 className="uy__card-title uy__card-title--sm">{c.title}</h4>
+                <div className="uy__right">
+                  <div className="uy__courses">
+                    {gridCourses.map((c, i) => renderCourseCard(c, i))}
                   </div>
-                  <ArrowCircle size={32} />
-                </a>
-              ))}
-            </div>
 
-            <a
-              className="uy__card uy__card--wide uy__card--neutral"
-              href={linkOf(wideCourse, '/courses')}
-            >
-              <img src={imgOf(wideCourse)} alt="" className="uy__card-img" />
-              <div className="uy__card-tint" />
-              <div className="uy__card-body">
-                <div className="uy__wide-row">
-                  <h4 className="uy__card-title uy__card-title--sm">{wideCourse.title}</h4>
-                  <ArrowCircle size={32} />
+                  {renderWideCourseCard(wideCourse)}
                 </div>
-                <p className="uy__card-label">Courses</p>
+              </>
+            )}
+
+            {/* Courses only — the same three-up grid + wide banner as the full
+                bento's course column, now spanning the whole section width. */}
+            {mode === 'courses' && (
+              <div className="uy__right">
+                <div className="uy__courses">
+                  {courses.slice(0, 3).map((c, i) => renderCourseCard(c, i))}
+                </div>
+
+                {renderWideCourseCard(courses[3], true)}
               </div>
-            </a>
+            )}
+
+            {/* Artefacts only — the two artefact cards span the full width. */}
+            {mode === 'artefacts' && featureArtefacts.map((a, i) => renderArtefactCard(a, i))}
           </div>
-        </div>
+        )}
 
         {/* Pagination dots (mobile carousel only) */}
-        <div className="uy__dots">
-          {Array.from({ length: CARD_COUNT }).map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              className={`uy__dot${i === activeCard ? ' is-active' : ''}`}
-              aria-label={`Go to card ${i + 1}`}
-              onClick={() => scrollToCard(i)}
-            />
-          ))}
-        </div>
+        {cardCount > 0 && (
+          <div className="uy__dots">
+            {Array.from({ length: cardCount }).map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`uy__dot${i === activeCard ? ' is-active' : ''}`}
+                aria-label={`Go to card ${i + 1}`}
+                onClick={() => scrollToCard(i)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

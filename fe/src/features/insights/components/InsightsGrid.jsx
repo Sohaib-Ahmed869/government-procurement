@@ -4,14 +4,7 @@ import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import photoA from '../../../assets/images/MainPictureHomepage.png';
-import photoB from '../../../assets/images/EnhanceExpImage.png';
-import photoC from '../../../assets/images/ExpertiseImage.png';
 import './InsightsGrid.css';
-
-// Stand-in imagery used when an article has no hero image from the CMS — cycled
-// across the cards so no two neighbours repeat.
-const PHOTOS = [photoA, photoB, photoC];
 
 const SORT_OPTIONS = [
   { value: 'none', label: 'None' },
@@ -190,7 +183,9 @@ export default function InsightsGrid() {
         {status === 'ready' && visible.length > 0 && (
           <ul className="insights__grid" ref={gridRef} onScroll={onGridScroll}>
             {visible.map((article, i) => {
-              const image = article.heroImage?.url || PHOTOS[i % PHOTOS.length];
+              // Only what the CMS provides — no placeholder image. Cards without a
+              // hero image fall back to the tile's own solid background colour.
+              const image = article.heroImage?.url || null;
               const date = formatDate(article.publishedAt);
               return (
                 <li key={article._id} className="insights-card" style={{ '--i': i }}>
@@ -198,7 +193,7 @@ export default function InsightsGrid() {
                       hover the whole tile darkens and the meta, excerpt and CTA
                       animate in — the rich "featured" look, for all cards. */}
                   <Link to={`/insights/${article.slug}`} className="insights-card__inner">
-                    <img className="insights-card__art" src={image} alt="" />
+                    {image && <img className="insights-card__art" src={image} alt="" />}
                     <div className="insights-card__scrim insights-card__scrim--base" aria-hidden="true" />
                     <div className="insights-card__scrim insights-card__scrim--full" aria-hidden="true" />
                     <div className="insights-card__body">
