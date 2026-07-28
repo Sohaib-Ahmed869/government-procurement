@@ -1,5 +1,5 @@
 .ab {
-  --ab-bg: #1a1a1a;
+  --ab-bg: var(--gp-ink-900);
 
   background: var(--ab-bg);
   color: #fff;
@@ -7,11 +7,11 @@
 }
 
 .ab[data-audience='award'] {
-  --ab-bg: #0a3114;
+  --ab-bg: var(--gp-green-900);
 }
 
 .ab[data-audience='win'] {
-  --ab-bg: #1a1a1a;
+  --ab-bg: var(--gp-ink-900);
 }
 
 .ab__inner {

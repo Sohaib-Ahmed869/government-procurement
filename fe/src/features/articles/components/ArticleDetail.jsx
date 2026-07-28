@@ -45,12 +45,6 @@ function ShareRow() {
         <button type="button" className="article-share__button" onClick={onCopy}>
           {copied ? 'Link copied' : 'Copy link'}
         </button>
-        <button type="button" className="article-share__button">
-          LinkedIn
-        </button>
-        <button type="button" className="article-share__button">
-          X
-        </button>
       </div>
     </div>
   );

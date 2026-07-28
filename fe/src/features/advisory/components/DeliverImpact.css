@@ -1,5 +1,5 @@
 .di {
-  --di-bg: #1a1a1a;
+  --di-bg: var(--gp-ink-900);
 
   background: var(--di-bg);
   color: #fff;
@@ -7,11 +7,11 @@
 }
 
 .di[data-audience='award'] {
-  --di-bg: #0a3114;
+  --di-bg: var(--gp-green-900);
 }
 
 .di[data-audience='win'] {
-  --di-bg: #1a1a1a;
+  --di-bg: var(--gp-ink-900);
 }
 
 .di__inner {

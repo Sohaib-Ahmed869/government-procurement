@@ -1,5 +1,5 @@
 .legal {
-  --legal-bg: #1a1a1a;
+  --legal-bg: var(--gp-ink-900);
 
   flex: 1 0 auto;
   background: var(--legal-bg);
@@ -8,11 +8,11 @@
 }
 
 .legal[data-audience='award'] {
-  --legal-bg: #0a3114;
+  --legal-bg: var(--gp-green-900);
 }
 
 .legal[data-audience='win'] {
-  --legal-bg: #1a1a1a;
+  --legal-bg: var(--gp-ink-900);
 }
 
 .legal__inner {

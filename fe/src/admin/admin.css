@@ -1,9 +1,9 @@
 /* Admin CMS — shared styles. Light theme with the site's green accent. */
 .admin {
-  --admin-green: #0a3114;
+  --admin-green: var(--gp-green-900);
   --admin-green-600: #0f4a20;
   --admin-green-700: #0c3a19;
-  --admin-mint: #7ee2a8;
+  --admin-mint: var(--gp-mint-300);
   --admin-mint-soft: #e3f6ec;
   --admin-bg: #f4f6f5;
   --admin-surface: #ffffff;

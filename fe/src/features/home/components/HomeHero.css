@@ -1,5 +1,5 @@
 .home-hero {
-  --home-bg: #1a1a1a;
+  --home-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
@@ -9,11 +9,11 @@
 }
 
 .home-hero[data-audience='award'] {
-  --home-bg: #0a3114;
+  --home-bg: var(--gp-green-900);
 }
 
 .home-hero[data-audience='win'] {
-  --home-bg: #1a1a1a;
+  --home-bg: var(--gp-ink-900);
 }
 
 /* --- reveal animations --- */
@@ -94,7 +94,6 @@
   font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.22em;
-  text-transform: uppercase;
   color: #fff;
 }
 
@@ -139,7 +138,7 @@
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 10px 30px 10px 10px;
+  padding: 14px 30px;
   font-size: 18px;
   font-weight: 500;
   color: #fff;
@@ -189,9 +188,10 @@
   }
 }
 
-/* trailing-icon variant (icon on the right) */
+/* Was the trailing-icon variant; with the icon gone it matches the base pill.
+   The class is kept so the advisory button can be styled apart again later. */
 .home-hero__btn--trailing {
-  padding: 10px 10px 10px 30px;
+  padding: 14px 30px;
 }
 
 .home-hero__circle {
@@ -295,21 +295,10 @@
     display: none;
   }
 
-  /* The mobile wave is a background on the intro, anchored to the intro's bottom
-     (left-bottom, fixed size). The buttons sit a fixed distance above that bottom
-     (via padding-bottom) and the advisory image follows in normal flow, so the
-     wave↔buttons and wave↔image gaps look the same at every width ≤768. */
+  /* No wave on small screens, so the intro only needs room for its own
+     content. */
   .home-hero__intro {
-    /* Tight to the header toggle above it; the 100px here was the room the
-       toggle used to occupy inside the hero. */
-    padding: 38px 24px 200px;
-    background-image: url('../../../assets/images/WaveSmallerScreen.png');
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    /* Phones (≤480px): fixed 480px wave, curl anchored left. Wider tablets: the
-       width stretches to fill the screen (touching both sides) while the height
-       stays fixed, so the vertical spacing stays consistent. */
-    background-size: max(480px, 100%) 895px;
+    padding: 38px 24px 56px;
   }
 
   .home-hero__title {
@@ -349,7 +338,7 @@
     justify-content: center;
     /* Extra left padding leaves room for the pinned icon; the label then centres
        in the remaining space and fills the button on one line. */
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 14px;
     white-space: nowrap;
   }
@@ -377,7 +366,7 @@
     max-width: 237px;
     height: 54px;
     justify-content: center;
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 14px;
     white-space: nowrap;
   }

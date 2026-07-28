@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi } from '../../../api';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import './InsightsGrid.css';
 
 const SORT_OPTIONS = [
@@ -87,14 +86,8 @@ function PillDropdown({ label, options, value, onChange }) {
   );
 }
 
-function CardMeta({ topic, date }) {
-  return (
-    <div className="insights-card__meta">
-      {topic && <span className="insights-card__topic">{topic}</span>}
-      {date && <span className="insights-card__date">{date}</span>}
-    </div>
-  );
-}
+// Three rows of the 4-up desktop grid; "View more" adds another batch.
+const PAGE_SIZE = 12;
 
 export default function InsightsGrid() {
   const { ref, inView } = useInView();
@@ -145,6 +138,15 @@ export default function InsightsGrid() {
     return list;
   }, [articles, topic, sort]);
 
+  // How many of the filtered articles are on screen. Reset whenever the filter
+  // or sort changes, so a new selection starts from the first page again.
+  const [shown, setShown] = useState(PAGE_SIZE);
+  useEffect(() => {
+    setShown(PAGE_SIZE);
+  }, [topic, sort]);
+
+  const onScreen = visible.slice(0, shown);
+
   const onGridScroll = () => {
     const el = gridRef.current;
     const card = el?.querySelector('.insights-card');
@@ -152,7 +154,7 @@ export default function InsightsGrid() {
     const gap = parseFloat(getComputedStyle(el).columnGap || '0') || 0;
     const step = card.getBoundingClientRect().width + gap;
     const idx = step ? Math.round(el.scrollLeft / step) : 0;
-    setActiveCard(Math.max(0, Math.min(visible.length - 1, idx)));
+    setActiveCard(Math.max(0, Math.min(shown - 1, idx)));
   };
 
   const scrollToCard = (i) => {
@@ -182,37 +184,47 @@ export default function InsightsGrid() {
 
         {status === 'ready' && visible.length > 0 && (
           <ul className="insights__grid" ref={gridRef} onScroll={onGridScroll}>
-            {visible.map((article, i) => {
+            {onScreen.map((article, i) => {
               // Only what the CMS provides — no placeholder image. Cards without a
               // hero image fall back to the tile's own solid background colour.
               const image = article.heroImage?.url || null;
               const date = formatDate(article.publishedAt);
               return (
-                <li key={article._id} className="insights-card" style={{ '--i': i }}>
-                  {/* Every card is identical: photo + title by default, and on
-                      hover the whole tile darkens and the meta, excerpt and CTA
-                      animate in — the rich "featured" look, for all cards. */}
+                <li key={article._id} className="insights-card" style={{ '--i': i % PAGE_SIZE }}>
+                  {/* Image on top, then topic, title and a date-led summary —
+                      everything visible at rest, nothing revealed on hover. */}
                   <Link to={`/insights/${article.slug}`} className="insights-card__inner">
-                    {image && <img className="insights-card__art" src={image} alt="" />}
-                    <div className="insights-card__scrim insights-card__scrim--base" aria-hidden="true" />
-                    <div className="insights-card__scrim insights-card__scrim--full" aria-hidden="true" />
-                    <div className="insights-card__body">
-                      <div className="insights-card__meta-slot insights-card__reveal">
-                        <CardMeta topic={article.topic} date={date} />
-                      </div>
-                      <h2 className="insights-card__title">{article.title}</h2>
-                      {article.excerpt && (
-                        <p className="insights-card__excerpt insights-card__reveal">
-                          {article.excerpt}
-                        </p>
-                      )}
-                      <span className="insights-card__cta insights-card__reveal">
-                        Learn more
-                        <span className="insights-card__cta-icon" aria-hidden="true">
-                          <img src={arrowIcon} alt="" />
-                        </span>
-                      </span>
-                    </div>
+                    <span className="insights-card__art">
+                      {image && <img src={image} alt="" />}
+                    </span>
+
+                    {article.topic && (
+                      <span className="insights-card__topic">{article.topic}</span>
+                    )}
+
+                    <h2 className="insights-card__title">
+                      {article.title}
+                      <svg
+                        className="insights-card__chevron"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        aria-hidden="true"
+                      >
+                        <polyline points="9 6 15 12 9 18" />
+                      </svg>
+                    </h2>
+
+                    {(date || article.excerpt) && (
+                      <p className="insights-card__summary">
+                        {date && <span className="insights-card__date">{date}</span>}
+                        {date && article.excerpt ? ' - ' : ''}
+                        {article.excerpt}
+                      </p>
+                    )}
                   </Link>
                 </li>
               );
@@ -220,10 +232,16 @@ export default function InsightsGrid() {
           </ul>
         )}
 
+        {status === 'ready' && visible.length > shown && (
+          <button type="button" className="insights__more" onClick={() => setShown((n) => n + PAGE_SIZE)}>
+            View more
+          </button>
+        )}
+
         {/* Pagination dots — shown only in the mobile carousel. */}
         {status === 'ready' && visible.length > 0 && (
           <div className="insights__dots">
-            {visible.map((article, i) => (
+            {onScreen.map((article, i) => (
               <button
                 key={article._id}
                 type="button"

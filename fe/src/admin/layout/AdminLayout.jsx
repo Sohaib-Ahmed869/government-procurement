@@ -13,7 +13,6 @@ const SECTION_TITLES = {
   courses: 'Courses',
   faqs: 'FAQ',
   pages: 'Pages',
-  testimonials: 'Testimonials',
   categories: 'Categories',
   moderation: 'Q&A Moderation',
   subscribers: 'Subscribers',

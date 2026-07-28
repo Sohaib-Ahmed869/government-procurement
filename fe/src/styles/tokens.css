@@ -1,0 +1,23 @@
+/* Brand palette — the single source of truth for the site's colours.
+   Component stylesheets never hardcode these hexes; their audience blocks
+   (`[data-audience='award'|'win']`) resolve their local --*-bg variables to the
+   tokens below, so changing a value here propagates everywhere at once.
+
+   Loaded from index.css, which main.jsx imports, so the tokens are in scope for
+   the public site and the admin CMS alike. */
+:root {
+  /* Award segment. green-900 is the section/header/footer background; the
+     others are the raised surfaces and gradient partners layered on top of it. */
+  --gp-green-900: #0a3114; /* award background */
+  --gp-green-800: #0e3e1b; /* panels, dropdowns and pills on award */
+  --gp-green-750: #0d3a1a; /* courses browser menu */
+  --gp-green-600: #14572a; /* lighter end of the empty-state gradient */
+
+  /* Accent — link, icon and badge colour on dark surfaces in both segments. */
+  --gp-mint-300: #7ee2a8;
+
+  /* Win segment background, and the raised surface that sits on it — the
+     grey counterpart to green-900 / green-800. */
+  --gp-ink-900: #1a1a1a;
+  --gp-ink-800: #242424;
+}

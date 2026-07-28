@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import logo from '../../assets/images/GovProcurementLogo.png';
+import logo from '../../assets/icons/GPLogo.svg';
 
 // Small inline-SVG icon set (no external icon dependency). Each is a 24x24
 // stroke icon that inherits currentColor.
@@ -57,7 +57,6 @@ const NAV = [
       { to: '/admin/articles', label: 'Articles', icon: 'doc' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
-      { to: '/admin/testimonials', label: 'Testimonials', icon: 'quote' },
       { to: '/admin/categories', label: 'Categories', icon: 'tag' },
     ],
   },

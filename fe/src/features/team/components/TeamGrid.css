@@ -1,0 +1,246 @@
+.team {
+  --team-bg: var(--gp-ink-900);
+  /* Raised surface the cards and avatar discs sit on. */
+  --team-surface: var(--gp-ink-800);
+
+  background: var(--team-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.team[data-audience='award'] {
+  --team-bg: var(--gp-green-900);
+  --team-surface: var(--gp-green-800);
+}
+
+.team[data-audience='win'] {
+  --team-bg: var(--gp-ink-900);
+  --team-surface: var(--gp-ink-800);
+}
+
+.team__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 40px 96px;
+}
+
+.team__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* A narrow gap, so the section colour shows as a seam between the cards
+     rather than separating them into standalone panels. */
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- card --- */
+/* Square-cornered, on the segment's raised surface — enough to lift the block
+   off the section background around it. */
+.team-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 40px 28px 32px;
+  text-align: center;
+  background: var(--team-surface);
+}
+
+/* Hover lifts the card clear of the grid: over ~0.8s it rises and scales up
+   over its neighbours, settles to the lighter 4% fill, and drops a shadow onto
+   them. The easing eases in and out, so the card is slowest at the start and
+   end of the travel and the lift is clearly readable rather than a snap. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .team-card {
+    transition:
+      transform 0.8s cubic-bezier(0.33, 0, 0.2, 1),
+      box-shadow 0.8s cubic-bezier(0.33, 0, 0.2, 1),
+      background-color 0.8s ease-in-out;
+  }
+
+  /* Every card lifts, whether or not it links anywhere — only the members with
+     a profile carry a link on the name (see .team-card--static in TeamGrid.jsx). */
+  .team-card:hover {
+    /* Above the neighbouring cards so the shadow falls on them, not under. */
+    z-index: 1;
+    transform: translateY(-10px) scale(1.04);
+    /* Sits over the section colour, so this resolves to the same tone the cards
+       used to rest at. */
+    background-color: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* --- avatar --- */
+.team-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex: none;
+  border-radius: 50%;
+  /* Reads against both card states: the card rests on --team-surface and drops
+     to the 4% fill on hover, so the disc needs its own tone. */
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.team-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.team-avatar__initials {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.team-card__avatar {
+  width: 132px;
+  height: 132px;
+}
+
+.team-card__avatar .team-avatar__initials {
+  font-size: 38px;
+}
+
+/* --- card text --- */
+.team-card__name {
+  margin: 22px 0 0;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.team-card__link {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Stretches the name's link over the whole card. */
+.team-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.team-card__role {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.team-card__rule {
+  display: block;
+  width: 48px;
+  height: 1px;
+  margin: 18px 0;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.team-card__summary {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  /* Keeps every card's text block the same depth however long the bio runs. */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- mail / LinkedIn --- */
+.team-card__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.team-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #fff;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.team-card__icon:hover,
+.team-card__icon:focus-visible {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.team :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .team__grid .team-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .team.is-in .team__grid .team-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .team.is-in .team__grid > li:nth-child(2) .team-card { transition-delay: 0.06s; }
+  .team.is-in .team__grid > li:nth-child(3) .team-card { transition-delay: 0.12s; }
+  .team.is-in .team__grid > li:nth-child(4) .team-card { transition-delay: 0.18s; }
+  .team.is-in .team__grid > li:nth-child(5) .team-card { transition-delay: 0.24s; }
+  .team.is-in .team__grid > li:nth-child(6) .team-card { transition-delay: 0.3s; }
+}
+
+@media (max-width: 1024px) {
+  .team__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .team__inner {
+    padding: 16px 24px 64px;
+  }
+
+  .team__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-card__avatar {
+    width: 112px;
+    height: 112px;
+  }
+
+  .team-card__avatar .team-avatar__initials {
+    font-size: 32px;
+  }
+
+  /* Full bio on mobile: there's a card per row, so nothing to keep level. */
+  .team-card__summary {
+    -webkit-line-clamp: none;
+    font-size: 15px;
+  }
+}

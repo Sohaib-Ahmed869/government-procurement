@@ -1,22 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
 import mainImage from '../../../assets/images/MainPictureHomepage.png';
 import wavesImage from '../../../assets/images/waves.png';
 import './HomeHero.css';
-
-// The dark glyph sits on transparent padding inside a white circle. Scaling the
-// image up and clipping to the circle crops that padding so the glyph fills it
-// (arrow ink ~24% of its canvas, call ~38% — hence the different sizes).
-function CircleIcon({ src, size }) {
-  return (
-    <span className="home-hero__circle" aria-hidden="true">
-      <img src={src} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
-    </span>
-  );
-}
 
 export default function HomeHero() {
   const { audience } = useAudience();
@@ -48,7 +35,7 @@ export default function HomeHero() {
       <img className="home-hero__waves" src={wavesImage} alt="" aria-hidden="true" />
 
       <div className="home-hero__intro">
-        <p className="home-hero__eyebrow">Award Government Contracts</p>
+        <p className="home-hero__eyebrow">Award government contracts</p>
         <h1 className="home-hero__title">Procure with Confidence</h1>
         <p className="home-hero__lede">
           Supporting government agencies and public sector organisations with end-to-end
@@ -58,11 +45,14 @@ export default function HomeHero() {
 
         <div className="home-hero__actions">
           <a className="home-hero__btn" href="/book-a-consultation">
-            <CircleIcon src={arrowIcon} size={30} />
             Book a Consultation
           </a>
-          <a className="home-hero__btn" href="tel:+61478669922">
-            <CircleIcon src={callIcon} size={30} />
+          <a
+            className="home-hero__btn"
+            href="https://wa.me/61478669922"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Whatsapp +61 478 669 922
           </a>
         </div>
@@ -73,7 +63,7 @@ export default function HomeHero() {
         className={`home-hero__advisory${advisory.inView ? ' is-in' : ''}`}
       >
         <div className="home-hero__advisory-text">
-          <p className="home-hero__eyebrow">Advisory Services</p>
+          <p className="home-hero__eyebrow">Advisory services</p>
           <h2 className="home-hero__subtitle">Your Trusted Partner</h2>
           <p className="home-hero__advisory-copy">
             We help private sector organisations and suppliers strengthen their bids and win
@@ -84,7 +74,6 @@ export default function HomeHero() {
 
           <a className="home-hero__btn home-hero__btn--trailing" href="/book-a-consultation">
             Book a Consultation
-            <CircleIcon src={arrowIcon} size={30} />
           </a>
         </div>
 

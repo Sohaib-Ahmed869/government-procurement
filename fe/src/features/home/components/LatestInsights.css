@@ -1,8 +1,8 @@
 .li {
-  --li-bg: #1a1a1a;
+  --li-bg: var(--gp-ink-900);
   /* Placeholder art for imageless cards — keyed to the segment (green for
      award, grey for win), matching the section surface. */
-  --li-empty-art: linear-gradient(160deg, #242424 0%, #3a3a3a 100%);
+  --li-empty-art: linear-gradient(160deg, var(--gp-ink-800) 0%, #3a3a3a 100%);
 
   background: var(--li-bg);
   color: #fff;
@@ -10,13 +10,13 @@
 }
 
 .li[data-audience='award'] {
-  --li-bg: #0a3114;
-  --li-empty-art: linear-gradient(160deg, #0a3114 0%, #14572a 100%);
+  --li-bg: var(--gp-green-900);
+  --li-empty-art: linear-gradient(160deg, var(--gp-green-900) 0%, var(--gp-green-600) 100%);
 }
 
 .li[data-audience='win'] {
-  --li-bg: #1a1a1a;
-  --li-empty-art: linear-gradient(160deg, #242424 0%, #3a3a3a 100%);
+  --li-bg: var(--gp-ink-900);
+  --li-empty-art: linear-gradient(160deg, var(--gp-ink-800) 0%, #3a3a3a 100%);
 }
 
 .li__inner {
@@ -38,7 +38,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
 }
 

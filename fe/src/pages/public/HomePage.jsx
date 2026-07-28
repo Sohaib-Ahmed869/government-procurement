@@ -3,7 +3,6 @@ import HomeHero from '../../features/home/components/HomeHero.jsx';
 import UnlockPotential from '../../features/home/components/UnlockPotential.jsx';
 import EnhanceExperience from '../../features/home/components/EnhanceExperience.jsx';
 import LatestInsights from '../../features/home/components/LatestInsights.jsx';
-import Testimonials from '../../features/home/components/Testimonials.jsx';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import './HomePage.css';
 
@@ -19,7 +18,6 @@ export default function HomePage() {
         <UnlockPotential key={`unlock-${audience}`} />
         <EnhanceExperience key={`enhance-${audience}`} />
         <LatestInsights key={`insights-${audience}`} />
-        <Testimonials key={`testimonials-${audience}`} />
       </PageLayout>
     </div>
   );

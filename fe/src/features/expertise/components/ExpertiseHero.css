@@ -1,5 +1,5 @@
 .xp {
-  --xp-bg: #1a1a1a;
+  --xp-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
@@ -10,11 +10,11 @@
 }
 
 .xp[data-audience='award'] {
-  --xp-bg: #0a3114;
+  --xp-bg: var(--gp-green-900);
 }
 
 .xp[data-audience='win'] {
-  --xp-bg: #1a1a1a;
+  --xp-bg: var(--gp-ink-900);
 }
 
 /* --- reveal on mount --- */
@@ -120,7 +120,7 @@
   display: inline-flex;
   align-items: center;
   gap: 16px;
-  padding: 10px 30px 10px 10px;
+  padding: 14px 30px;
   font-size: 18px;
   font-weight: 500;
   color: #fff;
@@ -243,7 +243,7 @@
     max-width: 280px;
     height: 52px;
     justify-content: center;
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 15px;
     white-space: nowrap;
   }

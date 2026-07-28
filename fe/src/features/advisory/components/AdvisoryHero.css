@@ -1,5 +1,5 @@
 .adv-hero {
-  --adv-bg: #1a1a1a;
+  --adv-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
@@ -9,11 +9,11 @@
 }
 
 .adv-hero[data-audience='award'] {
-  --adv-bg: #0a3114;
+  --adv-bg: var(--gp-green-900);
 }
 
 .adv-hero[data-audience='win'] {
-  --adv-bg: #1a1a1a;
+  --adv-bg: var(--gp-ink-900);
 }
 
 /* --- reveal on mount --- */
@@ -76,7 +76,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
 }
 
@@ -109,7 +108,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 22px 6px 6px;
+  padding: 12px 22px;
   font-size: 15px;
   font-weight: 500;
   color: #fff;
@@ -156,24 +155,9 @@
     display: none;
   }
 
-  /* The wide corner wave is replaced by a background wave anchored to the
-     hero's bottom, so its distance to the buttons stays constant however the
-     text wraps. */
-  .adv-hero__wave {
-    display: none;
-  }
-
   .adv-hero__inner {
-    /* Tight to the header toggle above it; the 100px here was the room the
-       toggle used to occupy inside the hero. */
-    padding: 38px 24px 180px;
+    padding: 38px 24px 56px;
     text-align: center;
-    background-image: url('../../../assets/images/EnhanceExpWave.png');
-    background-repeat: no-repeat;
-    /* Anchored bottom-right and oversized so the rising curve sweeps up the
-       right-hand side, as it does in the Enhance section. */
-    background-position: right bottom;
-    background-size: 100% auto;
   }
 
   .adv-hero__title {
@@ -219,7 +203,7 @@
     max-width: 274px;
     height: 54px;
     justify-content: center;
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 14px;
     white-space: nowrap;
   }

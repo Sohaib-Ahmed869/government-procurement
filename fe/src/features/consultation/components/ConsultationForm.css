@@ -1,5 +1,7 @@
 .consult {
-  --consult-bg: #1a1a1a;
+  --consult-bg: var(--gp-ink-900);
+  /* Dropdown panel follows the segment: green for Award, grey for Win. */
+  --consult-menu-bg: var(--gp-ink-800);
 
   position: relative;
   overflow: hidden;
@@ -9,11 +11,13 @@
 }
 
 .consult[data-audience='award'] {
-  --consult-bg: #0a3114;
+  --consult-bg: var(--gp-green-900);
+  --consult-menu-bg: var(--gp-green-800);
 }
 
 .consult[data-audience='win'] {
-  --consult-bg: #1a1a1a;
+  --consult-bg: var(--gp-ink-900);
+  --consult-menu-bg: var(--gp-ink-800);
 }
 
 /* --- reveal on scroll into view --- */
@@ -44,7 +48,9 @@
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 40px 0;
+  /* 40px side gutters, matching every other section's __inner. Without them the
+     grid runs edge to edge on any viewport under 1100px. */
+  padding: 40px;
 }
 
 /* --- two-column layout: intro + form --- */
@@ -65,7 +71,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
 }
 
@@ -195,26 +200,21 @@
   resize: vertical;
 }
 
-/* --- select: native, restyled to match the glass fields --- */
+/* --- select: a custom listbox, so the panel can be themed like the fields --- */
 .consult__select-wrap {
   position: relative;
 }
 
 .consult__select {
   padding-right: 44px;
+  text-align: left;
+  /* A chosen reason is a full sentence — let it wrap inside the field. */
+  line-height: 1.4;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
 .consult__select.is-placeholder {
   color: rgba(255, 255, 255, 0.7);
-}
-
-/* The native popup is OS-drawn; keep its options readable on the dark theme. */
-.consult__select option {
-  color: #0a3114;
 }
 
 .consult__chevron {
@@ -225,6 +225,53 @@
   display: inline-flex;
   color: #fff;
   pointer-events: none;
+  transition: transform 0.18s ease;
+}
+
+.consult__chevron.is-open {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Rounded, themed panel — a native <select> popup is drawn by the OS. */
+.consult__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--consult-menu-bg);
+  border-radius: 14px;
+  /* The reasons are full sentences, so the panel can run long — cap it and let
+     it scroll rather than pushing off the bottom of the viewport. */
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.38),
+    inset 1px 1px 1px rgba(255, 255, 255, 0.18);
+}
+
+.consult__option {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 10px;
+  transition: background-color 0.15s ease;
+}
+
+.consult__option:hover,
+.consult__option.is-active {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* --- inline validation --- */
@@ -281,6 +328,14 @@
 }
 
 /* --- responsive --- */
+/* Tablet / small laptop: the 72px gutter between intro and form takes too much
+   of the row once the gutters are in, squeezing both columns. */
+@media (max-width: 1024px) {
+  .consult__grid {
+    gap: 48px;
+  }
+}
+
 @media (max-width: 860px) {
   .consult__grid {
     grid-template-columns: 1fr;

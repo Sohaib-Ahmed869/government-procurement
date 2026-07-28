@@ -23,10 +23,6 @@ export const coursesApi = {
 
 export const faqsApi = createResource('faqs');
 export const pagesApi = createResource('pages');
-export const testimonialsApi = {
-  ...createResource('testimonials'),
-  uploadAvatar: (id, file) => api.upload(`/testimonials/${id}/avatar`, file),
-};
 
 // ---- Forum Q&A + moderation ------------------------------------------------
 export const questionsApi = {
@@ -78,7 +74,6 @@ export const settingsApi = {
 };
 export const usersApi = createResource('users');
 export const dashboardApi = { get: () => api.get('/dashboard') };
-export const searchApi = { query: (q, limit) => api.get('/search', { q, limit }) };
 export const auditApi = { page: (params) => api.page('/audit-log', params) };
 
 // ---- Auth ------------------------------------------------------------------

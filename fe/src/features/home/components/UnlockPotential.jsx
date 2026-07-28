@@ -142,7 +142,7 @@ export default function UnlockPotential() {
       data-audience={audience}
     >
       <div className="uy__inner">
-        <p className="uy__eyebrow">Courses &amp; Artefacts</p>
+        <p className="uy__eyebrow">Courses &amp; artefacts</p>
         <h2 className="uy__heading">Unlock Your Potential</h2>
 
         {/* Featured banner */}

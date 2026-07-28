@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { linksApi } from '../../../api';
-import wave from '../../../assets/images/WaveAdvisoryPage.png';
-import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './TenderPortals.css';
 
 // Tender portal links come from the CMS API (group: 'tender'). Each link =
@@ -12,7 +10,6 @@ import './TenderPortals.css';
 const REGION_LABEL = { featured: 'Featured', australia: 'Australian' };
 // The two lists and their URLs. Australian is the default (shown on top).
 const CATEGORY_PATH = { australia: '/aus-list', featured: '/featured-list' };
-const CATEGORIES = ['australia', 'featured'];
 
 // Which list the current URL is showing (defaults to Australian).
 function categoryFromPath(pathname) {
@@ -23,8 +20,8 @@ function regionLabel(region) {
   return REGION_LABEL[region] || (region ? region.charAt(0).toUpperCase() + region.slice(1) : 'Other');
 }
 
-// Keyed by region+sort in the parent, so it remounts and replays its reveal
-// whenever the list changes (but not while typing in search).
+// Keyed by region in the parent, so it remounts and replays its reveal whenever
+// the list changes.
 function TenderList({ links }) {
   const [shown, setShown] = useState(false);
   useEffect(() => {
@@ -55,93 +52,16 @@ function TenderList({ links }) {
         </li>
       ))}
       {links.length === 0 && (
-        <li className="tp__empty-row">No tenders match your search.</li>
+        <li className="tp__empty-row">No tenders in this list yet.</li>
       )}
     </ul>
   );
 }
 
-// Custom listbox rather than a native <select>: the OS-drawn popup can't be
-// rounded or themed. Used for both the country and sort pickers.
-function ChevronSelect({ value, onChange, options, variant, label, prefix }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function onDocClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    function onKey(e) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('mousedown', onDocClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  const current = options.find((o) => o.value === value) ?? options[0];
-
-  return (
-    <div className={`tp__select${variant ? ` tp__select--${variant}` : ''}`} ref={ref}>
-      <button
-        type="button"
-        className="tp__select-button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-label={label}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {prefix && <span className="tp__select-prefix">{prefix} </span>}
-        <span className="tp__select-value">{current.label}</span>
-      </button>
-
-      <svg className={`tp__chevron${open ? ' is-open' : ''}`} viewBox="0 0 12 8" aria-hidden="true">
-        <path d="M1 1.5 6 6.5 11 1.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-
-      {/* Small screens collapse the country picker to this globe circle. */}
-      {variant === 'country' && (
-        <svg className="tp__globe" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <ellipse cx="12" cy="12" rx="4" ry="9" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-        </svg>
-      )}
-
-      {open && (
-        <ul className="tp__menu" role="listbox">
-          {options.map((o) => (
-            <li key={o.value} role="option" aria-selected={o.value === value}>
-              <button
-                type="button"
-                className={`tp__option${o.value === value ? ' is-active' : ''}`}
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
-              >
-                {o.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
 export default function TenderPortals() {
   const { audience } = useAudience();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const category = categoryFromPath(pathname); // 'australia' | 'featured'
-
-  const [sort, setSort] = useState('asc');
-  const [query, setQuery] = useState('');
 
   const [links, setLinks] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -170,85 +90,27 @@ export default function TenderPortals() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // The filter switches lists by navigating to that list's URL.
-  const categoryOptions = CATEGORIES.map((c) => ({ value: c, label: regionLabel(c) }));
-  const onCategoryChange = (value) => {
-    const to = CATEGORY_PATH[value] || CATEGORY_PATH.australia;
-    if (to !== pathname) navigate(to);
-  };
-
-  // Links for the active list, then search + sort.
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const base = links
-      .filter((l) => (l.region || '') === category)
-      .filter(
-        (l) =>
-          !q ||
-          (l.label || '').toLowerCase().includes(q) ||
-          (l.description || '').toLowerCase().includes(q),
-      );
-    const sorted = [...base].sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-    return sort === 'desc' ? sorted.reverse() : sorted;
-  }, [links, query, sort, category]);
+  // Links for the active list, sorted alphabetically — the order the sort
+  // control used to default to.
+  const filtered = useMemo(
+    () =>
+      links
+        .filter((l) => (l.region || '') === category)
+        .sort((a, b) => (a.label || '').localeCompare(b.label || '')),
+    [links, category],
+  );
 
   return (
     <section
       className={`tp${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
-      <img className="tp__wave" src={wave} alt="" aria-hidden="true" />
-      <img className="tp__wave tp__wave--phone" src={phoneWave} alt="" aria-hidden="true" />
 
       <div className="tp__inner">
-        <h1 className="tp__title">
-          Explore <strong>{regionLabel(category)}</strong> Tenders
-        </h1>
+        <h1 className="tp__title">Explore {regionLabel(category)} Tenders</h1>
         <p className="tp__sub">
           Government tender opportunities, updated regularly across all sectors.
         </p>
-
-        <form className="tp__controls" onSubmit={(e) => e.preventDefault()}>
-          <div className="tp__search-wrap">
-            <svg className="tp__search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.5" y2="16.5" />
-            </svg>
-            <input
-              className="tp__search"
-              type="search"
-              placeholder="Search tenders"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              aria-label="Search tenders"
-            />
-          </div>
-
-          <ChevronSelect
-            variant="country"
-            label="List"
-            value={category}
-            onChange={onCategoryChange}
-            options={categoryOptions}
-          />
-
-          <ChevronSelect
-            variant="sort"
-            label="Sort by"
-            prefix="Sort by:"
-            value={sort}
-            onChange={setSort}
-            options={[
-              { value: 'asc', label: 'Alphabetical (Ascending)' },
-              { value: 'desc', label: 'Alphabetical (Descending)' },
-            ]}
-          />
-
-          <button type="submit" className="tp__search-btn">
-            Search
-          </button>
-        </form>
 
         {status === 'loading' && <p className="tp__featured">Loading tender portals…</p>}
         {status === 'error' && (
@@ -259,7 +121,7 @@ export default function TenderPortals() {
         {status === 'ready' && (
           <>
             <p className="tp__featured">{regionLabel(category)} Tenders</p>
-            <TenderList key={`${category}-${sort}`} links={filtered} />
+            <TenderList key={category} links={filtered} />
           </>
         )}
       </div>

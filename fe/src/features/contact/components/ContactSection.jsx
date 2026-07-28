@@ -3,8 +3,6 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { contactApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import callIcon from '../../../assets/icons/Call.png';
-import wave from '../../../assets/images/WaveAdvisoryPage.png';
-import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './ContactSection.css';
 
 const CONTACT_METHODS = [
@@ -130,17 +128,9 @@ export default function ContactSection() {
       className={`contact${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
-      <img className="contact__wave" src={wave} alt="" aria-hidden="true" />
-      <img
-        className="contact__wave contact__wave--phone"
-        src={phoneWave}
-        alt=""
-        aria-hidden="true"
-      />
 
       <div className="contact__inner">
-        <p className="contact__eyebrow">Our Expertise</p>
+        <p className="contact__eyebrow">Our expertise</p>
         <h1 className="contact__title">Let&rsquo;s Work Together</h1>
 
         <div className="contact__grid">

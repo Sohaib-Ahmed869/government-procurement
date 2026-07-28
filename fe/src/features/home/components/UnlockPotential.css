@@ -1,5 +1,5 @@
 .uy {
-  --uy-bg: #1a1a1a;
+  --uy-bg: var(--gp-ink-900);
 
   background: var(--uy-bg);
   color: #fff;
@@ -7,11 +7,20 @@
 }
 
 .uy[data-audience='award'] {
-  --uy-bg: #0a3114;
+  --uy-bg: var(--gp-green-900);
 }
 
 .uy[data-audience='win'] {
-  --uy-bg: #1a1a1a;
+  --uy-bg: var(--gp-ink-900);
+}
+
+/* Phones don't get this section at all — 760px is the site's phone breakpoint
+   (the footer's flat link run, the stacked heroes). Above it the section keeps
+   its mobile carousel for tablets. */
+@media (max-width: 760px) {
+  .uy {
+    display: none;
+  }
 }
 
 .uy__inner {
@@ -72,7 +81,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
 }
 
@@ -154,11 +162,13 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
+/* The dot picks up the section background, so it reads green on the award
+   segment and near-black on win. */
 .uy__watch-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--uy-bg);
   flex: none;
 }
 

@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/images/GovProcurementLogo.png';
-import arrowOutward from '../../assets/icons/Arrow outward.png';
+import logo from '../../assets/icons/GPLogo.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
+// Labels are sentence case: only the first word is capitalised.
 const NAV_LINKS = [
-  { label: 'Advisory', href: '/advisory' },
-  { label: 'Our Expertise', href: '/our-expertise' },
+  { label: 'Capabilities', href: '/advisory' },
+  // Our Expertise is off the nav while Our Team is trialled in its place. The
+  // page, route and components all still exist — restore this line to bring the
+  // link back.
+  // { label: 'Our expertise', href: '/our-expertise' },
+  { label: 'Our team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
-  { label: 'Resources', href: '/resources' },
-  { label: 'Forum', href: '/forum' },
-  { label: 'Explore Tender Websites', href: '/aus-list' },
+  { label: 'Insights', href: '/resources' },
+  { label: 'QnA', href: '/forum' },
+  { label: 'Tender websites', href: '/aus-list' },
 ];
 
 export default function Header({ showToggle = true, audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
 
-  // "Explore Tender Websites" is shown to both audiences (Win and Award).
+  // "Tender websites" is shown to both audiences (Win and Award).
   const navLinks = NAV_LINKS;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -40,6 +44,17 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
     };
   }, [menuOpen]);
 
+  // Mobile: the bar is sticky, and once the page has scrolled past the top it
+  // sheds the audience toggle row (see .is-stuck in Header.css). Only the
+  // threshold crossing sets state, so this doesn't re-render on every scroll.
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setStuck(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   // Close the menu when the viewport grows past the mobile breakpoint, so the
   // scroll lock is released and the desktop nav takes over cleanly.
   useEffect(() => {
@@ -52,7 +67,10 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
   }, []);
 
   return (
-    <header className="site-header" data-audience={audience}>
+    <header
+      className={`site-header${stuck ? ' is-stuck' : ''}`}
+      data-audience={audience}
+    >
       <div className="site-header__inner">
         {/* aria-labels keep the accessible names when the wordmark / CTA label
             are hidden to save width on narrow desktop widths. */}
@@ -62,7 +80,8 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
           onClick={closeMenu}
           aria-label="Government Procurement"
         >
-          <img className="site-header__logo" src={logo} alt="" width="21" height="23" />
+          {/* Source is 738×640; height drives the size, width follows. */}
+          <img className="site-header__logo" src={logo} alt="" width="26" height="23" />
           <span className="site-header__wordmark">Government Procurement</span>
         </Link>
 
@@ -79,63 +98,19 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         </nav>
 
         <div className="site-header__actions">
-          {/* The magnifier goes straight to the search page — no inline field. */}
-          <Link className="site-header__search-btn" to="/search" aria-label="Search the site">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </Link>
-
           {showToggle && <AudienceToggle />}
 
           <a
             className="site-header__cta"
             href="/book-a-consultation"
-            aria-label="Book a Consultation"
+            aria-label="Book a consultation"
           >
-            <span className="site-header__cta-label">Book a Consultation</span>
-            <span className="site-header__cta-arrow">
-              <img src={arrowOutward} alt="" />
-            </span>
+            <span className="site-header__cta-label">Book a consultation</span>
           </a>
         </div>
 
-        {/* Mobile-only pair: the magnifier goes straight to the search page,
-            so the menu itself carries no search field. */}
+        {/* Mobile-only: the hamburger that opens the menu. */}
         <div className="site-header__mobile-actions">
-          <Link
-            className="site-header__mobile-search-link"
-            to="/search"
-            aria-label="Search the site"
-            onClick={closeMenu}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-          </Link>
-
           <button
             type="button"
             className={`site-header__burger${menuOpen ? ' is-open' : ''}`}
@@ -152,7 +127,7 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
       </div>
 
       {/* The toggle sits in the top bar on desktop; on mobile the bar only has
-          room for the logo, search and hamburger, so it moves to its own row
+          room for the logo and hamburger, so it moves to its own row
           directly beneath — on every page, the way the homepage hero used to
           carry it. */}
       {showToggle && (
@@ -180,10 +155,7 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
                 href="/book-a-consultation"
                 onClick={closeMenu}
               >
-                Book a Consultation
-                <span className="site-header__cta-arrow">
-                  <img src={arrowOutward} alt="" />
-                </span>
+                Book a consultation
               </a>
             </li>
           </ul>

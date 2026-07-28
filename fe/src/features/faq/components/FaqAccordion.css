@@ -2,7 +2,7 @@
    Geist type, glass filter pills and the shared 1440 layout. The page hero
    (title + subtitle) lives in FaqHero. */
 .faq {
-  --faq-bg: #1a1a1a;
+  --faq-bg: var(--gp-ink-900);
 
   background: var(--faq-bg);
   color: rgba(255, 255, 255, 0.85);
@@ -10,11 +10,11 @@
 }
 
 .faq[data-audience='award'] {
-  --faq-bg: #0a3114;
+  --faq-bg: var(--gp-green-900);
 }
 
 .faq[data-audience='win'] {
-  --faq-bg: #1a1a1a;
+  --faq-bg: var(--gp-ink-900);
 }
 
 .faq__inner {
@@ -128,7 +128,7 @@
 }
 
 .faq-item__button:hover .faq-item__question {
-  color: #7ee2a8;
+  color: var(--gp-mint-300);
 }
 
 /* Collapsible panel: grid-rows 0fr -> 1fr gives a height animation the browser
@@ -145,7 +145,7 @@
 }
 
 .faq-item.is-open .faq-item__question {
-  color: #7ee2a8;
+  color: var(--gp-mint-300);
 }
 
 .faq-item__answer {
@@ -168,7 +168,7 @@
 
   .faq-item.is-open .faq-item__chevron {
     transform: rotate(180deg);
-    color: #7ee2a8;
+    color: var(--gp-mint-300);
   }
 
   .faq-item__panel {
@@ -240,7 +240,7 @@
 }
 
 .faq :is(button, a):focus-visible {
-  outline: 2px solid #7ee2a8;
+  outline: 2px solid var(--gp-mint-300);
   outline-offset: 3px;
 }
 

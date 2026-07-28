@@ -1,10 +1,13 @@
 .article {
   /* Themed to match the rest of the site: deep green for Award, near-black for
      Win. Everything on the page reads off these two variables. */
-  --art-bg: #0a3114;
-  --art-panel: #0e3e1b;
+  --art-bg: var(--gp-green-900);
+  --art-panel: var(--gp-green-800);
   --art-border: rgba(255, 255, 255, 0.12);
-  --art-accent: #7ee2a8;
+  --art-accent: var(--gp-mint-300);
+  /* Fill behind the topic pill and the author's initial disc. Follows the
+     segment: green for Award, grey for Win. */
+  --art-chip: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
   --art-text: rgba(255, 255, 255, 0.84);
   --art-muted: rgba(255, 255, 255, 0.6);
 
@@ -14,13 +17,15 @@
 }
 
 .article[data-audience='award'] {
-  --art-bg: #0a3114;
-  --art-panel: #0e3e1b;
+  --art-bg: var(--gp-green-900);
+  --art-panel: var(--gp-green-800);
+  --art-chip: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
 }
 
 .article[data-audience='win'] {
-  --art-bg: #1a1a1a;
-  --art-panel: #242424;
+  --art-bg: var(--gp-ink-900);
+  --art-panel: var(--gp-ink-800);
+  --art-chip: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
 }
 
 /* ---------- Hero ---------- */
@@ -55,7 +60,7 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   color: #fff;
-  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  background: var(--art-chip);
 }
 
 .article-hero__date,
@@ -92,7 +97,7 @@
   width: 44px;
   height: 44px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  background: var(--art-chip);
   color: #fff;
   font-size: 18px;
   font-weight: 600;
@@ -338,22 +343,49 @@
   gap: 10px;
 }
 
+/* Glass pill — same treatment as the subscribe button above and in the footer. */
 .article-share__button {
-  border: 1px solid var(--art-border);
-  border-radius: 999px;
-  padding: 9px 18px;
+  padding: 13px 26px;
   font-family: inherit;
-  font-size: 14px;
-  color: var(--art-text);
-  background: rgba(255, 255, 255, 0.04);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
 }
 
-.article-share__button:hover {
-  border-color: var(--art-accent);
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+.article-share__button:hover,
+.article-share__button:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.article-share__button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Hover polish — matches the subscribe button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .article-share__button {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .article-share__button:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
 }
 
 /* ---------- Related insights ---------- */
@@ -390,7 +422,7 @@
   display: flex;
 }
 
-/* Card face + glass border ring — matches the homepage testimonial cards. */
+/* Card face + glass border ring. */
 .article-related__link {
   position: relative;
   display: flex;

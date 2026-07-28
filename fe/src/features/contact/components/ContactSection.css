@@ -1,7 +1,7 @@
 .contact {
-  --contact-bg: #1a1a1a;
+  --contact-bg: var(--gp-ink-900);
   /* Dropdown panel follows the segment: green for Award, grey for Win. */
-  --contact-menu-bg: #242424;
+  --contact-menu-bg: var(--gp-ink-800);
 
   position: relative;
   overflow: hidden;
@@ -11,13 +11,13 @@
 }
 
 .contact[data-audience='award'] {
-  --contact-bg: #0a3114;
-  --contact-menu-bg: #0e3e1b;
+  --contact-bg: var(--gp-green-900);
+  --contact-menu-bg: var(--gp-green-800);
 }
 
 .contact[data-audience='win'] {
-  --contact-bg: #1a1a1a;
-  --contact-menu-bg: #242424;
+  --contact-bg: var(--gp-ink-900);
+  --contact-menu-bg: var(--gp-ink-800);
 }
 
 /* --- reveal on mount --- */
@@ -79,7 +79,6 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
 }
 

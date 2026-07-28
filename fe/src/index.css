@@ -1,3 +1,7 @@
+/* Brand colour tokens every stylesheet resolves against. Must stay first —
+   @import has to precede all other rules. */
+@import './styles/tokens.css';
+
 *,
 *::before,
 *::after {
@@ -14,7 +18,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  overflow-x: hidden;
+  /* `clip`, not `hidden`: both hide the horizontal spill, but `hidden` makes
+     this a scroll container, which would anchor the mobile header's
+     `position: sticky` to a box that never scrolls — i.e. no sticking at all. */
+  overflow-x: clip;
 }
 
 .page-layout__main {
