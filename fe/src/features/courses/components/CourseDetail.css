@@ -1,5 +1,10 @@
 .cd {
   --cd-bg: var(--gp-ink-900);
+  /* Fill behind the buy / register CTA, and the accent used by the tick
+     bullets, list markers and inline links. Both follow the segment: green for
+     Award, grey for Win. */
+  --cd-cta: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  --cd-accent: var(--gp-mint-300);
 
   background: var(--cd-bg);
   color: #fff;
@@ -8,10 +13,14 @@
 
 .cd[data-audience='award'] {
   --cd-bg: var(--gp-green-900);
+  --cd-cta: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  --cd-accent: var(--gp-mint-300);
 }
 
 .cd[data-audience='win'] {
   --cd-bg: var(--gp-ink-900);
+  --cd-cta: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+  --cd-accent: #c9c9c9;
 }
 
 .cd__inner {
@@ -202,8 +211,8 @@
   width: 44px;
   height: 44px;
   border-radius: 11px;
-  color: var(--gp-green-900);
-  background: var(--admin-mint, var(--gp-mint-300));
+  color: var(--cd-bg);
+  background: var(--cd-accent);
 }
 .cd-media__pdf-icon svg { width: 22px; height: 22px; }
 .cd-media__pdf-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
@@ -223,7 +232,7 @@
   color: rgba(255, 255, 255, 0.5);
   transition: color 0.15s ease, transform 0.15s ease;
 }
-.cd-media--pdf:hover .cd-media__pdf-arrow { color: var(--gp-mint-300); transform: translate(2px, -2px); }
+.cd-media--pdf:hover .cd-media__pdf-arrow { color: var(--cd-accent); transform: translate(2px, -2px); }
 
 @media (max-width: 640px) {
   /* materials already stack vertically at all sizes */
@@ -266,7 +275,7 @@
 
 .cd-check {
   flex: none;
-  color: var(--gp-mint-300);
+  color: var(--cd-accent);
   font-size: 15px;
   font-weight: 700;
   line-height: 1.3;
@@ -323,7 +332,7 @@
 }
 
 .cd-prose li::marker {
-  color: var(--gp-mint-300);
+  color: var(--cd-accent);
 }
 
 .cd-prose strong {
@@ -332,7 +341,7 @@
 }
 
 .cd-prose a {
-  color: var(--gp-mint-300);
+  color: var(--cd-accent);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -390,7 +399,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gp-mint-300);
+  color: var(--cd-accent);
 }
 
 .cd-buy__title {
@@ -429,7 +438,7 @@
   font-size: 14.5px;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  background: var(--cd-cta);
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -482,7 +491,7 @@
   flex: none;
   width: 17px;
   height: 17px;
-  color: var(--gp-mint-300);
+  color: var(--cd-accent);
 }
 
 .cd-book {
@@ -578,7 +587,7 @@
     font-weight: 600;
     color: #fff;
     cursor: pointer;
-    background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+    background: var(--cd-cta);
     border: 0;
     border-radius: 10px;
   }

@@ -6,6 +6,8 @@ import ExpertisePage from './pages/public/ExpertisePage.jsx';
 import AboutPage from './pages/public/AboutPage.jsx';
 import TeamPage from './pages/public/TeamPage.jsx';
 import TeamMemberPage from './pages/public/TeamMemberPage.jsx';
+import CareersPage from './pages/public/CareersPage.jsx';
+import JurisdictionalLinksPage from './pages/public/JurisdictionalLinksPage.jsx';
 import ContactPage from './pages/public/ContactPage.jsx';
 import BookConsultationPage from './pages/public/BookConsultationPage.jsx';
 import ForumHomePage from './pages/public/ForumHomePage.jsx';
@@ -61,6 +63,8 @@ function PublicSite() {
           {/* Our Team: listing plus a page per person. */}
           <Route path="/our-team" element={<TeamPage />} />
           <Route path="/our-team/:slug" element={<TeamMemberPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/jurisdictional-links" element={<JurisdictionalLinksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />

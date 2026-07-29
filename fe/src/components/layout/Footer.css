@@ -214,6 +214,84 @@
   text-underline-offset: 3px;
 }
 
+/* The WeChat entry opens a dialog rather than navigating, so it's a <button>.
+   Strip the native chrome so it reads as a link beside the others. */
+.site-footer__channel-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+/* --- WeChat QR dialog (opened from the "Call us" row) --- */
+.wechat-qr__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.wechat-qr {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  padding: 28px 24px 24px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--gp-ink-900, #111);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.wechat-qr__close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: 26px;
+  line-height: 1;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.wechat-qr__close:hover,
+.wechat-qr__close:focus-visible {
+  opacity: 1;
+}
+
+.wechat-qr__title {
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.wechat-qr__text {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+/* The exported code carries its own white quiet zone, so it needs no plate —
+   just centre it and let it shrink with the dialog on small screens. */
+.wechat-qr__code {
+  display: block;
+  width: 240px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 .site-footer__contact {
   /* Width comes from the grid track above. */
   min-width: 0;
@@ -225,6 +303,17 @@
   font-size: 14px;
   font-weight: 600;
   color: #fff;
+}
+
+.site-footer__contact-heading-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.site-footer__contact-heading-link:hover,
+.site-footer__contact-heading-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .site-footer__contact-sub {
@@ -396,11 +485,11 @@
     height: 48%;
   }
 
-  /* The widest row is "Forum / Explore Tender Websites / Book a Consultation":
-     ~23.5em of text plus two 1.1em gaps ≈ 26em, inside 48px of side padding.
-     Sizing off that keeps every row on one line down to the narrowest phones. */
+  /* The widest row is "Insights / Capabilities / Our team / Courses": ~17.5em of
+     text plus three 1.1em gaps ≈ 21em, inside 48px of side padding. Sizing off
+     that keeps every row on one line down to the narrowest phones. */
   .site-footer__flat {
-    font-size: min(18px, calc((100vw - 48px) / 26));
+    font-size: min(18px, calc((100vw - 48px) / 21));
   }
 
   .site-footer__flat-row .site-footer__link {

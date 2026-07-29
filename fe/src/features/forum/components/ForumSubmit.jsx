@@ -12,9 +12,19 @@ const TOPIC_OPTIONS = [
   { value: 'general', label: 'General' },
 ];
 
+// PLACEHOLDER — the real question titles are still to come. Only the values and
+// labels below need swapping; nothing else depends on them.
+const TITLE_OPTIONS = [
+  { value: 'evaluation', label: 'Evaluation and scoring' },
+  { value: 'compliance', label: 'Compliance and conformance' },
+  { value: 'probity', label: 'Probity and governance' },
+  { value: 'contracts', label: 'Contracts and variations' },
+  { value: 'other', label: 'Other' },
+];
+
 // A native <select> renders its list with the OS palette and square corners, so
-// the topic picker is a custom listbox styled to match the rest of the form.
-function TopicSelect({ value, onChange }) {
+// the pickers are a custom listbox styled to match the rest of the form.
+function Select({ id, options, value, onChange, placeholder }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -34,19 +44,19 @@ function TopicSelect({ value, onChange }) {
     };
   }, [open]);
 
-  const current = TOPIC_OPTIONS.find((o) => o.value === value);
+  const current = options.find((o) => o.value === value);
 
   return (
     <div className="forum-submit__select-wrap" ref={ref}>
       <button
         type="button"
-        id="fq-topic"
+        id={id}
         className={`forum-submit__input forum-submit__select${current ? '' : ' is-placeholder'}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
-        {current ? current.label : 'Enter your topic'}
+        {current ? current.label : placeholder}
       </button>
 
       <span className={`forum-submit__chevron${open ? ' is-open' : ''}`} aria-hidden="true">
@@ -56,8 +66,8 @@ function TopicSelect({ value, onChange }) {
       </span>
 
       {open && (
-        <ul className="forum-submit__menu" role="listbox" aria-labelledby="fq-topic">
-          {TOPIC_OPTIONS.map((o) => (
+        <ul className="forum-submit__menu" role="listbox" aria-labelledby={id}>
+          {options.map((o) => (
             <li key={o.value} role="option" aria-selected={o.value === value}>
               <button
                 type="button"
@@ -74,7 +84,7 @@ function TopicSelect({ value, onChange }) {
         </ul>
       )}
 
-      <input type="hidden" name="topic" value={value} />
+      <input type="hidden" name={id.replace('fq-', '')} value={value} />
     </div>
   );
 }
@@ -84,6 +94,7 @@ export default function ForumSubmit() {
   const { audience } = useAudience();
   const [sent, setSent] = useState(false);
   const [topic, setTopic] = useState('');
+  const [questionTitle, setQuestionTitle] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -93,12 +104,14 @@ export default function ForumSubmit() {
     const data = new FormData(formEl);
     const message = (data.get('message') || '').toString().trim();
     const chosen = (data.get('topic') || '').toString();
+    const chosenTitle = (data.get('title') || '').toString();
     setSubmitting(true);
     setError('');
     try {
+      const titleLabel = TITLE_OPTIONS.find((o) => o.value === chosenTitle)?.label;
       await questionsApi.submit({
-        // The message is the question; derive a short title from it.
-        title: message.slice(0, 80) || 'Forum question',
+        // Use the chosen title; with none picked, derive one from the message.
+        title: titleLabel || message.slice(0, 80) || 'Forum question',
         body: message,
         category: chosen === 'award' ? 'award' : 'win',
         name: (data.get('name') || '').toString().trim(),
@@ -106,6 +119,7 @@ export default function ForumSubmit() {
       });
       setSent(true);
       setTopic('');
+      setQuestionTitle('');
       formEl.reset();
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -150,13 +164,32 @@ export default function ForumSubmit() {
             </div>
 
             <div className="forum-submit__field" style={{ '--i': 2 }}>
-              <label className="forum-submit__label" htmlFor="fq-topic">
-                Enter topic
+              <label className="forum-submit__label" htmlFor="fq-title">
+                Question title
               </label>
-              <TopicSelect value={topic} onChange={setTopic} />
+              <Select
+                id="fq-title"
+                options={TITLE_OPTIONS}
+                value={questionTitle}
+                onChange={setQuestionTitle}
+                placeholder="Select a question title"
+              />
             </div>
 
             <div className="forum-submit__field" style={{ '--i': 3 }}>
+              <label className="forum-submit__label" htmlFor="fq-topic">
+                Enter topic
+              </label>
+              <Select
+                id="fq-topic"
+                options={TOPIC_OPTIONS}
+                value={topic}
+                onChange={setTopic}
+                placeholder="Enter your topic"
+              />
+            </div>
+
+            <div className="forum-submit__field" style={{ '--i': 4 }}>
               <label className="forum-submit__label" htmlFor="fq-message">
                 Message
               </label>
@@ -176,7 +209,7 @@ export default function ForumSubmit() {
               </p>
             )}
 
-            <button type="submit" className="forum-submit__send" style={{ '--i': 4 }} disabled={submitting}>
+            <button type="submit" className="forum-submit__send" style={{ '--i': 5 }} disabled={submitting}>
               {submitting ? 'Sending…' : 'Send now'}
               <span className="forum-submit__send-arrow" aria-hidden="true">
                 <img src={arrowIcon} alt="" />

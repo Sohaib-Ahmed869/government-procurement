@@ -3,6 +3,11 @@
    (title + subtitle) lives in FaqHero. */
 .faq {
   --faq-bg: var(--gp-ink-900);
+  /* Fill behind a hovered or selected filter pill, and the colour a question
+     takes on hover / when open. Both follow the segment: green for Award, grey
+     for Win. */
+  --faq-pill-active: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  --faq-accent: var(--gp-mint-300);
 
   background: var(--faq-bg);
   color: rgba(255, 255, 255, 0.85);
@@ -11,10 +16,14 @@
 
 .faq[data-audience='award'] {
   --faq-bg: var(--gp-green-900);
+  --faq-pill-active: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  --faq-accent: var(--gp-mint-300);
 }
 
 .faq[data-audience='win'] {
   --faq-bg: var(--gp-ink-900);
+  --faq-pill-active: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+  --faq-accent: #c9c9c9;
 }
 
 .faq__inner {
@@ -60,17 +69,12 @@
     color 0.15s ease;
 }
 
-/* Hovered and selected pills both take the same green as the article topic pill
-   / author circle and the "Buy course" button. */
-.faq__pill:hover {
-  color: #fff;
-  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
-  box-shadow: none;
-}
-
+/* Hovered and selected pills both take the segment fill — the same treatment as
+   the article topic pill and author circle. */
+.faq__pill:hover,
 .faq__pill.is-active {
   color: #fff;
-  background: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
+  background: var(--faq-pill-active);
   box-shadow: none;
 }
 
@@ -128,7 +132,7 @@
 }
 
 .faq-item__button:hover .faq-item__question {
-  color: var(--gp-mint-300);
+  color: var(--faq-accent);
 }
 
 /* Collapsible panel: grid-rows 0fr -> 1fr gives a height animation the browser
@@ -145,7 +149,7 @@
 }
 
 .faq-item.is-open .faq-item__question {
-  color: var(--gp-mint-300);
+  color: var(--faq-accent);
 }
 
 .faq-item__answer {
@@ -168,7 +172,7 @@
 
   .faq-item.is-open .faq-item__chevron {
     transform: rotate(180deg);
-    color: var(--gp-mint-300);
+    color: var(--faq-accent);
   }
 
   .faq-item__panel {
@@ -240,7 +244,7 @@
 }
 
 .faq :is(button, a):focus-visible {
-  outline: 2px solid var(--gp-mint-300);
+  outline: 2px solid var(--faq-accent);
   outline-offset: 3px;
 }
 

@@ -1,42 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaEnvelope, FaLinkedin } from 'react-icons/fa6';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
-import { articlesApi } from '../../../api';
-import { getMember } from '../data.js';
+import { articlesApi, teamApi } from '../../../api';
+import TeamAvatar from './TeamAvatar.jsx';
+import './TeamMemberDetail.css';
 
 function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-import TeamAvatar from './TeamAvatar.jsx';
-import './TeamMemberDetail.css';
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <rect x="2.5" y="5" width="19" height="14" rx="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M3.5 7.5 12 13l8.5-5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function LinkedInIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M7 10.5V17M7 7.4v.01M10.5 17v-3.6c0-1.4.9-2.4 2.2-2.4s2.3 1 2.3 2.4V17"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 function BackLink() {
@@ -53,7 +28,24 @@ function BackLink() {
 export default function TeamMemberDetail({ slug }) {
   const { audience } = useAudience();
   const { ref, inView } = useInView({ resetKey: audience });
-  const member = getMember(slug);
+
+  // The profile comes from the CMS (Content → Team). `null` while loading,
+  // `false` once we know there's nothing at this slug.
+  const [member, setMember] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const found = await teamApi.getBySlug(slug);
+        if (alive) setMember(found || false);
+      } catch {
+        if (alive) setMember(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [slug]);
 
   // Published work is the CMS insights feed. Kept to the first few — the "View
   // more" link below the grid goes to the full listing. A failure just leaves
@@ -73,6 +65,18 @@ export default function TeamMemberDetail({ slug }) {
       alive = false;
     };
   }, []);
+
+  // Still loading — hold the page rather than flashing "not found".
+  if (member === null) {
+    return (
+      <section className="tm" data-audience={audience}>
+        <div className="tm__inner">
+          <BackLink />
+          <p className="tm__bio">Loading…</p>
+        </div>
+      </section>
+    );
+  }
 
   // Unknown slug: keep the page on-theme and offer the way back rather than
   // dropping the visitor on the 404.
@@ -113,16 +117,14 @@ export default function TeamMemberDetail({ slug }) {
 
             <h1 className="tm__name">{member.name}</h1>
             <p className="tm__role">
-              {member.role}, {member.location}
+              {[member.role, member.location].filter(Boolean).join(', ')}
             </p>
 
             <p className="tm__bio">{member.summary}</p>
 
             <div className="tm__actions">
               <a className="tm__action" href={`mailto:${member.email}`}>
-                <span className="tm__action-icon" aria-hidden="true">
-                  <MailIcon />
-                </span>
+                <FaEnvelope className="tm__action-icon" aria-hidden="true" />
                 Contact
               </a>
               <a
@@ -131,9 +133,7 @@ export default function TeamMemberDetail({ slug }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span className="tm__action-icon" aria-hidden="true">
-                  <LinkedInIcon />
-                </span>
+                <FaLinkedin className="tm__action-icon" aria-hidden="true" />
                 LinkedIn
               </a>
             </div>
@@ -147,7 +147,7 @@ export default function TeamMemberDetail({ slug }) {
           <div className="tm__main">
             <section className="tm__block">
               <h2 className="tm__block-title">About {firstName}</h2>
-              {member.about.map((paragraph) => (
+              {(member.about || []).map((paragraph) => (
                 <p className="tm__para" key={paragraph.slice(0, 40)}>
                   {paragraph}
                 </p>
@@ -206,11 +206,11 @@ export default function TeamMemberDetail({ slug }) {
 
           <aside className="tm__aside">
             <a className="tm__cta" href={`mailto:${member.email}`}>
-              <MailIcon />
+              <FaEnvelope aria-hidden="true" />
               Get in touch
             </a>
 
-            {member.expertise.length > 0 && (
+            {(member.expertise || []).length > 0 && (
               <section className="tm__block">
                 <h2 className="tm__block-title">Expertise</h2>
                 <ul className="tm__expertise">

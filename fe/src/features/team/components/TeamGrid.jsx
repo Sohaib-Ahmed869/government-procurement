@@ -1,38 +1,36 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FaEnvelope, FaLinkedin } from 'react-icons/fa6';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
-import { TEAM } from '../data.js';
+import { teamApi } from '../../../api';
 import TeamAvatar from './TeamAvatar.jsx';
 import './TeamGrid.css';
-
-function MailIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <rect x="2.5" y="5" width="19" height="14" rx="3" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M3.5 7.5 12 13l8.5-5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function LinkedInIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M7 10.5V17M7 7.4v.01M10.5 17v-3.6c0-1.4.9-2.4 2.2-2.4s2.3 1 2.3 2.4V17"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export default function TeamGrid() {
   const { audience } = useAudience();
   const { ref, inView } = useInView({ resetKey: audience });
+
+  // Roster comes from the CMS (Content → Team), ordered there.
+  const [team, setTeam] = useState([]);
+  const [status, setStatus] = useState('loading'); // loading | ready | error
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const list = await teamApi.list();
+        if (!alive) return;
+        setTeam(list || []);
+        setStatus('ready');
+      } catch {
+        if (alive) setStatus('error');
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <section
@@ -41,9 +39,19 @@ export default function TeamGrid() {
       data-audience={audience}
     >
       <div className="team__inner">
+        {status === 'loading' && <p className="team__empty">Loading the team…</p>}
+        {status === 'error' && (
+          <p className="team__empty">
+            We couldn&apos;t load the team right now. Please try again shortly.
+          </p>
+        )}
+        {status === 'ready' && team.length === 0 && (
+          <p className="team__empty">No team members have been published yet.</p>
+        )}
+
         <ul className="team__grid">
-          {TEAM.map((member) => (
-            <li key={member.slug}>
+          {team.map((member) => (
+            <li key={member._id || member.slug}>
               {/* Members with a profile get a link on the name that stretches
                   over the whole card; the mail / LinkedIn buttons sit above it
                   so they stay separately clickable without nesting anchors.
@@ -77,7 +85,7 @@ export default function TeamGrid() {
                     href={`mailto:${member.email}`}
                     aria-label={`Email ${member.name}`}
                   >
-                    <MailIcon />
+                    <FaEnvelope className="team-card__icon-glyph" aria-hidden="true" />
                   </a>
                   <a
                     className="team-card__icon"
@@ -86,7 +94,7 @@ export default function TeamGrid() {
                     rel="noopener noreferrer"
                     aria-label={`${member.name} on LinkedIn`}
                   >
-                    <LinkedInIcon />
+                    <FaLinkedin className="team-card__icon-glyph" aria-hidden="true" />
                   </a>
                 </div>
               </article>

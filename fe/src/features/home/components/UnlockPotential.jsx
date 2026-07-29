@@ -4,7 +4,6 @@ import { useInView } from '../../../hooks/useInView.js';
 import { coursesApi } from '../../../api';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import cardImage from '../../../assets/images/MainPictureHomepage.png';
-import bannerImage from '../../../assets/images/HomepageCourse.png';
 import './UnlockPotential.css';
 
 // White circle with the dark arrow glyph, scaled to crop the PNG's padding.
@@ -143,22 +142,6 @@ export default function UnlockPotential() {
     >
       <div className="uy__inner">
         <p className="uy__eyebrow">Courses &amp; artefacts</p>
-        <h2 className="uy__heading">Unlock Your Potential</h2>
-
-        {/* Featured banner */}
-        <div className="uy__banner">
-          <img src={bannerImage} alt="" className="uy__banner-img" />
-          <div className="uy__banner-body">
-            <h3 className="uy__banner-title">
-              Helping procurement officers unlock their potential
-            </h3>
-            <p className="uy__banner-sub">Join our academy to get ahead in your career.</p>
-            <a className="uy__watch" href="/courses">
-              <span className="uy__watch-dot" aria-hidden="true" />
-              Watch video
-            </a>
-          </div>
-        </div>
 
         {/* Bento grid (desktop) / swipeable carousel (mobile). The layout adapts
             to how much content exists; see `mode` above. */}

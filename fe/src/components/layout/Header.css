@@ -331,7 +331,9 @@
   inset: 0;
   z-index: 90;
   background: var(--header-bg);
-  padding: 96px 28px 48px;
+  /* Top padding clears the fixed bar; the rest scales down on short screens so
+     all ten items fit without scrolling. */
+  padding: clamp(78px, 11vh, 96px) 28px clamp(24px, 4vh, 48px);
   overflow-y: auto;
   /* animation */
   opacity: 0;
@@ -355,32 +357,30 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: clamp(14px, 2.6vh, 26px);
 }
 
 .site-header__mobile-link {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
+  gap: clamp(10px, 2vh, 18px);
   font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: 26px;
+  font-size: clamp(16px, 3vh, 26px);
+  line-height: 1.15;
   font-weight: 400;
   color: #fff;
   text-decoration: none;
 }
 
 .site-header__mobile-cta {
-  margin-top: 6px;
+  margin-top: clamp(2px, 0.6vh, 6px);
 }
 
-.site-header__mobile-cta .site-header__cta-arrow {
-  width: 36px;
-  height: 36px;
-}
-
+/* The CTA arrow tracks the link size so it never dominates a shrunken menu. */
+.site-header__mobile-cta .site-header__cta-arrow,
 .site-header__mobile-cta .site-header__cta-arrow img {
-  width: 37px;
-  height: 37px;
+  width: clamp(24px, 4.2vh, 36px);
+  height: clamp(24px, 4.2vh, 36px);
 }
 
 /* Staggered reveal of the menu items when the panel opens. */
@@ -418,6 +418,15 @@
   }
   .site-header__mobile.is-open .site-header__mobile-list li:nth-child(7) {
     transition-delay: 0.4s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(8) {
+    transition-delay: 0.45s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(9) {
+    transition-delay: 0.5s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(10) {
+    transition-delay: 0.55s;
   }
 }
 

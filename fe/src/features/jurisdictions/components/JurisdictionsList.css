@@ -1,0 +1,358 @@
+.jl {
+  --jl-bg: var(--gp-ink-900);
+  /* Raised surface the filter panel and cards sit on. */
+  --jl-surface: var(--gp-ink-800);
+
+  background: var(--jl-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.jl[data-audience='award'] {
+  --jl-bg: var(--gp-green-900);
+  --jl-surface: var(--gp-green-800);
+}
+
+.jl[data-audience='win'] {
+  --jl-bg: var(--gp-ink-900);
+  --jl-surface: var(--gp-ink-800);
+}
+
+.jl__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 40px 96px;
+}
+
+/* --- filter panel --- */
+.jl__filters {
+  padding: 22px;
+  background: var(--jl-surface);
+  border-radius: 18px;
+}
+
+.jl__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Glass pill; the selected one inverts to solid white. */
+.jl__pill {
+  padding: 9px 18px;
+  font: inherit;
+  font-size: 13.5px;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.jl__pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.jl__pill.is-active {
+  color: var(--jl-bg);
+  font-weight: 600;
+  background: #fff;
+  box-shadow: none;
+}
+
+.jl__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+/* --- category select --- */
+.jl-select {
+  position: relative;
+  flex: 0 0 230px;
+}
+
+.jl-select__button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  font: inherit;
+  font-size: 14px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.jl-select__chevron {
+  flex: none;
+  transition: transform 0.18s ease;
+}
+
+.jl-select__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.jl-select__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--jl-surface);
+  border-radius: 12px;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.38),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.jl-select__option {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+}
+
+.jl-select__option:hover,
+.jl-select__option.is-active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* --- search --- */
+.jl__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.jl__search-icon {
+  position: absolute;
+  left: 16px;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
+
+.jl__search-input {
+  width: 100%;
+  padding: 13px 16px 13px 42px;
+  font: inherit;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  border-radius: 10px;
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.jl__search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.jl__count {
+  margin: 0;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.jl__reset {
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  color: #fff;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.jl__notice {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.jl__empty {
+  margin: 0;
+  padding: 40px 0;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* --- cards --- */
+.jl__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jl-card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  background: var(--jl-surface);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.jl-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.jl-card__state {
+  padding: 5px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--jl-bg);
+  background: #fff;
+  border-radius: 999px;
+}
+
+.jl-card__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.jl-card__title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #fff;
+}
+
+/* Amber so a monetary threshold stands out from the body copy. */
+.jl-card__threshold {
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 5px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #e8b866;
+  background: rgba(232, 184, 102, 0.12);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(232, 184, 102, 0.35);
+}
+
+.jl-card__body {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.jl-card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+}
+
+.jl-card__more-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  color: var(--jl-bg);
+  background: #fff;
+  border-radius: 50%;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .jl-card__more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.jl :is(a, button, input):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .jl__grid > .jl-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition-delay: calc(var(--i) * 50ms);
+  }
+
+  .jl.is-in .jl__grid > .jl-card {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .jl__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .jl__inner {
+    padding: 16px 24px 64px;
+  }
+
+  .jl__filters {
+    padding: 16px;
+  }
+
+  .jl__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jl-select,
+  .jl__search {
+    flex: 1 1 100%;
+  }
+}

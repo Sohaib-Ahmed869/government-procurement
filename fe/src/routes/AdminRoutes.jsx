@@ -8,6 +8,10 @@ import DashboardPage from '../admin/pages/DashboardPage.jsx';
 import ArticlesAdminPage from '../admin/pages/ArticlesAdminPage.jsx';
 import ArticleEditorPage from '../admin/pages/ArticleEditorPage.jsx';
 import CategoriesPage from '../admin/pages/CategoriesPage.jsx';
+import TeamAdminPage from '../admin/pages/TeamAdminPage.jsx';
+import CareersAdminPage from '../admin/pages/CareersAdminPage.jsx';
+import RulesAdminPage from '../admin/pages/RulesAdminPage.jsx';
+import HomeHeroPage from '../admin/pages/HomeHeroPage.jsx';
 import CoursesAdminPage from '../admin/pages/CoursesAdminPage.jsx';
 import CourseEditorPage from '../admin/pages/CourseEditorPage.jsx';
 import FaqAdminPage from '../admin/pages/FaqAdminPage.jsx';
@@ -51,6 +55,10 @@ export default function AdminRoutes() {
           <Route path="courses/:id" element={<CourseEditorPage />} />
           <Route path="faqs" element={<FaqAdminPage />} />
           <Route path="categories" element={<CategoriesPage />} />
+          <Route path="team" element={<TeamAdminPage />} />
+          <Route path="careers" element={<CareersAdminPage />} />
+          <Route path="rules" element={<RulesAdminPage />} />
+          <Route path="home-hero" element={<HomeHeroPage />} />
 
           {/* Community */}
           <Route path="moderation" element={<ModerationQueuePage />} />

@@ -91,12 +91,12 @@ async function unwrap(promise) {
 }
 
 export const api = {
-  get: (path, params) => unwrap(request(path, { method: 'GET', params })),
+  get: (path, params, opts) => unwrap(request(path, { method: 'GET', params, ...opts })),
   post: (path, body, opts) => unwrap(request(path, { method: 'POST', body, ...opts })),
   patch: (path, body, opts) => unwrap(request(path, { method: 'PATCH', body, ...opts })),
   del: (path, opts) => unwrap(request(path, { method: 'DELETE', ...opts })),
   // Returns the full envelope so callers can read `meta` for pagination.
-  page: (path, params) => request(path, { method: 'GET', params }),
+  page: (path, params, opts) => request(path, { method: 'GET', params, ...opts }),
   // Multipart upload (files). `fields` is an optional map of extra form fields.
   upload: (path, file, { fieldName = 'file', fields = {}, method = 'POST' } = {}) => {
     const form = new FormData();

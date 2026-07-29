@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { contactApi } from '../../../api';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
 import './ContactSection.css';
 
 const CONTACT_METHODS = [
@@ -193,9 +191,6 @@ export default function ContactSection() {
 
             <button type="submit" className="contact__submit" disabled={submitting}>
               {submitting ? 'Sending…' : 'Send now'}
-              <span className="contact__submit-arrow" aria-hidden="true">
-                <img src={arrowIcon} alt="" />
-              </span>
             </button>
 
             {sent && (
@@ -212,9 +207,6 @@ export default function ContactSection() {
               {CONTACT_METHODS.map(({ key, label, value, href }) => (
                 <li key={key}>
                   <a className="contact__pill" href={href}>
-                    <span className="contact__pill-icon" aria-hidden="true">
-                      <img src={callIcon} alt="" />
-                    </span>
                     <span className="contact__pill-text">
                       <span className="contact__pill-label">{label}</span>
                       {value}

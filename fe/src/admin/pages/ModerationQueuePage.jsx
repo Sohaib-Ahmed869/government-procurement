@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { questionsApi } from '../../api';
+import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 // Format an ISO date/timestamp into a short, readable label for the table.
@@ -34,6 +35,8 @@ export default function ModerationQueuePage() {
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [q, setQ] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [confirmId, setConfirmId] = useState(null);
+  const [notice, setNotice] = useState('');
   const [openId, setOpenId] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -46,7 +49,7 @@ export default function ModerationQueuePage() {
   const load = () => {
     setStatus('loading');
     questionsApi
-      .list({ q, status: statusFilter === 'all' ? undefined : statusFilter, limit: 100 })
+      .list({ q, status: statusFilter === 'all' ? undefined : statusFilter, limit: 100, all: 1 })
       .then((items) => {
         setRows(items);
         setStatus('ready');
@@ -76,6 +79,37 @@ export default function ModerationQueuePage() {
       load();
     } catch (err) {
       setError(err?.message || 'Failed to update status');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteQuestion = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      await questionsApi.remove(confirmId);
+      setConfirmId(null);
+      setOpenId(null);
+      load();
+    } catch (err) {
+      setError(err?.message || 'Failed to delete question');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Emailing is deliberately separate from saving: a moderator can revise an
+  // answer without notifying on every save, and can re-send later.
+  const sendAnswerEmail = async (id) => {
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const res = await questionsApi.sendAnswer(id);
+      setNotice(`Answer emailed to ${res?.to || 'the submitter'}.`);
+    } catch (err) {
+      setError(err?.message || 'Failed to send the answer');
     } finally {
       setBusy(false);
     }
@@ -112,7 +146,9 @@ export default function ModerationQueuePage() {
   const renderDetail = (row) => {
     const id = row._id || row.id;
     const name = row.name || row.submitter?.name || '—';
-    const email = row.email || row.submitter?.email || '—';
+    // The raw address drives the send button; '—' is only for display.
+    const submitterEmail = row.email || row.submitter?.email || '';
+    const email = submitterEmail || '—';
     return (
       <div className="admin-card" style={{ margin: '4px 0' }}>
         {error && <div className="admin-alert admin-alert--error">{error}</div>}
@@ -141,13 +177,16 @@ export default function ModerationQueuePage() {
           >
             Approve
           </button>
+          {/* Published questions flip to Unpublish, which returns them to
+              Approved — off the public forum but still answered and ready to
+              publish again. */}
           <button
             type="button"
-            className="admin-btn admin-btn--sm admin-btn--primary"
+            className={`admin-btn admin-btn--sm${row.status === 'published' ? '' : ' admin-btn--primary'}`}
             disabled={busy}
-            onClick={() => setStatusFor(id, 'published')}
+            onClick={() => setStatusFor(id, row.status === 'published' ? 'approved' : 'published')}
           >
-            Publish
+            {row.status === 'published' ? 'Unpublish' : 'Publish'}
           </button>
           <button
             type="button"
@@ -157,6 +196,14 @@ export default function ModerationQueuePage() {
             title="Featured questions show in the forum sidebar"
           >
             {row.featured ? '★ Featured' : '☆ Feature'}
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn--sm admin-btn--danger"
+            disabled={busy}
+            onClick={() => setConfirmId(id)}
+          >
+            Delete
           </button>
         </div>
 
@@ -215,7 +262,25 @@ export default function ModerationQueuePage() {
             >
               Save answer
             </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn--sm"
+              disabled={busy || !submitterEmail}
+              title={
+                submitterEmail
+                  ? 'Email the saved answer to the person who asked'
+                  : 'This question was submitted without an email address'
+              }
+              onClick={() => sendAnswerEmail(id)}
+            >
+              Send to email
+            </button>
           </div>
+          {notice && (
+            <p className="admin-field__hint" style={{ marginLeft: 0, marginTop: 8 }}>
+              {notice}
+            </p>
+          )}
         </div>
       </div>
     );
@@ -305,6 +370,16 @@ export default function ModerationQueuePage() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmDialog
+        open={Boolean(confirmId)}
+        title="Delete question"
+        message="Delete this question and its answer? This cannot be undone."
+        confirmLabel="Delete"
+        busy={busy}
+        onConfirm={deleteQuestion}
+        onCancel={() => setConfirmId(null)}
+      />
     </div>
   );
 }

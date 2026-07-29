@@ -86,6 +86,21 @@ function PillDropdown({ label, options, value, onChange }) {
   );
 }
 
+// Measured from the article's own body at 200 words per minute — the same
+// formula the CMS editor shows beneath the body field (RichTextEditor's
+// computeStats). Derived rather than read from the stored `readingMinutes`,
+// because that field only updates when someone saves the article, so an edited
+// (or seeded) article can carry a figure that no longer matches its text. The
+// stored value is the fallback for when the body isn't in the response.
+function readingMinutes(article) {
+  const words = String(article.body || '')
+    .replace(/<[^>]*>/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  if (words) return Math.max(1, Math.round(words / 200));
+  return article.readingMinutes > 0 ? article.readingMinutes : 0;
+}
+
 // Three rows of the 4-up desktop grid; "View more" adds another batch.
 const PAGE_SIZE = 12;
 
@@ -189,6 +204,11 @@ export default function InsightsGrid() {
               // hero image fall back to the tile's own solid background colour.
               const image = article.heroImage?.url || null;
               const date = formatDate(article.publishedAt);
+              const minutes = readingMinutes(article);
+              // "Article · 4 min read" — either half may be missing.
+              const meta = [article.topic, minutes ? `${minutes} min read` : null]
+                .filter(Boolean)
+                .join(' · ');
               return (
                 <li key={article._id} className="insights-card" style={{ '--i': i % PAGE_SIZE }}>
                   {/* Image on top, then topic, title and a date-led summary —
@@ -198,9 +218,7 @@ export default function InsightsGrid() {
                       {image && <img src={image} alt="" />}
                     </span>
 
-                    {article.topic && (
-                      <span className="insights-card__topic">{article.topic}</span>
-                    )}
+                    {meta && <span className="insights-card__topic">{meta}</span>}
 
                     <h2 className="insights-card__title">
                       {article.title}

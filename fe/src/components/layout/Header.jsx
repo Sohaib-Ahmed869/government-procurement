@@ -17,6 +17,8 @@ const NAV_LINKS = [
   { label: 'Insights', href: '/resources' },
   { label: 'QnA', href: '/forum' },
   { label: 'Tender websites', href: '/aus-list' },
+  { label: 'Careers', href: '/careers' },
+  { label: 'Jurisdictional links', href: '/jurisdictional-links' },
 ];
 
 export default function Header({ showToggle = true, audience: audienceProp }) {

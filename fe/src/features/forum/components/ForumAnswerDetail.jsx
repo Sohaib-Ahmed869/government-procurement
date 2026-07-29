@@ -37,10 +37,10 @@ export default function ForumAnswerDetail() {
       // Links may carry a slug or, as a fallback, the raw id.
       let item = null;
       try {
-        item = await questionsApi.getBySlug(id);
+        item = await questionsApi.publicGetBySlug(id);
       } catch {
         try {
-          item = await questionsApi.get(id);
+          item = await questionsApi.publicGet(id);
         } catch {
           item = null;
         }
@@ -55,7 +55,7 @@ export default function ForumAnswerDetail() {
 
       // A few other questions from the same category, for further reading.
       try {
-        const list = await questionsApi.list({ limit: 100, category: item.category });
+        const list = await questionsApi.publicList({ limit: 100, category: item.category });
         if (!alive) return;
         setRelated(
           (list || [])

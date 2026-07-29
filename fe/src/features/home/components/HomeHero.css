@@ -74,20 +74,6 @@
   }
 }
 
-/* --- decorative waves (asset) --- */
-.home-hero__waves {
-  position: absolute;
-  left: 0;
-  top: 5%;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
-  z-index: 0;
-  /* The source lines are light grey; soften them against the dark background. */
-  opacity: 0.5;
-}
-
 /* --- shared eyebrow --- */
 .home-hero__eyebrow {
   margin: 0;
@@ -282,13 +268,6 @@
 }
 
 @media (max-width: 860px) {
-  /* The wide desktop wave is replaced on small screens by a background wave that
-     is anchored to the intro (below), so its distance to the buttons/image stays
-     constant regardless of how the text wraps at different widths. */
-  .home-hero__waves {
-    display: none;
-  }
-
   /* The toggle already states the audience, so drop the redundant intro eyebrow
      (the advisory section keeps its own "Advisory Services" eyebrow). */
   .home-hero__intro .home-hero__eyebrow {

@@ -1,23 +1,26 @@
+import { useState } from 'react';
 import { AiFillTikTok } from 'react-icons/ai';
 import { FaFacebookF, FaLinkedin, FaThreads, FaYoutube } from 'react-icons/fa6';
 import { TbBrandInstagramFilled } from 'react-icons/tb';
 import logo from '../../assets/icons/GPLogo.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
+import WeChatQrDialog from './WeChatQrDialog.jsx';
 import './Footer.css';
 
-// The two segment columns carry the full header nav, with Home ahead of it and
-// the consultation CTA after. Kept in step with Header.jsx's NAV_LINKS by hand —
-// if a nav item is added or dropped there, mirror it here.
+// The two segment columns carry the header nav, with Home ahead of it and the
+// consultation CTA after. Labels and hrefs match Header.jsx's NAV_LINKS — keep
+// them in step by hand when a nav item changes. Careers is the one nav item left
+// out: it isn't audience-specific, so it sits in the company column below.
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Advisory', href: '/advisory' },
-  { label: 'Our Team', href: '/our-team' },
+  { label: 'Capabilities', href: '/advisory' },
+  { label: 'Our team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
-  { label: 'Resources', href: '/resources' },
-  { label: 'Forum', href: '/forum' },
-  { label: 'Explore Tender Websites', href: '/aus-list' },
-  { label: 'Book a Consultation', href: '/book-a-consultation' },
+  { label: 'Insights', href: '/resources' },
+  { label: 'QnA', href: '/forum' },
+  { label: 'Tender websites', href: '/aus-list' },
+  { label: 'Book a consultation', href: '/book-a-consultation' },
 ];
 
 // Every link in a segment column is tagged with that segment, so following one
@@ -38,6 +41,7 @@ const LINK_COLUMNS = [
     links: [
       { label: 'FAQ', href: '/faq' },
       { label: 'About', href: '/about' },
+      { label: 'Careers', href: '/careers' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
     ],
@@ -56,19 +60,20 @@ const FLAT_ROWS = [
     { label: 'Win Contracts', href: '/?audience=win' },
   ],
   [
-    { label: 'Resources', href: '/resources' },
-    { label: 'Advisory', href: '/advisory' },
-    { label: 'Expertise', href: '/our-expertise' },
+    { label: 'Insights', href: '/resources' },
+    { label: 'Capabilities', href: '/advisory' },
+    { label: 'Our team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
   ],
   [
-    { label: 'Forum', href: '/forum' },
-    { label: 'Explore Tender Websites', href: '/aus-list' },
-    { label: 'Book a Consultation', href: '/book-a-consultation' },
+    { label: 'QnA', href: '/forum' },
+    { label: 'Tender websites', href: '/aus-list' },
+    { label: 'Book a consultation', href: '/book-a-consultation' },
   ],
   [
     { label: 'FAQ', href: '/faq' },
     { label: 'About', href: '/about' },
+    { label: 'Careers', href: '/careers' },
     { label: 'Privacy', href: '/privacy' },
     { label: 'Terms', href: '/terms' },
   ],
@@ -80,15 +85,29 @@ const CONTACT_PHONE = '+61 478 669 922';
 const CONTACT_EMAIL = 'mkheir@govprocurement.com.au';
 const CONTACT_ADDRESS = '25 Restwell Street Bankstown NSW 2200';
 
-// Messaging apps the number above is reachable on. Only WhatsApp has a real
-// destination so far — it deep-links to CONTACT_PHONE. The rest point at the
-// apps' own sites as placeholders; swap in the account links when they arrive.
+// CONTACT_PHONE in the form the messaging deep links want: digits only, no
+// leading "+".
+const CONTACT_PHONE_DIGITS = CONTACT_PHONE.replace(/\D/g, '');
+
+// The Facebook profile ID from SOCIAL_LINKS below — m.me deep-links by account
+// ID, not by phone number, and this is the same account.
+const FACEBOOK_ID = '61585039209265';
+
+// Messaging apps the number above is reachable on. Each link opens its own app.
+// WhatsApp and Telegram publish number-based deep links, so those open a chat
+// with CONTACT_PHONE directly; Messenger opens the Facebook account.
+//
+// WeChat has no public https profile URL for personal accounts, so this entry
+// opens a dialog with the account's own QR code for the visitor to scan in
+// WeChat (Discover → Scan) rather than navigating anywhere. The image lives in
+// WeChatQrDialog — to replace it, export a fresh code from the account
+// (Me → name → My QR Code → Save) over src/assets/images/WeChatQr.png.
 const CALL_CHANNELS = [
-  { label: 'WhatsApp', href: 'https://wa.me/61478669922' },
-  { label: 'Telegram', href: 'https://telegram.org/' }, // TODO: t.me/<handle>
-  { label: 'WeChat', href: 'https://www.wechat.com/' }, // TODO: account link
-  { label: 'FB Messenger', href: 'https://www.messenger.com/' }, // TODO: m.me/<page>
-  { label: 'Botim', href: 'https://www.botim.me/' }, // TODO: account link
+  { label: 'WhatsApp', href: `https://wa.me/${CONTACT_PHONE_DIGITS}` },
+  { label: 'Telegram', href: `https://t.me/+${CONTACT_PHONE_DIGITS}` },
+  { label: 'WeChat', qr: true },
+  { label: 'FB Messenger', href: `https://m.me/${FACEBOOK_ID}` },
+  { label: 'Botim', href: 'https://www.botim.me/' }, // TODO: Botim profile
 ];
 
 // Official social profiles. Kept in sync with the `social` block seeded into
@@ -130,6 +149,9 @@ const SOCIAL_LINKS = [
 export default function Footer({ audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
+
+  // Whether the WeChat QR dialog is showing.
+  const [qrOpen, setQrOpen] = useState(false);
 
   // "Explore Tender Websites" is shown to both audiences (Win and Award).
   const showTenderPortals = true;
@@ -187,16 +209,26 @@ export default function Footer({ audience: audienceProp }) {
             Call us
           </h2>
           <ul className="site-footer__channels" aria-labelledby="footer-channels-heading">
-            {CALL_CHANNELS.map(({ label, href }) => (
+            {CALL_CHANNELS.map(({ label, href, qr }) => (
               <li key={label}>
-                <a
-                  className="site-footer__channel-link"
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {label}
-                </a>
+                {qr ? (
+                  <button
+                    type="button"
+                    className="site-footer__channel-link site-footer__channel-button"
+                    onClick={() => setQrOpen(true)}
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  <a
+                    className="site-footer__channel-link"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
@@ -237,7 +269,11 @@ export default function Footer({ audience: audienceProp }) {
             outside the <nav> above so it survives the ≤760px breakpoint, where
             the headed columns give way to the flat link run. */}
         <address className="site-footer__contact">
-          <h2 className="site-footer__contact-heading">Contact us</h2>
+          <h2 className="site-footer__contact-heading">
+            <a className="site-footer__contact-heading-link" href="/contact">
+              Contact us
+            </a>
+          </h2>
           <p className="site-footer__contact-sub">Head Office</p>
           <hr className="site-footer__contact-rule" />
           <ul className="site-footer__contact-list">
@@ -256,6 +292,8 @@ export default function Footer({ audience: audienceProp }) {
           </ul>
         </address>
       </div>
+
+      <WeChatQrDialog open={qrOpen} onClose={() => setQrOpen(false)} />
     </footer>
   );
 }

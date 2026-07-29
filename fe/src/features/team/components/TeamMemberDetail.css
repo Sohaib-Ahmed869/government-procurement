@@ -1,6 +1,9 @@
 .tm {
   --tm-bg: var(--gp-ink-900);
   --tm-surface: var(--gp-ink-800);
+  /* Fill behind the "Get in touch" CTA and the expertise chevrons. Follows the
+     segment: mint on Award, grey on Win. */
+  --tm-accent: var(--gp-mint-300);
 
   background: var(--tm-bg);
   color: #fff;
@@ -10,11 +13,13 @@
 .tm[data-audience='award'] {
   --tm-bg: var(--gp-green-900);
   --tm-surface: var(--gp-green-800);
+  --tm-accent: var(--gp-mint-300);
 }
 
 .tm[data-audience='win'] {
   --tm-bg: var(--gp-ink-900);
   --tm-surface: var(--gp-ink-800);
+  --tm-accent: #c9c9c9;
 }
 
 .tm__inner {
@@ -130,8 +135,8 @@
 .tm__action {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 22px 6px 6px;
+  gap: 10px;
+  padding: 12px 22px;
   font-size: 14px;
   font-weight: 500;
   color: #fff;
@@ -146,16 +151,12 @@
   background: rgba(255, 255, 255, 0.22);
 }
 
+/* Bare glyph in the link colour, as in the footer — no disc behind it. */
 .tm__action-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
   flex: none;
-  color: var(--tm-bg);
-  background: #fff;
-  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  color: #fff;
 }
 
 /* --- body: written profile left, contact + expertise right --- */
@@ -239,7 +240,7 @@
   align-self: start;
 }
 
-/* Mint CTA with dark text, the same treatment as the course "Buy" button. */
+/* Solid CTA with dark text, the same treatment as the course "Buy" button. */
 .tm__cta {
   display: flex;
   align-items: center;
@@ -250,7 +251,7 @@
   font-weight: 600;
   color: var(--tm-bg);
   text-decoration: none;
-  background: var(--gp-mint-300);
+  background: var(--tm-accent);
   border-radius: 10px;
   transition: filter 0.15s ease;
 }
@@ -285,7 +286,7 @@
 .tm__expertise-chevron {
   flex: none;
   margin-top: 4px;
-  color: var(--gp-mint-300);
+  color: var(--tm-accent);
 }
 
 /* --- published work: the insights feed, full width under the body --- */
@@ -343,7 +344,7 @@
 .tm__work-chevron {
   margin-left: 4px;
   vertical-align: -2px;
-  color: var(--gp-mint-300);
+  color: var(--tm-accent);
 }
 
 .tm__work-date {

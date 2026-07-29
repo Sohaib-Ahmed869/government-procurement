@@ -44,7 +44,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
       try {
         // A search spans the whole forum, so the category filter comes off —
         // otherwise a Win-page search would never surface an Award answer.
-        const list = await questionsApi.list(
+        const list = await questionsApi.publicList(
           query ? { limit: 100 } : { limit: 100, category },
         );
         if (!alive) return;
@@ -63,7 +63,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
     let alive = true;
     (async () => {
       try {
-        const list = await questionsApi.list({ featured: true, limit: 20 });
+        const list = await questionsApi.publicList({ featured: true, limit: 20 });
         if (!alive) return;
         setFeatured(
           (list || []).map((q) => ({

@@ -214,8 +214,11 @@
   color: rgba(255, 255, 255, 0.78);
 }
 
+/* Stated explicitly rather than left to inherit from .insights, so the date
+   can't drift onto another face if a wrapper ever sets its own. */
 .insights-card__date {
-  font-style: italic;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 /* Hover lifts the card clear of the grid, matching the team cards: it rises and
