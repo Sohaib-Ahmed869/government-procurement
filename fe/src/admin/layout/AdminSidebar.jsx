@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import logo from '../../assets/images/GovProcurementLogo.png';
+import logo from '../../assets/icons/GPLogo.svg';
 
 // Small inline-SVG icon set (no external icon dependency). Each is a 24x24
 // stroke icon that inherits currentColor.
@@ -52,13 +52,24 @@ const NAV = [
     items: [{ to: '/admin', label: 'Dashboard', end: true, icon: 'dashboard' }],
   },
   {
-    group: 'Content',
+    // Reusable content: listed, filtered and searched across the site.
+    group: 'Content library',
     items: [
       { to: '/admin/articles', label: 'Articles', icon: 'doc' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
-      { to: '/admin/testimonials', label: 'Testimonials', icon: 'quote' },
       { to: '/admin/categories', label: 'Categories', icon: 'tag' },
+    ],
+  },
+  {
+    // Copy that belongs to one specific page, in the order those pages appear
+    // in the site nav.
+    group: 'Page content',
+    items: [
+      { to: '/admin/home-hero', label: 'Homepage hero', icon: 'page' },
+      { to: '/admin/team', label: 'Team', icon: 'users' },
+      { to: '/admin/careers', label: 'Careers', icon: 'hand' },
+      { to: '/admin/rules', label: 'Rules', icon: 'rails' },
     ],
   },
   {
@@ -66,15 +77,17 @@ const NAV = [
     items: [{ to: '/admin/moderation', label: 'Q&A Moderation', icon: 'chat' }],
   },
   {
+    // Everything else the public sends in.
     group: 'Submissions',
     items: [
-      { to: '/admin/subscribers', label: 'Subscribers', icon: 'users' },
       { to: '/admin/contact', label: 'Contact inbox', icon: 'mail' },
       { to: '/admin/consultations', label: 'Consultations', icon: 'calendar' },
       { to: '/admin/register-interest', label: 'Register interest', icon: 'hand' },
+      { to: '/admin/subscribers', label: 'Subscribers', icon: 'users' },
     ],
   },
   {
+    // Site-wide furniture rather than page copy.
     group: 'Site',
     items: [
       { to: '/admin/announcements', label: 'Announcements', icon: 'megaphone' },
@@ -112,11 +125,11 @@ export default function AdminSidebar({
           end
           className="admin-sidebar__brand"
           onClick={onCloseMobile}
-          title="Gov Procurement CMS"
+          title="Government Procurement CMS"
         >
           <img src={logo} alt="Government Procurement" className="admin-sidebar__logo" />
           <span className="admin-sidebar__wordmark">
-            <strong>Gov Procurement</strong>
+            <strong>Government Procurement</strong>
             <span>CMS</span>
           </span>
         </NavLink>

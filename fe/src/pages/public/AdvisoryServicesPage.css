@@ -1,3 +1,7 @@
+/* (The transparent-header treatment that let the hero's corner wave run up
+   behind the bar has been removed along with the wave itself. It also pinned the
+   header with `position: relative`, which would override the sticky header.) */
+
 /* Big-screen scaling.
    The advisory page is designed at a 1440px content width. On wider screens it
    would otherwise sit in a fixed column with large empty margins. Instead we lay

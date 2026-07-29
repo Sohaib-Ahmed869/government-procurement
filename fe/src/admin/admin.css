@@ -1,9 +1,9 @@
 /* Admin CMS — shared styles. Light theme with the site's green accent. */
 .admin {
-  --admin-green: #0a3114;
+  --admin-green: var(--gp-green-900);
   --admin-green-600: #0f4a20;
   --admin-green-700: #0c3a19;
-  --admin-mint: #7ee2a8;
+  --admin-mint: var(--gp-mint-300);
   --admin-mint-soft: #e3f6ec;
   --admin-bg: #f4f6f5;
   --admin-surface: #ffffff;
@@ -134,13 +134,12 @@
   overflow: hidden;
   transition: opacity 0.16s var(--admin-ease);
 }
+/* "Government Procurement" is too long for one line in the sidebar, so it wraps
+   rather than being cut off with an ellipsis. */
 .admin-sidebar__wordmark strong {
   font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .admin-sidebar__wordmark span {
   font-size: 11px;
@@ -942,12 +941,33 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
-  align-items: start;
+}
+
+/* Side-by-side cards, so the stacked-card margin doesn't apply — it would push
+   the right card down by 18px. The grid gap already spaces them. */
+.dash-cols > .admin-card + .admin-card {
+  margin-top: 0;
+}
+
+/* Both cards fill the row's height (the taller one sets it) and lay out as a
+   column, so a short or empty list centres in the leftover space rather than
+   leaving the card bottom-heavy. */
+.dash-cols > .admin-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-cols .dash-list {
+  flex: 1;
 }
 
 .dash-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
-  padding: 26px 0 10px;
+  padding: 26px 0;
   text-align: center;
   font-size: 13.5px;
   color: var(--admin-muted);

@@ -5,23 +5,23 @@ import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
-// Resource types share the Course collection, distinguished by resourceType.
-const TYPE_TABS = [
-  { value: 'all', label: 'All' },
-  { value: 'courses', label: 'Courses' },
-  { value: 'artefacts', label: 'Artefacts' },
-  { value: 'bundles', label: 'Bundles' },
-];
-const TYPE_LABEL = { courses: 'Course', artefacts: 'Artefact', bundles: 'Bundle' };
-// Singular label used on the "New …" button per active tab.
-const NEW_LABEL = { all: 'resource', courses: 'course', artefacts: 'artefact', bundles: 'bundle' };
+// Level and category labels, matching the filters on the public courses page.
+const LEVEL_LABEL = {
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+};
+const CATEGORY_LABEL = {
+  general: 'General',
+  award: 'Award Contracts',
+  win: 'Win Contracts',
+};
 
 // LIST screen for courses, artefacts and bundles.
 export default function CoursesAdminPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [q, setQ] = useState('');
-  const [type, setType] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [confirmId, setConfirmId] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -32,7 +32,6 @@ export default function CoursesAdminPage() {
       .list({
         q,
         limit: 100,
-        ...(type !== 'all' ? { resourceType: type } : {}),
         ...(statusFilter !== 'all' ? { status: statusFilter } : {}),
       })
       .then((items) => {
@@ -42,7 +41,7 @@ export default function CoursesAdminPage() {
       .catch(() => setStatus('error'));
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(load, [q, type, statusFilter]);
+  useEffect(load, [q, statusFilter]);
 
   const onDelete = async () => {
     setBusy(true);
@@ -58,9 +57,15 @@ export default function CoursesAdminPage() {
   const columns = [
     { key: 'title', header: 'Title' },
     {
-      key: 'resourceType',
-      header: 'Type',
-      render: (r) => TYPE_LABEL[r.resourceType] || 'Course',
+      key: 'level',
+      header: 'Level',
+      // levelLabel is the free-text display chip; fall back to the enum.
+      render: (r) => r.levelLabel || LEVEL_LABEL[r.level] || '—',
+    },
+    {
+      key: 'segment',
+      header: 'Category',
+      render: (r) => CATEGORY_LABEL[r.segment] || '—',
     },
     {
       key: 'availability',
@@ -103,11 +108,8 @@ export default function CoursesAdminPage() {
       <div className="admin-page__head">
         <h2 className="admin-page__title">Courses &amp; resources</h2>
         <div className="admin-page__actions">
-          <Link
-            className="admin-btn admin-btn--primary"
-            to={`new${type !== 'all' ? `?type=${type}` : ''}`}
-          >
-            New {NEW_LABEL[type]}
+          <Link className="admin-btn admin-btn--primary" to="new">
+            New resource
           </Link>
         </div>
       </div>
@@ -120,20 +122,6 @@ export default function CoursesAdminPage() {
           onChange={(e) => setQ(e.target.value)}
           style={{ maxWidth: 280 }}
         />
-        <div className="admin-tabs" role="tablist" aria-label="Resource type">
-          {TYPE_TABS.map((t) => (
-            <button
-              key={t.value}
-              type="button"
-              role="tab"
-              aria-selected={type === t.value}
-              className={`admin-tab${type === t.value ? ' is-active' : ''}`}
-              onClick={() => setType(t.value)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
         <select
           className="admin-select"
           value={statusFilter}
@@ -153,7 +141,7 @@ export default function CoursesAdminPage() {
         rows={rows}
         loading={status === 'loading'}
         error={status === 'error' ? 'Failed to load courses' : null}
-        emptyText={type === 'all' ? 'No courses yet.' : `No ${type} yet.`}
+        emptyText="No courses yet."
       />
 
       <ConfirmDialog

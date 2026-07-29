@@ -1,5 +1,5 @@
 .ee {
-  --ee-bg: #1a1a1a;
+  --ee-bg: var(--gp-ink-900);
   --ee-content-bg: #262626;
 
   background: var(--ee-bg);
@@ -8,17 +8,21 @@
 }
 
 .ee[data-audience='award'] {
-  --ee-bg: #0a3114;
-  --ee-content-bg: #0e3e1b;
+  --ee-bg: var(--gp-green-900);
+  --ee-content-bg: var(--gp-green-800);
 }
 
 .ee[data-audience='win'] {
-  --ee-bg: #1a1a1a;
-  --ee-content-bg: #1a1a1a;
+  --ee-bg: var(--gp-ink-900);
+  --ee-content-bg: var(--gp-ink-900);
 }
 
+/* Same 1100px container as every other page section, so the card's edges line
+   up with the headings above and below it. */
 .ee__inner {
-  padding: 0;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -53,14 +57,16 @@
   }
 }
 
-/* Full-bleed: the card spans the full viewport width, no side gaps. */
 .ee__card {
   display: grid;
   /* Column width ≈ card height × image aspect (1.666), so the whole photo
      shows with no side cropping. */
   grid-template-columns: 560px 1fr;
   overflow: hidden;
-  height: 336px;
+  /* Inside the container the copy column is ~460px rather than the ~880px it
+     had full-bleed, so the card grows to fit rather than clipping its text. */
+  min-height: 336px;
+  border-radius: 14px;
   background: var(--ee-bg);
 }
 
@@ -128,7 +134,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 22px 6px 6px;
+  padding: 12px 22px;
   font-size: 14px;
   font-weight: 500;
   color: #fff;
@@ -225,7 +231,7 @@
 
   .ee__btn {
     gap: 10px;
-    padding: 5px 18px 5px 5px;
+    padding: 11px 18px;
     font-size: 13px;
   }
 
@@ -236,10 +242,17 @@
 }
 
 @media (max-width: 760px) {
+  /* The stacked layout is deliberately full-bleed — the wave runs to the edges
+     — so the container gutters come off here. */
+  .ee__inner {
+    padding: 0;
+  }
+
   /* Stacked, centred layout: photo drops out, wave anchors the bottom. */
   .ee__card {
     grid-template-columns: 1fr;
     height: auto;
+    border-radius: 0;
   }
 
   .ee__media {
@@ -297,7 +310,7 @@
     max-width: 274px;
     height: 54px;
     justify-content: center;
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 14px;
     white-space: nowrap;
   }

@@ -12,6 +12,9 @@ const consultationSchema = new mongoose.Schema(
       enum: ['advisory', 'training', 'tender-support', 'other'],
       default: 'other',
     },
+    // "Reason for contacting" from the booking form. Free text for now — the
+    // option list is still being settled, so no enum until it is.
+    reason: { type: String, default: '' },
     preferredDate: { type: Date },
     preferredTime: { type: String, enum: ['morning', 'afternoon', ''], default: '' },
     message: { type: String, default: '' },

@@ -152,7 +152,7 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: #0e3e1b;
+  background: var(--gp-green-800);
   border-radius: 14px;
   box-shadow:
     0 16px 36px rgba(0, 0, 0, 0.38),
@@ -162,7 +162,7 @@
 
 /* Dropdown panel green becomes dark gray in the win theme. */
 .forum-submit[data-audience='win'] .forum-submit__menu {
-  background: #242424;
+  background: var(--gp-ink-800);
 }
 
 .forum-submit__option {

@@ -218,7 +218,6 @@ export default function LinksManagerPage() {
               onChange={onChange}
               options={[
                 { value: 'australia', label: 'Australian' },
-                { value: 'featured', label: 'Featured' },
                 { value: '', label: '(none)' },
               ]}
             />

@@ -1,5 +1,5 @@
 .faq-hero {
-  --faq-hero-bg: #1a1a1a;
+  --faq-hero-bg: var(--gp-ink-900);
 
   background: var(--faq-hero-bg);
   color: #fff;
@@ -7,11 +7,11 @@
 }
 
 .faq-hero[data-audience='award'] {
-  --faq-hero-bg: #0a3114;
+  --faq-hero-bg: var(--gp-green-900);
 }
 
 .faq-hero[data-audience='win'] {
-  --faq-hero-bg: #1a1a1a;
+  --faq-hero-bg: var(--gp-ink-900);
 }
 
 @media (prefers-reduced-motion: no-preference) {

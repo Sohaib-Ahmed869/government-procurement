@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { contactApi } from '../../../api';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
-import wave from '../../../assets/images/WaveAdvisoryPage.png';
-import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './ContactSection.css';
 
 const CONTACT_METHODS = [
@@ -130,17 +126,9 @@ export default function ContactSection() {
       className={`contact${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
-      <img className="contact__wave" src={wave} alt="" aria-hidden="true" />
-      <img
-        className="contact__wave contact__wave--phone"
-        src={phoneWave}
-        alt=""
-        aria-hidden="true"
-      />
 
       <div className="contact__inner">
-        <p className="contact__eyebrow">Our Expertise</p>
+        <p className="contact__eyebrow">Our expertise</p>
         <h1 className="contact__title">Let&rsquo;s Work Together</h1>
 
         <div className="contact__grid">
@@ -203,9 +191,6 @@ export default function ContactSection() {
 
             <button type="submit" className="contact__submit" disabled={submitting}>
               {submitting ? 'Sending…' : 'Send now'}
-              <span className="contact__submit-arrow" aria-hidden="true">
-                <img src={arrowIcon} alt="" />
-              </span>
             </button>
 
             {sent && (
@@ -222,9 +207,6 @@ export default function ContactSection() {
               {CONTACT_METHODS.map(({ key, label, value, href }) => (
                 <li key={key}>
                   <a className="contact__pill" href={href}>
-                    <span className="contact__pill-icon" aria-hidden="true">
-                      <img src={callIcon} alt="" />
-                    </span>
                     <span className="contact__pill-text">
                       <span className="contact__pill-label">{label}</span>
                       {value}

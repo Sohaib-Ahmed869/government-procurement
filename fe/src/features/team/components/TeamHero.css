@@ -1,0 +1,94 @@
+.team-hero {
+  --team-hero-bg: var(--gp-ink-900);
+
+  background: var(--team-hero-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.team-hero[data-audience='award'] {
+  --team-hero-bg: var(--gp-green-900);
+}
+
+.team-hero[data-audience='win'] {
+  --team-hero-bg: var(--gp-ink-900);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .team-hero__eyebrow,
+  .team-hero__title,
+  .team-hero__sub {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .team-hero.is-in .team-hero__eyebrow {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.05s;
+  }
+  .team-hero.is-in .team-hero__title {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.12s;
+  }
+  .team-hero.is-in .team-hero__sub {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.2s;
+  }
+}
+
+.team-hero__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 40px 32px;
+}
+
+.team-hero__eyebrow {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #fff;
+}
+
+.team-hero__title {
+  margin: 0;
+  /* Shared page-title size: homepage, advisory, contact, insights. */
+  font-size: clamp(36px, 3.6vw, 60px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.team-hero__sub {
+  max-width: 470px;
+  margin: 20px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #fff;
+}
+
+/* Shared page-title breakpoint, matching the homepage and advisory heroes. */
+@media (max-width: 860px) {
+  .team-hero__title {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(38px, 11vw, 52px);
+  }
+}
+
+@media (max-width: 760px) {
+  .team-hero__inner {
+    padding: 40px 24px 24px;
+  }
+
+  .team-hero__sub {
+    max-width: none;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+}

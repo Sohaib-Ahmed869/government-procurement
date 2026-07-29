@@ -67,7 +67,7 @@
 .forum-related__tag {
   flex-shrink: 0;
   font-size: 12px;
-  color: #7ee2a8;
+  color: var(--gp-mint-300);
 }
 
 /* --- not found --- */
@@ -85,8 +85,8 @@
   padding: 11px 20px;
   font-size: 14px;
   font-weight: 500;
-  color: #0a3114;
-  background: #7ee2a8;
+  color: var(--gp-green-900);
+  background: var(--gp-mint-300);
   border-radius: 8px;
   text-decoration: none;
   transition: opacity 0.25s ease;

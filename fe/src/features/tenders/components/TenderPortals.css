@@ -1,5 +1,5 @@
 .tp {
-  --tp-bg: #1a1a1a;
+  --tp-bg: var(--gp-ink-900);
   /* Dropdown panel follows the segment: green for Award, grey for Win. */
   --tp-menu-bg: #1c1c1c;
 
@@ -11,12 +11,12 @@
 }
 
 .tp[data-audience='award'] {
-  --tp-bg: #0a3114;
-  --tp-menu-bg: #0e3e1b;
+  --tp-bg: var(--gp-green-900);
+  --tp-menu-bg: var(--gp-green-800);
 }
 
 .tp[data-audience='win'] {
-  --tp-bg: #1a1a1a;
+  --tp-bg: var(--gp-ink-900);
   --tp-menu-bg: #1c1c1c;
 }
 

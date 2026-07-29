@@ -19,7 +19,6 @@ import { Article } from '../models/Article.js';
 import { Course } from '../models/Course.js';
 import { Question } from '../models/Question.js';
 import { Link } from '../models/Link.js';
-import { Testimonial } from '../models/Testimonial.js';
 import { Announcement } from '../models/Announcement.js';
 import { toSlug } from '../utils/slugify.js';
 
@@ -263,7 +262,7 @@ async function run() {
     console.log('[seed] created 5 forum questions (3 published, 2 pending)');
   }
 
-  // 9. Tender + social links ------------------------------------------------
+  // 8. Tender + social links ------------------------------------------------
   if ((await Link.countDocuments()) === 0) {
     await Link.create([
       { group: 'tender', label: 'AusTender', url: 'https://www.tenders.gov.au', region: 'australia', description: 'Australian Government tenders.', order: 1 },
@@ -279,7 +278,7 @@ async function run() {
     console.log('[seed] created tender + social links');
   }
 
-  // 10. FAQs ----------------------------------------------------------------
+  // 9. FAQs ----------------------------------------------------------------
   if ((await Faq.countDocuments()) < 4) {
     await Faq.deleteMany({});
     await Faq.create([
@@ -292,17 +291,7 @@ async function run() {
     console.log('[seed] refreshed FAQs');
   }
 
-  // 11. Testimonials --------------------------------------------------------
-  if ((await Testimonial.countDocuments()) === 0) {
-    await Testimonial.create([
-      { quote: 'Their advisory team turned our win-rate around within two quarters.', author: 'Sarah Lin', role: 'Head of Bids', organisation: 'Meridian Infrastructure', order: 1 },
-      { quote: 'The probity training gave our panel real confidence in every evaluation.', author: 'Tom Beckett', role: 'Procurement Lead', organisation: 'City of Rivendell', order: 2 },
-      { quote: 'Clear, practical, and grounded in how tendering actually works.', author: 'Nadia Rahman', role: 'Director', organisation: 'BrightPath Consulting', order: 3 },
-    ]);
-    console.log('[seed] created 3 testimonials');
-  }
-
-  // 12. Announcement --------------------------------------------------------
+  // 10. Announcement --------------------------------------------------------
   if ((await Announcement.countDocuments()) === 0) {
     await Announcement.create({
       message: 'New course now open: Winning Government Tenders — Foundations.',

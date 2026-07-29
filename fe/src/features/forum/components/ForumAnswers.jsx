@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import ForumSidebar from './ForumSidebar.jsx';
@@ -24,8 +24,12 @@ function excerpt(text, max = 240) {
 }
 
 export default function ForumAnswers({ heading = 'Recent Answers', category = 'win' }) {
-  // resetKey replays the reveal animation whenever the category changes.
-  const { ref, inView } = useInView({ resetKey: category });
+  // The hero's search field writes ?q= here.
+  const [params] = useSearchParams();
+  const query = (params.get('q') || '').trim();
+
+  // resetKey replays the reveal animation whenever the list changes.
+  const { ref, inView } = useInView({ resetKey: `${category}-${query}` });
 
   const [answers, setAnswers] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -38,7 +42,11 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
     setStatus('loading');
     (async () => {
       try {
-        const list = await questionsApi.list({ limit: 100, category });
+        // A search spans the whole forum, so the category filter comes off —
+        // otherwise a Win-page search would never surface an Award answer.
+        const list = await questionsApi.publicList(
+          query ? { limit: 100 } : { limit: 100, category },
+        );
         if (!alive) return;
         setAnswers(list || []);
         setStatus('ready');
@@ -49,13 +57,13 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
     return () => {
       alive = false;
     };
-  }, [category]);
+  }, [category, query]);
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const list = await questionsApi.list({ featured: true, limit: 20 });
+        const list = await questionsApi.publicList({ featured: true, limit: 20 });
         if (!alive) return;
         setFeatured(
           (list || []).map((q) => ({
@@ -72,13 +80,26 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
     };
   }, []);
 
+  // Match on title and body. The list is capped at 100 server-side, so this
+  // filters what was fetched rather than issuing a second request.
+  const visible = useMemo(() => {
+    if (!query) return answers;
+    const needle = query.toLowerCase();
+    return answers.filter(
+      (item) =>
+        (item.title || '').toLowerCase().includes(needle) ||
+        (item.body || '').toLowerCase().includes(needle),
+    );
+  }, [answers, query]);
+
   const tag = CATEGORY_LABEL[category] ?? CATEGORY_LABEL.win;
+  const title = query ? `Results for “${query}”` : heading;
 
   return (
     <section ref={ref} className={`forum-answers${inView ? ' is-in' : ''}`}>
       <div className="forum-answers__inner">
         <div className="forum-answers__main">
-          <h2 className="forum-answers__heading">{heading}</h2>
+          <h2 className="forum-answers__heading">{title}</h2>
 
           {status === 'loading' && <p className="forum-answers__empty">Loading questions…</p>}
           {status === 'error' && (
@@ -86,13 +107,24 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
               We couldn&apos;t load questions right now. Please try again shortly.
             </p>
           )}
-          {status === 'ready' && answers.length === 0 && (
-            <p className="forum-answers__empty">No answered questions have been published yet.</p>
+          {status === 'ready' && visible.length === 0 && (
+            <p className="forum-answers__empty">
+              {query ? (
+                <>
+                  No questions match that search.{' '}
+                  <Link className="forum-answers__clear" to="/forum">
+                    Clear search
+                  </Link>
+                </>
+              ) : (
+                'No answered questions have been published yet.'
+              )}
+            </p>
           )}
 
-          {status === 'ready' && answers.length > 0 && (
+          {status === 'ready' && visible.length > 0 && (
             <ul className="forum-answers__list">
-              {answers.map((item, i) => (
+              {visible.map((item, i) => (
                 <li key={item._id} style={{ '--i': i }}>
                   <Link className="forum-card" to={`/forum/answers/${item.slug || item._id}`}>
                     <h3 className="forum-card__title">{item.title}</h3>

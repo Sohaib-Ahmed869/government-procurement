@@ -1,5 +1,5 @@
 .uy {
-  --uy-bg: #1a1a1a;
+  --uy-bg: var(--gp-ink-900);
 
   background: var(--uy-bg);
   color: #fff;
@@ -7,11 +7,11 @@
 }
 
 .uy[data-audience='award'] {
-  --uy-bg: #0a3114;
+  --uy-bg: var(--gp-green-900);
 }
 
 .uy[data-audience='win'] {
-  --uy-bg: #1a1a1a;
+  --uy-bg: var(--gp-ink-900);
 }
 
 .uy__inner {
@@ -23,8 +23,6 @@
 /* --- reveal on scroll-in --- */
 @media (prefers-reduced-motion: no-preference) {
   .uy__eyebrow,
-  .uy__heading,
-  .uy__banner,
   .uy__card {
     opacity: 0;
     transform: translateY(24px);
@@ -34,19 +32,11 @@
   }
 
   .uy.is-in .uy__eyebrow,
-  .uy.is-in .uy__heading,
-  .uy.is-in .uy__banner,
   .uy.is-in .uy__card {
     opacity: 1;
     transform: none;
   }
 
-  .uy.is-in .uy__heading {
-    transition-delay: 0.08s;
-  }
-  .uy.is-in .uy__banner {
-    transition-delay: 0.16s;
-  }
   .uy.is-in .uy__left .uy__card:nth-child(1) {
     transition-delay: 0.24s;
   }
@@ -72,94 +62,7 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: #fff;
-}
-
-.uy__heading {
-  margin: 14px 0 0;
-  font-size: clamp(32px, 4vw, 50px);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-}
-
-/* --- featured banner --- */
-.uy__banner {
-  position: relative;
-  overflow: hidden;
-  margin-top: 32px;
-  border-radius: 14px;
-  min-height: 300px;
-}
-
-.uy__banner-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Shift the framing down so more of the top of the photo shows. */
-  object-position: center 12%;
-}
-
-.uy__banner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.35) 40%,
-    rgba(0, 0, 0, 0.05) 100%
-  );
-}
-
-.uy__banner-body {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
-  padding: 32px;
-  max-width: 460px;
-}
-
-.uy__banner-title {
-  margin: 0;
-  font-size: clamp(22px, 2.4vw, 28px);
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.uy__banner-sub {
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: #fff;
-}
-
-.uy__watch {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 100px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-.uy__watch-dot {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  flex: none;
 }
 
 /* --- bento grid --- */
@@ -402,21 +305,6 @@
     transform: translateY(-50%) translateX(3px);
   }
 
-  /* Featured-banner "watch" pill: gentle lift + brighten. */
-  .uy__watch {
-    transition:
-      transform 0.2s ease-out,
-      background-color 0.2s ease-out,
-      box-shadow 0.2s ease-out;
-  }
-
-  .uy__watch:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.26);
-    box-shadow:
-      0 8px 20px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
 }
 
 .uy :is(a):focus-visible {
@@ -434,16 +322,8 @@
     padding: 20px 24px 56px;
   }
 
-  .uy__heading {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-    font-size: clamp(36px, 10.5vw, 48px);
-  }
-
-  .uy__banner-body {
-    padding: 24px;
-    max-width: none;
-  }
-
+  
+  
   /* --- bento becomes a horizontal snap carousel --- */
   .uy__bento {
     display: flex;

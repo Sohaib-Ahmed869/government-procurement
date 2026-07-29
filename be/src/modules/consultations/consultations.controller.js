@@ -14,7 +14,7 @@ function escapeRegex(str) {
 
 // POST / — PUBLIC. Book a consultation request from the website.
 export const submit = asyncHandler(async (req, res) => {
-  const { name, email, organisation, role, service, preferredDate, preferredTime, message } =
+  const { name, email, organisation, role, service, reason, preferredDate, preferredTime, message } =
     req.body;
 
   if (!name || !email) throw ApiError.badRequest('Name and email are required');
@@ -26,6 +26,7 @@ export const submit = asyncHandler(async (req, res) => {
     organisation: organisation || '',
     role: role || '',
     service: service || 'other',
+    reason: reason || '',
     preferredDate: preferredDate || undefined,
     preferredTime: ['morning', 'afternoon'].includes(preferredTime) ? preferredTime : '',
     message: message || '',

@@ -1,0 +1,279 @@
+.careers {
+  --careers-bg: var(--gp-ink-900);
+  /* Raised surface the reason and role cards sit on. */
+  --careers-surface: var(--gp-ink-800);
+
+  background: var(--careers-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+}
+
+.careers[data-audience='award'] {
+  --careers-bg: var(--gp-green-900);
+  --careers-surface: var(--gp-green-800);
+}
+
+.careers[data-audience='win'] {
+  --careers-bg: var(--gp-ink-900);
+  --careers-surface: var(--gp-ink-800);
+}
+
+.careers__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 40px 96px;
+}
+
+/* --- reveal on scroll-in --- */
+@media (prefers-reduced-motion: no-preference) {
+  .careers__block,
+  .careers__cta {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .careers.is-in .careers__block,
+  .careers.is-in .careers__cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .careers.is-in .careers__block:nth-of-type(2) { transition-delay: 0.08s; }
+  .careers.is-in .careers__block:nth-of-type(3) { transition-delay: 0.16s; }
+  .careers.is-in .careers__cta { transition-delay: 0.24s; }
+}
+
+.careers__block + .careers__block {
+  margin-top: 64px;
+  padding-top: 56px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.careers__heading {
+  margin: 0 0 22px;
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* The one line that carries the section — brighter than the body copy. */
+.careers__lead {
+  max-width: 720px;
+  margin: 0 0 32px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #fff;
+}
+
+.careers__copy {
+  max-width: 720px;
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.careers__linkedin {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.careers__linkedin:hover,
+.careers__linkedin:focus-visible {
+  color: #fff;
+}
+
+/* --- why join: labelled points --- */
+.careers__reasons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.careers__reason {
+  padding: 24px;
+  background: var(--careers-surface);
+  border-radius: 14px;
+}
+
+.careers__reason-title {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.careers__reason-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* --- roles --- */
+.careers__roles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.careers-role {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  background: var(--careers-surface);
+  border-radius: 14px;
+}
+
+.careers-role__title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.careers-role__body {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Glass pill — matches the subscribe button. Pinned to the bottom so the
+   buttons line up across a row of cards of different lengths. */
+.careers-role__apply {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 11px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.careers-role__apply:hover,
+.careers-role__apply:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* --- closing CTA --- */
+.careers__cta {
+  margin-top: 64px;
+  padding: 44px;
+  background: var(--careers-surface);
+  border-radius: 20px;
+}
+
+.careers__cta-title {
+  margin: 0 0 16px;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.careers__cta-copy {
+  max-width: 720px;
+  margin: 0 0 28px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Glass pill — the same treatment as the subscribe button. */
+.careers__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 32px;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.2);
+  border: 0;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: background-color 0.15s ease;
+}
+
+.careers__cta-btn:hover,
+.careers__cta-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Hover polish — matches the subscribe button: lift + shadow. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .careers__cta-btn {
+    transition:
+      background-color 0.2s ease-out,
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+
+  .careers__cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+}
+
+.careers :is(a):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (max-width: 860px) {
+  .careers__reasons,
+  .careers__roles {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .careers__inner {
+    padding: 16px 24px 64px;
+  }
+
+  .careers__block + .careers__block {
+    margin-top: 48px;
+    padding-top: 40px;
+  }
+
+  .careers__heading {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(28px, 8vw, 36px);
+  }
+
+  .careers__cta {
+    margin-top: 48px;
+    padding: 28px 24px;
+  }
+
+  .careers__cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

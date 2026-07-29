@@ -1,19 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
 import photo from '../../../assets/images/ExpertiseImage.png';
-import wave from '../../../assets/images/waves.png';
-import phoneWave from '../../../assets/images/WaveSmallerScreen.png';
 import './ExpertiseHero.css';
-
-function CircleIcon({ src, size = 30 }) {
-  return (
-    <span className="xp__circle" aria-hidden="true">
-      <img src={src} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
-    </span>
-  );
-}
 
 export default function ExpertiseHero() {
   const { audience } = useAudience();
@@ -39,14 +27,6 @@ export default function ExpertiseHero() {
         </filter>
       </svg>
 
-      {/* Phones get the wave drawn for narrow screens; CSS swaps which shows. */}
-      <img className="xp__wave" src={wave} alt="" aria-hidden="true" />
-      <img
-        className="xp__wave xp__wave--phone"
-        src={phoneWave}
-        alt=""
-        aria-hidden="true"
-      />
       <img className="xp__photo" src={photo} alt="Mohammed Kheir" />
 
       <div className="xp__inner">
@@ -56,11 +36,14 @@ export default function ExpertiseHero() {
 
           <div className="xp__actions">
             <a className="xp__btn" href="/book-a-consultation">
-              <CircleIcon src={arrowIcon} />
               Book a Consultation
             </a>
-            <a className="xp__btn" href="tel:+61478669922">
-              <CircleIcon src={callIcon} />
+            <a
+              className="xp__btn"
+              href="https://wa.me/61478669922"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Whatsapp +61 478 669 922
             </a>
           </div>

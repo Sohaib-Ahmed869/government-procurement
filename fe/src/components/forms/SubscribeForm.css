@@ -1,7 +1,7 @@
 .subscribe-form {
   /* Focus-glow accent, keyed to the segment: green for award, neutral grey for
      win — so the input's focus ring matches the active theme. */
-  --mint: #7ee2a8;
+  --mint: var(--gp-mint-300);
 
   max-width: 460px;
   margin: 0 auto;
@@ -11,7 +11,7 @@
 }
 
 .subscribe-form[data-audience='award'] {
-  --mint: #7ee2a8;
+  --mint: var(--gp-mint-300);
 }
 
 .subscribe-form[data-audience='win'] {

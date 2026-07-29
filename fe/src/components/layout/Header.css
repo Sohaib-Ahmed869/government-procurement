@@ -1,18 +1,31 @@
 .site-header {
   /* Segment colours are the only thing that changes between the two variants. */
-  --header-bg: #1a1a1a;
+  --header-bg: var(--gp-ink-900);
 
+  /* The bar stays on screen while the page scrolls, at every width. Sticky
+     rather than fixed so it keeps its place in the flow — the announcement
+     banner above it scrolls away normally and nothing below needs a
+     compensating top padding. */
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: var(--header-bg);
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   color: #fff;
 }
 
+/* Once the page has scrolled, a shadow separates the pinned bar from the content
+   passing underneath it. */
+.site-header.is-stuck {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
 .site-header[data-audience='award'] {
-  --header-bg: #0a3114;
+  --header-bg: var(--gp-green-900);
 }
 
 .site-header[data-audience='win'] {
-  --header-bg: #1a1a1a;
+  --header-bg: var(--gp-ink-900);
 }
 
 .site-header__inner {
@@ -37,6 +50,9 @@
 
 .site-header__logo {
   display: block;
+  /* Height is the constant; the raster's own ratio sets the width. */
+  height: 23px;
+  width: auto;
 }
 
 /* Brand logo lifts and scales a touch on hover. */
@@ -118,8 +134,9 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  /* Size and weight track the audience-toggle pills it sits beside. */
   font-size: 13.5px;
-  font-weight: 400;
+  font-weight: 500;
   color: #fff;
   text-decoration: none;
   white-space: nowrap;
@@ -234,83 +251,6 @@
   -webkit-mask-size: contain;
 }
 
-/* --- desktop search --- */
-/* A search icon button that expands to reveal an input. Same glass treatment as
-   the audience toggle so it sits naturally in the dark-green header bar. */
-.site-header__search {
-  display: inline-flex;
-  align-items: center;
-  height: 34px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border-radius: 999px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.site-header__search-input {
-  width: 0;
-  min-width: 0;
-  padding: 0;
-  font: inherit;
-  font-size: 13.5px;
-  color: #fff;
-  background: transparent;
-  border: 0;
-  outline: none;
-  opacity: 0;
-  transition:
-    width 0.24s ease,
-    padding 0.24s ease,
-    opacity 0.18s ease;
-}
-
-.site-header__search.is-open .site-header__search-input {
-  width: 160px;
-  padding: 0 4px 0 14px;
-  opacity: 1;
-}
-
-.site-header__search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* Recolour the native search clear/decoration to fit the dark bar. */
-.site-header__search-input::-webkit-search-cancel-button {
-  filter: invert(1);
-  opacity: 0.6;
-}
-
-.site-header__search-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  flex: none;
-  color: #fff;
-  background: transparent;
-  border: 0;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .site-header__search-btn {
-    transition: color 0.18s ease;
-  }
-}
-
-.site-header__search-btn:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 /* --- mobile-only toggle row (sits under the top bar) --- */
 .site-header__toggle-row {
   display: none;
@@ -339,25 +279,12 @@
   height: 18px;
 }
 
-/* --- mobile search + hamburger pair (mobile only) --- */
+/* --- hamburger (mobile only) --- */
 .site-header__mobile-actions {
   display: none;
   align-items: center;
   gap: 4px;
   margin-left: auto;
-}
-
-.site-header__mobile-search-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex: none;
-  color: #fff;
-  background: transparent;
-  border: 0;
-  border-radius: 999px;
 }
 
 /* WCAG 2.1 AA: keyboard operability needs a visible focus state (Bible §07). */
@@ -404,7 +331,9 @@
   inset: 0;
   z-index: 90;
   background: var(--header-bg);
-  padding: 96px 28px 48px;
+  /* Top padding clears the fixed bar; the rest scales down on short screens so
+     all ten items fit without scrolling. */
+  padding: clamp(78px, 11vh, 96px) 28px clamp(24px, 4vh, 48px);
   overflow-y: auto;
   /* animation */
   opacity: 0;
@@ -428,32 +357,30 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: clamp(14px, 2.6vh, 26px);
 }
 
 .site-header__mobile-link {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
+  gap: clamp(10px, 2vh, 18px);
   font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: 26px;
+  font-size: clamp(16px, 3vh, 26px);
+  line-height: 1.15;
   font-weight: 400;
   color: #fff;
   text-decoration: none;
 }
 
 .site-header__mobile-cta {
-  margin-top: 6px;
+  margin-top: clamp(2px, 0.6vh, 6px);
 }
 
-.site-header__mobile-cta .site-header__cta-arrow {
-  width: 36px;
-  height: 36px;
-}
-
+/* The CTA arrow tracks the link size so it never dominates a shrunken menu. */
+.site-header__mobile-cta .site-header__cta-arrow,
 .site-header__mobile-cta .site-header__cta-arrow img {
-  width: 37px;
-  height: 37px;
+  width: clamp(24px, 4.2vh, 36px);
+  height: clamp(24px, 4.2vh, 36px);
 }
 
 /* Staggered reveal of the menu items when the panel opens. */
@@ -491,6 +418,15 @@
   }
   .site-header__mobile.is-open .site-header__mobile-list li:nth-child(7) {
     transition-delay: 0.4s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(8) {
+    transition-delay: 0.45s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(9) {
+    transition-delay: 0.5s;
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(10) {
+    transition-delay: 0.55s;
   }
 }
 
@@ -556,8 +492,26 @@
   }
 }
 
-/* Tightest band before the hamburger takes over: the CTA drops to its arrow
-   and the wordmark to its monogram, which is what buys the last ~230px. */
+/* The band above fits at its own 1120px top end but not below it: brand + six
+   nav links + toggle + CTA still measure ~1045px, so anything narrower
+   (1024px laptops especially) pushed the CTA off the right edge. Dropping the
+   wordmark to the bare logo buys back ~150px and carries the bar down to 991,
+   where the next stage takes over. The brand link's aria-label keeps its
+   accessible name. */
+@media (max-width: 1105px) {
+  .site-header__wordmark {
+    display: none;
+  }
+
+  .site-header__nav-list {
+    gap: 10px;
+  }
+}
+
+/* Tightest band before the hamburger takes over. The wordmark stays hidden from
+   the band above; the CTA keeps its label, because with the arrow disc removed
+   hiding the label would leave an empty link. Dropping the CTA arrow and the
+   toggle icons freed ~50px, which is what lets the label survive to 861px. */
 @media (max-width: 990px) {
   .site-header__inner {
     gap: 12px;
@@ -572,9 +526,12 @@
     font-size: 11px;
   }
 
-  .site-header__wordmark,
-  .site-header__cta-label {
+  .site-header__wordmark {
     display: none;
+  }
+
+  .site-header__cta {
+    font-size: 11px;
   }
 
   .audience-toggle__option {
@@ -584,9 +541,11 @@
 
 /* --- mobile: swap the horizontal nav for the hamburger menu --- */
 @media (max-width: 860px) {
-  .site-header {
-    position: relative;
-    z-index: 100;
+  /* Mobile only: the audience toggle sits in its own row below the bar, painted
+     as an overlay. Once scrolled it drops away, so the pinned bar stays a single
+     slim row rather than leaving pills floating over the page. */
+  .site-header.is-stuck .site-header__toggle-row {
+    display: none;
   }
 
   /* Keep the top bar (and its hamburger) above the fixed overlay so the icon

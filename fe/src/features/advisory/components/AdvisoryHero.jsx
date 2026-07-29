@@ -1,17 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
-import wave from '../../../assets/images/WaveAdvisoryPage.png';
 import './AdvisoryHero.css';
-
-function CircleIcon({ src, size = 30 }) {
-  return (
-    <span className="adv-hero__circle" aria-hidden="true">
-      <img src={src} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
-    </span>
-  );
-}
 
 export default function AdvisoryHero() {
   const { audience } = useAudience();
@@ -28,11 +17,10 @@ export default function AdvisoryHero() {
       className={`adv-hero${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      <img className="adv-hero__wave" src={wave} alt="" aria-hidden="true" />
 
       <div className="adv-hero__inner">
-        <p className="adv-hero__eyebrow">Award Government Contracts</p>
-        <h1 className="adv-hero__title">Advisory Services</h1>
+        <p className="adv-hero__eyebrow">Award government contracts</p>
+        <h1 className="adv-hero__title">Our Capabilities</h1>
         {/* Small screens show only the first sentence, trailed by an ellipsis. */}
         <p className="adv-hero__copy">
           <span className="adv-hero__copy-lead">
@@ -48,11 +36,14 @@ export default function AdvisoryHero() {
 
         <div className="adv-hero__actions">
           <a className="adv-hero__btn" href="/book-a-consultation">
-            <CircleIcon src={arrowIcon} />
             Book a Consultation
           </a>
-          <a className="adv-hero__btn" href="tel:+61478669922">
-            <CircleIcon src={callIcon} />
+          <a
+            className="adv-hero__btn"
+            href="https://wa.me/61478669922"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Whatsapp +61 478 669 922
           </a>
         </div>

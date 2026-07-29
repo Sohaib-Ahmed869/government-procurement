@@ -1,5 +1,5 @@
 .eb {
-  --eb-bg: #1a1a1a;
+  --eb-bg: var(--gp-ink-900);
 
   background: var(--eb-bg);
   color: #fff;
@@ -7,11 +7,11 @@
 }
 
 .eb[data-audience='award'] {
-  --eb-bg: #0a3114;
+  --eb-bg: var(--gp-green-900);
 }
 
 .eb[data-audience='win'] {
-  --eb-bg: #1a1a1a;
+  --eb-bg: var(--gp-ink-900);
 }
 
 .eb__inner {
@@ -111,7 +111,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 20px 6px 6px;
+  padding: 12px 20px;
   font-size: 13.5px;
   font-weight: 500;
   color: #fff;
@@ -217,7 +217,7 @@
     max-width: 280px;
     height: 52px;
     justify-content: center;
-    padding: 12px 18px 12px 50px;
+    padding: 12px 18px;
     font-size: 15px;
     white-space: nowrap;
     /* Figma: fill #FFFFFF @ 20%, no stroke, Glass effect, radius 100. Overrides

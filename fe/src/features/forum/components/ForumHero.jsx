@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import callIcon from '../../../assets/icons/Call.png';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumHero.css';
 
@@ -15,6 +15,26 @@ export default function ForumHero({ compact = false }) {
     const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
+
+  // Search runs through the URL, the same way the category filter does: the
+  // field submits to /forum?q=…, and ForumAnswers reads the term from there.
+  // That keeps results linkable and the back button working.
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const activeQuery = params.get('q') || '';
+  const [query, setQuery] = useState(activeQuery);
+
+  // Follow the URL when it changes underneath us (back button, or landing on a
+  // forum page that already carries a query).
+  useEffect(() => {
+    setQuery(activeQuery);
+  }, [activeQuery]);
+
+  const onSearch = (event) => {
+    event.preventDefault();
+    const term = query.trim();
+    navigate(term ? `/forum?q=${encodeURIComponent(term)}` : '/forum');
+  };
 
   // On phones the sidebar isn't in the flow — the categories button opens it as
   // a full-screen panel instead.
@@ -48,25 +68,24 @@ export default function ForumHero({ compact = false }) {
         </p>
 
         <div className="forum-hero__tools">
-          <form className="forum-hero__search" role="search" onSubmit={(e) => e.preventDefault()}>
-            <span className="forum-hero__search-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+          <form className="forum-hero__search" role="search" onSubmit={onSearch}>
+            <button className="forum-hero__search-icon" type="submit" aria-label="Search questions">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" />
                 <line x1="21" y1="21" x2="16.5" y2="16.5" />
               </svg>
-            </span>
+            </button>
             <input
               className="forum-hero__search-input"
               type="search"
-              aria-label="Search"
+              aria-label="Search questions"
               placeholder="Search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
           </form>
 
           <a className="forum-hero__submit" href="/forum/submit" aria-label="Submit a question">
-            <span className="forum-hero__submit-icon" aria-hidden="true">
-              <img src={callIcon} alt="" />
-            </span>
             <span className="forum-hero__submit-label">Submit a question</span>
             {/* Small screens show the pill as a compact "+" circle instead. */}
             <span className="forum-hero__submit-plus" aria-hidden="true">

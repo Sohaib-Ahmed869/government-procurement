@@ -4,6 +4,10 @@ import AdvisoryServicesPage from './pages/public/AdvisoryServicesPage.jsx';
 import TenderPortalsPage from './pages/public/TenderPortalsPage.jsx';
 import ExpertisePage from './pages/public/ExpertisePage.jsx';
 import AboutPage from './pages/public/AboutPage.jsx';
+import TeamPage from './pages/public/TeamPage.jsx';
+import TeamMemberPage from './pages/public/TeamMemberPage.jsx';
+import CareersPage from './pages/public/CareersPage.jsx';
+import JurisdictionalLinksPage from './pages/public/JurisdictionalLinksPage.jsx';
 import ContactPage from './pages/public/ContactPage.jsx';
 import BookConsultationPage from './pages/public/BookConsultationPage.jsx';
 import ForumHomePage from './pages/public/ForumHomePage.jsx';
@@ -16,7 +20,6 @@ import CourseDetailPage from './pages/public/CourseDetailPage.jsx';
 import InsightsPage from './pages/public/InsightsPage.jsx';
 import ArticleDetailPage from './pages/public/ArticleDetailPage.jsx';
 import FaqPage from './pages/public/FaqPage.jsx';
-import SearchResultsPage from './pages/public/SearchResultsPage.jsx';
 // System / utility pages
 import PrivacyPolicyPage from './pages/system/PrivacyPolicyPage.jsx';
 import TermsPage from './pages/system/TermsPage.jsx';
@@ -57,6 +60,11 @@ function PublicSite() {
           <Route path="/aus-list" element={<TenderPortalsPage />} />
           <Route path="/featured-list" element={<TenderPortalsPage />} />
           <Route path="/our-expertise" element={<ExpertisePage />} />
+          {/* Our Team: listing plus a page per person. */}
+          <Route path="/our-team" element={<TeamPage />} />
+          <Route path="/our-team/:slug" element={<TeamMemberPage />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/jurisdictional-links" element={<JurisdictionalLinksPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
@@ -65,7 +73,6 @@ function PublicSite() {
           <Route path="/resources" element={<InsightsPage />} />
           <Route path="/insights/:slug" element={<ArticleDetailPage />} />
           <Route path="/faq" element={<FaqPage />} />
-          <Route path="/search" element={<SearchResultsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book-a-consultation" element={<BookConsultationPage />} />
 

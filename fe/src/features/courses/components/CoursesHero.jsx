@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import phoneWave from '../../../assets/images/ForumPhoneWave.png';
 import './CoursesHero.css';
 
 export default function CoursesHero() {
@@ -15,8 +14,6 @@ export default function CoursesHero() {
 
   return (
     <section className={`courses-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
-      {/* Corner wave, small screens only. */}
-      <img className="courses-hero__wave" src={phoneWave} alt="" aria-hidden="true" />
 
       <div className="courses-hero__inner">
         <h1 className="courses-hero__title">Unlock your potential</h1>

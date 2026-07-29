@@ -9,6 +9,9 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "seed": "node src/seed/seed.js",
+    "seed:team": "node src/seed/seed-team.js",
+    "seed:careers": "node src/seed/seed-careers.js",
+    "seed:demo-articles": "node src/seed/seed-demo-articles.js",
     "reset:courses": "node src/seed/reset-courses.js",
     "check": "node --check src/server.js"
   },

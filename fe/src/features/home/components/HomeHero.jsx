@@ -1,25 +1,43 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { homeHeroApi } from '../../../api';
 import { useInView } from '../../../hooks/useInView.js';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
-import callIcon from '../../../assets/icons/Call.png';
 import mainImage from '../../../assets/images/MainPictureHomepage.png';
-import wavesImage from '../../../assets/images/waves.png';
 import './HomeHero.css';
 
-// The dark glyph sits on transparent padding inside a white circle. Scaling the
-// image up and clipping to the circle crops that padding so the glyph fills it
-// (arrow ink ~24% of its canvas, call ~38% — hence the different sizes).
-function CircleIcon({ src, size }) {
-  return (
-    <span className="home-hero__circle" aria-hidden="true">
-      <img src={src} alt="" style={{ width: `${size}px`, height: `${size}px` }} />
-    </span>
-  );
-}
+// Copy shipped with the page. The CMS (Content → Homepage hero) overrides any
+// of these per segment; an empty field there falls back to the value here.
+const FALLBACK = {
+  eyebrow: 'Award government contracts',
+  heading: 'Procure with Confidence',
+  subheading:
+    'Supporting government agencies and public sector organisations with end-to-end procurement advisory, ensuring that contracts are awarded fairly, efficiently, and in line with best practice.',
+};
 
 export default function HomeHero() {
   const { audience } = useAudience();
+
+  // Both segments arrive in one call, so flipping the toggle doesn't refetch.
+  const [copy, setCopy] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    homeHeroApi
+      .get()
+      .then((data) => {
+        if (alive) setCopy(data || null);
+      })
+      .catch(() => {
+        /* fall back to the built-in copy */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const forAudience = copy?.[audience] || {};
+  const eyebrow = forAudience.eyebrow || FALLBACK.eyebrow;
+  const heading = forAudience.heading || FALLBACK.heading;
+  const subheading = forAudience.subheading || FALLBACK.subheading;
 
   // Mount animation: reset to hidden then flip the flag after a paint so the
   // reveal transitions play on load and again whenever the audience toggles.
@@ -45,24 +63,22 @@ export default function HomeHero() {
       className={`home-hero${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      <img className="home-hero__waves" src={wavesImage} alt="" aria-hidden="true" />
 
       <div className="home-hero__intro">
-        <p className="home-hero__eyebrow">Award Government Contracts</p>
-        <h1 className="home-hero__title">Procure with Confidence</h1>
-        <p className="home-hero__lede">
-          Supporting government agencies and public sector organisations with end-to-end
-          procurement advisory, ensuring that contracts are awarded fairly, efficiently, and
-          in line with best practice.
-        </p>
+        <p className="home-hero__eyebrow">{eyebrow}</p>
+        <h1 className="home-hero__title">{heading}</h1>
+        <p className="home-hero__lede">{subheading}</p>
 
         <div className="home-hero__actions">
           <a className="home-hero__btn" href="/book-a-consultation">
-            <CircleIcon src={arrowIcon} size={30} />
             Book a Consultation
           </a>
-          <a className="home-hero__btn" href="tel:+61478669922">
-            <CircleIcon src={callIcon} size={30} />
+          <a
+            className="home-hero__btn"
+            href="https://wa.me/61478669922"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Whatsapp +61 478 669 922
           </a>
         </div>
@@ -73,7 +89,7 @@ export default function HomeHero() {
         className={`home-hero__advisory${advisory.inView ? ' is-in' : ''}`}
       >
         <div className="home-hero__advisory-text">
-          <p className="home-hero__eyebrow">Advisory Services</p>
+          <p className="home-hero__eyebrow">Advisory services</p>
           <h2 className="home-hero__subtitle">Your Trusted Partner</h2>
           <p className="home-hero__advisory-copy">
             We help private sector organisations and suppliers strengthen their bids and win
@@ -84,7 +100,6 @@ export default function HomeHero() {
 
           <a className="home-hero__btn home-hero__btn--trailing" href="/book-a-consultation">
             Book a Consultation
-            <CircleIcon src={arrowIcon} size={30} />
           </a>
         </div>
 

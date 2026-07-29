@@ -1,5 +1,5 @@
 .courses-hero {
-  --courses-hero-bg: #1a1a1a;
+  --courses-hero-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
@@ -9,11 +9,11 @@
 }
 
 .courses-hero[data-audience='award'] {
-  --courses-hero-bg: #0a3114;
+  --courses-hero-bg: var(--gp-green-900);
 }
 
 .courses-hero[data-audience='win'] {
-  --courses-hero-bg: #1a1a1a;
+  --courses-hero-bg: var(--gp-ink-900);
 }
 
 /* Corner wave — small screens only. */

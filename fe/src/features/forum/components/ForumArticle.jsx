@@ -30,7 +30,7 @@ export default function ForumArticle() {
     (async () => {
       try {
         // A featured/most-recent published question drives the article page.
-        const list = await questionsApi.list({ limit: 1, category: 'win' });
+        const list = await questionsApi.publicList({ limit: 1, category: 'win' });
         if (!alive) return;
         const item = (list || [])[0] ?? null;
         if (!item) {

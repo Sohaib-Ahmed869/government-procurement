@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { coursesApi } from '../../../api';
-import resourcesIcon from '../../../assets/icons/ResourcesIcon.png';
 import menuIcon from '../../../assets/icons/Menu.png';
 import levelIcon from '../../../assets/icons/LevelIcon.png';
 import './CoursesBrowser.css';
@@ -20,12 +19,6 @@ const AVAILABILITY_LABEL = {
   closed: 'Closed',
 };
 
-const RESOURCE_OPTS = [
-  { value: 'all', label: 'All Resources' },
-  { value: 'courses', label: 'Courses' },
-  { value: 'artefacts', label: 'Artefacts' },
-  { value: 'bundles', label: 'Bundles', badge: 'Save more' },
-];
 const CATEGORY_OPTS = [
   { value: 'all', label: 'All Categories' },
   { value: 'general', label: 'General' },
@@ -126,7 +119,6 @@ function SortDropdown({ value, onChange }) {
 export default function CoursesBrowser() {
   const { ref, inView } = useInView();
   const { audience } = useAudience();
-  const [resource, setResource] = useState('all');
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
   const [sort, setSort] = useState('popular');
@@ -170,14 +162,10 @@ export default function CoursesBrowser() {
     };
   }, [filtersOpen]);
 
-  const currentResource =
-    RESOURCE_OPTS.find((o) => o.value === resource) ?? RESOURCE_OPTS[0];
-
   // Apply the side filters and the sort. Missing fields fall back to their
   // model defaults so older records aren't hidden.
   const visible = useMemo(() => {
     const filtered = courses.filter((c) => {
-      if (resource !== 'all' && (c.resourceType || 'courses') !== resource) return false;
       if (category !== 'all' && (c.segment || 'general') !== category) return false;
       if (level !== 'all' && (c.level || 'beginner') !== level) return false;
       return true;
@@ -198,7 +186,7 @@ export default function CoursesBrowser() {
         break;
     }
     return sorted;
-  }, [courses, resource, category, level, sort]);
+  }, [courses, category, level, sort]);
 
   return (
     <section ref={ref} className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
@@ -221,14 +209,6 @@ export default function CoursesBrowser() {
           </button>
 
           <aside className="courses-filters">
-          <FilterGroup
-            icon={<img className="courses-filter__img" src={resourcesIcon} alt="" />}
-            heading="Resources"
-            name="resource"
-            options={RESOURCE_OPTS}
-            value={resource}
-            onChange={setResource}
-          />
           <FilterGroup
             icon={<img className="courses-filter__img" src={menuIcon} alt="" />}
             heading="Categories"
@@ -256,7 +236,7 @@ export default function CoursesBrowser() {
             aria-controls="courses-filter-panel"
             onClick={() => setFiltersOpen(true)}
           >
-            {currentResource.label}
+            All Resources
             <span className="courses-resource__chevron" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 12 15 18 9" />

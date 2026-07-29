@@ -22,18 +22,39 @@ export const coursesApi = {
 };
 
 export const faqsApi = createResource('faqs');
-export const pagesApi = createResource('pages');
-export const testimonialsApi = {
-  ...createResource('testimonials'),
-  uploadAvatar: (id, file) => api.upload(`/testimonials/${id}/avatar`, file),
+export const careersApi = {
+  listOpenings: (params) => api.get('/careers/openings', params),
+  createOpening: (body) => api.post('/careers/openings', body),
+  updateOpening: (id, body) => api.patch(`/careers/openings/${id}`, body),
+  removeOpening: (id) => api.del(`/careers/openings/${id}`),
 };
+
+export const rulesApi = createResource('rules');
+
+export const homeHeroApi = {
+  get: () => api.get('/home-hero'),
+  save: (audience, body) => api.patch(`/home-hero/${audience}`, body),
+};
+
+export const teamApi = {
+  ...createResource('team'),
+  getBySlug: (slug) => api.get(`/team/slug/${slug}`),
+  uploadPhoto: (id, file) => api.upload(`/team/${id}/photo`, file),
+};
+export const pagesApi = createResource('pages');
 
 // ---- Forum Q&A + moderation ------------------------------------------------
 export const questionsApi = {
   ...createResource('questions'),
   submit: (body) => api.post('/questions', body, { auth: false }),
+  // Public forum reads. Sent without the CMS token so a signed-in admin sees
+  // exactly what a visitor sees — published questions only.
+  publicList: (params) => api.get('/questions', params, { auth: false }),
+  publicGet: (id) => api.get(`/questions/${id}`, undefined, { auth: false }),
+  publicGetBySlug: (slug) => api.get(`/questions/slug/${slug}`, undefined, { auth: false }),
   setStatus: (id, status, note) => api.patch(`/questions/${id}/status`, { status, note }),
   answer: (id, paragraphs, lessons) => api.patch(`/questions/${id}/answer`, { paragraphs, lessons }),
+  sendAnswer: (id) => api.post(`/questions/${id}/send-answer`),
   setFeatured: (id, featured) => api.patch(`/questions/${id}/featured`, { featured }),
 };
 
@@ -78,7 +99,6 @@ export const settingsApi = {
 };
 export const usersApi = createResource('users');
 export const dashboardApi = { get: () => api.get('/dashboard') };
-export const searchApi = { query: (q, limit) => api.get('/search', { q, limit }) };
 export const auditApi = { page: (params) => api.page('/audit-log', params) };
 
 // ---- Auth ------------------------------------------------------------------

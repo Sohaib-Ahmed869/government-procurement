@@ -1,7 +1,7 @@
 .forum-hero {
   /* Root is transparent (it sits on .forum-page); this var only drives the
      mobile slide-up panel background so it tracks the audience theme. */
-  --forum-hero-panel-bg: #1a1a1a;
+  --forum-hero-panel-bg: var(--gp-ink-900);
 
   position: relative;
   z-index: 1;
@@ -10,11 +10,11 @@
 }
 
 .forum-hero[data-audience='award'] {
-  --forum-hero-panel-bg: #0a3114;
+  --forum-hero-panel-bg: var(--gp-green-900);
 }
 
 .forum-hero[data-audience='win'] {
-  --forum-hero-panel-bg: #1a1a1a;
+  --forum-hero-panel-bg: var(--gp-ink-900);
 }
 
 /* `.forum-answers` is also `z-index: 1` and comes later in the DOM, so it would
@@ -110,10 +110,16 @@
     inset -1px -1px 1px rgba(255, 255, 255, 0.12);
 }
 
+/* The magnifier submits the form, so it's a button — stripped back to look the
+   way it did as a plain span. */
 .forum-hero__search-icon {
   display: inline-flex;
   flex: none;
+  padding: 0;
   color: #fff;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
 }
 
 .forum-hero__search-input {
@@ -142,7 +148,7 @@
   align-items: center;
   gap: 12px;
   flex: none;
-  padding: 8px 24px 8px 8px;
+  padding: 13px 24px;
   font-size: 14px;
   font-weight: 500;
   color: #fff;

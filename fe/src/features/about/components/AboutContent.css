@@ -1,6 +1,6 @@
 .about {
   /* Every band on the page shares one surface colour, keyed to the segment. */
-  --about-bg: #1a1a1a;
+  --about-bg: var(--gp-ink-900);
 
   /* Paint the wrapper too, so the mobile toggle-row clearance (the 118px
      padding-top that .page-layout__main adds to the first child) reads as the
@@ -11,11 +11,11 @@
 }
 
 .about[data-audience='award'] {
-  --about-bg: #0a3114;
+  --about-bg: var(--gp-green-900);
 }
 
 .about[data-audience='win'] {
-  --about-bg: #1a1a1a;
+  --about-bg: var(--gp-ink-900);
 }
 
 /* ===== reveal on scroll-in (shared) ===== */

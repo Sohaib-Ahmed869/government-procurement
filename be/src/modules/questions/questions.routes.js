@@ -6,6 +6,7 @@ import {
   getById,
   updateStatus,
   answer,
+  sendAnswer,
   setFeatured,
   remove,
 } from './questions.controller.js';
@@ -25,6 +26,7 @@ router.get('/slug/:slug', optionalAuth, getBySlug);
 // Moderation actions — moderator/editor/superadmin only.
 router.patch('/:id/status', protect, authorize(MODERATION_ROLES), updateStatus);
 router.patch('/:id/answer', protect, authorize(MODERATION_ROLES), answer);
+router.post('/:id/send-answer', protect, authorize(MODERATION_ROLES), sendAnswer);
 router.patch('/:id/featured', protect, authorize(MODERATION_ROLES), setFeatured);
 router.delete('/:id', protect, authorize(MODERATION_ROLES), remove);
 

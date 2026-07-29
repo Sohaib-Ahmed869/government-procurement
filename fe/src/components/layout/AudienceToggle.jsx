@@ -1,11 +1,9 @@
 import { AUDIENCE } from '../../constants/audiences.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
-import awardIcon from '../../assets/icons/AwardsContracts.png';
-import winIcon from '../../assets/icons/WinContracts.png';
 
 const OPTIONS = [
-  { value: AUDIENCE.AWARD, label: 'Award Contracts', icon: awardIcon },
-  { value: AUDIENCE.WIN, label: 'Win Contracts', icon: winIcon },
+  { value: AUDIENCE.AWARD, label: 'Award contracts' },
+  { value: AUDIENCE.WIN, label: 'Win contracts' },
 ];
 
 export default function AudienceToggle() {
@@ -13,7 +11,7 @@ export default function AudienceToggle() {
 
   return (
     <div className="audience-toggle" role="group" aria-label="Choose your audience">
-      {OPTIONS.map(({ value, label, icon }) => {
+      {OPTIONS.map(({ value, label }) => {
         const isActive = audience === value;
 
         return (
@@ -24,14 +22,6 @@ export default function AudienceToggle() {
             aria-pressed={isActive}
             onClick={() => setAudience(value)}
           >
-            {isActive && (
-              // Black source PNG recoloured to the text colour via CSS mask.
-              <span
-                className="audience-toggle__icon"
-                style={{ maskImage: `url(${icon})`, WebkitMaskImage: `url(${icon})` }}
-                aria-hidden="true"
-              />
-            )}
             {label}
           </button>
         );
