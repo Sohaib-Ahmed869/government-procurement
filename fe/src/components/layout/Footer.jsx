@@ -10,8 +10,10 @@ import './Footer.css';
 
 // The two segment columns carry the header nav, with Home ahead of it and the
 // consultation CTA after. Labels and hrefs match Header.jsx's NAV_LINKS — keep
-// them in step by hand when a nav item changes. Careers is the one nav item left
-// out: it isn't audience-specific, so it sits in the company column below.
+// them in step by hand when a nav item changes.
+//
+// `shared: true` marks a page with no win/award variant, so it is linked plainly
+// rather than tagged with an audience it would ignore.
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Capabilities', href: '/advisory' },
@@ -20,17 +22,19 @@ const AUDIENCE_LINKS = [
   { label: 'Insights', href: '/resources' },
   { label: 'QnA', href: '/forum' },
   { label: 'Tender websites', href: '/aus-list' },
+  { label: 'Careers', href: '/careers', shared: true },
+  { label: 'Jurisdictional links', href: '/jurisdictional-links', shared: true },
   { label: 'Book a consultation', href: '/book-a-consultation' },
 ];
 
-// Every link in a segment column is tagged with that segment, so following one
-// lands the visitor on the matching variant of the page.
+// Every audience-specific link in a segment column is tagged with that segment,
+// so following one lands the visitor on the matching variant of the page.
 function audienceColumn(heading, audience) {
   return {
     heading,
-    links: AUDIENCE_LINKS.map(({ label, href }) => ({
+    links: AUDIENCE_LINKS.map(({ label, href, shared }) => ({
       label,
-      href: `${href}?audience=${audience}`,
+      href: shared ? href : `${href}?audience=${audience}`,
     })),
   };
 }
@@ -41,7 +45,6 @@ const LINK_COLUMNS = [
     links: [
       { label: 'FAQ', href: '/faq' },
       { label: 'About', href: '/about' },
-      { label: 'Careers', href: '/careers' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
     ],
@@ -51,9 +54,13 @@ const LINK_COLUMNS = [
 ];
 
 // On small screens the headed columns collapse into a flat run of links, laid
-// out as three fixed rows (2 / 4 / 3). The rows are explicit rather than
+// out as five fixed rows (2 / 4 / 3 / 2 / 4). The rows are explicit rather than
 // wrap-driven so the grouping holds at every width; the CSS scales the type
 // down so each row still fits on one line.
+//
+// Rows are balanced by rendered width, not link count — the font-size divisor in
+// Footer.css is calibrated to the widest row, so a row much longer than the rest
+// shrinks the type for all of them. Keep new rows near the others in length.
 const FLAT_ROWS = [
   [
     { label: 'Award Contracts', href: '/?audience=award' },
@@ -68,12 +75,15 @@ const FLAT_ROWS = [
   [
     { label: 'QnA', href: '/forum' },
     { label: 'Tender websites', href: '/aus-list' },
+    { label: 'Careers', href: '/careers' },
+  ],
+  [
+    { label: 'Jurisdictional links', href: '/jurisdictional-links' },
     { label: 'Book a consultation', href: '/book-a-consultation' },
   ],
   [
     { label: 'FAQ', href: '/faq' },
     { label: 'About', href: '/about' },
-    { label: 'Careers', href: '/careers' },
     { label: 'Privacy', href: '/privacy' },
     { label: 'Terms', href: '/terms' },
   ],
