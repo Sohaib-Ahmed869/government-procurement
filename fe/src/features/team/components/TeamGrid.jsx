@@ -72,7 +72,7 @@ export default function TeamGrid() {
                 </h2>
 
                 <p className="team-card__role">
-                  {member.role}, {member.location}
+                  {[member.role, member.location].filter(Boolean).join(', ')}
                 </p>
 
                 <span className="team-card__rule" aria-hidden="true" />

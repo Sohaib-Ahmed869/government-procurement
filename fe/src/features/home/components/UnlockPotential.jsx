@@ -49,7 +49,7 @@ export default function UnlockPotential() {
   //   • full      — 4+ courses AND 2+ artefacts: the standard bento.
   //   • courses   — 4+ courses, <2 artefacts: 4 course cards fill the full width.
   //   • artefacts — <4 courses, 2+ artefacts: 2 artefact cards fill the full width.
-  //   • none      — neither threshold met: heading + banner only, no boxes.
+  //   • none      — neither threshold met: the section drops out entirely.
   // (The API caps courses at 4 and artefacts at 2, so these lengths equal the
   // thresholds exactly.)
   const enoughCourses = courses.length >= 4;
@@ -64,8 +64,8 @@ export default function UnlockPotential() {
   const wideCourse = courses[3];
 
   // Cards in the mobile carousel: full = 2 feature + 3 course + 1 wide, otherwise
-  // just the boxes that mode renders.
-  const cardCount = mode === 'full' ? 6 : mode === 'courses' ? 4 : mode === 'artefacts' ? 2 : 0;
+  // just the boxes that mode renders. ('none' never reaches the render below.)
+  const cardCount = mode === 'full' ? 6 : mode === 'courses' ? 4 : 2;
 
   // A single course / artefact card — reused by the courses-only and
   // artefacts-only full-width layouts.
@@ -134,6 +134,11 @@ export default function UnlockPotential() {
     cards?.[i]?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   };
 
+  // Nothing meets the thresholds (still loading, errored, or genuinely empty):
+  // drop the whole section rather than leave its eyebrow heading standing over
+  // an empty space. Same call as LatestInsights makes.
+  if (mode === 'none') return null;
+
   return (
     <section
       ref={ref}
@@ -145,73 +150,69 @@ export default function UnlockPotential() {
 
         {/* Bento grid (desktop) / swipeable carousel (mobile). The layout adapts
             to how much content exists; see `mode` above. */}
-        {mode !== 'none' && (
-          <div
-            className={`uy__bento uy__bento--${mode}`}
-            ref={bentoRef}
-            onScroll={onBentoScroll}
-          >
-            {mode === 'full' && (
-              <>
-                <div className="uy__left">
-                  {featureArtefacts.map((a, i) => (
-                    <a
-                      key={a._id || `artefact-${i}`}
-                      className={`uy__card uy__card--feature uy__card--neutral${i === 1 ? ' uy__card--short' : ''}`}
-                      href={linkOf(a, '/courses')}
-                    >
-                      <img src={imgOf(a)} alt="" className="uy__card-img" />
-                      <div className="uy__card-tint" />
-                      <div className="uy__card-body">
-                        <p className="uy__card-label">Artefacts</p>
-                        <h4 className="uy__card-title">{a.title}</h4>
-                      </div>
-                      <ArrowCircle />
-                    </a>
-                  ))}
-                </div>
+        <div
+          className={`uy__bento uy__bento--${mode}`}
+          ref={bentoRef}
+          onScroll={onBentoScroll}
+        >
+          {mode === 'full' && (
+            <>
+              <div className="uy__left">
+                {featureArtefacts.map((a, i) => (
+                  <a
+                    key={a._id || `artefact-${i}`}
+                    className={`uy__card uy__card--feature uy__card--neutral${i === 1 ? ' uy__card--short' : ''}`}
+                    href={linkOf(a, '/courses')}
+                  >
+                    <img src={imgOf(a)} alt="" className="uy__card-img" />
+                    <div className="uy__card-tint" />
+                    <div className="uy__card-body">
+                      <p className="uy__card-label">Artefacts</p>
+                      <h4 className="uy__card-title">{a.title}</h4>
+                    </div>
+                    <ArrowCircle />
+                  </a>
+                ))}
+              </div>
 
-                <div className="uy__right">
-                  <div className="uy__courses">
-                    {gridCourses.map((c, i) => renderCourseCard(c, i))}
-                  </div>
-
-                  {renderWideCourseCard(wideCourse)}
-                </div>
-              </>
-            )}
-
-            {/* Courses only — the same three-up grid + wide banner as the full
-                bento's course column, now spanning the whole section width. */}
-            {mode === 'courses' && (
               <div className="uy__right">
                 <div className="uy__courses">
-                  {courses.slice(0, 3).map((c, i) => renderCourseCard(c, i))}
+                  {gridCourses.map((c, i) => renderCourseCard(c, i))}
                 </div>
 
-                {renderWideCourseCard(courses[3], true)}
+                {renderWideCourseCard(wideCourse)}
               </div>
-            )}
+            </>
+          )}
 
-            {/* Artefacts only — the two artefact cards span the full width. */}
-            {mode === 'artefacts' && featureArtefacts.map((a, i) => renderArtefactCard(a, i))}
-          </div>
-        )}
+          {/* Courses only — the same three-up grid + wide banner as the full
+              bento's course column, now spanning the whole section width. */}
+          {mode === 'courses' && (
+            <div className="uy__right">
+              <div className="uy__courses">
+                {courses.slice(0, 3).map((c, i) => renderCourseCard(c, i))}
+              </div>
+
+              {renderWideCourseCard(courses[3], true)}
+            </div>
+          )}
+
+          {/* Artefacts only — the two artefact cards span the full width. */}
+          {mode === 'artefacts' && featureArtefacts.map((a, i) => renderArtefactCard(a, i))}
+        </div>
 
         {/* Pagination dots (mobile carousel only) */}
-        {cardCount > 0 && (
-          <div className="uy__dots">
-            {Array.from({ length: cardCount }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`uy__dot${i === activeCard ? ' is-active' : ''}`}
-                aria-label={`Go to card ${i + 1}`}
-                onClick={() => scrollToCard(i)}
-              />
-            ))}
-          </div>
-        )}
+        <div className="uy__dots">
+          {Array.from({ length: cardCount }).map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`uy__dot${i === activeCard ? ' is-active' : ''}`}
+              aria-label={`Go to card ${i + 1}`}
+              onClick={() => scrollToCard(i)}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
