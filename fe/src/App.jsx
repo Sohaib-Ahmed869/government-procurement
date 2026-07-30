@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/public/HomePage.jsx';
 import AdvisoryServicesPage from './pages/public/AdvisoryServicesPage.jsx';
 import TenderPortalsPage from './pages/public/TenderPortalsPage.jsx';
@@ -48,13 +48,23 @@ export default function App() {
   );
 }
 
+// Keeps a renamed page's old URL working: swaps the first path segment for
+// `base` and carries the rest across, along with the query string and hash. So
+// /forum/answers/7 → /qna/answers/7, and the footer's ?audience= variants
+// survive too. `replace` keeps the dead URL out of the back button.
+function RenamedPath({ base }) {
+  const { pathname, search, hash } = useLocation();
+  const rest = pathname.replace(/^\/[^/]+/, '');
+  return <Navigate to={`${base}${rest}${search}${hash}`} replace />;
+}
+
 function PublicSite() {
   return (
     <AudienceProvider>
       <Routes>
           {/* Public */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/advisory" element={<AdvisoryServicesPage />} />
+          <Route path="/capabilities" element={<AdvisoryServicesPage />} />
           {/* Tender portals: one page, two lists driven by the URL. */}
           <Route path="/tender-portals" element={<TenderPortalsPage />} />
           <Route path="/aus-list" element={<TenderPortalsPage />} />
@@ -69,19 +79,24 @@ function PublicSite() {
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           <Route path="/insights" element={<InsightsPage />} />
-          {/* Navbar "Resources" points here; it shows the Insights listing. */}
-          <Route path="/resources" element={<InsightsPage />} />
           <Route path="/insights/:slug" element={<ArticleDetailPage />} />
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/book-a-consultation" element={<BookConsultationPage />} />
 
-          {/* Forum */}
-          <Route path="/forum" element={<ForumHomePage />} />
-          <Route path="/forum/articles" element={<ForumArticlePage />} />
-          <Route path="/forum/categories" element={<ForumCategoriesPage />} />
-          <Route path="/forum/submit" element={<ForumSubmitPage />} />
-          <Route path="/forum/answers/:id" element={<ForumAnswerPage />} />
+          {/* QnA */}
+          <Route path="/qna" element={<ForumHomePage />} />
+          <Route path="/qna/articles" element={<ForumArticlePage />} />
+          <Route path="/qna/categories" element={<ForumCategoriesPage />} />
+          <Route path="/qna/submit" element={<ForumSubmitPage />} />
+          <Route path="/qna/answers/:id" element={<ForumAnswerPage />} />
+
+          {/* Renamed pages — the old URLs still resolve, so existing links,
+              bookmarks and anything already indexed keep working. */}
+          <Route path="/advisory" element={<RenamedPath base="/capabilities" />} />
+          <Route path="/resources" element={<RenamedPath base="/insights" />} />
+          <Route path="/forum" element={<RenamedPath base="/qna" />} />
+          <Route path="/forum/*" element={<RenamedPath base="/qna" />} />
 
           {/* System / utility */}
           <Route path="/privacy" element={<PrivacyPolicyPage />} />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { pagesApi } from '../../api';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
@@ -53,7 +53,10 @@ export default function PagesEditorPage() {
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [error, setError] = useState(null);
-  const snapshot = useRef(JSON.stringify(BLANK));
+  // State rather than a ref — `dirty` below is memoised, so the saved baseline
+  // has to be something React can see change, or saving leaves `dirty` stuck on
+  // its previous value.
+  const [snapshot, setSnapshot] = useState(() => JSON.stringify(BLANK));
 
   const load = () => {
     setStatus('loading');
@@ -68,7 +71,7 @@ export default function PagesEditorPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(load, [statusFilter]);
 
-  const dirty = useMemo(() => JSON.stringify(form) !== snapshot.current, [form]);
+  const dirty = useMemo(() => JSON.stringify(form) !== snapshot, [form, snapshot]);
 
   const set = (name, value) => { setForm((f) => ({ ...f, [name]: value })); setJustSaved(false); };
   const onChange = (e) => set(e.target.name, e.target.value);
@@ -78,7 +81,7 @@ export default function PagesEditorPage() {
     setCurrentId(null);
     setCurrentSlug('');
     setForm(BLANK);
-    snapshot.current = JSON.stringify(BLANK);
+    setSnapshot(JSON.stringify(BLANK));
     setError(null);
     setJustSaved(false);
     setEditing(true);
@@ -97,7 +100,7 @@ export default function PagesEditorPage() {
     setCurrentId(row._id || row.id);
     setCurrentSlug(row.slug || '');
     setForm(next);
-    snapshot.current = JSON.stringify(next);
+    setSnapshot(JSON.stringify(next));
     setError(null);
     setJustSaved(false);
     setEditing(true);
@@ -135,7 +138,7 @@ export default function PagesEditorPage() {
 
       const nextForm = statusOverride ? { ...form, status: statusOverride } : form;
       if (statusOverride) setForm(nextForm);
-      snapshot.current = JSON.stringify(nextForm);
+      setSnapshot(JSON.stringify(nextForm));
       setJustSaved(true);
       setSaving(false);
 

@@ -14,6 +14,10 @@ const STATUS_OPTS = [
 
 const EMPTY = { title: '', description: '', applyUrl: '', order: 0, status: 'published' };
 
+// Where Apply goes when no link is set. Mirrors CareersContent.jsx's fallback —
+// shown here so the admin can see what "blank" means without leaving the form.
+const CAREERS_EMAIL = 'mkheir@govprocurement.com.au';
+
 // Job openings listed under "Roles we are hiring for" on the Careers page.
 export default function CareersAdminPage() {
   const [rows, setRows] = useState([]);
@@ -102,7 +106,8 @@ export default function CareersAdminPage() {
     {
       key: 'applyUrl',
       header: 'Apply link',
-      render: (r) => r.applyUrl || '—',
+      // Blank isn't missing data, so say what it does instead of showing a dash.
+      render: (r) => r.applyUrl || <span className="admin-field__hint">Email (default)</span>,
     },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     {
@@ -197,8 +202,8 @@ export default function CareersAdminPage() {
             name="applyUrl"
             value={form.applyUrl}
             onChange={onChange}
-            required
-            hint="Where the Apply button goes — a URL or mailto: address."
+            placeholder={`Leave blank to email ${CAREERS_EMAIL}`}
+            hint="(optional) Where the Apply button goes — a URL or mailto: address."
           />
           <FormField
             label="Order"

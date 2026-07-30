@@ -33,7 +33,7 @@ export default function ForumHero({ compact = false }) {
   const onSearch = (event) => {
     event.preventDefault();
     const term = query.trim();
-    navigate(term ? `/forum?q=${encodeURIComponent(term)}` : '/forum');
+    navigate(term ? `/qna?q=${encodeURIComponent(term)}` : '/qna');
   };
 
   // On phones the sidebar isn't in the flow — the categories button opens it as
@@ -85,7 +85,7 @@ export default function ForumHero({ compact = false }) {
             />
           </form>
 
-          <a className="forum-hero__submit" href="/forum/submit" aria-label="Submit a question">
+          <a className="forum-hero__submit" href="/qna/submit" aria-label="Submit a question">
             <span className="forum-hero__submit-label">Submit a question</span>
             {/* Small screens show the pill as a compact "+" circle instead. */}
             <span className="forum-hero__submit-plus" aria-hidden="true">

@@ -31,9 +31,13 @@
      the row runs short the link columns narrow and their longest labels wrap —
      nothing drops to a second row. */
   display: grid;
-  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) 200px;
+  /* The contact track is sized off its widest line — the head office email, one
+     unbreakable ~28-character token at 13.5px. At 200px it wrapped its last
+     letter onto a line of its own, so the track takes 230px and the column gap
+     gives the difference back rather than the link columns paying for it. */
+  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) 230px;
   align-items: start;
-  gap: 48px 32px;
+  gap: 48px 20px;
   max-width: 1100px;
   margin: 0 auto;
   padding: 56px 40px;
@@ -337,8 +341,18 @@
   gap: 14px;
   font-size: 13.5px;
   line-height: 1.5;
-  /* The email is one long unbroken token — let it break rather than overflow. */
+  /* The street address is the only line long enough to need wrapping, and it has
+     spaces to wrap at. Anything without them breaks anywhere rather than
+     overflowing — except the email, which is pinned to one line below. */
   overflow-wrap: anywhere;
+}
+
+/* The address is fine broken across lines; the email is not — a single trailing
+   letter on its own line reads as a typo. The track above is sized to hold it,
+   and this makes sure it stays whole even if the font metrics land differently
+   from the measurement that track was based on. */
+.site-footer__contact-email {
+  white-space: nowrap;
 }
 
 .site-footer__contact-link {
@@ -377,8 +391,10 @@
    little back. The row itself holds — only the link columns get tighter. */
 @media (max-width: 1100px) {
   .site-footer__inner {
-    grid-template-columns: minmax(160px, 200px) minmax(0, 1fr) 190px;
-    gap: 48px 24px;
+    /* Contact holds its 230px — the email needs it at every width — so the give
+       comes from the brand track and the gaps. */
+    grid-template-columns: minmax(160px, 200px) minmax(0, 1fr) 230px;
+    gap: 48px 16px;
   }
 
   .site-footer__links {

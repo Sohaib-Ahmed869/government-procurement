@@ -26,8 +26,7 @@ export const listOpenings = asyncHandler(async (req, res) => {
 
 export const createOpening = asyncHandler(async (req, res) => {
   if (!req.body.title) throw ApiError.badRequest('title is required');
-  // Every opening must say where to apply — the page has no fallback.
-  if (!req.body.applyUrl) throw ApiError.badRequest('applyUrl is required');
+  // applyUrl is optional — blank means Apply points at the careers inbox.
 
   const opening = new JobOpening();
   for (const field of EDITABLE) {
@@ -48,9 +47,7 @@ export const createOpening = asyncHandler(async (req, res) => {
 export const updateOpening = asyncHandler(async (req, res) => {
   const opening = await JobOpening.findById(req.params.id);
   if (!opening) throw ApiError.notFound('Job opening not found');
-  if (req.body.applyUrl !== undefined && !req.body.applyUrl) {
-    throw ApiError.badRequest('applyUrl is required');
-  }
+  // Clearing applyUrl is allowed — Apply falls back to the careers inbox.
 
   for (const field of EDITABLE) {
     if (req.body[field] !== undefined) opening[field] = req.body[field];

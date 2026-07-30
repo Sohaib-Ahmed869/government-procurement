@@ -251,7 +251,9 @@ export default function TeamMemberDetail({ slug }) {
                       <span className="tm__work-art">
                         {image && <img src={image} alt="" />}
                       </span>
-                      {article.topic && <span className="tm__work-type">{article.topic}</span>}
+                      {article.category?.name && (
+                        <span className="tm__work-type">{article.category.name}</span>
+                      )}
                       <span className="tm__work-title">
                         {article.title}
                         <svg

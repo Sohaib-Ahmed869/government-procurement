@@ -18,7 +18,7 @@ export default function JurisdictionsHero() {
         <h1 className="jl-hero__title">Procurement rules by state</h1>
         <p className="jl-hero__sub">
           Explore the procurement rules and thresholds that apply in each
-          Australian state and territory — filter by jurisdiction or rule type.
+          Australian state and territory, filter by jurisdiction or rule type.
         </p>
       </div>
     </section>

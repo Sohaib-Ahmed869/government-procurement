@@ -8,38 +8,34 @@ import { connectDB, disconnectDB } from '../config/db.js';
 import { CONTENT_STATUS } from '../constants/statuses.js';
 import { JobOpening } from '../models/JobOpening.js';
 
-// Applications come by email until a proper ATS link exists. Same address as the
-// footer's contact block.
-const APPLY_URL = 'mailto:mkheir@govprocurement.com.au?subject=Application';
-
+// applyUrl is deliberately absent from these entries. The Careers page emails the
+// careers inbox when an opening has no link (see CareersContent.jsx's applyHref),
+// so there's nothing to seed — and leaving the key out means the Object.assign
+// below can't overwrite a link an editor has since added in the CMS.
 const OPENINGS = [
   {
     title: 'Graduate',
     description:
       'A structured first year in procurement, working alongside senior advisers on live engagements across the public and private sectors. You will learn how tenders are actually run and evaluated.',
     order: 10,
-    applyUrl: APPLY_URL,
   },
   {
     title: 'Analyst',
     description:
       'Support delivery across the procurement lifecycle — market research, spend and data analysis, drafting tender documentation, and helping evaluation panels reach defensible decisions.',
     order: 20,
-    applyUrl: APPLY_URL,
   },
   {
     title: 'Consultant',
     description:
       'Run end-to-end procurement processes with clients, from sourcing strategy through approach to market and award, with support from the wider team.',
     order: 30,
-    applyUrl: APPLY_URL,
   },
   {
     title: 'Senior Consultant',
     description:
       'Lead engagements and client relationships, advise on complex or high-value procurements, and mentor the analysts and consultants working with you.',
     order: 40,
-    applyUrl: APPLY_URL,
   },
 ];
 

@@ -16,11 +16,11 @@ import './Footer.css';
 // rather than tagged with an audience it would ignore.
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Capabilities', href: '/advisory' },
+  { label: 'Capabilities', href: '/capabilities' },
   { label: 'Our team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
-  { label: 'Insights', href: '/resources' },
-  { label: 'QnA', href: '/forum' },
+  { label: 'Insights', href: '/insights' },
+  { label: 'QnA', href: '/qna' },
   { label: 'Tender websites', href: '/aus-list' },
   { label: 'Careers', href: '/careers', shared: true },
   { label: 'Jurisdictional links', href: '/jurisdictional-links', shared: true },
@@ -67,13 +67,13 @@ const FLAT_ROWS = [
     { label: 'Win Contracts', href: '/?audience=win' },
   ],
   [
-    { label: 'Insights', href: '/resources' },
-    { label: 'Capabilities', href: '/advisory' },
+    { label: 'Insights', href: '/insights' },
+    { label: 'Capabilities', href: '/capabilities' },
     { label: 'Our team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
   ],
   [
-    { label: 'QnA', href: '/forum' },
+    { label: 'QnA', href: '/qna' },
     { label: 'Tender websites', href: '/aus-list' },
     { label: 'Careers', href: '/careers' },
   ],
@@ -295,7 +295,10 @@ export default function Footer({ audience: audienceProp }) {
               </a>
             </li>
             <li>
-              <a className="site-footer__contact-link" href={`mailto:${CONTACT_EMAIL}`}>
+              <a
+                className="site-footer__contact-link site-footer__contact-email"
+                href={`mailto:${CONTACT_EMAIL}`}
+              >
                 {CONTACT_EMAIL}
               </a>
             </li>

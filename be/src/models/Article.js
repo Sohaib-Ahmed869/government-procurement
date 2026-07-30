@@ -8,7 +8,12 @@ const articleSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, index: true },
     excerpt: { type: String, default: '' },
     body: { type: String, default: '' }, // rich HTML
-    topic: { type: String, default: '' }, // display topic label (e.g. "Strategy")
+    // Legacy free-text topic label. Superseded by `category`, which is what the
+    // CMS sets and the site displays — nothing writes this any more. Kept so the
+    // values already stored on existing articles aren't discarded.
+    topic: { type: String, default: '' },
+    // The article's category: the CMS taxonomy entry, and the topic label shown
+    // on cards and in the article hero. Reads populate it (see the controller).
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
     author: { type: String, default: '' },
     heroImage: {

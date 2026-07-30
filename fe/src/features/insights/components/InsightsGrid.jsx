@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import { articlesApi } from '../../../api';
+import { articlesApi, categoriesApi } from '../../../api';
 import './InsightsGrid.css';
 
 const SORT_OPTIONS = [
@@ -107,10 +107,12 @@ const PAGE_SIZE = 12;
 export default function InsightsGrid() {
   const { ref, inView } = useInView();
   const { audience } = useAudience();
-  const [topic, setTopic] = useState('all');
+  // The selected category id, or 'all'.
+  const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('none');
 
   const [articles, setArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
 
   // On mobile the grid is a horizontal snap carousel; track which card is
@@ -122,9 +124,16 @@ export default function InsightsGrid() {
     let alive = true;
     (async () => {
       try {
-        const list = await articlesApi.list({ limit: 100 });
+        // Categories come from the CMS taxonomy, not from the articles, so the
+        // filter offers exactly what an editor set up (and in their order). A
+        // failed category fetch just leaves the filter empty — the grid stays.
+        const [list, cats] = await Promise.all([
+          articlesApi.list({ limit: 100 }),
+          categoriesApi.list({ kind: 'article' }).catch(() => []),
+        ]);
         if (!alive) return;
         setArticles(list || []);
+        setCategories(cats || []);
         setStatus('ready');
       } catch {
         if (alive) setStatus('error');
@@ -135,14 +144,20 @@ export default function InsightsGrid() {
     };
   }, []);
 
-  // Topic pills derived from the distinct topic values present in the data.
-  const topicOptions = useMemo(() => {
-    const topics = [...new Set(articles.map((a) => a.topic).filter(Boolean))];
-    return [{ value: 'all', label: 'Featured Topics' }, ...topics.map((t) => ({ value: t, label: t }))];
-  }, [articles]);
+  // Only categories that actually have a published insight under them, so every
+  // option in the dropdown leads somewhere.
+  const categoryOptions = useMemo(() => {
+    const used = new Set(articles.map((a) => a.category?._id).filter(Boolean));
+    const inUse = categories.filter((c) => used.has(c._id || c.id));
+    return [
+      { value: 'all', label: 'Featured Topics' },
+      ...inUse.map((c) => ({ value: c._id || c.id, label: c.name })),
+    ];
+  }, [articles, categories]);
 
   const visible = useMemo(() => {
-    let list = topic === 'all' ? articles : articles.filter((a) => a.topic === topic);
+    let list =
+      category === 'all' ? articles : articles.filter((a) => a.category?._id === category);
     if (sort !== 'none') {
       list = [...list].sort((a, b) =>
         sort === 'a-z'
@@ -151,14 +166,14 @@ export default function InsightsGrid() {
       );
     }
     return list;
-  }, [articles, topic, sort]);
+  }, [articles, category, sort]);
 
   // How many of the filtered articles are on screen. Reset whenever the filter
   // or sort changes, so a new selection starts from the first page again.
   const [shown, setShown] = useState(PAGE_SIZE);
   useEffect(() => {
     setShown(PAGE_SIZE);
-  }, [topic, sort]);
+  }, [category, sort]);
 
   const onScreen = visible.slice(0, shown);
 
@@ -182,7 +197,7 @@ export default function InsightsGrid() {
       <div className="insights__inner">
         {status === 'ready' && articles.length > 0 && (
           <div className="insights__filters">
-            <PillDropdown options={topicOptions} value={topic} onChange={setTopic} />
+            <PillDropdown options={categoryOptions} value={category} onChange={setCategory} />
             <PillDropdown label="Sort by:" options={SORT_OPTIONS} value={sort} onChange={setSort} />
           </div>
         )}
@@ -205,8 +220,9 @@ export default function InsightsGrid() {
               const image = article.heroImage?.url || null;
               const date = formatDate(article.publishedAt);
               const minutes = readingMinutes(article);
-              // "Article · 4 min read" — either half may be missing.
-              const meta = [article.topic, minutes ? `${minutes} min read` : null]
+              // "Strategy · 4 min read" — either half may be missing. The
+              // category name is the topic label.
+              const meta = [article.category?.name, minutes ? `${minutes} min read` : null]
                 .filter(Boolean)
                 .join(' · ');
               return (

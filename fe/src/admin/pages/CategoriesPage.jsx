@@ -5,7 +5,23 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
 
-const KINDS = ['article', 'video', 'faq', 'course'];
+// Kinds an editor can assign. Only insights and FAQs use this taxonomy — courses
+// and their artefacts categorise by segment on the resource itself (see
+// CourseEditorPage), so those kinds are no longer offered here. 'article' is
+// stored as-is but presented as "Insight", matching the site and the CMS nav.
+const KINDS = [
+  { value: 'article', label: 'Insight' },
+  { value: 'faq', label: 'FAQ' },
+];
+
+// Display labels, including the kinds that are no longer selectable — older
+// categories may still carry them, and a blank cell would read as missing data.
+const KIND_LABELS = {
+  article: 'Insight',
+  faq: 'FAQ',
+  video: 'Video',
+  course: 'Course',
+};
 const BLANK = { name: '', kinds: [], order: 0 };
 
 // Categories admin: the list is the whole screen; add/edit opens a drawer.
@@ -91,7 +107,12 @@ export default function CategoriesPage() {
 
   const columns = [
     { key: 'name', header: 'Name' },
-    { key: 'kinds', header: 'Kinds', render: (r) => (Array.isArray(r.kinds) ? r.kinds.join(', ') : '') },
+    {
+      key: 'kinds',
+      header: 'Kinds',
+      render: (r) =>
+        Array.isArray(r.kinds) ? r.kinds.map((k) => KIND_LABELS[k] ?? k).join(', ') : '',
+    },
     { key: 'order', header: 'Order', width: 80 },
     {
       key: 'actions',
@@ -118,7 +139,7 @@ export default function CategoriesPage() {
       <div className="admin-page__head">
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Categories</h2>
-          <p className="admin-page__subtitle">Shared taxonomy for articles, videos, FAQs and courses.</p>
+          <p className="admin-page__subtitle">Shared taxonomy for insights, videos, FAQs and courses.</p>
         </div>
         <div className="admin-page__actions">
           <button type="button" className="admin-btn admin-btn--primary" onClick={openCreate}>
@@ -166,14 +187,14 @@ export default function CategoriesPage() {
           <div className="admin-field">
             <span className="admin-field__label">Applies to</span>
             <div className="admin-checkgroup">
-              {KINDS.map((kind) => (
-                <label key={kind} className="admin-checkgroup__item">
+              {KINDS.map(({ value, label }) => (
+                <label key={value} className="admin-checkgroup__item">
                   <input
                     type="checkbox"
-                    checked={form.kinds.includes(kind)}
-                    onChange={() => toggleKind(kind)}
+                    checked={form.kinds.includes(value)}
+                    onChange={() => toggleKind(value)}
                   />
-                  <span>{kind}</span>
+                  <span>{label}</span>
                 </label>
               ))}
             </div>

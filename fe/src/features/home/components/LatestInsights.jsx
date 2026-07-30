@@ -51,7 +51,7 @@ export default function LatestInsights() {
             <p className="li__eyebrow">Insights</p>
             <h2 className="li__heading">Latest Insights</h2>
           </div>
-          <Link className="li__viewall" to="/resources">
+          <Link className="li__viewall" to="/insights">
             View all insights
             <span className="li__viewall-arrow" aria-hidden="true">→</span>
           </Link>
@@ -73,7 +73,9 @@ export default function LatestInsights() {
                   </div>
                   <div className="li-card__body">
                     <div className="li-card__meta">
-                      {article.topic && <span className="li-card__topic">{article.topic}</span>}
+                      {article.category?.name && (
+                        <span className="li-card__topic">{article.category.name}</span>
+                      )}
                       {date && <span className="li-card__date">{date}</span>}
                     </div>
                     <h3 className="li-card__title">{article.title}</h3>

@@ -129,7 +129,9 @@ export default function ArticleDetail({ slug }) {
       <header className="article-hero">
         <div className="article-hero__inner">
           <div className="article-hero__meta">
-            {article.topic && <span className="article-hero__chip">{article.topic}</span>}
+            {article.category?.name && (
+              <span className="article-hero__chip">{article.category.name}</span>
+            )}
             {date && <span className="article-hero__date">{date}</span>}
           </div>
           <h1 className="article-hero__title">{article.title}</h1>
@@ -201,7 +203,9 @@ export default function ArticleDetail({ slug }) {
                 <li key={item._id} className="article-related__card">
                   <Link to={`/insights/${item.slug}`} className="article-related__link">
                     <div className="article-related__meta">
-                      {item.topic && <span className="article-related__topic">{item.topic}</span>}
+                      {item.category?.name && (
+                        <span className="article-related__topic">{item.category.name}</span>
+                      )}
                       <span className="article-related__date">{formatDate(item.publishedAt)}</span>
                     </div>
                     <h3 className="article-related__card-title">{item.title}</h3>

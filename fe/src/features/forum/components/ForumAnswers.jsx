@@ -68,7 +68,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
         setFeatured(
           (list || []).map((q) => ({
             label: q.title,
-            href: `/forum/answers/${q.slug || q._id}`,
+            href: `/qna/answers/${q.slug || q._id}`,
           })),
         );
       } catch {
@@ -112,7 +112,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
               {query ? (
                 <>
                   No questions match that search.{' '}
-                  <Link className="forum-answers__clear" to="/forum">
+                  <Link className="forum-answers__clear" to="/qna">
                     Clear search
                   </Link>
                 </>
@@ -126,7 +126,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
             <ul className="forum-answers__list">
               {visible.map((item, i) => (
                 <li key={item._id} style={{ '--i': i }}>
-                  <Link className="forum-card" to={`/forum/answers/${item.slug || item._id}`}>
+                  <Link className="forum-card" to={`/qna/answers/${item.slug || item._id}`}>
                     <h3 className="forum-card__title">{item.title}</h3>
                     <div className="forum-card__meta">
                       <span className="forum-tag">{CATEGORY_LABEL[item.category] ?? tag}</span>

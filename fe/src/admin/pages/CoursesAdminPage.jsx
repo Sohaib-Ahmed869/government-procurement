@@ -16,6 +16,11 @@ const CATEGORY_LABEL = {
   award: 'Award Contracts',
   win: 'Win Contracts',
 };
+const TYPE_LABEL = {
+  courses: 'Course',
+  artefacts: 'Artefact',
+  bundles: 'Bundle',
+};
 
 // LIST screen for courses, artefacts and bundles.
 export default function CoursesAdminPage() {
@@ -56,6 +61,22 @@ export default function CoursesAdminPage() {
 
   const columns = [
     { key: 'title', header: 'Title' },
+    {
+      key: 'resourceType',
+      header: 'Type',
+      // Homepage slots are capped per type (4 courses, 2 artefacts), so the star
+      // has to sit next to the type for the count to mean anything.
+      render: (r) => (
+        <span className="admin-cell-inline">
+          {TYPE_LABEL[r.resourceType] || '—'}
+          {r.featured && (
+            <span className="admin-libcard__star" title="Featured on homepage">
+              ★
+            </span>
+          )}
+        </span>
+      ),
+    },
     {
       key: 'level',
       header: 'Level',

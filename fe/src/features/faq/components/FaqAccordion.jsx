@@ -80,17 +80,22 @@ export default function FaqAccordion() {
     };
   }, []);
 
-  // Category pills are derived from the distinct categories in the fetched data.
+  // Pills come from the categories actually carried by the published questions —
+  // a category set up in the CMS but not yet used by any question never shows up
+  // here. A question left uncategorised adds no pill of its own; it's reachable
+  // under "All". (Previously an uncategorised question invented a "General" pill
+  // that no category had actually set.)
   const categories = useMemo(() => {
     const seen = [];
     for (const f of faqs) {
-      const c = f.category || 'General';
-      if (!seen.includes(c)) seen.push(c);
+      const c = (f.category || '').trim();
+      if (c && !seen.includes(c)) seen.push(c);
     }
     return ['all', ...seen];
   }, [faqs]);
 
-  const visible = category === 'all' ? faqs : faqs.filter((f) => (f.category || 'General') === category);
+  const visible =
+    category === 'all' ? faqs : faqs.filter((f) => (f.category || '').trim() === category);
 
   return (
     <section ref={ref} className={`faq${inView ? ' is-in' : ''}`} data-audience={audience}>

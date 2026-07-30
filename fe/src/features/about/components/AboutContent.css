@@ -325,14 +325,13 @@
   color: #fff;
 }
 
-/* Glass pill with a leading arrow disc — exactly like the homepage
-   "Book a Consultation" button. */
+/* Glass pill, label only — the leading arrow disc was dropped, so the padding is
+   even on both sides and keeps the pill at the height it had with the disc. */
 .about-cta__button {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
   margin-top: 32px;
-  padding: 10px 30px 10px 10px;
+  padding: 14px 32px;
   font-size: 18px;
   font-weight: 500;
   color: #fff;
@@ -350,22 +349,6 @@
   background: rgba(255, 255, 255, 0.28);
 }
 
-.about-cta__circle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex: none;
-  overflow: hidden;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.about-cta__circle img {
-  display: block;
-}
-
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .about-cta__button {
     transition:
@@ -379,14 +362,6 @@
     box-shadow:
       0 10px 24px rgba(0, 0, 0, 0.28),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-
-  .about-cta__circle {
-    transition: transform 0.2s ease-out;
-  }
-
-  .about-cta__button:hover .about-cta__circle {
-    transform: translateX(-2px);
   }
 }
 

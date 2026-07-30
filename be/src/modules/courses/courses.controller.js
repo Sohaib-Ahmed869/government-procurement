@@ -6,6 +6,7 @@ import { uniqueSlug } from '../../utils/slugify.js';
 import {
   CONTENT_STATUS,
   COURSE_STATES,
+  COURSE_RESOURCE_TYPE,
   COURSE_RESOURCE_TYPES,
   COURSE_SEGMENTS,
   COURSE_LEVELS,
@@ -14,6 +15,51 @@ import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
 import { parseYouTubeId } from '../../utils/youtube.js';
 import { Course } from '../../models/Course.js';
+
+// Homepage slots, per resource type. The "Unlock your potential" section renders
+// 4 course cards and 2 artefact cards (UnlockPotential.jsx), so those are the
+// only rails a resource can compete for. A type absent here has no rail at all
+// (bundles) and can't be featured.
+const FEATURED_SLOTS = {
+  [COURSE_RESOURCE_TYPE.COURSES]: 4,
+  [COURSE_RESOURCE_TYPE.ARTEFACTS]: 2,
+};
+
+// A slot is only held by something actually live: a featured draft isn't on the
+// homepage, so it doesn't hold one open for itself. It claims a slot when it's
+// published — and if the rail filled up meanwhile, the CMS drops the flag rather
+// than failing the publish. Same rule as insights.
+function countFeaturedLive(resourceType, exceptId) {
+  const filter = { featured: true, status: CONTENT_STATUS.PUBLISHED, resourceType };
+  if (exceptId) filter._id = { $ne: exceptId };
+  return Course.countDocuments(filter);
+}
+
+// `errors.featured` is what lets the CMS recognise this rejection and clear the
+// featured flag itself rather than just printing the message.
+function noFreeSlotError(resourceType, max) {
+  return ApiError.badRequest(
+    `No space in featured ${resourceType} — all ${max} homepage slots are taken by published ${resourceType}.`,
+    { featured: 'no-free-slot' },
+  );
+}
+
+// Throws unless this resource type has a homepage slot free. `exceptId` skips the
+// resource being saved so an already-featured one doesn't count against itself.
+async function assertFeaturedSlotFree(resourceType, exceptId) {
+  const max = FEATURED_SLOTS[resourceType];
+  // No rail at all: featuring would be a flag with nowhere to show, so it's
+  // refused rather than silently stored. The CMS hides the control for these.
+  if (!max) {
+    throw ApiError.badRequest(
+      `${resourceType} aren't shown on the homepage, so they can't be featured.`,
+      { featured: 'no-homepage-rail' },
+    );
+  }
+  if ((await countFeaturedLive(resourceType, exceptId)) >= max) {
+    throw noFreeSlotError(resourceType, max);
+  }
+}
 
 // Derives a course-media `kind` from an uploaded file's mimetype. uploadMedia's
 // fileFilter already restricts to image/video/pdf, so the throw is defensive.
@@ -102,6 +148,9 @@ export const create = asyncHandler(async (req, res) => {
   if (data.status === CONTENT_STATUS.PUBLISHED && !data.publishedAt) {
     data.publishedAt = new Date();
   }
+  if (data.featured === true) {
+    await assertFeaturedSlotFree(data.resourceType || COURSE_RESOURCE_TYPE.COURSES);
+  }
 
   const course = await Course.create(data);
   recordAudit({
@@ -119,6 +168,12 @@ export const update = asyncHandler(async (req, res) => {
   if (!course) throw ApiError.notFound('Course not found');
 
   assertTaxonomy(req.body);
+
+  // Captured before the field loop below overwrites them — the slot check needs
+  // to know what changed, not just where things ended up.
+  const wasFeatured = course.featured;
+  const wasLive = course.status === CONTENT_STATUS.PUBLISHED;
+  const wasResourceType = course.resourceType;
 
   // Re-slug only when the title changes, keeping the course's own slug free.
   if (req.body.title && req.body.title !== course.title) {
@@ -157,6 +212,17 @@ export const update = asyncHandler(async (req, res) => {
   if (course.status === CONTENT_STATUS.PUBLISHED && !course.publishedAt) {
     course.publishedAt = new Date();
   }
+
+  // A slot is claimed when the flag goes on, when a featured draft goes live, or
+  // when a featured resource moves to a different type's rail. Re-saving one
+  // that's already featured and live claims nothing new. Nothing has been
+  // persisted yet, so throwing here leaves the stored course untouched.
+  const claimingSlot =
+    course.featured &&
+    (!wasFeatured ||
+      (course.status === CONTENT_STATUS.PUBLISHED && !wasLive) ||
+      course.resourceType !== wasResourceType);
+  if (claimingSlot) await assertFeaturedSlotFree(course.resourceType, course._id);
 
   await course.save();
   recordAudit({
