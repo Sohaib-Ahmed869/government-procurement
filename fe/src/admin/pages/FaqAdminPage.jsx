@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { faqsApi } from '../../api';
+import { useEffect, useMemo, useState } from 'react';
+import { faqsApi, categoriesApi } from '../../api';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
@@ -25,6 +25,17 @@ export default function FaqAdminPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
+  // The FAQ-kind entries from the Categories section — the only values the
+  // category dropdown offers, so the public page's filter pills can't be created
+  // by a typo.
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    categoriesApi
+      .list({ kind: 'faq' })
+      .then((items) => setCategories(items || []))
+      .catch(() => setCategories([]));
+  }, []);
 
   const load = () => {
     setStatus('loading');
@@ -97,6 +108,19 @@ export default function FaqAdminPage() {
     setConfirmId(null);
     load();
   };
+
+  // The category is stored as the category's name, so an FAQ written before the
+  // taxonomy existed can hold a value no longer on the list. That value stays
+  // selectable rather than being silently blanked when the FAQ is next edited.
+  const categoryOptions = useMemo(() => {
+    const names = categories.map((c) => c.name).filter(Boolean);
+    const orphan = form.category && !names.includes(form.category) ? form.category : null;
+    return [
+      { value: '', label: categories.length ? '— None —' : '— No FAQ categories yet —' },
+      ...names.map((n) => ({ value: n, label: n })),
+      ...(orphan ? [{ value: orphan, label: `${orphan} (not in Categories)` }] : []),
+    ];
+  }, [categories, form.category]);
 
   const columns = [
     { key: 'question', header: 'Question' },
@@ -193,7 +217,19 @@ export default function FaqAdminPage() {
             onChange={onChange}
             required
           />
-          <FormField label="Category" name="category" value={form.category} onChange={onChange} />
+          <FormField
+            label="Category"
+            name="category"
+            as="select"
+            value={form.category}
+            onChange={onChange}
+            options={categoryOptions}
+            hint={
+              categories.length
+                ? '(a category only appears on the site once a question uses it)'
+                : '(add FAQ categories under Categories first)'
+            }
+          />
           <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
             <FormField label="Order" name="order" type="number" value={form.order} onChange={onChange} />
             <FormField

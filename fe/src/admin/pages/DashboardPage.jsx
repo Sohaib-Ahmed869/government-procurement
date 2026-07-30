@@ -136,7 +136,7 @@ export default function DashboardPage() {
       cta: 'Manage',
     },
     {
-      label: 'Articles',
+      label: 'Insights',
       value: c.articles?.published ?? 0,
       to: '/admin/articles',
       icon: 'doc',

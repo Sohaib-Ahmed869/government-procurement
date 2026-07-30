@@ -743,6 +743,15 @@
   background-position: right 12px center;
   padding-right: 36px;
 }
+/* The explicit background/colour above would otherwise hide the browser's own
+   disabled styling, so a locked control has to say so itself. */
+.admin-input:disabled, .admin-textarea:disabled, .admin-select:disabled {
+  background-color: var(--admin-surface-2);
+  border-color: var(--admin-border);
+  color: var(--admin-muted);
+  cursor: not-allowed;
+}
+.admin-select:disabled:hover { border-color: var(--admin-border); }
 .admin-textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
 .admin-field__error {
   display: flex;
@@ -792,6 +801,8 @@
 }
 .admin-alert--error { background: #fbe0dd; color: #a8342a; border-color: #f2c9c3; }
 .admin-alert--success { background: #dff5e7; color: #1c6b3a; border-color: #bfe9cd; }
+/* Not a failure — something the CMS adjusted that the author should know about. */
+.admin-alert--warning { background: #fdf1d8; color: #8a5a12; border-color: #f4dfb4; }
 
 /* Sticky save bar for long forms (e.g. Settings). */
 .admin-savebar {
@@ -1392,6 +1403,15 @@
   color: var(--admin-green);
   background: var(--admin-mint);
   box-shadow: 0 2px 6px rgba(126, 226, 168, 0.5);
+}
+
+/* Keeps a table cell's label and its badge on one line — a cell is narrow
+   enough that the two would otherwise wrap onto separate lines. */
+.admin-cell-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 /* Source pill (YouTube / Upload), top-right of a video thumbnail */

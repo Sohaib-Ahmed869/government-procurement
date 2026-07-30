@@ -5,7 +5,7 @@ import ForumAnswerDetail from '../../features/forum/components/ForumAnswerDetail
 import './ForumPage.css';
 
 export default function ForumAnswerPage() {
-  // The answer id comes from the /forum/answers/:id route param, read inside
+  // The answer id comes from the /qna/answers/:id route param, read inside
   // ForumAnswerDetail via useParams.
   // Forum has no win/award toggle and is pinned to the green theme.
   return (

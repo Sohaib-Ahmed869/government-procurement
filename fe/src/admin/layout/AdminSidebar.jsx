@@ -55,7 +55,9 @@ const NAV = [
     // Reusable content: listed, filtered and searched across the site.
     group: 'Content library',
     items: [
-      { to: '/admin/articles', label: 'Articles', icon: 'doc' },
+      // Stored as "articles" throughout the API and routes; the public site calls
+      // them Insights, so that's the label the CMS shows.
+      { to: '/admin/articles', label: 'Insights', icon: 'doc' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
       { to: '/admin/categories', label: 'Categories', icon: 'tag' },

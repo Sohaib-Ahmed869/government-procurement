@@ -9,7 +9,7 @@ const STORAGE_KEY = 'gp.admin.sidebar.collapsed';
 // Page title shown in the header, keyed by the first path segment under /admin.
 const SECTION_TITLES = {
   '': 'Dashboard',
-  articles: 'Articles',
+  articles: 'Insights',
   courses: 'Courses',
   faqs: 'FAQ',
   pages: 'Pages',
@@ -32,7 +32,7 @@ const SECTION_TITLES = {
 };
 
 // Sections with New/Edit sub-routes get a refined title.
-const SINGULAR = { articles: 'article', courses: 'course' };
+const SINGULAR = { articles: 'insight', courses: 'course' };
 
 function deriveTitle(pathname) {
   const [section, sub] = pathname.replace(/^\/admin\/?/, '').split('/');

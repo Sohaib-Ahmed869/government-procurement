@@ -4,7 +4,6 @@ import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { pagesApi } from '../../../api';
-import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import './AboutContent.css';
 
 // Placeholder company copy — final wording comes from the CMS Pages editor later.
@@ -170,9 +169,6 @@ export default function AboutContent() {
           <h2 className="about-cta__heading">{CTA.heading}</h2>
           <p className="about-cta__body">{CTA.body}</p>
           <Link className="about-cta__button" to={CTA.href}>
-            <span className="about-cta__circle" aria-hidden="true">
-              <img src={arrowIcon} alt="" style={{ width: '30px', height: '30px' }} />
-            </span>
             {CTA.action}
           </Link>
         </div>

@@ -9,6 +9,28 @@ const CV_EMAIL = 'mkheir@govprocurement.com.au';
 const CV_HREF = `mailto:${CV_EMAIL}?subject=${encodeURIComponent('CV submission')}`;
 const LINKEDIN_HREF = 'https://www.linkedin.com/company/governmentprocurement/';
 
+// An opening's Apply link is optional in the CMS. Left blank, Apply emails the
+// careers inbox with the role in the subject line.
+function applyHref(role) {
+  const url = String(role.applyUrl || '').trim();
+  if (!url) {
+    const subject = role.title ? `Application: ${role.title}` : 'Application';
+    return `mailto:${CV_EMAIL}?subject=${encodeURIComponent(subject)}`;
+  }
+  // Schemes we pass through as-is, plus internal paths. A bare domain from the
+  // CMS ("www.seek.com.au/…") would otherwise resolve against /careers and 404,
+  // so it gets https://.
+  if (/^(https?:|mailto:|tel:)/i.test(url) || url.startsWith('/')) return url;
+  return `https://${url}`;
+}
+
+// External links open in a new tab so the visitor keeps the Careers page. A
+// mailto:/tel: must not — the handler opens elsewhere and _blank would strand an
+// empty tab behind it.
+function applyTargetProps(href) {
+  return /^https?:\/\//i.test(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+}
+
 const REASONS = [
   {
     title: 'Team culture',
@@ -108,16 +130,22 @@ export default function CareersContent() {
           <section className="careers__block">
             <h2 className="careers__heading">Roles we are hiring for</h2>
             <ul className="careers__roles">
-              {roles.map((role) => (
-                <li className="careers-role" key={role._id || role.title}>
-                  <h3 className="careers-role__title">{role.title}</h3>
-                  <p className="careers-role__body">{role.description}</p>
-                  {/* applyUrl is required in the CMS, so there's no fallback. */}
-                  <a className="careers-role__apply" href={role.applyUrl}>
-                    Apply
-                  </a>
-                </li>
-              ))}
+              {roles.map((role) => {
+                const href = applyHref(role);
+                return (
+                  <li className="careers-role" key={role._id || role.title}>
+                    <h3 className="careers-role__title">{role.title}</h3>
+                    <p className="careers-role__body">{role.description}</p>
+                    <a
+                      className="careers-role__apply"
+                      href={href}
+                      {...applyTargetProps(href)}
+                    >
+                      Apply
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

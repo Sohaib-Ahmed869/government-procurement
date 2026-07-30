@@ -179,7 +179,7 @@ export const sendAnswer = asyncHandler(async (req, res) => {
   // Only published questions have a page to link to.
   const link =
     question.status === QUESTION_STATUS.PUBLISHED && question.slug
-      ? `${origin}/forum/answers/${question.slug}`
+      ? `${origin}/qna/answers/${question.slug}`
       : '';
 
   const html = [

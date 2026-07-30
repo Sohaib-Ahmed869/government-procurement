@@ -160,6 +160,15 @@
 }
 .editor-publish__dot.is-live { background: #2fa564; }
 
+/* Explanatory note under a settings control — e.g. why the homepage-featured
+   select is locked. */
+.editor-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--admin-muted);
+}
+
 /* Hero image drop zone */
 .editor-hero {
   position: relative;

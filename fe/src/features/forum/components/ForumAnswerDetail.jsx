@@ -93,7 +93,7 @@ export default function ForumAnswerDetail() {
               We couldn&apos;t find the question you were looking for. It may have been moved or
               removed.
             </p>
-            <Link className="forum-answer-missing__link" to="/forum">
+            <Link className="forum-answer-missing__link" to="/qna">
               Back to the forum
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function ForumAnswerDetail() {
     <section ref={ref} className={`forum-article${inView ? ' is-in' : ''}`}>
       <div className="forum-article__inner">
         <div className="forum-article__main">
-          <Breadcrumbs items={[{ label: 'Forum', to: '/forum' }, { label: answer.title }]} />
+          <Breadcrumbs items={[{ label: 'QnA', to: '/qna' }, { label: answer.title }]} />
 
           <h1 className="forum-article__title">{answer.title}</h1>
           <div className="forum-article__meta">
@@ -150,7 +150,7 @@ export default function ForumAnswerDetail() {
                   <li key={item._id}>
                     <Link
                       className="forum-related__link"
-                      to={`/forum/answers/${item.slug || item._id}`}
+                      to={`/qna/answers/${item.slug || item._id}`}
                     >
                       <span className="forum-related__title">{item.title}</span>
                       <span className="forum-related__tag">

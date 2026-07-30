@@ -13,18 +13,24 @@ function escapeRegex(text) {
 // Runs a search over one model: try the $text index first, then fall back to a
 // case-insensitive regex $or across the given fields (covers models/queries the
 // text index can't serve). `baseFilter` scopes results (e.g. published only).
-async function searchModel(model, term, fields, baseFilter, limit, sort) {
+// `populate` is optional and applied to both paths, so callers that need a ref
+// resolved (articles need their category name) get it either way.
+async function searchModel(model, term, fields, baseFilter, limit, sort, populate) {
   const rx = new RegExp(escapeRegex(term), 'i');
   const regexFilter = { ...baseFilter, $or: fields.map((f) => ({ [f]: rx })) };
+  const run = (filter) => {
+    let q = model.find(filter).sort(sort).limit(limit);
+    if (populate) q = q.populate(populate);
+    return q.lean();
+  };
   try {
-    const textFilter = { ...baseFilter, $text: { $search: term } };
-    const items = await model.find(textFilter).sort(sort).limit(limit).lean();
+    const items = await run({ ...baseFilter, $text: { $search: term } });
     // If the text index yields nothing, retry with regex before giving up.
     if (items.length) return items;
-    return model.find(regexFilter).sort(sort).limit(limit).lean();
+    return run(regexFilter);
   } catch {
     // No usable text index (or bad query) — regex fallback.
-    return model.find(regexFilter).sort(sort).limit(limit).lean();
+    return run(regexFilter);
   }
 }
 
@@ -46,6 +52,7 @@ export const search = asyncHandler(async (req, res) => {
       { status: CONTENT_STATUS.PUBLISHED },
       limit,
       '-publishedAt',
+      { path: 'category', select: 'name' },
     ),
     searchModel(
       Question,
@@ -72,7 +79,9 @@ export const search = asyncHandler(async (req, res) => {
       slug: a.slug,
       title: a.title,
       excerpt: a.excerpt || '',
-      topic: a.topic || '',
+      // The category name is the article's topic label (the free-text `topic`
+      // field it used to read is legacy and no longer written).
+      topic: a.category?.name || '',
       date: a.publishedAt || a.createdAt,
     })),
     questions: questions.map((q) => ({

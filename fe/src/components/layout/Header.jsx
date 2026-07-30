@@ -1,25 +1,41 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/icons/GPLogo.png';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
 // Labels are sentence case: only the first word is capitalised.
+//
+// `match` lists the paths that should light this item up, for the pages that
+// answer to more than one route (see App.jsx). It defaults to `href` alone, and
+// child paths always count — /courses/:id keeps Courses lit.
 const NAV_LINKS = [
-  { label: 'Capabilities', href: '/advisory' },
+  { label: 'Capabilities', href: '/capabilities' },
   // Our Expertise is off the nav while Our Team is trialled in its place. The
   // page, route and components all still exist — restore this line to bring the
   // link back.
   // { label: 'Our expertise', href: '/our-expertise' },
   { label: 'Our team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
-  { label: 'Insights', href: '/resources' },
-  { label: 'QnA', href: '/forum' },
-  { label: 'Tender websites', href: '/aus-list' },
+  // /insights covers the listing and /insights/:slug for a single article.
+  { label: 'Insights', href: '/insights' },
+  { label: 'QnA', href: '/qna' },
+  // One page, three routes.
+  {
+    label: 'Tender websites',
+    href: '/aus-list',
+    match: ['/aus-list', '/featured-list', '/tender-portals'],
+  },
   { label: 'Careers', href: '/careers' },
   { label: 'Jurisdictional links', href: '/jurisdictional-links' },
 ];
+
+// Whether `pathname` is this nav item's page — an exact match, or anything
+// beneath it (a course, an article, a team member, a forum sub-page).
+function isCurrent(pathname, { href, match }) {
+  return (match ?? [href]).some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
 
 export default function Header({ showToggle = true, audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
@@ -28,6 +44,7 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
   // "Tender websites" is shown to both audiences (Win and Award).
   const navLinks = NAV_LINKS;
   const [menuOpen, setMenuOpen] = useState(false);
+  const { pathname } = useLocation();
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -89,13 +106,20 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
 
         <nav className="site-header__nav" aria-label="Primary">
           <ul className="site-header__nav-list">
-            {navLinks.map(({ label, href }) => (
-              <li key={href}>
-                <Link className="site-header__nav-link" to={href}>
-                  {label}
-                </Link>
-              </li>
-            ))}
+            {navLinks.map((item) => {
+              const current = isCurrent(pathname, item);
+              return (
+                <li key={item.href}>
+                  <Link
+                    className={`site-header__nav-link${current ? ' is-current' : ''}`}
+                    to={item.href}
+                    aria-current={current ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -144,13 +168,21 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
       >
         <nav className="site-header__mobile-nav" aria-label="Mobile">
           <ul className="site-header__mobile-list">
-            {navLinks.map(({ label, href }) => (
-              <li key={href}>
-                <Link className="site-header__mobile-link" to={href} onClick={closeMenu}>
-                  {label}
-                </Link>
-              </li>
-            ))}
+            {navLinks.map((item) => {
+              const current = isCurrent(pathname, item);
+              return (
+                <li key={item.href}>
+                  <Link
+                    className={`site-header__mobile-link${current ? ' is-current' : ''}`}
+                    to={item.href}
+                    onClick={closeMenu}
+                    aria-current={current ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
             <li>
               <a
                 className="site-header__mobile-link site-header__mobile-cta"

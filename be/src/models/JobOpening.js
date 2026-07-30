@@ -7,8 +7,9 @@ const jobOpeningSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
-    // Where Apply points. Required — the Careers page has no fallback.
-    applyUrl: { type: String, required: true, trim: true },
+    // Where Apply points. Optional: left blank, the Careers page falls back to a
+    // mailto: for the careers inbox (see CareersContent.jsx).
+    applyUrl: { type: String, default: '', trim: true },
     order: { type: Number, default: 0 },
     status: { type: String, enum: CONTENT_STATUSES, default: CONTENT_STATUS.PUBLISHED, index: true },
   },

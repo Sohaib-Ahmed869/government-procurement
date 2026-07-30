@@ -102,6 +102,26 @@
   color: #fff;
 }
 
+/* The page you're on: full white against the dimmed rest of the nav. */
+.site-header__nav-link.is-current {
+  color: #fff;
+}
+
+/* …and it keeps the underline permanently, so the current page is still marked
+   for anyone who can't tell 78% white from 100%. Spelled out in full rather than
+   reusing the hover ::after below, which only exists when motion is allowed. */
+.site-header__nav-link.is-current::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
 /* Animated underline that slides in from the left on hover/focus. */
 @media (prefers-reduced-motion: no-preference) {
   .site-header__nav-link::after {
@@ -370,6 +390,14 @@
   font-weight: 400;
   color: #fff;
   text-decoration: none;
+}
+
+/* Every label in the mobile menu is already white, so the current page is marked
+   with an underline instead of a colour change. */
+.site-header__mobile-link.is-current {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 6px;
 }
 
 .site-header__mobile-cta {

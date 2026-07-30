@@ -4,8 +4,12 @@ import './EditorShell.css';
 // a sticky action bar (back, title, save-state, Save / Publish) above a
 // document column (children) and a settings rail (`sidebar`).
 //
-// Props: eyebrow, title, onBack, status, dirty, saving, savedAt, error,
-//        onSave, onPublish, publishLabel, sidebar, children.
+// Props: eyebrow, title, onBack, status, dirty, saving, savedAt, error, notice,
+//        onSave, saveLabel, onPublish, publishLabel, sidebar, children.
+//
+// `error` is a failure; `notice` is for something the editor did on the author's
+// behalf that they need to know about (e.g. dropping a featured flag because the
+// homepage slots filled up while the draft sat unpublished).
 export default function EditorShell({
   eyebrow,
   title,
@@ -15,19 +19,24 @@ export default function EditorShell({
   saving,
   justSaved,
   error,
+  notice,
   onSave,
+  saveLabel = 'Save draft',
   onPublish,
   publishLabel = 'Publish',
   sidebar,
   children,
 }) {
+  // Label and colour are picked together — they used to be two independent
+  // expressions, which let a saved-but-still-dirty render show "Unsaved changes"
+  // in the green just-saved colour.
   const saveState = saving
-    ? 'Saving…'
+    ? { label: 'Saving…', tone: '' }
     : dirty
-      ? 'Unsaved changes'
+      ? { label: 'Unsaved changes', tone: ' is-dirty' }
       : justSaved
-        ? 'Saved'
-        : 'All changes saved';
+        ? { label: 'Changes saved', tone: ' is-saved' }
+        : { label: 'All changes saved', tone: '' };
 
   return (
     <div className="editor">
@@ -46,16 +55,14 @@ export default function EditorShell({
         </div>
 
         <div className="editor__bar-right">
-          <span className={`editor__savestate${dirty ? ' is-dirty' : ''}${justSaved ? ' is-saved' : ''}`}>
-            {saveState}
-          </span>
+          <span className={`editor__savestate${saveState.tone}`}>{saveState.label}</span>
           <button
             type="button"
             className="admin-btn admin-btn--sm"
             onClick={onSave}
-            disabled={saving || (!dirty && !justSaved && false)}
+            disabled={saving}
           >
-            Save draft
+            {saveLabel}
           </button>
           {onPublish && (
             <button
@@ -71,6 +78,11 @@ export default function EditorShell({
       </div>
 
       {error && <div className="admin-alert admin-alert--error editor__error">{error}</div>}
+      {notice && (
+        <div className="admin-alert admin-alert--warning editor__error" role="status">
+          {notice}
+        </div>
+      )}
 
       <div className="editor__grid">
         <div className="editor__main">{children}</div>

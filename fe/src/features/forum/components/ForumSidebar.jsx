@@ -32,7 +32,7 @@ export default function ForumSidebar({ featured = [] }) {
           <Link
             key={key}
             className={`forum-cat${activeCategory === key ? ' is-active' : ''}`}
-            to={`/forum/categories?category=${key}`}
+            to={`/qna/categories?category=${key}`}
           >
             {label}
           </Link>
