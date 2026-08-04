@@ -31,29 +31,6 @@ function applyTargetProps(href) {
   return /^https?:\/\//i.test(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 }
 
-const REASONS = [
-  {
-    title: 'Team culture',
-    body: 'A supportive, inclusive team where people are given real responsibility early. We work closely, share what we learn, and keep the door open.',
-  },
-  {
-    title: 'Diverse experience',
-    body: 'We work with agencies and suppliers across every level of government, so you gain exposure to a wide range of categories, sectors and procurement models.',
-  },
-  {
-    title: 'Meaningful work',
-    body: 'Public procurement decides how public money is spent. The work is scrutinised, it matters, and doing it well has a visible effect.',
-  },
-  {
-    title: 'Flexibility',
-    body: 'Full-time and part-time roles, flexible hours and hybrid working. We judge the work, not the hours you were at a desk.',
-  },
-  {
-    title: 'Training and development',
-    body: 'We run a training practice of our own, so professional development is part of how we work rather than an afterthought.',
-  },
-];
-
 
 export default function CareersContent() {
   const { audience } = useAudience();
@@ -84,25 +61,6 @@ export default function CareersContent() {
       data-audience={audience}
     >
       <div className="careers__inner">
-        {/* --- why join --- */}
-        <section className="careers__block">
-          <h2 className="careers__heading">Why join Government Procurement?</h2>
-          <p className="careers__lead">
-            We are a specialist procurement advisory and training practice
-            working with Australian government agencies and the suppliers who
-            bid to them. So why join the team?
-          </p>
-
-          <ul className="careers__reasons">
-            {REASONS.map((reason) => (
-              <li className="careers__reason" key={reason.title}>
-                <h3 className="careers__reason-title">{reason.title}</h3>
-                <p className="careers__reason-body">{reason.body}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
         {/* --- current opportunities --- */}
         <section className="careers__block">
           <h2 className="careers__heading">Current job opportunities</h2>

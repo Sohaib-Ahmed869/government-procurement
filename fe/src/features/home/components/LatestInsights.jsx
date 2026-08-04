@@ -12,6 +12,19 @@ function formatDate(iso) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+// Measured from the article's own body at 200 words per minute — the same
+// formula the Insights listing and the CMS editor use, so a card shows the same
+// figure wherever it appears. The stored value is the fallback for when the body
+// isn't in the response.
+function readingMinutes(article) {
+  const words = String(article.body || '')
+    .replace(/<[^>]*>/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  if (words) return Math.max(1, Math.round(words / 200));
+  return article.readingMinutes > 0 ? article.readingMinutes : 0;
+}
+
 // The three most recent published articles, pulled from the CMS. Renders nothing
 // until at least one article is available so an empty CMS leaves no gap.
 export default function LatestInsights() {
@@ -61,6 +74,7 @@ export default function LatestInsights() {
           {articles.map((article) => {
             const image = article.heroImage?.url;
             const date = formatDate(article.publishedAt);
+            const minutes = readingMinutes(article);
             return (
               <li key={article._id || article.slug} className="li-card">
                 <Link className="li-card__inner" to={`/insights/${article.slug}`}>
@@ -77,9 +91,11 @@ export default function LatestInsights() {
                         <span className="li-card__topic">{article.category.name}</span>
                       )}
                       {date && <span className="li-card__date">{date}</span>}
+                      {minutes > 0 && (
+                        <span className="li-card__read">{minutes} min read</span>
+                      )}
                     </div>
                     <h3 className="li-card__title">{article.title}</h3>
-                    {article.excerpt && <p className="li-card__excerpt">{article.excerpt}</p>}
                   </div>
                 </Link>
               </li>

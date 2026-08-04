@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import './SystemMessage.css';
 
@@ -9,20 +10,20 @@ import './SystemMessage.css';
 // actions: [{ label, to?, href?, variant? }]  variant: 'primary' | 'ghost'
 export default function SystemMessage({
   code,
-  tone = 'award',
   eyebrow,
   title,
   message,
   children,
   actions = [],
 }) {
+  const { audience } = useAudience();
   const { ref, inView } = useInView();
 
   return (
     <section
       ref={ref}
       className={`sysmsg${inView ? ' is-in' : ''}`}
-      data-tone={tone}
+      data-audience={audience}
     >
       <div className="sysmsg__inner">
         {code && <p className="sysmsg__code">{code}</p>}

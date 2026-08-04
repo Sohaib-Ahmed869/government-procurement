@@ -143,7 +143,8 @@
   color: #fff;
 }
 
-.li-card__date {
+.li-card__date,
+.li-card__read {
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -155,17 +156,6 @@
   color: #fff;
 }
 
-.li-card__excerpt {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.75);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 
 /* --- reveal on scroll-in --- */
 @media (prefers-reduced-motion: no-preference) {

@@ -5,7 +5,6 @@ import { Question } from '../../models/Question.js';
 import { Subscriber } from '../../models/Subscriber.js';
 import { Article } from '../../models/Article.js';
 import { Course } from '../../models/Course.js';
-import { ContactMessage } from '../../models/ContactMessage.js';
 import { Consultation } from '../../models/Consultation.js';
 
 // GET / — staff overview for the admin home. Everything is fetched in parallel
@@ -19,7 +18,6 @@ export const overview = asyncHandler(async (req, res) => {
     articlesDraft,
     coursesPublished,
     coursesDraft,
-    newContact,
     newConsultations,
     recentQuestions,
   ] = await Promise.all([
@@ -37,7 +35,6 @@ export const overview = asyncHandler(async (req, res) => {
     Article.countDocuments({ status: CONTENT_STATUS.DRAFT }),
     Course.countDocuments({ status: CONTENT_STATUS.PUBLISHED }),
     Course.countDocuments({ status: CONTENT_STATUS.DRAFT }),
-    ContactMessage.countDocuments({ status: 'new' }),
     Consultation.countDocuments({ status: 'new' }),
     Question.find({ status: QUESTION_STATUS.SUBMITTED })
       .sort('-createdAt')
@@ -54,7 +51,6 @@ export const overview = asyncHandler(async (req, res) => {
       articles: { published: articlesPublished, draft: articlesDraft },
       courses: { published: coursesPublished, draft: coursesDraft },
     },
-    newContact,
     newConsultations,
     recentQuestions,
   });

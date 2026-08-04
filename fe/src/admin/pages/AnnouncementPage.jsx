@@ -10,31 +10,8 @@ const EMPTY = {
   message: '',
   link: '',
   linkLabel: '',
-  tone: 'info',
   active: true,
-  startsAt: '',
-  endsAt: '',
 };
-
-// Convert an ISO timestamp to the `YYYY-MM-DDTHH:mm` value a
-// datetime-local input expects (in local time).
-function toLocalInput(value) {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(
-    d.getMinutes(),
-  )}`;
-}
-
-// Short human label for a date used in the table's window column.
-function shortDate(value) {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-}
 
 // Site announcements banner: list + inline create/edit.
 export default function AnnouncementPage() {
@@ -78,10 +55,7 @@ export default function AnnouncementPage() {
       message: r.message || '',
       link: r.link || '',
       linkLabel: r.linkLabel || '',
-      tone: r.tone || 'info',
       active: r.active !== false,
-      startsAt: toLocalInput(r.startsAt),
-      endsAt: toLocalInput(r.endsAt),
     });
     setDrawerOpen(true);
   };
@@ -99,10 +73,7 @@ export default function AnnouncementPage() {
       message: form.message,
       link: form.link,
       linkLabel: form.linkLabel,
-      tone: form.tone,
       active: String(form.active) === 'true',
-      startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : null,
-      endsAt: form.endsAt ? new Date(form.endsAt).toISOString() : null,
     };
     try {
       if (editingId) await announcementsApi.update(editingId, body);
@@ -131,16 +102,10 @@ export default function AnnouncementPage() {
         return msg.length > 60 ? `${msg.slice(0, 60)}…` : msg;
       },
     },
-    { key: 'tone', header: 'Tone' },
     {
       key: 'active',
       header: 'Active',
       render: (r) => <StatusBadge status={r.active !== false ? 'active' : 'inactive'} />,
-    },
-    {
-      key: 'window',
-      header: 'Window',
-      render: (r) => `${shortDate(r.startsAt)} → ${shortDate(r.endsAt)}`,
     },
     {
       key: 'actions',
@@ -215,18 +180,6 @@ export default function AnnouncementPage() {
             <FormField label="Link" name="link" value={form.link} onChange={onChange} />
             <FormField label="Link label" name="linkLabel" value={form.linkLabel} onChange={onChange} />
             <FormField
-              label="Tone"
-              name="tone"
-              as="select"
-              value={form.tone}
-              onChange={onChange}
-              options={[
-                { value: 'info', label: 'Info' },
-                { value: 'success', label: 'Success' },
-                { value: 'warning', label: 'Warning' },
-              ]}
-            />
-            <FormField
               label="Active"
               name="active"
               as="select"
@@ -237,8 +190,6 @@ export default function AnnouncementPage() {
                 { value: 'false', label: 'No' },
               ]}
             />
-            <FormField label="Starts at" name="startsAt" type="datetime-local" value={form.startsAt} onChange={onChange} />
-            <FormField label="Ends at" name="endsAt" type="datetime-local" value={form.endsAt} onChange={onChange} />
           </div>
         </form>
       </AdminDrawer>

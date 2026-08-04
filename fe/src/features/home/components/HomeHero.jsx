@@ -71,15 +71,7 @@ export default function HomeHero() {
 
         <div className="home-hero__actions">
           <a className="home-hero__btn" href="/book-a-consultation">
-            Book a Consultation
-          </a>
-          <a
-            className="home-hero__btn"
-            href="https://wa.me/61478669922"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Whatsapp +61 478 669 922
+            Request a Consultation
           </a>
         </div>
       </div>
@@ -89,7 +81,7 @@ export default function HomeHero() {
         className={`home-hero__advisory${advisory.inView ? ' is-in' : ''}`}
       >
         <div className="home-hero__advisory-text">
-          <p className="home-hero__eyebrow">Advisory services</p>
+          <p className="home-hero__eyebrow">Advisory Services</p>
           <h2 className="home-hero__subtitle">Your Trusted Partner</h2>
           <p className="home-hero__advisory-copy">
             We help private sector organisations and suppliers strengthen their bids and win
@@ -99,7 +91,7 @@ export default function HomeHero() {
           </p>
 
           <a className="home-hero__btn home-hero__btn--trailing" href="/book-a-consultation">
-            Book a Consultation
+            Request a Consultation
           </a>
         </div>
 

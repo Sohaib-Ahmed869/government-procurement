@@ -2,8 +2,8 @@ import { AUDIENCE } from '../../constants/audiences.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
 
 const OPTIONS = [
-  { value: AUDIENCE.AWARD, label: 'Award contracts' },
-  { value: AUDIENCE.WIN, label: 'Win contracts' },
+  { value: AUDIENCE.AWARD, label: 'Award Contracts' },
+  { value: AUDIENCE.WIN, label: 'Win Contracts' },
 ];
 
 export default function AudienceToggle() {

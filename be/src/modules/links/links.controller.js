@@ -4,15 +4,20 @@ import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Link } from '../../models/Link.js';
 
-// GET / — PUBLIC list of managed links. Anonymous callers only see active
-// links; staff (optionalAuth) can pass ?all=1 to include inactive ones.
-// Optional filters: ?group (tender|social) and ?region. Sorted by curator order.
+// GET / — PUBLIC list of managed links. Active-only by default; ?all=1 includes
+// the inactive ones. Optional filters: ?group and ?region. Sorted by curator
+// order.
+//
+// ?all=1 is open to anonymous callers, not just staff. The footer renders from a
+// fixed catalogue in the site and treats a saved link as an override of it, so it
+// has to see a link that has been switched off — otherwise "no row returned" is
+// indistinguishable from "never edited", and the built-in link reappears. These
+// are published URLs either way; `active` is a display preference rather than an
+// access control.
 export const list = asyncHandler(async (req, res) => {
   const filter = {};
-  const isStaff = Boolean(req.user);
 
-  // Non-staff always get active-only; staff opt into everything via ?all=1.
-  if (!(isStaff && req.query.all === '1')) {
+  if (req.query.all !== '1') {
     filter.active = true;
   }
 

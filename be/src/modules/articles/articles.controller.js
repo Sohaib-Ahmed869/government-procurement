@@ -62,6 +62,10 @@ export const list = asyncHandler(async (req, res) => {
     sort = req.query.sort || '-createdAt';
   }
 
+  // Available to both: a team member's profile page lists the insights they
+  // wrote, and that page is public.
+  if (req.query.author) filter.author = req.query.author;
+
   const { items, meta } = await paginate(Article, filter, {
     page,
     limit,

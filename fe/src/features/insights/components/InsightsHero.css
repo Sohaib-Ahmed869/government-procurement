@@ -15,8 +15,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .insights-hero__title,
-  .insights-hero__sub {
+  .insights-hero__title {
     opacity: 0;
     transform: translateY(28px);
     transition:
@@ -28,11 +27,6 @@
     opacity: 1;
     transform: none;
     transition-delay: 0.05s;
-  }
-  .insights-hero.is-in .insights-hero__sub {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.15s;
   }
 }
 
@@ -51,14 +45,6 @@
   letter-spacing: -0.015em;
 }
 
-.insights-hero__sub {
-  max-width: 470px;
-  margin: 20px 0 0;
-  font-size: 13px;
-  line-height: 1.65;
-  color: #fff;
-}
-
 /* Shared page-title breakpoint, matching the homepage and advisory heroes. */
 @media (max-width: 860px) {
   .insights-hero__title {
@@ -70,12 +56,5 @@
 @media (max-width: 760px) {
   .insights-hero__inner {
     padding: 40px 24px 24px;
-  }
-
-  /* Matches the footer blurb. */
-  .insights-hero__sub {
-    max-width: none;
-    font-size: 18px;
-    line-height: 1.5;
   }
 }

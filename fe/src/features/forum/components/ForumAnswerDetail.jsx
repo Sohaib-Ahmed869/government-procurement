@@ -3,14 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { questionsApi } from '../../../api';
+import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumArticle.css';
 import './ForumAnswerDetail.css';
-
-const CATEGORY_LABEL = {
-  win: 'Win Contracts',
-  award: 'Award Contracts',
-};
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -93,7 +89,7 @@ export default function ForumAnswerDetail() {
               We couldn&apos;t find the question you were looking for. It may have been moved or
               removed.
             </p>
-            <Link className="forum-answer-missing__link" to="/qna">
+            <Link className="forum-answer-missing__link" to="/q-and-a">
               Back to the forum
             </Link>
           </div>
@@ -109,7 +105,7 @@ export default function ForumAnswerDetail() {
     <section ref={ref} className={`forum-article${inView ? ' is-in' : ''}`}>
       <div className="forum-article__inner">
         <div className="forum-article__main">
-          <Breadcrumbs items={[{ label: 'QnA', to: '/qna' }, { label: answer.title }]} />
+          <Breadcrumbs items={[{ label: 'Q&A', to: '/q-and-a' }, { label: answer.title }]} />
 
           <h1 className="forum-article__title">{answer.title}</h1>
           <div className="forum-article__meta">
@@ -150,7 +146,7 @@ export default function ForumAnswerDetail() {
                   <li key={item._id}>
                     <Link
                       className="forum-related__link"
-                      to={`/qna/answers/${item.slug || item._id}`}
+                      to={`/q-and-a/answers/${item.slug || item._id}`}
                     >
                       <span className="forum-related__title">{item.title}</span>
                       <span className="forum-related__tag">

@@ -4,6 +4,8 @@ import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { parsePaging, paginate } from '../../utils/pagination.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Consultation } from '../../models/Consultation.js';
+import { Setting } from '../../models/Setting.js';
+import { sendMail } from '../../utils/mailer.js';
 
 const SERVICES = ['advisory', 'training', 'tender-support', 'other'];
 
@@ -20,7 +22,7 @@ export const submit = asyncHandler(async (req, res) => {
   if (!name || !email) throw ApiError.badRequest('Name and email are required');
   if (service && !SERVICES.includes(service)) throw ApiError.badRequest('Invalid service');
 
-  await Consultation.create({
+  const doc = await Consultation.create({
     name,
     email,
     organisation: organisation || '',
@@ -31,6 +33,40 @@ export const submit = asyncHandler(async (req, res) => {
     preferredTime: ['morning', 'afternoon'].includes(preferredTime) ? preferredTime : '',
     message: message || '',
   });
+
+  // Notify the site inbox if one is configured — never fail the booking if the
+  // settings lookup or mail delivery throws. This is the alert the contact form
+  // used to send; with that page retired, a consultation booking is the site's
+  // main enquiry, so the notification moved here with it.
+  try {
+    const settings = await Setting.getSingleton();
+    const to = settings?.contact?.email;
+    if (to) {
+      const detail = [
+        doc.organisation ? `<p><strong>Organisation:</strong> ${doc.organisation}</p>` : '',
+        doc.role ? `<p><strong>Role:</strong> ${doc.role}</p>` : '',
+        doc.service ? `<p><strong>Service:</strong> ${doc.service}</p>` : '',
+        doc.reason ? `<p><strong>Reason:</strong> ${doc.reason}</p>` : '',
+        doc.preferredDate
+          ? `<p><strong>Preferred date:</strong> ${new Date(doc.preferredDate).toDateString()}</p>`
+          : '',
+        doc.preferredTime ? `<p><strong>Preferred time:</strong> ${doc.preferredTime}</p>` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      await sendMail({
+        to,
+        subject: `New consultation request from ${doc.name}`,
+        html: `<p><strong>From:</strong> ${doc.name} &lt;${doc.email}&gt;</p>
+${detail}
+${doc.message ? `<p><strong>Message:</strong></p>\n<p>${doc.message}</p>` : ''}`,
+        text: `From: ${doc.name} <${doc.email}>\n\n${doc.message || '(no message)'}`,
+      });
+    }
+  } catch {
+    /* notification is best-effort */
+  }
 
   return created(res, {
     message: 'Thanks — we will be in touch shortly to arrange your consultation.',

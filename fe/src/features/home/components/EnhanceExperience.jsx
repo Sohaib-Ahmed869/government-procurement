@@ -29,15 +29,7 @@ export default function EnhanceExperience() {
 
             <div className="ee__actions">
               <a className="ee__btn" href="/book-a-consultation">
-                Book a Consultation
-              </a>
-              <a
-                className="ee__btn"
-                href="https://wa.me/61478669922"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Whatsapp +61 478 669 922
+                Request a Consultation
               </a>
             </div>
           </div>

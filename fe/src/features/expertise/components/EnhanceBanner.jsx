@@ -22,15 +22,7 @@ export default function EnhanceBanner() {
 
             <div className="eb__actions">
               <a className="eb__btn" href="/book-a-consultation">
-                Book a Consultation
-              </a>
-              <a
-                className="eb__btn"
-                href="https://wa.me/61478669922"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Whatsapp +61 478 669 922
+                Request a Consultation
               </a>
             </div>
           </div>

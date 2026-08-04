@@ -289,7 +289,7 @@ export default function ModerationQueuePage() {
   return (
     <div>
       <div className="admin-page__head">
-        <h2 className="admin-page__title">Moderation queue</h2>
+        <h2 className="admin-page__title">Q&amp;A</h2>
       </div>
 
       <div className="admin-toolbar">

@@ -80,7 +80,10 @@
 .site-header__nav-list {
   display: flex;
   align-items: center;
-  gap: 28px;
+  /* The bar is one non-wrapping row, so this gap is the slack that keeps the
+     CTA inside the inner's 40px right padding. Widening it past ~22px pushes
+     the actions past the padding edge and the CTA sits flush to the edge. */
+  gap: 22px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -459,8 +462,14 @@
 }
 
 /* --- narrow desktop / tablet: keep everything on one row by scaling the bar
-   down in stages rather than wrapping the nav onto a second line. --- */
-@media (max-width: 1300px) {
+   down in stages rather than wrapping the nav onto a second line.
+
+   The top end is 1440px, not 1300px, because index.css lays the page out at a
+   fixed 1440px and zooms it from 1441px up. So the band above is only ever
+   rendered at exactly 1440px of layout width, and every real viewport narrower
+   than that lands here. At 1300–1440 the roomy band above did not fit — the
+   CTA was pushed off the right edge — which is what this boundary fixes. --- */
+@media (max-width: 1440px) {
   .site-header__inner {
     gap: 20px;
     padding: 0 24px;
@@ -485,7 +494,10 @@
   }
 }
 
-@media (max-width: 1120px) {
+/* The band above stops fitting at ~1242px — below that the actions overflow the
+   inner's padding and the CTA drifts off the right edge — so this one takes
+   over at 1250px rather than 1120px. */
+@media (max-width: 1250px) {
   .site-header__inner {
     gap: 14px;
     padding: 0 18px;
@@ -542,11 +554,11 @@
    toggle icons freed ~50px, which is what lets the label survive to 861px. */
 @media (max-width: 990px) {
   .site-header__inner {
-    gap: 12px;
+    gap: 10px;
   }
 
   .site-header__nav-list {
-    gap: 10px;
+    gap: 9px;
   }
 
   .site-header__nav-link,

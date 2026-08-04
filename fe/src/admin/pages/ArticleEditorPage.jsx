@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { articlesApi, categoriesApi } from '../../api';
+import { articlesApi, categoriesApi, teamApi } from '../../api';
 import FormField from '../components/FormField.jsx';
 import RichTextEditor from '../components/RichTextEditor.jsx';
 import EditorShell from '../components/EditorShell.jsx';
 
 const BLANK = {
-  title: '', author: '', excerpt: '', body: '',
+  title: '', author: '', body: '',
   category: '', featured: 'false', status: 'draft',
   seoTitle: '', seoDescription: '',
 };
@@ -44,6 +44,9 @@ export default function ArticleEditorPage() {
 
   const [form, setForm] = useState(BLANK);
   const [categories, setCategories] = useState([]);
+  // Authors are the people on the Our Team page — picking one here is what puts
+  // the insight in that member's "Published work".
+  const [team, setTeam] = useState([]);
   const [heroFile, setHeroFile] = useState(null);
   const [heroUrl, setHeroUrl] = useState('');
   const [dragging, setDragging] = useState(false);
@@ -63,6 +66,7 @@ export default function ArticleEditorPage() {
 
   useEffect(() => {
     categoriesApi.list({ kind: 'article' }).then(setCategories).catch(() => setCategories([]));
+    teamApi.list({ limit: 100 }).then((list) => setTeam(list || [])).catch(() => setTeam([]));
   }, []);
 
   // Published + featured only: those are the ones actually on the homepage.
@@ -92,7 +96,7 @@ export default function ArticleEditorPage() {
       .then((a) => {
         const next = {
           title: a.title ?? '', author: a.author ?? '',
-          excerpt: a.excerpt ?? '', body: a.body ?? '',
+          body: a.body ?? '',
           category: a.category?._id ?? a.category ?? '',
           featured: a.featured ? 'true' : 'false', status: a.status ?? 'draft',
           seoTitle: a.seo?.title ?? '', seoDescription: a.seo?.description ?? '',
@@ -122,8 +126,11 @@ export default function ArticleEditorPage() {
   };
 
   const payload = (statusOverride) => ({
+    // `excerpt` is deliberately not sent. The field has been retired from this
+    // editor, and omitting it leaves whatever an older article already had
+    // stored intact rather than blanking it on the next save.
     title: form.title, author: form.author,
-    excerpt: form.excerpt, body: form.body,
+    body: form.body,
     category: form.category || undefined,
     featured: form.featured === 'true',
     status: statusOverride || form.status,
@@ -270,8 +277,23 @@ export default function ArticleEditorPage() {
               options={[{ value: '', label: '— None —' }, ...categories.map((c) => ({ value: c._id || c.id, label: c.name }))]}
               hint="(shown as the topic on the site)"
             />
-            <FormField label="Author" name="author" value={form.author} onChange={onChange} />
-            <FormField label="Excerpt" name="excerpt" as="textarea" rows={3} value={form.excerpt} onChange={onChange} />
+            <FormField
+              label="Author"
+              name="author"
+              as="select"
+              value={form.author}
+              onChange={onChange}
+              options={[
+                { value: '', label: '— None —' },
+                // An author saved before this became a dropdown — or a member
+                // since removed — would otherwise vanish from the field on open.
+                ...(form.author && !team.some((m) => m.name === form.author)
+                  ? [{ value: form.author, label: `${form.author} (not on the team page)` }]
+                  : []),
+                ...team.map((m) => ({ value: m.name, label: m.name })),
+              ]}
+              hint="(their profile lists this insight under Published work)"
+            />
           </div>
 
           <div className="editor-panel">
@@ -305,7 +327,7 @@ export default function ArticleEditorPage() {
               <div className="editor-seo-preview__title">{form.seoTitle || form.title || 'Insight title'}</div>
               <div className="editor-seo-preview__url">/insights/{slug || 'insight-slug'}</div>
               <div className="editor-seo-preview__desc">
-                {form.seoDescription || form.excerpt || 'Add a meta description to control the search snippet.'}
+                {form.seoDescription || 'Add a meta description to control the search snippet.'}
               </div>
             </div>
           </div>

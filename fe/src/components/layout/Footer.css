@@ -36,7 +36,13 @@
      letter onto a line of its own, so the track takes 230px and the column gap
      gives the difference back rather than the link columns paying for it. */
   grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) 230px;
-  align-items: start;
+  /* Baseline, not start: top-aligning the three tracks left the brand wordmark
+     sitting a few pixels below the column headings across the row, because it is
+     centred against the 23px logo beside it. Aligning on first baseline puts the
+     wordmark and every heading on one line. See .site-footer__wordmark — the
+     brand link needs align-self there for its baseline to come from the text
+     rather than the logo. */
+  align-items: baseline;
   gap: 48px 20px;
   max-width: 1100px;
   margin: 0 auto;
@@ -64,19 +70,15 @@
 }
 
 .site-footer__wordmark {
+  /* The brand link is a flex row, and a flex container takes its baseline from
+     the first item that opts into baseline alignment — with none, it falls back
+     to the logo's bottom edge. Opting the wordmark in makes the text's baseline
+     the one the inner grid aligns the column headings to. */
+  align-self: baseline;
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 0.01em;
-}
-
-.site-footer__blurb {
-  margin: 20px 0 0;
-  /* Follows the column rather than holding it open at 380px. */
-  max-width: none;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: #fff;
 }
 
 /* --- social links --- */
@@ -88,37 +90,49 @@
   color: #fff;
 }
 
-/* Three per row, two rows: six across would need ~324px and the brand column is
-   only ~240px wide once the contact block takes its place on the row. */
+/* All six on one row. The brand column is only ~200–220px wide once the contact
+   block takes its place on the row, so the cells divide whatever the column
+   gives them and the box caps at 44px on the wider, stacked layouts. */
 .site-footer__social {
   display: grid;
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
-  gap: 12px;
-  /* The heading above carries the gap from the blurb. */
+  gap: 6px;
+  max-width: 300px;
+  /* The heading above carries the gap from the wordmark. */
   margin: 14px 0 0;
   padding: 0;
   list-style: none;
 }
 
-/* Bare glyphs — no disc behind them. The box stays 44px so the row keeps its
-   spacing and the tap target stays comfortable. */
+.site-footer__social li {
+  display: flex;
+  justify-content: center;
+}
+
+/* Bare glyphs — no disc behind them. The box tracks its cell so the row keeps
+   its spacing and the tap target stays as large as the column allows. */
 .site-footer__social-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 100%;
+  max-width: 44px;
+  height: auto;
+  aspect-ratio: 1;
   color: #fff;
   border: 0;
   background: transparent;
   transition: opacity 0.15s ease;
 }
 
-/* react-icons default to 1em; pin the glyph size instead of inheriting it. */
+/* react-icons default to 1em; size the glyph off its box instead of inheriting,
+   capped so it never outgrows the 22px it sits at on the roomy layouts. */
 .site-footer__social-icon {
-  width: 22px;
-  height: 22px;
+  width: 62%;
+  height: 62%;
+  max-width: 22px;
+  max-height: 22px;
 }
 
 .site-footer__social-link:hover,
@@ -140,8 +154,18 @@
 
 /* --- link columns --- */
 .site-footer__links {
+  /* The columns are content-width, so a narrow gap left the track's slack
+     pooling after the last one as a wide void before the contact block. A
+     roomier gap spends most of that slack between the columns instead. */
+  --links-gap: 64px;
+
   display: flex;
-  gap: 24px;
+  gap: var(--links-gap);
+  /* Widens the brand-to-Award-Contracts gap past the grid's column gap, which
+     applies equally to both track boundaries and so can't be raised on its own.
+     The track's right edge doesn't move, so the void before the contact block
+     narrows by the same amount. */
+  margin-left: 28px;
   /* Lets the track shrink below the columns' natural width, so long labels wrap
      inside their column instead of widening the row. */
   min-width: 0;
@@ -151,8 +175,16 @@
   min-width: 0;
 }
 
+/* Policies sits closer to Win Contracts than the other columns do — as a share
+   of the gap, so it holds through the fluid band below. */
+.site-footer__col:last-child {
+  margin-left: calc(var(--links-gap) * -0.3);
+}
+
+/* The rule below carries the space down to the list, so the heading only needs
+   to clear the rule itself. */
 .site-footer__heading {
-  margin: 0 0 20px;
+  margin: 0 0 12px;
   font-size: 14px;
   font-weight: 600;
   color: #fff;
@@ -180,42 +212,94 @@
 }
 
 /* --- head office contact block (right of the link columns) --- */
-/* Messaging channels under "Call us" — one run of labels, pipe-separated, that
-   wraps inside the narrow brand column. */
+/* Messaging channels under "Contact" — brand marks on a single row, same
+   treatment as the social row above so the two read as one block. Five cells
+   rather than six, capped narrower to match that row's rhythm. */
 .site-footer__channels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: 6px;
+  max-width: 250px;
+  /* The heading above carries the gap from the social row. */
   margin: 14px 0 0;
   padding: 0;
   list-style: none;
-  font-size: 13.5px;
-  line-height: 1.5;
   color: #fff;
 }
 
 .site-footer__channels li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Same box treatment as .site-footer__social-link, so the two rows line up. */
+.site-footer__channel-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-}
-
-/* Separator sits before every item but the first, so it never trails a line. */
-.site-footer__channels li + li::before {
-  content: '|';
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.site-footer__channel-link {
+  justify-content: center;
+  width: 100%;
+  max-width: 44px;
+  height: auto;
+  aspect-ratio: 1;
   color: #fff;
   text-decoration: none;
-  transition: text-decoration-color 0.15s ease;
+  transition: opacity 0.15s ease;
+}
+
+.site-footer__channel-icon {
+  width: 62%;
+  height: 62%;
+  max-width: 22px;
+  max-height: 22px;
+}
+
+/* WeChat's mark is two side-by-side bubbles in a wider-than-tall viewBox, so at
+   a matched box size it renders shorter than the round marks beside it and
+   reads as smaller. Drawn a step larger to sit optically level with them. */
+.site-footer__channel-icon--wechat {
+  width: 80%;
+  height: 80%;
+  max-width: 28px;
+  max-height: 28px;
 }
 
 .site-footer__channel-link:hover,
 .site-footer__channel-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  opacity: 0.75;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .site-footer__channel-link {
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+
+  .site-footer__channel-link:hover {
+    transform: translateY(-3px);
+  }
+}
+
+/* The number on its own line under the channels — plain text, not a pill, the
+   same treatment the contact page gives it. */
+.site-footer__phone {
+  margin: 12px 0 0;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.site-footer__phone-link {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.site-footer__phone-link:hover,
+.site-footer__phone-link:focus-visible {
+  opacity: 0.75;
 }
 
 /* The WeChat entry opens a dialog rather than navigating, so it's a <button>.
@@ -229,7 +313,7 @@
   cursor: pointer;
 }
 
-/* --- WeChat QR dialog (opened from the "Call us" row) --- */
+/* --- WeChat QR dialog (opened from the "Contact" row) --- */
 .wechat-qr__backdrop {
   position: fixed;
   inset: 0;
@@ -320,14 +404,18 @@
   text-underline-offset: 3px;
 }
 
-.site-footer__contact-sub {
-  margin: 8px 0 0;
-  font-size: 13.5px;
+/* Introduces each detail in the contact block — "Head Office:", "Contact
+   Number:", "Email Address:" — with the value on the line beneath. */
+.site-footer__contact-label {
+  font-weight: 600;
   color: #fff;
 }
 
-.site-footer__contact-rule {
-  margin: 14px 0 0;
+/* Divider under each column heading — the solid white-at-35% rule the contact
+   block used to carry on its own. Sits full-width in whichever column it lands
+   in. */
+.site-footer__rule {
+  margin: 14px 0 20px;
   border: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.35);
 }
@@ -397,8 +485,15 @@
     gap: 48px 16px;
   }
 
+  /* The columns are content-width and the track narrows fast through this band,
+     so the gap has to give the space back as the viewport shrinks — a flat 48px
+     still fits at 1000px but squeezes "Jurisdictional links" onto two lines by
+     901px, where the band ends. Fluid from 48px down to the 20px this used to
+     hold, reaching it just as the layout stacks. */
   .site-footer__links {
-    gap: 20px;
+    --links-gap: clamp(20px, calc((100vw - 900px) / 4 + 20px), 48px);
+
+    margin-left: 16px;
   }
 }
 
@@ -409,18 +504,21 @@
     gap: 40px;
   }
 
+  /* Stacked: the columns wrap into their own block, so the nudges that shaped
+     the single row above no longer apply. */
   .site-footer__links {
     flex-wrap: wrap;
     gap: 40px 56px;
+    margin-left: 0;
+  }
+
+  .site-footer__col:last-child {
+    margin-left: 0;
   }
 
   .site-footer__brand-col,
   .site-footer__contact {
     max-width: 420px;
-  }
-
-  .site-footer__blurb {
-    max-width: 380px;
   }
 }
 
@@ -463,27 +561,20 @@
     white-space: nowrap;
   }
 
-  .site-footer__blurb {
-    max-width: none;
-    margin-top: 28px;
-    font-size: 18px;
-    line-height: 1.5;
-    color: #fff;
+  /* Stacked footer — the brand column has the full width back, so the two rows
+     get their full 50px box. Each row is capped at the width its own boxes and
+     gaps need (6×50+5×10, 5×50+4×10) and falls back to the available width on
+     narrower phones, so the cells shrink together rather than overflowing. */
+  .site-footer__social {
+    max-width: min(350px, 100%);
+    margin-top: 16px;
+    gap: 10px;
   }
 
-  /* Six pills and five gaps have to fit inside 48px of side padding, so the
-     pill is sized off the viewport rather than fixed — 50px on wide phones,
-     shrinking from ~390px down. The glyph tracks the pill so the padding ring
-     around it stays proportional. */
-  .site-footer__social {
-    --social-gap: 10px;
-    --social-size: min(50px, calc((100vw - 48px - 5 * var(--social-gap)) / 6));
-
-    /* Stacked footer — the brand column has the full width back, so all six fit
-       on one row again. */
-    grid-template-columns: repeat(6, max-content);
+  .site-footer__channels {
+    max-width: min(290px, 100%);
     margin-top: 16px;
-    gap: var(--social-gap);
+    gap: 10px;
   }
 
   .site-footer__social-heading {
@@ -491,14 +582,29 @@
     font-size: 18px;
   }
 
-  .site-footer__social-link {
-    width: var(--social-size);
-    height: var(--social-size);
+  .site-footer__social-link,
+  .site-footer__channel-link {
+    max-width: 50px;
   }
 
-  .site-footer__social-link svg {
+  /* The glyph tracks the box so the padding ring around it stays proportional. */
+  .site-footer__social-icon,
+  .site-footer__channel-icon {
     width: 48%;
     height: 48%;
+    max-width: none;
+    max-height: none;
+  }
+
+  .site-footer__channel-icon--wechat {
+    width: 62%;
+    height: 62%;
+  }
+
+  /* Tracks the headings, which step up on the stacked layout. */
+  .site-footer__phone {
+    margin-top: 14px;
+    font-size: 20px;
   }
 
   /* The widest row is "Insights / Capabilities / Our team / Courses": ~17.5em of

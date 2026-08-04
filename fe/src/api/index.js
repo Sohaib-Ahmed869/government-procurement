@@ -21,7 +21,6 @@ export const coursesApi = {
   removeMedia: (id, mediaId) => api.del(`/courses/${id}/media/${mediaId}`),
 };
 
-export const faqsApi = createResource('faqs');
 export const careersApi = {
   listOpenings: (params) => api.get('/careers/openings', params),
   createOpening: (body) => api.post('/careers/openings', body),
@@ -31,9 +30,23 @@ export const careersApi = {
 
 export const rulesApi = createResource('rules');
 
+// Tender portals listed on the Tender Websites page — name, subtitle, the three
+// destination links and a logo.
+export const tenderSitesApi = {
+  ...createResource('tender-sites'),
+  uploadLogo: (id, file) => api.upload(`/tender-sites/${id}/logo`, file),
+};
+
 export const homeHeroApi = {
   get: () => api.get('/home-hero'),
   save: (audience, body) => api.patch(`/home-hero/${audience}`, body),
+};
+
+// Editable hero copy for the pages that came after the homepage, keyed by page
+// name (see HERO_PAGES in the backend's PageHero model).
+export const pageHeroApi = {
+  get: (page) => api.get(`/page-heroes/${page}`),
+  save: (page, audience, body) => api.patch(`/page-heroes/${page}/${audience}`, body),
 };
 
 export const teamApi = {
@@ -59,11 +72,6 @@ export const questionsApi = {
 };
 
 // ---- Public submissions ----------------------------------------------------
-export const contactApi = {
-  ...createResource('contact'),
-  submit: (body) => api.post('/contact', body, { auth: false }),
-};
-
 export const consultationsApi = {
   ...createResource('consultations'),
   submit: (body) => api.post('/consultations', body, { auth: false }),

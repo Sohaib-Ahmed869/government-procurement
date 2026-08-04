@@ -1,5 +1,8 @@
 .home-hero {
   --home-bg: var(--gp-ink-900);
+  /* Raised panel behind the advisory block — the same surface the "Enhance your
+     Experience" card sits on, so the two read as one family down the page. */
+  --home-surface: var(--gp-ink-800);
 
   position: relative;
   overflow: hidden;
@@ -10,10 +13,12 @@
 
 .home-hero[data-audience='award'] {
   --home-bg: var(--gp-green-900);
+  --home-surface: var(--gp-green-800);
 }
 
 .home-hero[data-audience='win'] {
   --home-bg: var(--gp-ink-900);
+  --home-surface: var(--gp-ink-800);
 }
 
 /* --- reveal animations --- */
@@ -197,6 +202,10 @@
 }
 
 /* --- advisory --- */
+/* Sits on the segment's raised surface, matching the "Enhance your Experience"
+   card below it. Sized the way that card is — the 1100px container less its
+   40px gutters — so the two panels share one left and right edge down the page,
+   with the gutters kept as the panel's own outer margin at narrow widths. */
 .home-hero__advisory {
   position: relative;
   z-index: 1;
@@ -204,10 +213,11 @@
   grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 64px;
-  /* Align the left edge with the header/footer content (max-width 1440, 40px sides). */
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 60px 40px 96px;
+  width: min(1020px, calc(100% - 80px));
+  margin: 24px auto 72px;
+  padding: 48px;
+  background: var(--home-surface);
+  border-radius: 14px;
 }
 
 .home-hero__advisory .home-hero__eyebrow {
@@ -308,8 +318,8 @@
   .home-hero__actions .home-hero__btn {
     position: relative;
     flex: none;
-    /* Pin both buttons to the same width; wide enough that the longer
-       "Whatsapp +61 478 669 922" label clears the pinned icon on the left. */
+    /* Pinned width rather than shrink-to-fit, so the stacked button keeps a
+       consistent size and its label clears the icon pinned on the left. */
     width: 274px;
     min-width: 274px;
     max-width: 274px;
@@ -330,11 +340,16 @@
     transform: translateY(-50%);
   }
 
+  /* Full-bleed from here down, matching the "Enhance your Experience" card,
+     which drops its gutters and corners at the same width. */
   .home-hero__advisory {
-    padding: 40px 24px 64px;
+    width: 100%;
+    margin: 16px 0 48px;
+    padding: 40px 24px 48px;
+    border-radius: 0;
   }
 
-  /* Advisory "Book a Consultation" button: identical to the intro buttons —
+  /* Advisory "Request a consultation" button: identical to the intro button —
      fixed size, label centred, icon pinned left (even though it's the trailing
      variant, so its icon is positioned to the left too). */
   .home-hero__advisory .home-hero__btn {

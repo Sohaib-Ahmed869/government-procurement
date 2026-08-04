@@ -31,51 +31,23 @@
   border-radius: 18px;
 }
 
-.jl__states {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Glass pill; the selected one inverts to solid white. */
-.jl__pill {
-  padding: 9px 18px;
-  font: inherit;
-  font-size: 13.5px;
-  color: #fff;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.06);
-  border: 0;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
-}
-
-.jl__pill:hover {
-  background: rgba(255, 255, 255, 0.14);
-}
-
-.jl__pill.is-active {
-  color: var(--jl-bg);
-  font-weight: 600;
-  background: #fff;
-  box-shadow: none;
-}
-
 .jl__row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 14px;
-  margin-top: 16px;
 }
 
-/* --- category select --- */
+/* --- jurisdiction / category selects --- */
 .jl-select {
   position: relative;
   flex: 0 0 230px;
+}
+
+/* The jurisdiction names are full titles now — "Australian Federal Government"
+   is the longest — so that select needs more room than the categories. */
+.jl-select--wide {
+  flex-basis: 290px;
 }
 
 .jl-select__button {
@@ -223,15 +195,21 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
+/* The jurisdiction pill holds a full title now, so the head wraps and the
+   category drops beneath it rather than the two fighting over one line. */
 .jl-card__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px 12px;
   margin-bottom: 18px;
 }
 
+/* Kept on one line — a title broken across three lines inside a pill reads as a
+   layout fault rather than a badge. */
 .jl-card__state {
+  white-space: nowrap;
   padding: 5px 14px;
   font-size: 12.5px;
   font-weight: 600;

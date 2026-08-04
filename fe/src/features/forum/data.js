@@ -1,13 +1,16 @@
 // Forum content keyed by audience category. "win" = supplier-side questions,
-// "award" = agency/buyer-side questions.
+// "award" = agency/buyer-side questions, "general" = neither segment in
+// particular. The three match the options the submission form offers.
 export const CATEGORY_LABEL = {
   win: 'Win Contracts',
   award: 'Award Contracts',
+  general: 'General',
 };
 
 export const CATEGORIES = [
   { key: 'award', label: 'Award Contracts' },
   { key: 'win', label: 'Win Contracts' },
+  { key: 'general', label: 'General' },
 ];
 
 // Each item drives both the answer card (title, date, body excerpt) and its
