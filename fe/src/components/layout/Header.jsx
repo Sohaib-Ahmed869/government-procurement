@@ -5,7 +5,7 @@ import { useAudience } from '../../context/AudienceContext.jsx';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
-// Labels are sentence case: only the first word is capitalised.
+// Labels are title case: every word is capitalised.
 //
 // `match` lists the paths that should light this item up, for the pages that
 // answer to more than one route (see App.jsx). It defaults to `href` alone, and
@@ -15,20 +15,20 @@ const NAV_LINKS = [
   // Our Expertise is off the nav while Our Team is trialled in its place. The
   // page, route and components all still exist — restore this line to bring the
   // link back.
-  // { label: 'Our expertise', href: '/our-expertise' },
-  { label: 'Our team', href: '/our-team' },
+  // { label: 'Our Expertise', href: '/our-expertise' },
+  { label: 'Our Team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
   // /insights covers the listing and /insights/:slug for a single article.
   { label: 'Insights', href: '/insights' },
-  { label: 'QnA', href: '/qna' },
+  { label: 'Q&A', href: '/q-and-a' },
   // One page, three routes.
   {
-    label: 'Tender websites',
+    label: 'Tender Websites',
     href: '/aus-list',
     match: ['/aus-list', '/featured-list', '/tender-portals'],
   },
   { label: 'Careers', href: '/careers' },
-  { label: 'Jurisdictional links', href: '/jurisdictional-links' },
+  { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
 ];
 
 // Whether `pathname` is this nav item's page — an exact match, or anything
@@ -129,9 +129,9 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
           <a
             className="site-header__cta"
             href="/book-a-consultation"
-            aria-label="Book a consultation"
+            aria-label="Request a Consultation"
           >
-            <span className="site-header__cta-label">Book a consultation</span>
+            <span className="site-header__cta-label">Request a Consultation</span>
           </a>
         </div>
 
@@ -189,7 +189,7 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
                 href="/book-a-consultation"
                 onClick={closeMenu}
               >
-                Book a consultation
+                Request a Consultation
               </a>
             </li>
           </ul>

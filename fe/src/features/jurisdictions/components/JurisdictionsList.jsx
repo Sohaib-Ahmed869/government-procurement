@@ -3,17 +3,26 @@ import { FaMagnifyingGlass, FaChevronDown, FaArrowUpRightFromSquare } from 'reac
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { rulesApi } from '../../../api';
-import { STATES, CATEGORIES, CATEGORY_BY_VALUE } from '../data.js';
+import {
+  JURISDICTIONS,
+  JURISDICTION_BY_VALUE,
+  CATEGORIES,
+  CATEGORY_BY_VALUE,
+} from '../data.js';
 import './JurisdictionsList.css';
 
 const ALL_CATEGORIES = { value: 'all', label: 'All categories' };
+const ALL_JURISDICTIONS = { value: 'all', label: 'All jurisdictions' };
 
 // Custom listbox rather than a native <select>: the OS draws the native popup,
 // so it can't take the rounded, themed treatment used across the site.
-function CategorySelect({ value, onChange }) {
+//
+// Shared by both filters. The jurisdictions are full names rather than the
+// abbreviations they used to be, which is far too much text for a row of pills
+// — so they live in a dropdown of their own beside the categories.
+function FilterSelect({ id, label, value, options, onChange, wide = false }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
-  const options = [ALL_CATEGORIES, ...CATEGORIES];
 
   useEffect(() => {
     if (!open) return undefined;
@@ -31,16 +40,17 @@ function CategorySelect({ value, onChange }) {
     };
   }, [open]);
 
-  const current = options.find((o) => o.value === value) ?? ALL_CATEGORIES;
+  const current = options.find((o) => o.value === value) ?? options[0];
 
   return (
-    <div className="jl-select" ref={ref}>
+    <div className={`jl-select${wide ? ' jl-select--wide' : ''}`} ref={ref}>
       <button
         type="button"
-        id="jl-category"
+        id={id}
         className="jl-select__button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-label={label}
         onClick={() => setOpen((o) => !o)}
       >
         {current.label}
@@ -48,7 +58,7 @@ function CategorySelect({ value, onChange }) {
       </button>
 
       {open && (
-        <ul className="jl-select__menu" role="listbox" aria-labelledby="jl-category">
+        <ul className="jl-select__menu" role="listbox" aria-labelledby={id}>
           {options.map((o) => (
             <li key={o.value} role="option" aria-selected={o.value === value}>
               <button
@@ -100,7 +110,7 @@ export default function JurisdictionsList() {
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return rules.filter((rule) => {
+    const matched = rules.filter((rule) => {
       if (state !== 'all' && rule.state !== state) return false;
       if (category !== 'all' && rule.category !== category) return false;
       if (!needle) return true;
@@ -109,6 +119,21 @@ export default function JurisdictionsList() {
         (rule.body || '').toLowerCase().includes(needle)
       );
     });
+
+    // The API sorts alphabetically by jurisdiction code, so the cards are
+    // re-ordered here: first by the sequence the jurisdiction filter lists them
+    // in, then alphabetically by category within each — CATEGORIES is held in
+    // alphabetical order, so its index gives that for free. Sorting a copy keeps
+    // the API's own order as the final tie-break.
+    const rank = (list, value) => {
+      const i = list.findIndex((item) => item.value === value);
+      return i === -1 ? list.length : i;
+    };
+    return [...matched].sort(
+      (a, b) =>
+        rank(JURISDICTIONS, a.state) - rank(JURISDICTIONS, b.state) ||
+        rank(CATEGORIES, a.category) - rank(CATEGORIES, b.category),
+    );
   }, [rules, state, category, query]);
 
   const filtered = state !== 'all' || category !== 'all' || query.trim();
@@ -128,28 +153,23 @@ export default function JurisdictionsList() {
       <div className="jl__inner">
         {/* --- filters --- */}
         <div className="jl__filters">
-          <div className="jl__states" role="group" aria-label="Filter by state">
-            <button
-              type="button"
-              className={`jl__pill${state === 'all' ? ' is-active' : ''}`}
-              onClick={() => setState('all')}
-            >
-              All states
-            </button>
-            {STATES.map((s) => (
-              <button
-                key={s}
-                type="button"
-                className={`jl__pill${state === s ? ' is-active' : ''}`}
-                onClick={() => setState(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-
           <div className="jl__row">
-            <CategorySelect value={category} onChange={setCategory} />
+            <FilterSelect
+              id="jl-jurisdiction"
+              label="Filter by jurisdiction"
+              value={state}
+              options={[ALL_JURISDICTIONS, ...JURISDICTIONS]}
+              onChange={setState}
+              wide
+            />
+
+            <FilterSelect
+              id="jl-category"
+              label="Filter by category"
+              value={category}
+              options={[ALL_CATEGORIES, ...CATEGORIES]}
+              onChange={setCategory}
+            />
 
             <div className="jl__search">
               <FaMagnifyingGlass className="jl__search-icon" aria-hidden="true" />
@@ -194,7 +214,9 @@ export default function JurisdictionsList() {
               return (
                 <li className="jl-card" key={rule._id || rule.id} style={{ '--i': i }}>
                   <div className="jl-card__head">
-                    <span className="jl-card__state">{rule.state}</span>
+                    <span className="jl-card__state">
+                      {JURISDICTION_BY_VALUE[rule.state]?.label || rule.state}
+                    </span>
                     <span className="jl-card__category">
                       {Icon && <Icon aria-hidden="true" />}
                       {meta?.label}

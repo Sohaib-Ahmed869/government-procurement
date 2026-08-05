@@ -284,20 +284,24 @@
   color: #fff;
 }
 
+/* A grid of cards, holding the gap down from the subtitle that the removed
+   "Australian Tenders" label used to carry. The columns size themselves, so the row count follows the
+   number of portals rather than a fixed breakpoint. */
 .tp__list {
   list-style: none;
-  margin: 0;
+  margin: 40px 0 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .tp__row {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px 24px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  padding: 24px;
   border-radius: 24px;
   /* Glass edge — matches the boxes below Expertise on the Our Expertise page. */
   background: rgba(241, 238, 234, 0.05);
@@ -308,44 +312,63 @@
     inset -1px -1px 1px rgba(255, 255, 255, 0.12);
 }
 
+/* The portal's own mark, on its own tile so logos of different proportions all
+   occupy the same footprint across the grid. align-self keeps it at the card's
+   top left rather than stretching to the full column. */
+.tp__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  align-self: flex-start;
+  width: 64px;
+  height: 64px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+.tp__logo img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .tp__name {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 17px;
+  gap: 4px;
+  font-size: 19px;
   font-weight: 600;
+  line-height: 1.25;
+}
+
+/* One button per destination that's been filled in, stacked full width so the
+   card reads straight down. They follow the subtitle rather than being pushed to
+   the card's foot — cards stretch to a shared height in the grid, and pinning
+   them low left a gap under any portal with fewer links. */
+.tp__links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .tp__desc {
   font-size: 13.5px;
   font-weight: 400;
   line-height: 1.45;
-  color: #fff;
-}
-
-.tp__country {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  white-space: nowrap;
-}
-
-.tp__country-label {
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.tp__country-value {
-  font-size: 13.5px;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 /* Glass pill — matches the subscribe button. */
 .tp__explore {
   flex: none;
-  padding: 9px 18px;
-  font-size: 12.5px;
+  display: block;
+  padding: 11px 18px;
+  text-align: center;
+  font-size: 13px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
@@ -370,11 +393,7 @@
 }
 
 @media (max-width: 720px) {
-  /* Rows become stacked cards: name, country line, then the Explore pill. */
   .tp__row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
     padding: 22px 20px;
     border-radius: 20px;
   }
@@ -384,27 +403,7 @@
   }
 
   .tp__name {
-    flex: none;
     font-size: 20px;
-    line-height: 1.25;
-  }
-
-  .tp__country {
-    gap: 10px;
-  }
-
-  .tp__country-label {
-    font-size: 12.5px;
-  }
-
-  .tp__country-value {
-    font-size: 12.5px;
-    color: #fff;
-  }
-
-  .tp__explore {
-    padding: 10px 20px;
-    font-size: 13px;
   }
 
   .tp__featured {

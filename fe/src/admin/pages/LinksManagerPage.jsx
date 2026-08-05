@@ -1,255 +1,165 @@
 import { useEffect, useState } from 'react';
 import { linksApi } from '../../api';
-import DataTable from '../components/DataTable.jsx';
-import StatusBadge from '../components/StatusBadge.jsx';
-import ConfirmDialog from '../components/ConfirmDialog.jsx';
-import AdminDrawer from '../components/AdminDrawer.jsx';
-import FormField from '../components/FormField.jsx';
+import { EDITABLE_FOOTER_LINKS } from '../../constants/footerLinks.js';
 
-// Blank form used for "create". `region` matters for tender links, `platform`
-// for social links — we keep both fields and only surface the relevant one per
-// group in the table.
-const EMPTY = {
-  group: 'tender',
-  label: '',
-  url: '',
-  region: 'australia',
-  platform: '',
-  order: 0,
-  active: true,
-};
-
-// Links manager: tender + social links, with an inline create/edit form.
-// Listing uses `all: 1` so inactive links show up too.
+// The footer's social and messaging links.
+//
+// Deliberately not a create/delete table: every link is drawn with its own brand
+// icon in code, so a platform an editor invented would have nothing to show. The
+// rows below are therefore fixed — what can be changed is where each one points,
+// and whether it appears at all.
+//
+// WeChat is absent because it has no URL: it opens a dialog with the account's
+// QR code rather than navigating anywhere.
 export default function LinksManagerPage() {
-  const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
-  const [confirmId, setConfirmId] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [form, setForm] = useState(EMPTY);
-  const [editingId, setEditingId] = useState(null);
-  const [saving, setSaving] = useState(false);
+  // Keyed by platform: { id, url, active } — id is null until first saved.
+  const [rows, setRows] = useState({});
+  const [savingKey, setSavingKey] = useState(null);
+  const [savedKey, setSavedKey] = useState(null);
   const [error, setError] = useState(null);
 
   const load = () => {
     setStatus('loading');
     linksApi
-      .list({ all: 1 })
+      .list({ group: 'social', all: 1 })
       .then((items) => {
-        setRows(items);
+        const saved = new Map(
+          (items || []).filter((l) => l.platform).map((l) => [l.platform, l]),
+        );
+        const next = {};
+        for (const link of EDITABLE_FOOTER_LINKS) {
+          const match = saved.get(link.platform);
+          next[link.platform] = {
+            id: match?._id || match?.id || null,
+            // Nothing saved yet — show the address the site currently uses, so
+            // the first save records what is already live rather than a blank.
+            url: match?.url ?? link.href,
+            active: match ? match.active !== false : true,
+          };
+        }
+        setRows(next);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
   };
   useEffect(load, []);
 
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+  const setField = (platform, field, value) => {
+    setSavedKey(null);
+    setRows((r) => ({ ...r, [platform]: { ...r[platform], [field]: value } }));
   };
 
-  const openCreate = () => {
-    setForm(EMPTY);
-    setEditingId(null);
+  const save = async (link) => {
+    const row = rows[link.platform];
+    if (!row) return;
+    if (!row.url.trim()) {
+      setError(`${link.label} needs a URL. To hide it, untick "Shown" instead.`);
+      return;
+    }
+    setSavingKey(link.platform);
     setError(null);
-    setDrawerOpen(true);
-  };
-
-  const openEdit = (r) => {
-    setEditingId(r._id || r.id);
-    setError(null);
-    setForm({
-      group: r.group || 'tender',
-      label: r.label || '',
-      url: r.url || '',
-      region: r.region || '',
-      platform: r.platform || '',
-      order: r.order ?? 0,
-      active: r.active !== false,
-    });
-    setDrawerOpen(true);
-  };
-
-  const closeDrawer = () => {
-    if (saving) return;
-    setDrawerOpen(false);
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
-    const body = {
-      group: form.group,
-      label: form.label,
-      url: form.url,
-      region: form.region,
-      platform: form.platform,
-      order: Number(form.order) || 0,
-      active: String(form.active) === 'true',
-    };
     try {
-      if (editingId) await linksApi.update(editingId, body);
+      const body = {
+        group: 'social',
+        platform: link.platform,
+        label: link.label,
+        url: row.url.trim(),
+        active: row.active,
+      };
+      if (row.id) await linksApi.update(row.id, body);
       else await linksApi.create(body);
-      setDrawerOpen(false);
+      setSavedKey(link.platform);
       load();
     } catch (err) {
-      setError(err.message || 'Failed to save link');
+      setError(err?.message || `Failed to save ${link.label}`);
     } finally {
-      setSaving(false);
+      setSavingKey(null);
     }
   };
-
-  const onDelete = async () => {
-    await linksApi.remove(confirmId);
-    setConfirmId(null);
-    load();
-  };
-
-  const columns = [
-    { key: 'group', header: 'Group' },
-    { key: 'label', header: 'Label' },
-    {
-      key: 'url',
-      header: 'URL',
-      render: (r) => (
-        <a href={r.url} target="_blank" rel="noreferrer">
-          {r.url}
-        </a>
-      ),
-    },
-    {
-      key: 'regionPlatform',
-      header: 'Region / Platform',
-      render: (r) => (r.group === 'social' ? r.platform || '—' : r.region || '—'),
-    },
-    {
-      key: 'active',
-      header: 'Active',
-      render: (r) => <StatusBadge status={r.active !== false ? 'active' : 'inactive'} />,
-    },
-    {
-      key: 'actions',
-      header: '',
-      render: (r) => (
-        <div className="admin-table__actions">
-          <button type="button" className="admin-btn admin-btn--sm" onClick={() => openEdit(r)}>
-            Edit
-          </button>
-          <button
-            type="button"
-            className="admin-btn admin-btn--sm admin-btn--danger"
-            onClick={() => setConfirmId(r._id || r.id)}
-          >
-            Delete
-          </button>
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Links</h2>
-          <p className="admin-page__subtitle">Tender portal links and social profiles.</p>
-        </div>
-        <div className="admin-page__actions">
-          <button type="button" className="admin-btn admin-btn--primary" onClick={openCreate}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            New link
-          </button>
+          <p className="admin-page__subtitle">
+            Where the footer&rsquo;s social and messaging icons point. Each one keeps its own
+            icon, so the list is fixed — change the address, or untick to hide it.
+          </p>
         </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        rows={rows}
-        loading={status === 'loading'}
-        error={status === 'error' ? 'Failed to load links' : null}
-        emptyText="No links yet."
-      />
+      {status === 'loading' && <p className="admin-page__subtitle">Loading…</p>}
+      {status === 'error' && (
+        <div className="admin-alert admin-alert--error">Failed to load the links.</div>
+      )}
 
-      <AdminDrawer
-        open={drawerOpen}
-        title={editingId ? 'Edit link' : 'New link'}
-        subtitle="Region applies to tender links; platform applies to social links."
-        onClose={closeDrawer}
-        busy={saving}
-        footer={
-          <>
-            <button type="button" className="admin-btn" onClick={closeDrawer} disabled={saving}>
-              Cancel
-            </button>
-            <button type="submit" form="link-form" className="admin-btn admin-btn--primary" disabled={saving}>
-              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Add link'}
-            </button>
-          </>
-        }
-      >
-        <form id="link-form" onSubmit={onSubmit}>
+      {status === 'ready' && (
+        <div className="admin-card">
           {error && <div className="admin-alert admin-alert--error">{error}</div>}
-          <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <FormField
-              label="Group"
-              name="group"
-              as="select"
-              value={form.group}
-              onChange={onChange}
-              options={[
-                { value: 'tender', label: 'Tender' },
-                { value: 'social', label: 'Social' },
-              ]}
-            />
-            <FormField label="Label" name="label" value={form.label} onChange={onChange} required />
-          </div>
-          <FormField label="URL" name="url" value={form.url} onChange={onChange} required />
-          <div className="admin-form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <FormField
-              label="List"
-              name="region"
-              as="select"
-              hint="tender links"
-              value={form.region}
-              onChange={onChange}
-              options={[
-                { value: 'australia', label: 'Australian' },
-                { value: '', label: '(none)' },
-              ]}
-            />
-            <FormField
-              label="Platform"
-              name="platform"
-              hint="social links"
-              value={form.platform}
-              onChange={onChange}
-            />
-            <FormField label="Order" name="order" type="number" value={form.order} onChange={onChange} />
-            <FormField
-              label="Active"
-              name="active"
-              as="select"
-              value={String(form.active)}
-              onChange={onChange}
-              options={[
-                { value: 'true', label: 'Yes' },
-                { value: 'false', label: 'No' },
-              ]}
-            />
-          </div>
-        </form>
-      </AdminDrawer>
 
-      <ConfirmDialog
-        open={Boolean(confirmId)}
-        message="Delete this link? This cannot be undone."
-        onConfirm={onDelete}
-        onCancel={() => setConfirmId(null)}
-      />
+          {EDITABLE_FOOTER_LINKS.map((link) => {
+            const row = rows[link.platform] || { url: '', active: true };
+            const Icon = link.Icon;
+            return (
+              <div
+                key={link.platform}
+                className="admin-field"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '190px minmax(0, 1fr) auto auto',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <span
+                  className="admin-field__label"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 10, margin: 0 }}
+                >
+                  <Icon aria-hidden="true" style={{ width: 18, height: 18, flex: 'none' }} />
+                  {link.label}
+                </span>
+
+                <input
+                  className="admin-input"
+                  type="url"
+                  value={row.url}
+                  aria-label={`${link.label} URL`}
+                  onChange={(e) => setField(link.platform, 'url', e.target.value)}
+                />
+
+                <label className="admin-checkgroup__item" style={{ whiteSpace: 'nowrap' }}>
+                  <input
+                    type="checkbox"
+                    checked={row.active}
+                    onChange={(e) => setField(link.platform, 'active', e.target.checked)}
+                  />
+                  <span>Shown</span>
+                </label>
+
+                <button
+                  type="button"
+                  className="admin-btn admin-btn--sm admin-btn--primary"
+                  onClick={() => save(link)}
+                  disabled={savingKey === link.platform}
+                >
+                  {savingKey === link.platform
+                    ? 'Saving…'
+                    : savedKey === link.platform
+                      ? 'Saved'
+                      : 'Save'}
+                </button>
+              </div>
+            );
+          })}
+
+          <p className="admin-field__hint" style={{ marginLeft: 0 }}>
+            WeChat isn&rsquo;t listed: it opens a QR code to scan rather than a link. To change
+            it, replace the image in the site&rsquo;s assets.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

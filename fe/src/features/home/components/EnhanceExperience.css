@@ -12,9 +12,12 @@
   --ee-content-bg: var(--gp-green-800);
 }
 
+/* ink-800 is the grey counterpart to green-800, so the copy panel lifts off the
+   page here the same way it does on Award. It matched the page background
+   before, which left the card looking flat on this segment. */
 .ee[data-audience='win'] {
   --ee-bg: var(--gp-ink-900);
-  --ee-content-bg: var(--gp-ink-900);
+  --ee-content-bg: var(--gp-ink-800);
 }
 
 /* Same 1100px container as every other page section, so the card's edges line
@@ -299,9 +302,8 @@
     margin-top: 32px;
   }
 
-  /* Matches the hero buttons: pinned width, wide enough that the longer
-     "Whatsapp +61 478 669 922" label clears the left-pinned icon; label
-     centred, icon pinned to the left edge out of flow. */
+  /* Matches the hero buttons: pinned width so the label clears the left-pinned
+     icon; label centred, icon pinned to the left edge out of flow. */
   .ee__btn {
     position: relative;
     flex: none;

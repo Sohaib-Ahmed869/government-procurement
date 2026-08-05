@@ -5,11 +5,6 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi, categoriesApi } from '../../../api';
 import './InsightsGrid.css';
 
-const SORT_OPTIONS = [
-  { value: 'none', label: 'None' },
-  { value: 'a-z', label: 'A–Z' },
-  { value: 'z-a', label: 'Z–A' },
-];
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -109,7 +104,6 @@ export default function InsightsGrid() {
   const { audience } = useAudience();
   // The selected category id, or 'all'.
   const [category, setCategory] = useState('all');
-  const [sort, setSort] = useState('none');
 
   const [articles, setArticles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -155,25 +149,17 @@ export default function InsightsGrid() {
     ];
   }, [articles, categories]);
 
-  const visible = useMemo(() => {
-    let list =
-      category === 'all' ? articles : articles.filter((a) => a.category?._id === category);
-    if (sort !== 'none') {
-      list = [...list].sort((a, b) =>
-        sort === 'a-z'
-          ? (a.title || '').localeCompare(b.title || '')
-          : (b.title || '').localeCompare(a.title || ''),
-      );
-    }
-    return list;
-  }, [articles, category, sort]);
+  const visible = useMemo(
+    () => (category === 'all' ? articles : articles.filter((a) => a.category?._id === category)),
+    [articles, category],
+  );
 
   // How many of the filtered articles are on screen. Reset whenever the filter
-  // or sort changes, so a new selection starts from the first page again.
+  // changes, so a new selection starts from the first page again.
   const [shown, setShown] = useState(PAGE_SIZE);
   useEffect(() => {
     setShown(PAGE_SIZE);
-  }, [category, sort]);
+  }, [category]);
 
   const onScreen = visible.slice(0, shown);
 
@@ -198,7 +184,6 @@ export default function InsightsGrid() {
         {status === 'ready' && articles.length > 0 && (
           <div className="insights__filters">
             <PillDropdown options={categoryOptions} value={category} onChange={setCategory} />
-            <PillDropdown label="Sort by:" options={SORT_OPTIONS} value={sort} onChange={setSort} />
           </div>
         )}
 
@@ -220,11 +205,11 @@ export default function InsightsGrid() {
               const image = article.heroImage?.url || null;
               const date = formatDate(article.publishedAt);
               const minutes = readingMinutes(article);
-              // "Strategy · 4 min read" — either half may be missing. The
+              // "Strategy | 4 min read" — either half may be missing. The
               // category name is the topic label.
               const meta = [article.category?.name, minutes ? `${minutes} min read` : null]
                 .filter(Boolean)
-                .join(' · ');
+                .join(' | ');
               return (
                 <li key={article._id} className="insights-card" style={{ '--i': i % PAGE_SIZE }}>
                   {/* Image on top, then topic, title and a date-led summary —
@@ -252,11 +237,9 @@ export default function InsightsGrid() {
                       </svg>
                     </h2>
 
-                    {(date || article.excerpt) && (
+                    {date && (
                       <p className="insights-card__summary">
-                        {date && <span className="insights-card__date">{date}</span>}
-                        {date && article.excerpt ? ' - ' : ''}
-                        {article.excerpt}
+                        <span className="insights-card__date">{date}</span>
                       </p>
                     )}
                   </Link>

@@ -90,9 +90,10 @@
   overflow: hidden;
   flex: none;
   border-radius: 50%;
-  /* Reads against both card states: the card rests on --team-surface and drops
-     to the 4% fill on hover, so the disc needs its own tone. */
-  background: rgba(255, 255, 255, 0.08);
+  /* Solid white, so portraits shot on a light background sit on their own tone
+     rather than the card's. Reads against both card states — the card rests on
+     --team-surface and drops to the 4% fill on hover. */
+  background: #fff;
 }
 
 .team-avatar__img {
@@ -101,15 +102,28 @@
   object-fit: cover;
 }
 
+/* Dark on the white disc — this is the fallback when a member has no photo, and
+   it shows on the member detail page as well as the grid. */
 .team-avatar__initials {
   font-weight: 500;
   letter-spacing: 0.02em;
-  color: #fff;
+  color: var(--gp-ink-900);
 }
 
 .team-card__avatar {
   width: 132px;
   height: 132px;
+}
+
+/* Headshots are supplied with a margin of background around the subject, so at
+   its natural size the person sits small inside the disc. A modest scale fills
+   the circle with the face — the disc clips the overspill. Kept to 1.15 and
+   centred rather than pushed further: past that the crop starts taking the top
+   of the head off, and the framing has to hold for every member's photo, not
+   just one. */
+.team-card__avatar .team-avatar__img {
+  object-position: center;
+  transform: scale(1.15);
 }
 
 .team-card__avatar .team-avatar__initials {

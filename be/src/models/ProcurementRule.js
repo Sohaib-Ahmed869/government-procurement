@@ -1,11 +1,26 @@
 import mongoose from 'mongoose';
 import { CONTENT_STATUS, CONTENT_STATUSES } from '../constants/statuses.js';
 
-export const RULE_STATES = ['ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA'];
+// Jurisdictions a rule can belong to. FED is the Australian Federal Government;
+// the rest are the states and territories. The site holds the display order and
+// the full names (see fe/src/features/jurisdictions/data.js).
+export const RULE_STATES = ['FED', 'ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC', 'WA'];
 
 // Kept in step with CATEGORIES in fe/src/features/jurisdictions/data.js, which
 // holds the display label and icon for each value.
-export const RULE_CATEGORIES = ['thresholds', 'panels', 'local-sme', 'probity'];
+// Kept alphabetical, matching the labels the site and the CMS show (see
+// fe/src/features/jurisdictions/data.js).
+export const RULE_CATEGORIES = [
+  'aboriginal-procurement-policy',
+  'complaints',
+  'contracting-frameworks',
+  'governance',
+  'local-content-policy',
+  'other-procurement-policy',
+  'prequalification-panel',
+  'probity',
+  'procurement-legislation',
+];
 
 // A single procurement rule shown on the Jurisdictional links page.
 const procurementRuleSchema = new mongoose.Schema(

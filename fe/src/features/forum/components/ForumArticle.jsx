@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
+import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumArticle.css';
-
-const CATEGORY_LABEL = {
-  win: 'Win Contracts',
-  award: 'Award Contracts',
-};
 
 function formatDate(iso) {
   if (!iso) return '';

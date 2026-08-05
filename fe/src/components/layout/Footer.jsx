@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import { AiFillTikTok } from 'react-icons/ai';
-import { FaFacebookF, FaLinkedin, FaThreads, FaYoutube } from 'react-icons/fa6';
-import { TbBrandInstagramFilled } from 'react-icons/tb';
+import { useEffect, useState } from 'react';
 import logo from '../../assets/icons/GPLogo.png';
+import { linksApi } from '../../api';
+import {
+  CONTACT_ADDRESS_LINES,
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_PHONE_HREF,
+} from '../../constants/contact.js';
+import { resolveFooterLinks } from '../../constants/footerLinks.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
 import WeChatQrDialog from './WeChatQrDialog.jsx';
@@ -17,14 +22,14 @@ import './Footer.css';
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Capabilities', href: '/capabilities' },
-  { label: 'Our team', href: '/our-team' },
+  { label: 'Our Team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
   { label: 'Insights', href: '/insights' },
-  { label: 'QnA', href: '/qna' },
-  { label: 'Tender websites', href: '/aus-list' },
+  { label: 'Q&A', href: '/q-and-a' },
+  { label: 'Tender Websites', href: '/aus-list' },
   { label: 'Careers', href: '/careers', shared: true },
-  { label: 'Jurisdictional links', href: '/jurisdictional-links', shared: true },
-  { label: 'Book a consultation', href: '/book-a-consultation' },
+  { label: 'Jurisdictional Links', href: '/jurisdictional-links', shared: true },
+  { label: 'Request a Consultation', href: '/book-a-consultation' },
 ];
 
 // Every audience-specific link in a segment column is tagged with that segment,
@@ -39,18 +44,18 @@ function audienceColumn(heading, audience) {
   };
 }
 
+// Left to right across the row: the brand column carries the Government
+// Procurement wordmark, then the two segments, then Policies last.
 const LINK_COLUMNS = [
+  audienceColumn('Award Contracts', 'award'),
+  audienceColumn('Win Contracts', 'win'),
   {
-    heading: 'Government Procurement',
+    heading: 'Policies',
     links: [
-      { label: 'FAQ', href: '/faq' },
-      { label: 'About', href: '/about' },
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
     ],
   },
-  audienceColumn('Award Contracts', 'award'),
-  audienceColumn('Win Contracts', 'win'),
 ];
 
 // On small screens the headed columns collapse into a flat run of links, laid
@@ -69,91 +74,22 @@ const FLAT_ROWS = [
   [
     { label: 'Insights', href: '/insights' },
     { label: 'Capabilities', href: '/capabilities' },
-    { label: 'Our team', href: '/our-team' },
+    { label: 'Our Team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
   ],
   [
-    { label: 'QnA', href: '/qna' },
-    { label: 'Tender websites', href: '/aus-list' },
+    { label: 'Q&A', href: '/q-and-a' },
+    { label: 'Tender Websites', href: '/aus-list' },
     { label: 'Careers', href: '/careers' },
   ],
   [
-    { label: 'Jurisdictional links', href: '/jurisdictional-links' },
-    { label: 'Book a consultation', href: '/book-a-consultation' },
+    { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
+    { label: 'Request a Consultation', href: '/book-a-consultation' },
   ],
   [
-    { label: 'FAQ', href: '/faq' },
-    { label: 'About', href: '/about' },
     { label: 'Privacy', href: '/privacy' },
     { label: 'Terms', href: '/terms' },
   ],
-];
-
-// Head office contact details. The phone number is the same one the WhatsApp
-// buttons across the site use (see ContactSection's CONTACT_METHODS).
-const CONTACT_PHONE = '+61 478 669 922';
-const CONTACT_EMAIL = 'mkheir@govprocurement.com.au';
-const CONTACT_ADDRESS = '25 Restwell Street Bankstown NSW 2200';
-
-// CONTACT_PHONE in the form the messaging deep links want: digits only, no
-// leading "+".
-const CONTACT_PHONE_DIGITS = CONTACT_PHONE.replace(/\D/g, '');
-
-// The Facebook profile ID from SOCIAL_LINKS below — m.me deep-links by account
-// ID, not by phone number, and this is the same account.
-const FACEBOOK_ID = '61585039209265';
-
-// Messaging apps the number above is reachable on. Each link opens its own app.
-// WhatsApp and Telegram publish number-based deep links, so those open a chat
-// with CONTACT_PHONE directly; Messenger opens the Facebook account.
-//
-// WeChat has no public https profile URL for personal accounts, so this entry
-// opens a dialog with the account's own QR code for the visitor to scan in
-// WeChat (Discover → Scan) rather than navigating anywhere. The image lives in
-// WeChatQrDialog — to replace it, export a fresh code from the account
-// (Me → name → My QR Code → Save) over src/assets/images/WeChatQr.png.
-const CALL_CHANNELS = [
-  { label: 'WhatsApp', href: `https://wa.me/${CONTACT_PHONE_DIGITS}` },
-  { label: 'Telegram', href: `https://t.me/+${CONTACT_PHONE_DIGITS}` },
-  { label: 'WeChat', qr: true },
-  { label: 'FB Messenger', href: `https://m.me/${FACEBOOK_ID}` },
-  { label: 'Botim', href: 'https://www.botim.me/' }, // TODO: Botim profile
-];
-
-// Official social profiles. Kept in sync with the `social` block seeded into
-// site Settings (settings.social) so the CMS and footer show the same links.
-// Icons are the brand marks from react-icons, drawn in the link colour.
-const SOCIAL_LINKS = [
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/govprocurement/?hl=en',
-    Icon: TbBrandInstagramFilled,
-  },
-  {
-    label: 'Facebook',
-    href: 'https://www.facebook.com/profile.php?id=61585039209265',
-    Icon: FaFacebookF,
-  },
-  {
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/company/governmentprocurement/',
-    Icon: FaLinkedin,
-  },
-  {
-    label: 'YouTube',
-    href: 'https://www.youtube.com/@GovernmentProcurement',
-    Icon: FaYoutube,
-  },
-  {
-    label: 'TikTok',
-    href: 'https://www.tiktok.com/@govprocurement',
-    Icon: AiFillTikTok,
-  },
-  {
-    label: 'Threads',
-    href: 'https://www.threads.com/@govprocurement',
-    Icon: FaThreads,
-  },
 ];
 
 export default function Footer({ audience: audienceProp }) {
@@ -162,6 +98,31 @@ export default function Footer({ audience: audienceProp }) {
 
   // Whether the WeChat QR dialog is showing.
   const [qrOpen, setQrOpen] = useState(false);
+
+  // Saved links from the CMS override the catalogue's built-in addresses. The
+  // footer renders from the catalogue either way, so a failed or empty fetch
+  // simply leaves the shipped links in place.
+  const [savedLinks, setSavedLinks] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    linksApi
+      // `all: 1` so links switched off in the CMS still come back — the footer
+      // needs to see one to leave it out. Without it the API filters them away,
+      // and resolveFooterLinks falls back to the built-in link instead.
+      .list({ group: 'social', all: 1 })
+      .then((list) => {
+        if (alive) setSavedLinks(list || []);
+      })
+      .catch(() => {
+        /* keep the built-in links */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const socialLinks = resolveFooterLinks('social', savedLinks);
+  const channelLinks = resolveFooterLinks('channel', savedLinks);
 
   // "Explore Tender Websites" is shown to both audiences (Win and Award).
   const showTenderPortals = true;
@@ -192,16 +153,12 @@ export default function Footer({ audience: audienceProp }) {
             <img className="site-footer__logo" src={logo} alt="" width="26" height="23" />
             <span className="site-footer__wordmark">Government Procurement</span>
           </a>
-          <p className="site-footer__blurb">
-            For over two decades, we've helped top organisations worldwide transform
-            procurement through platforms, training, and consulting.
-          </p>
           <h2 className="site-footer__social-heading" id="footer-social-heading">
-            Follow us
+            Follow Us
           </h2>
           <ul className="site-footer__social" aria-labelledby="footer-social-heading">
-            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
-              <li key={label}>
+            {socialLinks.map(({ platform, label, href, Icon }) => (
+              <li key={platform}>
                 <a
                   className="site-footer__social-link"
                   href={href}
@@ -216,38 +173,54 @@ export default function Footer({ audience: audienceProp }) {
           </ul>
 
           <h2 className="site-footer__social-heading" id="footer-channels-heading">
-            Call us
+            Contact
           </h2>
           <ul className="site-footer__channels" aria-labelledby="footer-channels-heading">
-            {CALL_CHANNELS.map(({ label, href, qr }) => (
-              <li key={label}>
-                {qr ? (
-                  <button
-                    type="button"
-                    className="site-footer__channel-link site-footer__channel-button"
-                    onClick={() => setQrOpen(true)}
-                  >
-                    {label}
-                  </button>
-                ) : (
-                  <a
-                    className="site-footer__channel-link"
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {label}
-                  </a>
-                )}
-              </li>
-            ))}
+            {channelLinks.map(({ platform, label, href, qr, Icon, iconModifier }) => {
+              const iconClass = `site-footer__channel-icon${
+                iconModifier ? ` site-footer__channel-icon--${iconModifier}` : ''
+              }`;
+              return (
+                <li key={platform}>
+                  {qr ? (
+                    <button
+                      type="button"
+                      className="site-footer__channel-link site-footer__channel-button"
+                      onClick={() => setQrOpen(true)}
+                      aria-label={label}
+                      title={label}
+                    >
+                      <Icon className={iconClass} aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <a
+                      className="site-footer__channel-link"
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      title={label}
+                    >
+                      <Icon className={iconClass} aria-hidden="true" />
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
+
+          <p className="site-footer__phone">
+            <a className="site-footer__phone-link" href={CONTACT_PHONE_HREF}>
+              {CONTACT_PHONE}
+            </a>
+          </p>
         </div>
 
         <nav className="site-footer__links" aria-label="Footer">
           {LINK_COLUMNS.map(({ heading, links }) => (
             <div className="site-footer__col" key={heading}>
               <h2 className="site-footer__heading">{heading}</h2>
+              <hr className="site-footer__rule" />
               <ul className="site-footer__list">
                 {links.map(({ label, href }) => (
                   <li key={label}>
@@ -279,22 +252,30 @@ export default function Footer({ audience: audienceProp }) {
             outside the <nav> above so it survives the ≤760px breakpoint, where
             the headed columns give way to the flat link run. */}
         <address className="site-footer__contact">
-          <h2 className="site-footer__contact-heading">
-            <a className="site-footer__contact-heading-link" href="/contact">
-              Contact us
-            </a>
-          </h2>
-          <p className="site-footer__contact-sub">Head Office</p>
-          <hr className="site-footer__contact-rule" />
+          <h2 className="site-footer__contact-heading">Contact Us</h2>
+          <hr className="site-footer__rule" />
+          {/* Each detail is introduced by its own label, so the block reads the
+              same way whether or not the address wraps. */}
           <ul className="site-footer__contact-list">
-            <li>{CONTACT_ADDRESS}</li>
             <li>
-              T :{' '}
-              <a className="site-footer__contact-link" href={`tel:${CONTACT_PHONE.replace(/\s/g, '')}`}>
+              <span className="site-footer__contact-label">Head Office:</span>
+              {CONTACT_ADDRESS_LINES.map((line) => (
+                <span key={line}>
+                  <br />
+                  {line}
+                </span>
+              ))}
+            </li>
+            <li>
+              <span className="site-footer__contact-label">Contact Number:</span>
+              <br />
+              <a className="site-footer__contact-link" href={CONTACT_PHONE_HREF}>
                 {CONTACT_PHONE}
               </a>
             </li>
             <li>
+              <span className="site-footer__contact-label">Email Address:</span>
+              <br />
               <a
                 className="site-footer__contact-link site-footer__contact-email"
                 href={`mailto:${CONTACT_EMAIL}`}

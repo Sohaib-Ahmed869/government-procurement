@@ -16,11 +16,6 @@ export default function InsightsHero() {
     <section className={`insights-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="insights-hero__inner">
         <h1 className="insights-hero__title">Insights</h1>
-        <p className="insights-hero__sub">
-          From mastering the fundamentals to applying advanced strategies, our
-          training empowers you to deliver stronger results and create lasting
-          impact in your organisation.
-        </p>
       </div>
     </section>
   );

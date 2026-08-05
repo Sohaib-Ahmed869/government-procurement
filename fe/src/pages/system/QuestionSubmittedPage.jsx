@@ -10,8 +10,8 @@ export default function QuestionSubmittedPage() {
           title="Your question is in the queue"
           message="Thanks! Your question has been submitted for review. Once our moderators approve and answer it, it'll appear in the forum."
           actions={[
-            { label: 'Back to QnA', to: '/qna', variant: 'primary' },
-            { label: 'Ask another question', to: '/qna/submit', variant: 'ghost' },
+            { label: 'Back to Q&A', to: '/q-and-a', variant: 'primary' },
+            { label: 'Ask another question', to: '/q-and-a/submit', variant: 'ghost' },
           ]}
         />
       </PageLayout>

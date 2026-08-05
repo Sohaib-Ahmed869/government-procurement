@@ -122,7 +122,10 @@
   /* No gap: each card's own padding provides the gutter, so the panel that
      appears on hover has room to sit around the content. */
   gap: 0;
-  margin: 0;
+  /* That same padding would otherwise indent the first column past the page
+     title above it. Pulling the grid out by it puts the card content back on
+     the container's own edge, so the row lines up with "Insights". */
+  margin: 0 -16px;
   padding: 0;
   list-style: none;
 }

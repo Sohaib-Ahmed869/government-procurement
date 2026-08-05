@@ -52,37 +52,28 @@ const NAV = [
     items: [{ to: '/admin', label: 'Dashboard', end: true, icon: 'dashboard' }],
   },
   {
-    // Reusable content: listed, filtered and searched across the site.
-    group: 'Content library',
+    // One entry per public page, in the order those pages appear in the site
+    // nav — so the CMS reads the same way round as the website does. Labels
+    // match the nav too: what an editor sees here is what a visitor sees there.
+    // Routes keep their original names (articles, rules, moderation…), since
+    // those are the API's own words.
+    group: 'Pages',
     items: [
-      // Stored as "articles" throughout the API and routes; the public site calls
-      // them Insights, so that's the label the CMS shows.
-      { to: '/admin/articles', label: 'Insights', icon: 'doc' },
+      { to: '/admin/home-hero', label: 'Homepage', icon: 'page' },
+      { to: '/admin/capabilities', label: 'Capabilities', icon: 'page' },
+      { to: '/admin/team', label: 'Our Team', icon: 'users' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
-      { to: '/admin/faqs', label: 'FAQ', icon: 'question' },
-      { to: '/admin/categories', label: 'Categories', icon: 'tag' },
-    ],
-  },
-  {
-    // Copy that belongs to one specific page, in the order those pages appear
-    // in the site nav.
-    group: 'Page content',
-    items: [
-      { to: '/admin/home-hero', label: 'Homepage hero', icon: 'page' },
-      { to: '/admin/team', label: 'Team', icon: 'users' },
+      { to: '/admin/articles', label: 'Insights', icon: 'doc' },
+      { to: '/admin/moderation', label: 'Q&A', icon: 'chat' },
+      { to: '/admin/tenders', label: 'Tenders', icon: 'link' },
       { to: '/admin/careers', label: 'Careers', icon: 'hand' },
-      { to: '/admin/rules', label: 'Rules', icon: 'rails' },
+      { to: '/admin/rules', label: 'Jurisdictional Links', icon: 'rails' },
     ],
-  },
-  {
-    group: 'Community',
-    items: [{ to: '/admin/moderation', label: 'Q&A Moderation', icon: 'chat' }],
   },
   {
     // Everything else the public sends in.
     group: 'Submissions',
     items: [
-      { to: '/admin/contact', label: 'Contact inbox', icon: 'mail' },
       { to: '/admin/consultations', label: 'Consultations', icon: 'calendar' },
       { to: '/admin/register-interest', label: 'Register interest', icon: 'hand' },
       { to: '/admin/subscribers', label: 'Subscribers', icon: 'users' },
@@ -92,6 +83,7 @@ const NAV = [
     // Site-wide furniture rather than page copy.
     group: 'Site',
     items: [
+      { to: '/admin/categories', label: 'Dropdown List', icon: 'tag' },
       { to: '/admin/announcements', label: 'Announcements', icon: 'megaphone' },
       { to: '/admin/links', label: 'Links', icon: 'link' },
       { to: '/admin/media', label: 'Media library', icon: 'media' },

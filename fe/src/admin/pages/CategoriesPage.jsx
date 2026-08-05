@@ -5,14 +5,11 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
 
-// Kinds an editor can assign. Only insights and FAQs use this taxonomy — courses
-// and their artefacts categorise by segment on the resource itself (see
-// CourseEditorPage), so those kinds are no longer offered here. 'article' is
-// stored as-is but presented as "Insight", matching the site and the CMS nav.
-const KINDS = [
-  { value: 'article', label: 'Insight' },
-  { value: 'faq', label: 'FAQ' },
-];
+// Kinds an editor can assign. Only insights use this taxonomy now — courses and
+// their artefacts categorise by segment on the resource itself (see
+// CourseEditorPage), and FAQs have been retired. 'article' is stored as-is but
+// presented as "Insight", matching the site and the CMS nav.
+const KINDS = [{ value: 'article', label: 'Insight' }];
 
 // Display labels, including the kinds that are no longer selectable — older
 // categories may still carry them, and a blank cell would read as missing data.
@@ -24,7 +21,7 @@ const KIND_LABELS = {
 };
 const BLANK = { name: '', kinds: [], order: 0 };
 
-// Categories admin: the list is the whole screen; add/edit opens a drawer.
+// Dropdown List admin: the list is the whole screen; add/edit opens a drawer.
 export default function CategoriesPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -138,8 +135,8 @@ export default function CategoriesPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Categories</h2>
-          <p className="admin-page__subtitle">Shared taxonomy for insights, videos, FAQs and courses.</p>
+          <h2 className="admin-page__title">Dropdown List</h2>
+          <p className="admin-page__subtitle">Shared taxonomy for insights.</p>
         </div>
         <div className="admin-page__actions">
           <button type="button" className="admin-btn admin-btn--primary" onClick={openCreate}>

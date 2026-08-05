@@ -204,7 +204,7 @@ export default function TeamAdminPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Team</h2>
+          <h2 className="admin-page__title">Our Team</h2>
           <p className="admin-page__subtitle">
             People shown on the Our Team page, in the order set below.
           </p>

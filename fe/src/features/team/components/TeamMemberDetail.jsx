@@ -7,6 +7,9 @@ import { articlesApi, teamApi } from '../../../api';
 import TeamAvatar from './TeamAvatar.jsx';
 import './TeamMemberDetail.css';
 
+// Two rows of the 4-up desktop "Published work" grid.
+const WORK_PAGE_SIZE = 8;
+
 function formatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -47,15 +50,18 @@ export default function TeamMemberDetail({ slug }) {
     };
   }, [slug]);
 
-  // Published work is the CMS insights feed. Kept to the first few — the "View
-  // more" link below the grid goes to the full listing. A failure just leaves
-  // the section hidden rather than showing an error on a profile page.
+  // Published work is this member's own insights — the ones whose Author is set
+  // to them in the CMS. Fetched once the profile has loaded, since the filter is
+  // their name. A failure just leaves the section hidden rather than showing an
+  // error on a profile page.
   const [articles, setArticles] = useState([]);
+  const authorName = member?.name;
   useEffect(() => {
+    if (!authorName) return undefined;
     let alive = true;
     (async () => {
       try {
-        const list = await articlesApi.list({ limit: 4 });
+        const list = await articlesApi.list({ author: authorName, limit: 100 });
         if (alive) setArticles(list || []);
       } catch {
         /* section stays hidden */
@@ -64,7 +70,15 @@ export default function TeamMemberDetail({ slug }) {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [authorName]);
+
+  // Two rows of the 4-up desktop grid. "View more" adds another batch in place
+  // rather than sending the visitor off to the full Insights listing.
+  const [shownWork, setShownWork] = useState(WORK_PAGE_SIZE);
+  useEffect(() => {
+    setShownWork(WORK_PAGE_SIZE);
+  }, [authorName]);
+  const visibleArticles = articles.slice(0, shownWork);
 
   // Still loading — hold the page rather than flashing "not found".
   if (member === null) {
@@ -108,38 +122,44 @@ export default function TeamMemberDetail({ slug }) {
       className={`tm${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      <div className="tm__inner">
-        <div className="tm__hero">
-          <TeamAvatar member={member} className="tm__avatar" />
+      {/* The hero sits in its own full-bleed band so its gradient runs edge to
+          edge, rather than stopping at the 1100px column. */}
+      <div className="tm__hero-band">
+        <div className="tm__inner tm__inner--hero">
+          <div className="tm__hero">
+            <TeamAvatar member={member} className="tm__avatar" />
 
-          <div className="tm__intro">
-            <BackLink />
+            <div className="tm__intro">
+              <BackLink />
 
-            <h1 className="tm__name">{member.name}</h1>
-            <p className="tm__role">
-              {[member.role, member.location].filter(Boolean).join(', ')}
-            </p>
+              <h1 className="tm__name">{member.name}</h1>
+              <p className="tm__role">
+                {[member.role, member.location].filter(Boolean).join(', ')}
+              </p>
 
-            <p className="tm__bio">{member.summary}</p>
+              <p className="tm__bio">{member.summary}</p>
 
-            <div className="tm__actions">
-              <a className="tm__action" href={`mailto:${member.email}`}>
-                <FaEnvelope className="tm__action-icon" aria-hidden="true" />
-                Contact
-              </a>
-              <a
-                className="tm__action"
-                href={member.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaLinkedin className="tm__action-icon" aria-hidden="true" />
-                LinkedIn
-              </a>
+              <div className="tm__actions">
+                <a className="tm__action" href={`mailto:${member.email}`}>
+                  <FaEnvelope className="tm__action-icon" aria-hidden="true" />
+                  Contact
+                </a>
+                <a
+                  className="tm__action"
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaLinkedin className="tm__action-icon" aria-hidden="true" />
+                  LinkedIn
+                </a>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="tm__inner">
         {/* Body: the written profile on the left, contact CTA + expertise in a
             narrower column on the right. Every block after About renders only
             when there's content for it. */}
@@ -242,7 +262,7 @@ export default function TeamMemberDetail({ slug }) {
             <h2 className="tm__block-title">Published work</h2>
 
             <ul className="tm__work-grid">
-              {articles.map((article) => {
+              {visibleArticles.map((article) => {
                 const image = article.heroImage?.url || null;
                 const date = formatDate(article.publishedAt);
                 return (
@@ -276,9 +296,15 @@ export default function TeamMemberDetail({ slug }) {
               })}
             </ul>
 
-            <Link className="tm__work-more" to="/insights">
-              View more
-            </Link>
+            {shownWork < articles.length && (
+              <button
+                type="button"
+                className="tm__work-more"
+                onClick={() => setShownWork((n) => n + WORK_PAGE_SIZE)}
+              >
+                View more
+              </button>
+            )}
           </section>
         )}
       </div>

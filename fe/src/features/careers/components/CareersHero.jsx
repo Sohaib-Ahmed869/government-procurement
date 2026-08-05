@@ -17,11 +17,6 @@ export default function CareersHero() {
       <div className="careers-hero__inner">
         <p className="careers-hero__eyebrow">Work with us</p>
         <h1 className="careers-hero__title">Careers</h1>
-        <p className="careers-hero__sub">
-          Culture is our most valued asset. We are professionals who embrace
-          collaboration, seek better ways of working, and help our clients get
-          procurement right.
-        </p>
       </div>
     </section>
   );

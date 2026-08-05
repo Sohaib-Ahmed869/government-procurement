@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { rulesApi } from '../../api';
-import { STATES, CATEGORIES, CATEGORY_BY_VALUE } from '../../features/jurisdictions/data.js';
+import {
+  JURISDICTIONS,
+  JURISDICTION_BY_VALUE,
+  CATEGORIES,
+  CATEGORY_BY_VALUE,
+} from '../../features/jurisdictions/data.js';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
@@ -14,17 +19,15 @@ const STATUS_OPTS = [
 ];
 
 // Same lists the public page uses, so the two can't drift apart.
-const STATE_OPTS = STATES.map((s) => ({ value: s, label: s }));
+const STATE_OPTS = JURISDICTIONS.map((j) => ({ value: j.value, label: j.label }));
 const CATEGORY_OPTS = CATEGORIES.map((c) => ({ value: c.value, label: c.label }));
 
 const EMPTY = {
-  state: STATES[0],
+  state: JURISDICTIONS[0].value,
   category: CATEGORIES[0].value,
   title: '',
-  threshold: '',
   body: '',
   sourceUrl: '',
-  order: 0,
   status: 'published',
 };
 
@@ -68,13 +71,11 @@ export default function RulesAdminPage() {
   const openEdit = (row) => {
     setEditingId(row._id || row.id);
     setForm({
-      state: row.state || STATES[0],
+      state: row.state || JURISDICTIONS[0].value,
       category: row.category || CATEGORIES[0].value,
       title: row.title || '',
-      threshold: row.threshold || '',
       body: row.body || '',
       sourceUrl: row.sourceUrl || '',
-      order: row.order ?? 0,
       status: row.status || 'published',
     });
     setSaveError(null);
@@ -94,10 +95,8 @@ export default function RulesAdminPage() {
       state: form.state,
       category: form.category,
       title: form.title,
-      threshold: form.threshold,
       body: form.body,
       sourceUrl: form.sourceUrl,
-      order: Number(form.order) || 0,
       status: form.status,
     };
     try {
@@ -119,18 +118,17 @@ export default function RulesAdminPage() {
   };
 
   const columns = [
-    { key: 'state', header: 'State', width: 80 },
+    {
+      key: 'state',
+      header: 'Jurisdiction',
+      render: (r) => JURISDICTION_BY_VALUE[r.state]?.label || r.state || '—',
+      width: 210,
+    },
     { key: 'title', header: 'Rule' },
     {
       key: 'category',
       header: 'Category',
       render: (r) => CATEGORY_BY_VALUE[r.category]?.label || r.category || '—',
-    },
-    {
-      key: 'threshold',
-      header: 'Threshold',
-      render: (r) => r.threshold || '—',
-      width: 120,
     },
     {
       key: 'sourceUrl',
@@ -163,7 +161,7 @@ export default function RulesAdminPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Rules</h2>
+          <h2 className="admin-page__title">Jurisdictional Links</h2>
           <p className="admin-page__subtitle">
             Procurement rules shown on the Jurisdictional links page, by state and category.
           </p>
@@ -184,13 +182,13 @@ export default function RulesAdminPage() {
           className="admin-select"
           value={stateFilter}
           onChange={(e) => setStateFilter(e.target.value)}
-          aria-label="Filter by state"
-          style={{ maxWidth: 190 }}
+          aria-label="Filter by jurisdiction"
+          style={{ maxWidth: 240 }}
         >
-          <option value="all">All states</option>
-          {STATES.map((s) => (
-            <option key={s} value={s}>
-              {s}
+          <option value="all">All jurisdictions</option>
+          {JURISDICTIONS.map((j) => (
+            <option key={j.value} value={j.value}>
+              {j.label}
             </option>
           ))}
         </select>
@@ -227,7 +225,7 @@ export default function RulesAdminPage() {
           {saveError && <div className="admin-alert admin-alert--error">{saveError}</div>}
 
           <FormField
-            label="State"
+            label="Jurisdiction"
             name="state"
             as="select"
             options={STATE_OPTS}
@@ -253,13 +251,6 @@ export default function RulesAdminPage() {
             required
           />
           <FormField
-            label="Threshold"
-            name="threshold"
-            value={form.threshold}
-            onChange={onChange}
-            hint="Optional chip, e.g. “≥ $200,000”. Leave empty to hide it."
-          />
-          <FormField
             label="Description"
             name="body"
             as="textarea"
@@ -273,14 +264,6 @@ export default function RulesAdminPage() {
             value={form.sourceUrl}
             onChange={onChange}
             hint="Link to the official source. Without one the card has no Read more button."
-          />
-          <FormField
-            label="Order"
-            name="order"
-            type="number"
-            value={form.order}
-            onChange={onChange}
-            hint="Lowest first, within each state."
           />
           <FormField
             label="Status"

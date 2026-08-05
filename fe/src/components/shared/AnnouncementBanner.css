@@ -1,4 +1,10 @@
+/* The banner takes its colour from the segment rather than from a tone chosen
+   per message: the green the old "success" tone used on Award, light grey on
+   Win. The text colour follows, since one is dark and the other light. */
 .announce {
+  --announce-bg: #e6e6e6;
+  --announce-fg: var(--gp-ink-900);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8,18 +14,19 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: 14px;
   text-align: center;
+  background: var(--announce-bg);
+  color: var(--announce-fg);
 }
 
-/* info: glass pill look — matches the WhatsApp / Book a Consultation buttons. */
-.announce--info {
-  background: rgba(255, 255, 255, 0.2);
-  color: #000;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+.announce[data-audience='award'] {
+  --announce-bg: var(--gp-green-800);
+  --announce-fg: #fff;
 }
-.announce--success { background: var(--gp-green-800); color: #fff; }
-.announce--warning { background: #d32f2f; color: #fff; }
+
+.announce[data-audience='win'] {
+  --announce-bg: #e6e6e6;
+  --announce-fg: var(--gp-ink-900);
+}
 
 .announce__msg {
   margin: 0;
@@ -50,7 +57,9 @@
   transition: opacity 0.15s ease, background 0.15s ease;
 }
 
+/* currentColor at low alpha, so the hover wash reads on the dark Award green
+   and the light Win grey alike. */
 .announce__close:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, currentColor 14%, transparent);
 }

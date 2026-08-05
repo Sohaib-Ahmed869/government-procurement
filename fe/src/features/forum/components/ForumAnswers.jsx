@@ -2,13 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
+import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumAnswers.css';
-
-const CATEGORY_LABEL = {
-  win: 'Win Contracts',
-  award: 'Award Contracts',
-};
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -33,9 +29,6 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
 
   const [answers, setAnswers] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
-  // Featured questions for the sidebar (published + featured). Empty => the
-  // sidebar hides the whole "Featured Questions" block.
-  const [featured, setFeatured] = useState([]);
 
   useEffect(() => {
     let alive = true;
@@ -58,27 +51,6 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
       alive = false;
     };
   }, [category, query]);
-
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const list = await questionsApi.publicList({ featured: true, limit: 20 });
-        if (!alive) return;
-        setFeatured(
-          (list || []).map((q) => ({
-            label: q.title,
-            href: `/qna/answers/${q.slug || q._id}`,
-          })),
-        );
-      } catch {
-        /* sidebar just stays empty */
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   // Match on title and body. The list is capped at 100 server-side, so this
   // filters what was fetched rather than issuing a second request.
@@ -112,7 +84,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
               {query ? (
                 <>
                   No questions match that search.{' '}
-                  <Link className="forum-answers__clear" to="/qna">
+                  <Link className="forum-answers__clear" to="/q-and-a">
                     Clear search
                   </Link>
                 </>
@@ -126,7 +98,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
             <ul className="forum-answers__list">
               {visible.map((item, i) => (
                 <li key={item._id} style={{ '--i': i }}>
-                  <Link className="forum-card" to={`/qna/answers/${item.slug || item._id}`}>
+                  <Link className="forum-card" to={`/q-and-a/answers/${item.slug || item._id}`}>
                     <h3 className="forum-card__title">{item.title}</h3>
                     <div className="forum-card__meta">
                       <span className="forum-tag">{CATEGORY_LABEL[item.category] ?? tag}</span>
@@ -140,7 +112,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
           )}
         </div>
 
-        <ForumSidebar featured={featured} />
+        <ForumSidebar />
       </div>
     </section>
   );

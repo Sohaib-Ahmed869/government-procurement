@@ -113,7 +113,7 @@ export default function ForumSubmit() {
         // Use the chosen title; with none picked, derive one from the message.
         title: titleLabel || message.slice(0, 80) || 'Forum question',
         body: message,
-        category: chosen === 'award' ? 'award' : 'win',
+        category: ['award', 'general'].includes(chosen) ? chosen : 'win',
         name: (data.get('name') || '').toString().trim(),
         email: (data.get('email') || '').toString().trim(),
       });

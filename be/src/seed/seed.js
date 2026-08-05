@@ -14,7 +14,6 @@ import { User } from '../models/User.js';
 import { Setting } from '../models/Setting.js';
 import { Category } from '../models/Category.js';
 import { Page } from '../models/Page.js';
-import { Faq } from '../models/Faq.js';
 import { Article } from '../models/Article.js';
 import { Course } from '../models/Course.js';
 import { Question } from '../models/Question.js';
@@ -276,19 +275,6 @@ async function run() {
       { group: 'social', label: 'X', url: 'https://x.com', platform: 'x', order: 3 },
     ]);
     console.log('[seed] created tender + social links');
-  }
-
-  // 9. FAQs ----------------------------------------------------------------
-  if ((await Faq.countDocuments()) < 4) {
-    await Faq.deleteMany({});
-    await Faq.create([
-      { question: 'What is Government Procurement?', answer: 'We help organisations win and manage government contracts through advisory, training, and tools.', category: 'Getting started', order: 1 },
-      { question: 'How do I book a consultation?', answer: 'Use the “Book a Consultation” link in the header to request a session.', category: 'Getting started', order: 2 },
-      { question: 'Do your courses count towards CPD?', answer: 'Yes — our courses provide a certificate of completion suitable for CPD records.', category: 'Courses', order: 3 },
-      { question: 'Can I get a bid reviewed before submitting?', answer: 'Our advisory team offers tender reviews. Book a consultation to discuss scope.', category: 'Bidding & tenders', order: 4 },
-      { question: 'How is my personal data handled?', answer: 'In line with the Privacy Act 1988 and our Privacy Policy. You can unsubscribe at any time.', category: 'Account & billing', order: 5 },
-    ]);
-    console.log('[seed] refreshed FAQs');
   }
 
   // 10. Announcement --------------------------------------------------------

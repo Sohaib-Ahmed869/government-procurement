@@ -4,6 +4,10 @@
   /* Fill behind the "Get in touch" CTA and the expertise chevrons. Follows the
      segment: mint on Award, grey on Win. */
   --tm-accent: var(--gp-mint-300);
+  /* The lifted tone in the hero band, taken from the fill the FAQ filter pills
+     use when active — so the two segments read the same way here as they do
+     there. */
+  --tm-band-lift: #4a4a4a;
 
   background: var(--tm-bg);
   color: #fff;
@@ -14,18 +18,49 @@
   --tm-bg: var(--gp-green-900);
   --tm-surface: var(--gp-green-800);
   --tm-accent: var(--gp-mint-300);
+  --tm-band-lift: #2f7d45;
 }
 
 .tm[data-audience='win'] {
   --tm-bg: var(--gp-ink-900);
   --tm-surface: var(--gp-ink-800);
   --tm-accent: #c9c9c9;
+  --tm-band-lift: #4a4a4a;
 }
 
 .tm__inner {
   max-width: 1100px;
   margin: 0 auto;
   padding: 48px 40px 96px;
+}
+
+/* --- hero band --- */
+/* A lifted wash rising from the right, easing back to the section's own colour
+   before it reaches the edges. Two tones, both the segment's: the page
+   background, and the lighter fill the FAQ filter pills take when active. That
+   keeps the band on-theme under either toggle, and because it resolves to
+   --tm-bg at every edge there is no seam where it meets the body below.
+   The oklab pass keeps the midpoint on the hue instead of sagging through a
+   grey; browsers without it keep the sRGB blend above. */
+.tm__hero-band {
+  background:
+    radial-gradient(125% 145% at 82% 16%, var(--tm-band-lift) 0%, transparent 62%),
+    var(--tm-bg);
+  background:
+    radial-gradient(125% 145% at 82% 16% in oklab, var(--tm-band-lift) 0%, transparent 62%),
+    var(--tm-bg);
+}
+
+/* The band wraps the introduction rather than standing to a height of its own. */
+.tm__inner--hero {
+  padding-top: 28px;
+  padding-bottom: 32px;
+}
+
+/* The body below keeps the section's own dark surface, so it needs the top
+   padding the hero used to carry. */
+.tm__inner:not(.tm__inner--hero) {
+  padding-top: 56px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -90,7 +125,7 @@
   gap: 6px;
   margin-bottom: 18px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -121,7 +156,7 @@
   margin: 20px 0 0;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 /* --- contact / LinkedIn: the glass pills used across the site --- */
@@ -141,14 +176,14 @@
   font-weight: 500;
   color: #fff;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 100px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: background-color 0.15s ease;
 }
 
 .tm__action:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.28);
 }
 
 /* Bare glyph in the link colour, as in the footer — no disc behind it. */
@@ -156,7 +191,7 @@
   flex: none;
   width: 20px;
   height: 20px;
-  color: #fff;
+  color: currentColor;
 }
 
 /* --- body: written profile left, contact + expertise right --- */
@@ -369,16 +404,21 @@
 }
 
 /* Glass pill — matches the subscribe button. */
+/* A <button> now — it reveals the next batch in place rather than navigating —
+   so the native chrome comes off and the font is inherited. */
 .tm__work-more {
   display: inline-flex;
   align-items: center;
   margin-top: 36px;
   padding: 13px 30px;
+  font: inherit;
   font-size: 15px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
+  cursor: pointer;
   background: rgba(255, 255, 255, 0.2);
+  border: 0;
   border-radius: 999px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease;
@@ -389,11 +429,12 @@
   background: rgba(255, 255, 255, 0.28);
 }
 
-.tm :is(a):focus-visible {
+.tm :is(a, button):focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
   border-radius: 4px;
 }
+
 
 @media (max-width: 1024px) {
   .tm__body {
@@ -424,6 +465,24 @@
 @media (max-width: 760px) {
   .tm__inner {
     padding: 32px 24px 64px;
+  }
+
+  .tm__inner--hero {
+    padding-bottom: 40px;
+  }
+
+  .tm__inner:not(.tm__inner--hero) {
+    padding-top: 40px;
+  }
+
+  /* Stacked, the portrait leads from the top centre, so the lift moves with it. */
+  .tm__hero-band {
+    background:
+      radial-gradient(120% 55% at 50% 10%, var(--tm-band-lift) 0%, transparent 68%),
+      var(--tm-bg);
+    background:
+      radial-gradient(120% 55% at 50% 10% in oklab, var(--tm-band-lift) 0%, transparent 68%),
+      var(--tm-bg);
   }
 
   /* Stacked: the portrait leads, centred above the introduction. */

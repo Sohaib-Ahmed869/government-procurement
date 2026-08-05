@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAudience } from '../../context/AudienceContext.jsx';
 import { announcementsApi } from '../../api';
 import './AnnouncementBanner.css';
 
@@ -7,6 +8,7 @@ import './AnnouncementBanner.css';
 // Dismissible per-message; the dismissal is remembered in localStorage so it
 // doesn't reappear until a different announcement is published.
 export default function AnnouncementBanner() {
+  const { audience } = useAudience();
   const [banner, setBanner] = useState(null);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function AnnouncementBanner() {
   const isInternal = banner.link && banner.link.startsWith('/');
 
   return (
-    <div className={`announce announce--${banner.tone || 'info'}`} role="region" aria-label="Site announcement">
+    <div className="announce" data-audience={audience} role="region" aria-label="Site announcement">
       <p className="announce__msg">
         {banner.message}
         {banner.link &&

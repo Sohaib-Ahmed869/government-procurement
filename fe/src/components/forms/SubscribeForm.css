@@ -60,6 +60,9 @@
   padding: 11px 18px;
   font-family: inherit;
   font-size: 14px;
+  /* Centred so the placeholder and typed address line up with the heading and
+     copy above, which the section centres. */
+  text-align: center;
   color: #fff;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -92,7 +95,7 @@
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  /* Glass pill — matches the WhatsApp / Book a Consultation buttons on the homepage. */
+  /* Glass pill — matches the Request a consultation button on the homepage. */
   color: #fff;
   background: rgba(255, 255, 255, 0.2);
   border: 0;
@@ -109,7 +112,7 @@
   background: rgba(255, 255, 255, 0.28);
 }
 
-/* Hover polish — matches the homepage "Book a Consultation" button: lift + shadow. */
+/* Hover polish — matches the homepage "Request a consultation" button: lift + shadow. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .subscribe-form__button {
     transition:

@@ -111,13 +111,6 @@ export default function DashboardPage() {
       cta: 'Moderate',
     },
     {
-      label: 'New contact messages',
-      value: data.newContact ?? 0,
-      to: '/admin/contact',
-      icon: 'mail',
-      cta: 'Open inbox',
-    },
-    {
       label: 'New consultations',
       value: data.newConsultations ?? 0,
       to: '/admin/consultations',

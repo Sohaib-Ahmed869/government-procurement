@@ -36,15 +36,7 @@ export default function ExpertiseHero() {
 
           <div className="xp__actions">
             <a className="xp__btn" href="/book-a-consultation">
-              Book a Consultation
-            </a>
-            <a
-              className="xp__btn"
-              href="https://wa.me/61478669922"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Whatsapp +61 478 669 922
+              Request a Consultation
             </a>
           </div>
         </div>

@@ -207,8 +207,8 @@
     margin-top: 32px;
   }
 
-  /* Pinned width so both buttons match; wide enough that the longer
-     "Whatsapp +61 478 669 922" label clears the left-pinned icon. */
+  /* Pinned width rather than shrink-to-fit, so the label clears the
+     left-pinned icon. */
   .eb__btn {
     position: relative;
     flex: none;

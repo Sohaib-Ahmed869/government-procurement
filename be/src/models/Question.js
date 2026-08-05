@@ -9,8 +9,9 @@ const questionSchema = new mongoose.Schema(
     slug: { type: String, unique: true, sparse: true, index: true },
     // The submitted question body.
     body: { type: String, required: true },
-    // Audience category: 'win' (supplier-side) or 'award' (buyer-side).
-    category: { type: String, enum: ['win', 'award'], default: 'win', index: true },
+    // Audience category: 'win' (supplier-side), 'award' (buyer-side), or
+    // 'general' for questions that sit outside either segment.
+    category: { type: String, enum: ['win', 'award', 'general'], default: 'win', index: true },
 
     // Curated flag: featured questions surface in the forum sidebar.
     featured: { type: Boolean, default: false, index: true },

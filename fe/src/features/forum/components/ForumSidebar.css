@@ -42,34 +42,6 @@
   border-top: 2px solid #fff;
 }
 
-.forum-sidebar__featured {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.forum-sidebar__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: #fff;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-
-.forum-sidebar__link:hover {
-  opacity: 0.8;
-}
-
-.forum-sidebar__arrow {
-  flex: none;
-  color: #fff;
-}
-
 .forum-sidebar :is(a):focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;

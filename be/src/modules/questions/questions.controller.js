@@ -24,7 +24,7 @@ export const submit = asyncHandler(async (req, res) => {
   const question = await Question.create({
     title,
     body,
-    category: category === 'award' ? 'award' : 'win',
+    category: ['award', 'general'].includes(category) ? category : 'win',
     submitter,
     status: QUESTION_STATUS.SUBMITTED,
   });
