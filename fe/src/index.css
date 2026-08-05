@@ -24,6 +24,16 @@ body {
   overflow-x: clip;
 }
 
+/* The announcement banner and the header stay on screen together while the page
+   scrolls. One sticky wrapper rather than two sticky children, so the two can
+   never overlap and the header doesn't need to know the banner's height —
+   which varies with the message, and drops to nothing once it's dismissed. */
+.page-layout__chrome {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
 .page-layout__main {
   flex: 1;
   display: flex;
@@ -87,4 +97,17 @@ body {
   .page-scale .page-layout {
     min-height: calc(100vh / (100vw / 1440px));
   }
+}
+
+/* While an audience switch is resetting the page's reveal animations, hold every
+   transition. The reveals are two-way — the same 0.7s that fades a section in
+   would fade it out when it's hidden for the replay, so the section would drift
+   a few percent and come straight back: a flicker, not a reveal. Suppressed
+   here, the hidden state snaps into place and only the reveal itself animates.
+   Set by the audience toggle and cleared a frame or two later. */
+html[data-reveal-reset] *,
+html[data-reveal-reset] *::before,
+html[data-reveal-reset] *::after {
+  transition: none !important;
+  animation: none !important;
 }

@@ -145,6 +145,29 @@
   color: var(--admin-muted);
 }
 
+/* Overview — sits between the title and the rich-text body. */
+.editor-overview {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--admin-text);
+  background: #fff;
+  resize: vertical;
+}
+
+.editor-overview::placeholder { color: #9aa8a1; }
+
+.editor-overview:focus {
+  outline: none;
+  border-color: var(--admin-green);
+}
+
 /* Publish toggle row */
 .editor-publish {
   display: flex;

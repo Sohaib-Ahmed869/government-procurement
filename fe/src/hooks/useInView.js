@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { REVEAL_RESET_MS } from '../constants/motion.js';
 
 // Returns a ref and an `inView` flag that flips true once the element scrolls
 // into the viewport. Used to trigger on-enter reveal animations.
@@ -19,6 +20,14 @@ export function useInView({
   const [node, setNode] = useState(null);
   const ref = useCallback((el) => setNode(el), []);
   const [inView, setInView] = useState(false);
+
+  // Hide again the moment resetKey changes, before the browser paints. A plain
+  // effect isn't enough for a section that's already on screen: the observer
+  // re-fires a frame later and React folds the two updates together, so the
+  // element never goes back to its start state and the reveal doesn't replay.
+  useLayoutEffect(() => {
+    setInView(false);
+  }, [resetKey]);
 
   useEffect(() => {
     if (!node) return undefined;
@@ -46,8 +55,16 @@ export function useInView({
       { threshold, rootMargin }
     );
 
-    observer.observe(node);
-    return () => observer.disconnect();
+    // Held back rather than observed straight away. A section already on screen
+    // reports as intersecting immediately, so watching it in the same frame it
+    // was hidden reveals it again before the hidden state has been painted —
+    // and the animation is a flicker. The wait costs nothing on a section the
+    // visitor still has to scroll to.
+    const start = window.setTimeout(() => observer.observe(node), REVEAL_RESET_MS);
+    return () => {
+      window.clearTimeout(start);
+      observer.disconnect();
+    };
   }, [node, threshold, rootMargin, once, resetKey]);
 
   return { ref, inView };

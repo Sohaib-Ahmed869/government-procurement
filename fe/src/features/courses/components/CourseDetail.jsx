@@ -56,8 +56,8 @@ const Icon = {
 };
 
 export default function CourseDetail({ course, status = 'ready' }) {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
 
   // Loading / error / not-found states, themed to match the detail page.
   if (status !== 'ready' || !course) {

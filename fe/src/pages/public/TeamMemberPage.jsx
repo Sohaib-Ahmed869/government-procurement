@@ -6,7 +6,9 @@ export default function TeamMemberPage() {
   const { slug } = useParams();
 
   return (
-    <div className="page-scale">
+    // tm-page lets the profile's hero wash carry up into the header's toggle
+    // row on phones — see TeamMemberDetail.css.
+    <div className="page-scale tm-page">
       <PageLayout>
         <TeamMemberDetail slug={slug} />
       </PageLayout>

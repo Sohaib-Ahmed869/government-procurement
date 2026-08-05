@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 9px 44px 9px 20px;
+  padding: 9px 20px;
   position: relative;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: 14px;
@@ -37,29 +37,4 @@
   font-weight: 600;
   color: inherit;
   text-underline-offset: 3px;
-}
-
-.announce__close {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.15s ease, background 0.15s ease;
-}
-
-/* currentColor at low alpha, so the hover wash reads on the dark Award green
-   and the light Win grey alike. */
-.announce__close:hover {
-  opacity: 1;
-  background: color-mix(in srgb, currentColor 14%, transparent);
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import ForumSidebar from './ForumSidebar.jsx';
 import './ForumHero.css';
 
@@ -9,12 +10,8 @@ import './ForumHero.css';
 export default function ForumHero({ compact = false }) {
   const { audience } = useAudience();
 
-  // Mount animation: reveal after the first paint.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  // Reveal on mount, and again each time the audience toggle changes.
+  const mounted = useMountReveal(audience);
 
   // Search runs through the URL, the same way the category filter does: the
   // field submits to /forum?q=…, and ForumAnswers reads the term from there.

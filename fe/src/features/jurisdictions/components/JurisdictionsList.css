@@ -21,7 +21,7 @@
 .jl__inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 40px 96px;
+  padding: 24px 40px 48px;
 }
 
 /* --- filter panel --- */
@@ -143,12 +143,6 @@
 
 .jl__search-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
-}
-
-.jl__count {
-  margin: 0;
-  font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.7);
 }
 
 .jl__reset {
@@ -318,7 +312,7 @@
 
 @media (max-width: 760px) {
   .jl__inner {
-    padding: 16px 24px 64px;
+    padding: 16px 24px 40px;
   }
 
   .jl__filters {

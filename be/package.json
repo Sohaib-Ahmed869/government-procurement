@@ -12,6 +12,7 @@
     "seed:team": "node src/seed/seed-team.js",
     "seed:careers": "node src/seed/seed-careers.js",
     "seed:tenders": "node src/seed/seed-tenders.js",
+    "seed:capabilities": "node src/seed/seed-capabilities.js",
     "seed:demo-articles": "node src/seed/seed-demo-articles.js",
     "reset:courses": "node src/seed/reset-courses.js",
     "check": "node --check src/server.js"

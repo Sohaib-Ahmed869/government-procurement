@@ -42,12 +42,8 @@ export const homeHeroApi = {
   save: (audience, body) => api.patch(`/home-hero/${audience}`, body),
 };
 
-// Editable hero copy for the pages that came after the homepage, keyed by page
-// name (see HERO_PAGES in the backend's PageHero model).
-export const pageHeroApi = {
-  get: (page) => api.get(`/page-heroes/${page}`),
-  save: (page, audience, body) => api.patch(`/page-heroes/${page}/${audience}`, body),
-};
+// Cards in the "Deliver with Impact" row on the Capabilities page.
+export const capabilitiesApi = createResource('capabilities');
 
 export const teamApi = {
   ...createResource('team'),

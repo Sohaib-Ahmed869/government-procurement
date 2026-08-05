@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { homeHeroApi } from '../../../api';
+import { AUDIENCE_EYEBROW } from '../../../constants/audiences.js';
 import { useInView } from '../../../hooks/useInView.js';
 import mainImage from '../../../assets/images/MainPictureHomepage.png';
 import './HomeHero.css';
 
 // Copy shipped with the page. The CMS (Content → Homepage hero) overrides any
 // of these per segment; an empty field there falls back to the value here.
+// The eyebrow follows the toggle — see AUDIENCE_EYEBROW.
 const FALLBACK = {
-  eyebrow: 'Award government contracts',
   heading: 'Procure with Confidence',
   subheading:
     'Supporting government agencies and public sector organisations with end-to-end procurement advisory, ensuring that contracts are awarded fairly, efficiently, and in line with best practice.',
@@ -35,24 +37,12 @@ export default function HomeHero() {
   }, []);
 
   const forAudience = copy?.[audience] || {};
-  const eyebrow = forAudience.eyebrow || FALLBACK.eyebrow;
+  const eyebrow = forAudience.eyebrow || AUDIENCE_EYEBROW[audience];
   const heading = forAudience.heading || FALLBACK.heading;
   const subheading = forAudience.subheading || FALLBACK.subheading;
 
-  // Mount animation: reset to hidden then flip the flag after a paint so the
-  // reveal transitions play on load and again whenever the audience toggles.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(false);
-    let inner;
-    const outer = requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => setMounted(true));
-    });
-    return () => {
-      cancelAnimationFrame(outer);
-      cancelAnimationFrame(inner);
-    };
-  }, [audience]);
+  // Reveal on mount, and again each time the audience toggle changes.
+  const mounted = useMountReveal(audience);
 
   // The advisory block sits lower down, so reveal it on scroll-in instead.
   // Passing the audience replays the reveal when the toggle changes.

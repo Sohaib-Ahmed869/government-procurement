@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
@@ -13,12 +14,13 @@ function formatDate(iso) {
 }
 
 export default function ForumArticle() {
+  const { audience } = useAudience();
   const [article, setArticle] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | empty
 
   // resetKey includes status so the reveal animation replays once the ready
   // content actually mounts (the ref isn't rendered during loading).
-  const { ref, inView } = useInView({ resetKey: `${article?._id ?? 'none'}:${status}` });
+  const { ref, inView } = useInView({ resetKey: `${audience}:${article?._id ?? 'none'}:${status}` });
 
   useEffect(() => {
     let alive = true;

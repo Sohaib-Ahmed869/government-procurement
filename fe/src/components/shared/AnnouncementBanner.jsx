@@ -4,9 +4,9 @@ import { useAudience } from '../../context/AudienceContext.jsx';
 import { announcementsApi } from '../../api';
 import './AnnouncementBanner.css';
 
-// Thin site-wide banner driven by the CMS (the active, in-window announcement).
-// Dismissible per-message; the dismissal is remembered in localStorage so it
-// doesn't reappear until a different announcement is published.
+// Thin site-wide banner driven by the CMS (the active announcement). Not
+// dismissible — it stays for as long as the CMS keeps it active, so whether a
+// visitor sees it is an editor's decision rather than theirs.
 export default function AnnouncementBanner() {
   const { audience } = useAudience();
   const [banner, setBanner] = useState(null);
@@ -16,9 +16,7 @@ export default function AnnouncementBanner() {
     announcementsApi
       .active()
       .then((b) => {
-        if (!alive || !b) return;
-        const dismissed = localStorage.getItem('gp.banner.dismissed');
-        if (dismissed !== (b._id || b.id)) setBanner(b);
+        if (alive && b) setBanner(b);
       })
       .catch(() => {});
     return () => {
@@ -27,15 +25,6 @@ export default function AnnouncementBanner() {
   }, []);
 
   if (!banner) return null;
-
-  const dismiss = () => {
-    try {
-      localStorage.setItem('gp.banner.dismissed', banner._id || banner.id);
-    } catch {
-      /* ignore */
-    }
-    setBanner(null);
-  };
 
   const isInternal = banner.link && banner.link.startsWith('/');
 
@@ -54,9 +43,6 @@ export default function AnnouncementBanner() {
             </a>
           ))}
       </p>
-      <button type="button" className="announce__close" aria-label="Dismiss announcement" onClick={dismiss}>
-        ×
-      </button>
     </div>
   );
 }

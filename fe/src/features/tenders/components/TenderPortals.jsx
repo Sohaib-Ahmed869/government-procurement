@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { tenderSitesApi } from '../../../api';
 import './TenderPortals.css';
 
@@ -85,12 +86,8 @@ export default function TenderPortals() {
     };
   }, []);
 
-  // Mount animation: reveal after the first paint.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  // Reveal on mount, and again each time the audience toggle changes.
+  const mounted = useMountReveal(audience);
 
   return (
     <section className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>

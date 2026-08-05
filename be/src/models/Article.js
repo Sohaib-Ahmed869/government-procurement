@@ -6,7 +6,10 @@ const articleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, index: true },
+    // Retired from the CMS and the site — kept so existing values aren't lost.
     excerpt: { type: String, default: '' },
+    // High-level overview, printed above the body on the article page.
+    overview: { type: String, default: '' },
     body: { type: String, default: '' }, // rich HTML
     // Legacy free-text topic label. Superseded by `category`, which is what the
     // CMS sets and the site displays — nothing writes this any more. Kept so the
@@ -33,6 +36,6 @@ const articleSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-articleSchema.index({ title: 'text', excerpt: 'text', body: 'text' });
+articleSchema.index({ title: 'text', overview: 'text', body: 'text' });
 
 export const Article = mongoose.model('Article', articleSchema);

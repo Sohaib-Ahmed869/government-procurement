@@ -6,7 +6,7 @@ import RichTextEditor from '../components/RichTextEditor.jsx';
 import EditorShell from '../components/EditorShell.jsx';
 
 const BLANK = {
-  title: '', author: '', body: '',
+  title: '', author: '', overview: '', body: '',
   category: '', featured: 'false', status: 'draft',
   seoTitle: '', seoDescription: '',
 };
@@ -96,7 +96,7 @@ export default function ArticleEditorPage() {
       .then((a) => {
         const next = {
           title: a.title ?? '', author: a.author ?? '',
-          body: a.body ?? '',
+          overview: a.overview ?? '', body: a.body ?? '',
           category: a.category?._id ?? a.category ?? '',
           featured: a.featured ? 'true' : 'false', status: a.status ?? 'draft',
           seoTitle: a.seo?.title ?? '', seoDescription: a.seo?.description ?? '',
@@ -130,7 +130,7 @@ export default function ArticleEditorPage() {
     // editor, and omitting it leaves whatever an older article already had
     // stored intact rather than blanking it on the next save.
     title: form.title, author: form.author,
-    body: form.body,
+    overview: form.overview, body: form.body,
     category: form.category || undefined,
     featured: form.featured === 'true',
     status: statusOverride || form.status,
@@ -341,6 +341,17 @@ export default function ArticleEditorPage() {
         onChange={onChange}
         placeholder="Insight title"
         aria-label="Insight title"
+      />
+      {/* Printed above the body on the site, in larger type. */}
+      <span className="editor-body-label">Overview</span>
+      <textarea
+        className="editor-overview"
+        name="overview"
+        rows={3}
+        value={form.overview}
+        onChange={onChange}
+        placeholder="A high-level overview of the insight, in a sentence or two…"
+        aria-label="Overview"
       />
       <span className="editor-body-label">Body</span>
       <RichTextEditor

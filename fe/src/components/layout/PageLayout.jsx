@@ -8,8 +8,12 @@ import AnnouncementBanner from '../shared/AnnouncementBanner.jsx';
 export default function PageLayout({ children, showToggle = true, audience }) {
   return (
     <div className="page-layout">
-      <AnnouncementBanner />
-      <Header showToggle={showToggle} audience={audience} />
+      {/* Banner and header pin to the top together, as one block — sticking them
+          separately would let the header slide up over the banner. */}
+      <div className="page-layout__chrome">
+        <AnnouncementBanner />
+        <Header showToggle={showToggle} audience={audience} />
+      </div>
       <main className="page-layout__main">{children}</main>
       <Footer audience={audience} />
     </div>

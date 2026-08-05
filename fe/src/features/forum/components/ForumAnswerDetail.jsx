@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { questionsApi } from '../../../api';
@@ -18,13 +19,14 @@ function formatDate(iso) {
 export default function ForumAnswerDetail() {
   const { id } = useParams();
 
+  const { audience } = useAudience();
   const [answer, setAnswer] = useState(null);
   const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound
 
   // resetKey includes status so the IntersectionObserver re-attaches once the
   // content section actually mounts (the ref isn't rendered during loading).
-  const { ref, inView } = useInView({ resetKey: `${id}:${status}` });
+  const { ref, inView } = useInView({ resetKey: `${audience}:${id}:${status}` });
 
   useEffect(() => {
     let alive = true;

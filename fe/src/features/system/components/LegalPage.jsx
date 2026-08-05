@@ -1,19 +1,20 @@
-import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import './LegalPage.css';
 
 // Shared long-form template for the legal / policy pages (Privacy Policy,
 // Terms of Use). Content is passed as an array of { heading, body } sections
 // where body is an array of paragraph strings or { list: [...] }. Real copy is
 // managed in the CMS Pages editor later; these hold the placeholder text.
-export default function LegalPage({ title, updated, intro, sections = [], crumbs = [] }) {
+export default function LegalPage({ title, updated, intro, sections = [] }) {
   const { audience } = useAudience();
+  // The head is above the fold on every legal page, so reveal on mount rather
+  // than on scroll — and replay it when the audience toggle changes.
+  const shown = useMountReveal(audience);
 
   return (
-    <article className="legal" data-audience={audience}>
+    <article className={`legal${shown ? ' is-in' : ''}`} data-audience={audience}>
       <div className="legal__inner">
-        {crumbs.length > 0 && <Breadcrumbs items={crumbs} />}
-
         <header className="legal__head">
           <h1 className="legal__title">{title}</h1>
           {updated && <p className="legal__updated">Last updated: {updated}</p>}
