@@ -1,7 +1,6 @@
 import PageLayout from '../../components/layout/PageLayout.jsx';
 import AdvisoryHero from '../../features/advisory/components/AdvisoryHero.jsx';
 import DeliverImpact from '../../features/advisory/components/DeliverImpact.jsx';
-import EnhanceExperience from '../../features/home/components/EnhanceExperience.jsx';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import './AdvisoryServicesPage.css';
 
@@ -15,7 +14,6 @@ export default function AdvisoryServicesPage() {
       <PageLayout>
         <AdvisoryHero key={`adv-hero-${audience}`} />
         <DeliverImpact key={`adv-impact-${audience}`} />
-        <EnhanceExperience key={`adv-enhance-${audience}`} />
       </PageLayout>
     </div>
   );

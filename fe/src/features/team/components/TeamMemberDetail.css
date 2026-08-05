@@ -18,20 +18,20 @@
   --tm-bg: var(--gp-green-900);
   --tm-surface: var(--gp-green-800);
   --tm-accent: var(--gp-mint-300);
-  --tm-band-lift: #2f7d45;
+  --tm-band-lift: var(--gp-lift-green);
 }
 
 .tm[data-audience='win'] {
   --tm-bg: var(--gp-ink-900);
   --tm-surface: var(--gp-ink-800);
   --tm-accent: #c9c9c9;
-  --tm-band-lift: #4a4a4a;
+  --tm-band-lift: var(--gp-lift-grey);
 }
 
 .tm__inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 48px 40px 96px;
+  padding: 48px 40px 48px;
 }
 
 /* --- hero band --- */
@@ -462,9 +462,29 @@
   }
 }
 
+/* The mobile audience toggle is painted as an overlay, and index.css reserves
+   room for it as top padding on the page's first section — here, on .tm, whose
+   flat background then showed as a dark block behind the toggle with the hero's
+   wash starting below it. Handing that padding to the band instead puts the
+   wash behind the toggle: it now starts directly under the header bar and runs
+   unbroken down to the Contact and LinkedIn buttons.
+
+   Matched to the 860px breakpoint the reserved space itself uses, not the
+   760px one below — between the two the toggle is on screen and still needs
+   the band behind it. */
+@media (max-width: 860px) {
+  .tm-page .page-layout__main > .tm {
+    padding-top: 0;
+  }
+
+  .tm__hero-band {
+    padding-top: var(--mobile-toggle-space);
+  }
+}
+
 @media (max-width: 760px) {
   .tm__inner {
-    padding: 32px 24px 64px;
+    padding: 32px 24px 40px;
   }
 
   .tm__inner--hero {
@@ -475,15 +495,20 @@
     padding-top: 40px;
   }
 
-  /* Stacked, the portrait leads from the top centre, so the lift moves with it. */
+  /* Stacked, the wash rises from the foot of the band: full strength around the
+     Contact and LinkedIn buttons, easing back to the page colour on the way up
+     to the header. Because it resolves to --tm-bg before it gets there, the top
+     of the band matches the bar above it exactly and the two meet with no seam,
+     even though the band runs up behind the audience toggle.
+
+     Angled off the bottom-right, so it carries the same direction as the wash
+     on wider screens. Colour to colour rather than to transparent: an alpha
+     fade sags through grey across the middle of the band. */
   .tm__hero-band {
-    background:
-      radial-gradient(120% 55% at 50% 10%, var(--tm-band-lift) 0%, transparent 68%),
-      var(--tm-bg);
-    background:
-      radial-gradient(120% 55% at 50% 10% in oklab, var(--tm-band-lift) 0%, transparent 68%),
-      var(--tm-bg);
+    background: linear-gradient(340deg, var(--tm-band-lift) 0%, var(--tm-bg) 78%);
+    background: linear-gradient(340deg in oklab, var(--tm-band-lift) 0%, var(--tm-bg) 78%);
   }
+
 
   /* Stacked: the portrait leads, centred above the introduction. */
   .tm__hero {
@@ -525,8 +550,27 @@
     text-align: left;
   }
 
+  /* Stacked, the two columns stop being boxes so their blocks become items of
+     .tm__body directly — that's what lets the running profile and the sidebar
+     interleave, which `order` alone can't do across two containers.
+     Reading order on a phone: About, the contact button, then the credentials
+     shortest-first, with the published work last. */
+  .tm__main,
   .tm__aside {
-    order: -1;
+    display: contents;
+  }
+
+  .tm__block--about { order: 1; }
+  .tm__cta { order: 2; }
+  .tm__block--expertise { order: 3; }
+  .tm__block--education { order: 4; }
+  .tm__block--experience { order: 5; }
+  .tm__block--publications { order: 6; }
+
+  /* The grid's own gap spaces them now; the stacking margins would double it. */
+  .tm__block + .tm__block,
+  .tm__aside .tm__block {
+    margin-top: 0;
   }
 
   .tm__aside .tm__block {

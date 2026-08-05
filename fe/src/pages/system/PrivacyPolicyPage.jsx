@@ -66,7 +66,6 @@ export default function PrivacyPolicyPage() {
           title="Privacy Policy"
           updated="September 2025"
           intro="How we collect, use, and protect your personal information."
-          crumbs={[{ label: 'Privacy Policy' }]}
           sections={SECTIONS}
         />
       </PageLayout>

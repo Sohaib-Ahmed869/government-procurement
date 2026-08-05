@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useInView } from '../../../hooks/useInView.js';
+import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { coursesApi } from '../../../api';
 import menuIcon from '../../../assets/icons/Menu.png';
@@ -117,8 +117,12 @@ function SortDropdown({ value, onChange }) {
 }
 
 export default function CoursesBrowser() {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  // Revealed with the hero rather than on scroll. This section sits directly
+  // under a short hero and is taller than the viewport, so it never satisfied
+  // the observer's threshold on a shorter screen — the page looked like it
+  // ended below the intro until you scrolled.
+  const inView = useMountReveal(audience);
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
   const [sort, setSort] = useState('popular');
@@ -189,7 +193,7 @@ export default function CoursesBrowser() {
   }, [courses, category, level, sort]);
 
   return (
-    <section ref={ref} className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="courses-browse__inner">
         {/* Sidebar on desktop; a slide-up panel on phones. */}
         <div

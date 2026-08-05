@@ -100,8 +100,8 @@ function readingMinutes(article) {
 const PAGE_SIZE = 12;
 
 export default function InsightsGrid() {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
   // The selected category id, or 'all'.
   const [category, setCategory] = useState('all');
 

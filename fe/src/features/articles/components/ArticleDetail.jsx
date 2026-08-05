@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
+import { FaLink, FaCheck } from 'react-icons/fa6';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import { articlesApi } from '../../../api';
+import { articlesApi, teamApi } from '../../../api';
 import './ArticleDetail.css';
 
 function formatDate(iso) {
@@ -18,32 +18,46 @@ function authorName(author) {
   if (!author) return '';
   return typeof author === 'string' ? author : author.name || '';
 }
-function authorRole(author) {
-  return author && typeof author === 'object' ? author.role || '' : '';
+
+// The byline links to the writer's profile — but only when there is one to open.
+// Members are stored with hasProfile false until a profile page is filled in,
+// and /our-team/<slug> is only rendered for those that have it.
+function profilePath(team, name) {
+  if (!name) return null;
+  const member = team.find((m) => m.name === name);
+  return member?.hasProfile && member.slug ? `/our-team/${member.slug}` : null;
 }
 
+// Copy-link control, sitting above the article alongside the byline.
 function ShareRow() {
   const [copied, setCopied] = useState(false);
+  const url = typeof window !== 'undefined' ? window.location.href : '';
 
   const onCopy = () => {
-    const url = typeof window !== 'undefined' ? window.location.href : '';
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).then(
-        () => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        },
-        () => setCopied(false),
-      );
-    }
+    if (!navigator?.clipboard?.writeText) return;
+    navigator.clipboard.writeText(url).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      },
+      () => setCopied(false),
+    );
   };
 
   return (
     <div className="article-share">
       <span className="article-share__label">Share this article</span>
-      <div className="article-share__buttons">
-        <button type="button" className="article-share__button" onClick={onCopy}>
-          {copied ? 'Link copied' : 'Copy link'}
+      <div className="article-share__actions">
+        <button
+          type="button"
+          className="article-share__action"
+          onClick={onCopy}
+          aria-label={copied ? 'Link copied' : 'Copy link'}
+        >
+          <span className="article-share__icon" aria-hidden="true">
+            {copied ? <FaCheck /> : <FaLink />}
+          </span>
+          <span className="article-share__name">{copied ? 'Copied' : 'Copy link'}</span>
         </button>
       </div>
     </div>
@@ -53,21 +67,25 @@ function ShareRow() {
 export default function ArticleDetail({ slug }) {
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
+  const [team, setTeam] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound | error
   const { audience } = useAudience();
 
   // resetKey includes status so the reveal observer re-attaches once the
   // content mounts (the ref isn't rendered during the loading state).
-  const { ref, inView } = useInView({ resetKey: `${slug}:${status}` });
+  const { ref, inView } = useInView({ resetKey: `${audience}:${slug}:${status}` });
 
   useEffect(() => {
     let alive = true;
     setStatus('loading');
     (async () => {
       try {
-        const [item, list] = await Promise.all([
+        // The team list is only needed to resolve the byline link, so a failure
+        // there leaves the name as plain text rather than failing the page.
+        const [item, list, people] = await Promise.all([
           articlesApi.getBySlug(slug),
           articlesApi.list({ limit: 4 }).catch(() => []),
+          teamApi.list({ limit: 100 }).catch(() => []),
         ]);
         if (!alive) return;
         if (!item) {
@@ -76,6 +94,7 @@ export default function ArticleDetail({ slug }) {
         }
         setArticle(item);
         setRelated((list || []).filter((a) => a.slug !== slug).slice(0, 3));
+        setTeam(people || []);
         setStatus('ready');
       } catch (err) {
         if (!alive) return;
@@ -92,7 +111,7 @@ export default function ArticleDetail({ slug }) {
     return (
       <section className="article" data-audience={audience}>
         <div className="article-body">
-          <p className="article-prose__lead">Loading article…</p>
+          <p className="article-overview">Loading article…</p>
         </div>
       </section>
     );
@@ -105,7 +124,7 @@ export default function ArticleDetail({ slug }) {
           <h1 className="article-hero__title">
             {status === 'notfound' ? 'Article not found' : 'Something went wrong'}
           </h1>
-          <p className="article-prose__lead">
+          <p className="article-overview">
             {status === 'notfound'
               ? "We couldn't find the article you were looking for. It may have been moved or removed."
               : "We couldn't load this article right now. Please try again shortly."}
@@ -119,44 +138,56 @@ export default function ArticleDetail({ slug }) {
   }
 
   const name = authorName(article.author);
-  const role = authorRole(article.author);
-  const initial = name ? name.charAt(0).toUpperCase() : '·';
+  const authorHref = profilePath(team, name);
   const date = formatDate(article.publishedAt);
   const heroUrl = article.heroImage?.url;
+  const kind = article.category?.name || 'Article';
 
   return (
     <article ref={ref} className={`article${inView ? ' is-in' : ''}`} data-audience={audience}>
-      <header className="article-hero">
-        <div className="article-hero__inner">
-          <div className="article-hero__meta">
-            {article.category?.name && (
-              <span className="article-hero__chip">{article.category.name}</span>
-            )}
-            {date && <span className="article-hero__date">{date}</span>}
+      {/* Title panel on the left, hero image running to the right edge. */}
+      <header className={`article-hero${heroUrl ? '' : ' article-hero--plain'}`}>
+        <div className="article-hero__panel">
+          <div className="article-hero__panel-inner">
+            <h1 className="article-hero__title">{article.title}</h1>
+            <p className="article-hero__meta">
+              {date && <span>{date}</span>}
+              {date && <span className="article-hero__sep">|</span>}
+              <span>{kind}</span>
+              {article.readingMinutes > 0 && (
+                <>
+                  <span className="article-hero__sep">|</span>
+                  <span>{article.readingMinutes} min read</span>
+                </>
+              )}
+            </p>
           </div>
-          <h1 className="article-hero__title">{article.title}</h1>
-          {name && (
-            <div className="article-hero__author">
-              <span className="article-hero__avatar" aria-hidden="true">
-                {initial}
-              </span>
-              <span className="article-hero__author-text">
-                <span className="article-hero__author-name">{name}</span>
-                {role && <span className="article-hero__author-role">{role}</span>}
-              </span>
-            </div>
-          )}
         </div>
+        {heroUrl && (
+          <div className="article-hero__media">
+            <img src={heroUrl} alt={article.heroImage?.alt || ''} />
+          </div>
+        )}
       </header>
 
-      {heroUrl && (
-        <figure className="article-figure">
-          <img className="article-figure__img" src={heroUrl} alt="" />
-        </figure>
-      )}
-
       <div className="article-body">
-        <Breadcrumbs items={[{ label: 'Insights', to: '/insights' }, { label: article.title }]} />
+        <div className="article-byline">
+          {name && (
+            <p className="article-byline__author">
+              By{' '}
+              {authorHref ? (
+                <Link className="article-byline__link" to={authorHref}>
+                  {name}
+                </Link>
+              ) : (
+                <span className="article-byline__name">{name}</span>
+              )}
+            </p>
+          )}
+          <ShareRow />
+        </div>
+
+        {article.overview && <p className="article-overview">{article.overview}</p>}
 
         {/* Body is authored HTML from the CMS. */}
         <div
@@ -164,34 +195,6 @@ export default function ArticleDetail({ slug }) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: article.body || '' }}
         />
-
-        <aside className="article-cta">
-          <div className="article-cta__text">
-            <h2 className="article-cta__title">Get insights like this in your inbox</h2>
-            <p className="article-cta__copy">
-              Join procurement leaders getting our latest thinking on strategy, governance, and
-              the tools reshaping the profession.
-            </p>
-          </div>
-          <form
-            className="article-cta__form"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <input
-              type="email"
-              className="article-cta__input"
-              placeholder="you@organisation.gov"
-              aria-label="Email address"
-            />
-            <button type="submit" className="article-cta__button">
-              Subscribe
-            </button>
-          </form>
-        </aside>
-
-        <ShareRow />
       </div>
 
       {related.length > 0 && (

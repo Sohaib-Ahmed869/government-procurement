@@ -19,8 +19,8 @@ const EXPERTISE = [
 ];
 
 export default function AboutExpertise() {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
 
   return (
     <section ref={ref} className={`ab${inView ? ' is-in' : ''}`} data-audience={audience}>

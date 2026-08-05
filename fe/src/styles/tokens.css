@@ -20,4 +20,11 @@
      grey counterpart to green-900 / green-800. */
   --gp-ink-900: #1a1a1a;
   --gp-ink-800: #242424;
+
+  /* Lifted wash on the team profile hero: the fill the Q&A filter pills take
+     when active, and its grey counterpart. Shared because the wash spans two
+     stylesheets — the page's hero band and the header's toggle row above it —
+     and a mismatch between them would show as a seam. */
+  --gp-lift-green: #2f7d45;
+  --gp-lift-grey: #4a4a4a;
 }

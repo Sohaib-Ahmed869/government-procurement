@@ -147,6 +147,7 @@ export default function UnlockPotential() {
     >
       <div className="uy__inner">
         <p className="uy__eyebrow">Courses &amp; artefacts</p>
+        <h2 className="uy__title">Unlock your potential</h2>
 
         {/* Bento grid (desktop) / swipeable carousel (mobile). The layout adapts
             to how much content exists; see `mode` above. */}

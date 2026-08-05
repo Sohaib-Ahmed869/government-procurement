@@ -101,27 +101,11 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         >
           {/* Source is 738×640; height drives the size, width follows. */}
           <img className="site-header__logo" src={logo} alt="" width="26" height="23" />
-          <span className="site-header__wordmark">Government Procurement</span>
+          <span className="site-header__wordmark">
+            <span>Government</span>
+            <span>Procurement</span>
+          </span>
         </Link>
-
-        <nav className="site-header__nav" aria-label="Primary">
-          <ul className="site-header__nav-list">
-            {navLinks.map((item) => {
-              const current = isCurrent(pathname, item);
-              return (
-                <li key={item.href}>
-                  <Link
-                    className={`site-header__nav-link${current ? ' is-current' : ''}`}
-                    to={item.href}
-                    aria-current={current ? 'page' : undefined}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
 
         <div className="site-header__actions">
           {showToggle && <AudienceToggle />}
@@ -152,13 +136,32 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         </div>
       </div>
 
+      <nav className="site-header__nav" aria-label="Primary">
+        <ul className="site-header__nav-list">
+          {navLinks.map((item) => {
+            const current = isCurrent(pathname, item);
+            return (
+              <li key={item.href}>
+                <Link
+                  className={`site-header__nav-link${current ? ' is-current' : ''}`}
+                  to={item.href}
+                  aria-current={current ? 'page' : undefined}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
       {/* The toggle sits in the top bar on desktop; on mobile the bar only has
           room for the logo and hamburger, so it moves to its own row
           directly beneath — on every page, the way the homepage hero used to
           carry it. */}
       {showToggle && (
         <div className={`site-header__toggle-row${menuOpen ? ' is-hidden' : ''}`}>
-          <AudienceToggle />
+          <AudienceToggle plain />
         </div>
       )}
 

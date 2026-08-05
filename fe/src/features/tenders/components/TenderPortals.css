@@ -41,7 +41,7 @@
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 56px 40px 96px;
+  padding: 56px 40px 48px;
 }
 
 /* --- reveal on mount --- */
@@ -326,12 +326,22 @@
   padding: 8px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Once a logo is uploaded the tile becomes a solid white chip: the artwork is
+   fitted inside it whole, and the rounded corners cut white on all four sides.
+   Left transparent, the corners would only clip where the artwork happened to
+   reach the edge, rounding two sides and leaving the other two square. */
+.tp__logo:has(img) {
+  padding: 0;
+  background: #fff;
 }
 
 .tp__logo img {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 

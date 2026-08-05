@@ -4,8 +4,8 @@ import bg from '../../../assets/images/OurexpertiseEnhance.png';
 import './EnhanceBanner.css';
 
 export default function EnhanceBanner() {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
 
   return (
     <section ref={ref} className={`eb${inView ? ' is-in' : ''}`} data-audience={audience}>

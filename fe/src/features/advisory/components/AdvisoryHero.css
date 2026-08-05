@@ -19,9 +19,7 @@
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
   .adv-hero__eyebrow,
-  .adv-hero__title,
-  .adv-hero__copy,
-  .adv-hero__actions {
+  .adv-hero__title {
     opacity: 0;
     transform: translateY(28px);
     transition:
@@ -38,16 +36,6 @@
     opacity: 1;
     transform: none;
     transition-delay: 0.15s;
-  }
-  .adv-hero.is-in .adv-hero__copy {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.25s;
-  }
-  .adv-hero.is-in .adv-hero__actions {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.35s;
   }
 }
 
@@ -68,7 +56,8 @@
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  padding: 72px 40px 48px;
+  /* Half the gap to the section heading below; .di__inner pays the rest. */
+  padding: 72px 40px 24px;
 }
 
 .adv-hero__eyebrow {
@@ -88,75 +77,19 @@
   letter-spacing: -0.015em;
 }
 
-.adv-hero__copy {
-  max-width: 575px;
-  margin: 26px 0 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #fff;
-}
-
-.adv-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 40px;
-}
-
-/* --- glass buttons --- */
-.adv-hero__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 22px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 100px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: background-color 0.15s ease;
-}
-
-.adv-hero__btn:hover {
-  background: rgba(255, 255, 255, 0.24);
-}
-
-.adv-hero__circle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex: none;
-  overflow: hidden;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.adv-hero__circle img {
-  display: block;
-}
-
 .adv-hero :is(a):focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
 
 @media (max-width: 860px) {
-  /* Centred stack: title, copy, buttons — with the wave anchored to the
-     bottom of the hero the way the homepage hero does it. */
-
   /* The header toggle already states the audience, so the eyebrow is redundant. */
   .adv-hero__eyebrow {
     display: none;
   }
 
   .adv-hero__inner {
-    padding: 38px 24px 56px;
+    padding: 38px 24px 16px;
     text-align: center;
   }
 
@@ -165,53 +98,5 @@
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
     /* Shared page-title size on small screens. */
     font-size: clamp(38px, 11vw, 52px);
-  }
-
-  /* Only the first sentence runs on phones; the rest is dropped and the lead
-     picks up a trailing dot so it reads as truncated. */
-  .adv-hero__copy-rest {
-    display: none;
-  }
-
-  .adv-hero__copy-lead::after {
-    content: '.';
-  }
-
-  /* Matches the footer blurb. */
-  .adv-hero__copy {
-    max-width: 420px;
-    margin: 22px auto 0;
-    font-size: 18px;
-    line-height: 1.5;
-    color: #fff;
-  }
-
-  .adv-hero__actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    margin-top: 32px;
-  }
-
-  /* Pinned width rather than shrink-to-fit, so the label clears the
-     left-pinned icon. */
-  .adv-hero__btn {
-    position: relative;
-    flex: none;
-    width: 274px;
-    min-width: 274px;
-    max-width: 274px;
-    height: 54px;
-    justify-content: center;
-    padding: 12px 18px;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-
-  .adv-hero__circle {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
   }
 }

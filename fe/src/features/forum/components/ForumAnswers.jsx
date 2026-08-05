@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
@@ -20,12 +21,13 @@ function excerpt(text, max = 240) {
 }
 
 export default function ForumAnswers({ heading = 'Recent Answers', category = 'win' }) {
+  const { audience } = useAudience();
   // The hero's search field writes ?q= here.
   const [params] = useSearchParams();
   const query = (params.get('q') || '').trim();
 
   // resetKey replays the reveal animation whenever the list changes.
-  const { ref, inView } = useInView({ resetKey: `${category}-${query}` });
+  const { ref, inView } = useInView({ resetKey: `${audience}:${category}-${query}` });
 
   const [answers, setAnswers] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error

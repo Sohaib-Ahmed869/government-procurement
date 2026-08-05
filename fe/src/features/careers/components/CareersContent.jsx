@@ -6,7 +6,9 @@ import './CareersContent.css';
 
 // Applications come by email, to the same address as the footer's contact block.
 const CV_EMAIL = 'mkheir@govprocurement.com.au';
-const CV_HREF = `mailto:${CV_EMAIL}?subject=${encodeURIComponent('CV submission')}`;
+// A proposed role rather than an application to an advertised one — its own
+// subject line so those land distinctly in the same inbox.
+const OWN_ROLE_HREF = `mailto:${CV_EMAIL}?subject=${encodeURIComponent('Role proposal')}`;
 const LINKEDIN_HREF = 'https://www.linkedin.com/company/governmentprocurement/';
 
 // An opening's Apply link is optional in the CMS. Left blank, Apply emails the
@@ -61,32 +63,13 @@ export default function CareersContent() {
       data-audience={audience}
     >
       <div className="careers__inner">
-        {/* --- current opportunities --- */}
-        <section className="careers__block">
-          <h2 className="careers__heading">Current job opportunities</h2>
-          <p className="careers__copy">
-            We recruit across our procurement consulting roles. Open positions
-            are listed below; use the apply link to start a conversation.
-          </p>
-          <p className="careers__copy">
-            We aren&rsquo;t always advertising, but we&rsquo;re happy to receive
-            open applications year-round. To be considered for future roles, send
-            us your CV and a short covering note.
-          </p>
-          <a
-            className="careers__linkedin"
-            href={LINKEDIN_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Follow us on LinkedIn to hear when we&rsquo;re hiring
-          </a>
-        </section>
-
         {/* --- roles --- */}
-        {roles.length > 0 && (
-          <section className="careers__block">
-            <h2 className="careers__heading">Roles we are hiring for</h2>
+        {/* The heading stands whether or not anything is open: an empty careers
+            page reads as broken, and "nothing right now" is useful in itself. */}
+        <section className="careers__block">
+          <h2 className="careers__heading">Roles we are hiring for</h2>
+
+          {roles.length > 0 ? (
             <ul className="careers__roles">
               {roles.map((role) => {
                 const href = applyHref(role);
@@ -105,20 +88,35 @@ export default function CareersContent() {
                 );
               })}
             </ul>
-          </section>
-        )}
+          ) : (
+            <p className="careers__copy">
+              We aren&rsquo;t hiring for any positions at the moment. New roles
+              are posted here as they open, and we&rsquo;re glad to hear from you
+              in the meantime.
+            </p>
+          )}
 
-        {/* --- closing CTA --- */}
-        <section className="careers__cta">
-          <h2 className="careers__cta-title">Apply to join our team</h2>
-          <p className="careers__cta-copy">
-            Culture is our most valued asset. We are respectful, we promote
-            better ways of working, and we listen to what our clients are
-            actually trying to achieve. We collaborate, mentor and support each
-            other&rsquo;s growth.
+          <a
+            className="careers__linkedin"
+            href={LINKEDIN_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Follow us on LinkedIn to hear when we&rsquo;re hiring
+          </a>
+        </section>
+
+        {/* --- reverse brief: propose a role rather than answer an advert --- */}
+        <section className="careers__block">
+          <h2 className="careers__heading">Create your own role</h2>
+          <p className="careers__copy">
+            Tell us the role you think we should be hiring for and why you are
+            the person to do it. Send your CV with a short
+            note covering what the role would involve, the problem it solves for
+            our clients, and the experience you would bring to it.
           </p>
-          <a className="careers__cta-btn" href={CV_HREF}>
-            Submit your CV
+          <a className="careers__cta-btn" href={OWN_ROLE_HREF}>
+            Propose a role
           </a>
         </section>
       </div>

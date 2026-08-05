@@ -21,13 +21,12 @@
 .careers__inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 40px 96px;
+  padding: 24px 40px 48px;
 }
 
 /* --- reveal on scroll-in --- */
 @media (prefers-reduced-motion: no-preference) {
-  .careers__block,
-  .careers__cta {
+  .careers__block {
     opacity: 0;
     transform: translateY(28px);
     transition:
@@ -35,15 +34,13 @@
       transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
-  .careers.is-in .careers__block,
-  .careers.is-in .careers__cta {
+  .careers.is-in .careers__block {
     opacity: 1;
     transform: none;
   }
 
   .careers.is-in .careers__block:nth-of-type(2) { transition-delay: 0.08s; }
   .careers.is-in .careers__block:nth-of-type(3) { transition-delay: 0.16s; }
-  .careers.is-in .careers__cta { transition-delay: 0.24s; }
 }
 
 .careers__block + .careers__block {
@@ -70,6 +67,7 @@
 
 .careers__linkedin {
   display: inline-block;
+  /* Enough to clear the paragraph it follows in the empty state. */
   margin-top: 6px;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.65);
@@ -91,6 +89,12 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Following the role cards rather than a paragraph, the link needs to clear the
+   card edge — 6px reads as if it belongs to the last card. */
+.careers__roles + .careers__linkedin {
+  margin-top: 28px;
 }
 
 .careers-role {
@@ -134,30 +138,6 @@
 .careers-role__apply:hover,
 .careers-role__apply:focus-visible {
   background: rgba(255, 255, 255, 0.28);
-}
-
-/* --- closing CTA --- */
-.careers__cta {
-  margin-top: 64px;
-  padding: 44px;
-  background: var(--careers-surface);
-  border-radius: 20px;
-}
-
-.careers__cta-title {
-  margin: 0 0 16px;
-  font-size: clamp(26px, 3vw, 34px);
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.careers__cta-copy {
-  max-width: 720px;
-  margin: 0 0 28px;
-  font-size: 16px;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
 }
 
 /* Glass pill — the same treatment as the subscribe button. */
@@ -214,7 +194,7 @@
 
 @media (max-width: 760px) {
   .careers__inner {
-    padding: 16px 24px 64px;
+    padding: 16px 24px 40px;
   }
 
   .careers__block + .careers__block {
@@ -225,11 +205,6 @@
   .careers__heading {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
     font-size: clamp(28px, 8vw, 36px);
-  }
-
-  .careers__cta {
-    margin-top: 48px;
-    padding: 28px 24px;
   }
 
   .careers__cta-btn {

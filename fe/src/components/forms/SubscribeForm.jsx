@@ -38,10 +38,11 @@ export default function SubscribeForm() {
   return (
     <section className="subscribe-form" data-audience={audience} aria-labelledby="subscribe-form-heading">
       <h2 className="subscribe-form__heading" id="subscribe-form-heading">
-        Stay in the loop
+        Remain Connected
       </h2>
       <p className="subscribe-form__copy">
-        Procurement insights, new courses, and tender tips, straight to your inbox.
+        High-impact briefings on regulatory shifts, current affairs, and professional
+        developments.
       </p>
 
       {status === 'success' ? (
@@ -60,7 +61,7 @@ export default function SubscribeForm() {
               type="email"
               name="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder="you@example.com.au"
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value);
@@ -74,7 +75,7 @@ export default function SubscribeForm() {
               aria-describedby={status === 'error' ? 'subscribe-form-error' : undefined}
             />
             <button className="subscribe-form__button" type="submit" disabled={submitting}>
-              {submitting ? 'Subscribing…' : 'Subscribe'}
+              {submitting ? 'Sending…' : 'Receive Updates'}
             </button>
           </div>
           {status === 'error' && (

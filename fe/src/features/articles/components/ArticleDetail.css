@@ -22,130 +22,162 @@
   --art-chip: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
 }
 
+/* Grey stands in for the mint accent here, so links, the share icon and the
+   quote rule follow the segment instead of staying green. Same grey the
+   subscribe form uses on Win. */
 .article[data-audience='win'] {
   --art-bg: var(--gp-ink-900);
   --art-panel: var(--gp-ink-800);
+  --art-accent: #c9c9c9;
   --art-chip: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero ----------
+   Full-bleed: title panel on the left, hero image filling the right half, both
+   running to the edges of the screen. Only the content below is in the site
+   container. The panel takes the same lifted fill as the "Enhance your
+   Experience" card — green-800 on Award, ink-800 on Win.
+
+   The panel's text is right-aligned inside its half so it still lands on the
+   page's text edge: the half is 50% wide and the content column is 1100px
+   centred with 40px gutters, so the text starts at (50% - 550px + 40px) —
+   hence the block and its right padding sum to 510. */
 .article-hero {
-  /* Flat page background, same as every other page header — no tinted glow. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
   background: var(--art-bg);
   color: #fff;
-  padding: 88px 40px 60px;
 }
 
-.article-hero__inner {
-  max-width: 1100px;
-  margin: 0 auto;
+.article-hero__panel {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 80px 50px 80px 40px;
+  min-height: 440px;
+  background: var(--art-panel);
+}
+
+.article-hero__panel-inner {
+  width: 100%;
+  max-width: 460px; /* 460 + 50px padding = 510 — see the note above. */
+}
+
+/* No hero image on the article: one full-width panel, normal page gutters. */
+.article-hero--plain {
+  grid-template-columns: 1fr;
+}
+
+.article-hero--plain .article-hero__panel {
+  justify-content: center;
+  padding: 72px 40px;
+  min-height: 0;
+}
+
+/* 1100px content column less its two 40px gutters, so the title lines up with
+   the body text rather than with the column's outer edge. */
+.article-hero--plain .article-hero__panel-inner {
+  max-width: 1020px;
+}
+
+.article-hero__media {
+  position: relative;
+  min-height: 100%;
+}
+
+.article-hero__media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-hero__title {
+  margin: 0;
+  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-size: clamp(34px, 3.6vw, 52px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  color: #fff;
 }
 
 .article-hero__meta {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
-/* Topic pill + author avatar share the "Buy course" button fill from the
-   course detail page. */
-.article-hero__chip {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: #fff;
-  background: var(--art-chip);
-}
-
-.article-hero__date,
-.article-hero__reading {
+  gap: 8px;
+  margin: 26px 0 0;
   font-size: 14px;
   color: var(--art-muted);
 }
 
-.article-hero__dot {
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.article-hero__title {
-  margin: 0;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(36px, 4.6vw, 60px);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-  color: #fff;
-}
-
-.article-hero__author {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 30px;
-}
-
-.article-hero__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: var(--art-chip);
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.article-hero__author-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-}
-
-.article-hero__author-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #fff;
-}
-
-.article-hero__author-role {
-  font-size: 13px;
-  color: var(--art-muted);
-}
-
-/* ---------- Hero image ---------- */
-.article-figure {
-  max-width: 1100px;
-  margin: 8px auto 0;
-  padding: 0 40px;
-}
-
-.article-figure__img {
-  display: block;
-  width: 100%;
-  max-height: 460px;
-  object-fit: cover;
-  border-radius: 20px;
-  border: 1px solid var(--art-border);
+.article-hero__sep {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ---------- Body ---------- */
 .article-body {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 44px 40px 8px;
+  padding: 36px 40px 8px;
+}
+
+/* ---------- Byline + share ---------- */
+.article-byline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--art-border);
+}
+
+.article-byline__author {
+  margin: 0;
+  font-size: 15px;
+  color: var(--art-muted);
+}
+
+.article-byline__name {
+  color: #fff;
+}
+
+.article-byline__link {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-underline-offset: 4px;
+}
+
+.article-byline__link:hover {
+  text-decoration-color: var(--art-accent);
+  color: var(--art-accent);
+}
+
+.article-byline__link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- High-level overview ---------- */
+.article-overview {
+  margin: 34px 0 0;
+  max-width: 46em;
+  font-size: 22px;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: #fff;
 }
 
 .article-prose {
-  margin-top: 28px;
+  margin-top: 34px;
 }
 
 .article-prose p {
@@ -222,177 +254,72 @@
   color: #fff;
 }
 
-/* ---------- In-article subscribe CTA ---------- */
-.article-cta {
-  margin: 48px 0;
-  padding: 36px;
-  border-radius: 20px;
-  border: 1px solid var(--art-border);
-  background: var(--art-panel);
-  color: #fff;
-}
-
-.article-cta__title {
-  margin: 0 0 8px;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  color: #fff;
-}
-
-.article-cta__copy {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--art-muted);
-}
-
-.article-cta__form {
-  display: flex;
-  gap: 10px;
-  margin-top: 22px;
-}
-
-.article-cta__input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  padding: 13px 20px;
-  font-family: inherit;
-  font-size: 15px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.article-cta__input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.article-cta__input:focus {
-  outline: none;
-  border-color: var(--art-accent);
-}
-
-/* Glass pill — matches the "Stay in the loop" subscribe button. */
-.article-cta__button {
-  flex: 0 0 auto;
-  padding: 13px 26px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.2);
-  border: 0;
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s ease, opacity 0.15s ease;
-}
-
-.article-cta__button:hover,
-.article-cta__button:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.article-cta__button:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .article-cta__button {
-    transition:
-      background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out,
-      opacity 0.15s ease;
-  }
-
-  .article-cta__button:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-}
-
-/* ---------- Share row ---------- */
+/* ---------- Share row ----------
+   Sits above the article next to the byline: compact icon+label buttons rather
+   than one oversized pill. */
 .article-share {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 16px;
-  padding-top: 28px;
-  border-top: 1px solid var(--art-border);
+  gap: 14px;
 }
 
 .article-share__label {
-  font-size: 14px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--art-muted);
+}
+
+.article-share__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-share__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--art-border);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 500;
   color: #fff;
-}
-
-.article-share__buttons {
-  display: flex;
-  gap: 10px;
-}
-
-/* Glass pill — same treatment as the subscribe button above and in the footer. */
-.article-share__button {
-  padding: 13px 26px;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.2);
-  border: 0;
-  border-radius: 999px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  text-decoration: none;
   white-space: nowrap;
-  transition: background-color 0.15s ease;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
-.article-share__button:hover,
-.article-share__button:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
+.article-share__action:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
-.article-share__button:focus-visible {
+.article-share__action:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
 
-/* Hover polish — matches the subscribe button: lift + shadow. */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .article-share__button {
-    transition:
-      background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out;
-  }
-
-  .article-share__button:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
+.article-share__icon {
+  display: inline-flex;
+  font-size: 13px;
+  color: var(--art-accent);
 }
 
 /* ---------- Related insights ---------- */
 .article-related {
   border-top: 1px solid var(--art-border);
   background: var(--art-bg);
-  padding: 56px 40px 80px;
+  /* Light at the foot: the footer's subscribe block adds its own 48px on top,
+     and that spacing is shared by every page. */
+  padding: 56px 40px 32px;
 }
 
 .article-related__inner {
@@ -531,8 +458,34 @@
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
-  .article-hero {
-    padding: 72px 24px 52px;
+  /* Image over title — side by side leaves neither enough room. */
+  .article-hero,
+  .article-hero--plain {
+    grid-template-columns: 1fr;
+  }
+
+  .article-hero__media {
+    grid-row: 1;
+    min-height: 220px;
+    height: 46vw;
+    max-height: 300px;
+  }
+
+  .article-hero__panel,
+  .article-hero--plain .article-hero__panel {
+    justify-content: flex-start;
+    padding: 36px 24px 40px;
+    min-height: 0;
+  }
+
+  .article-hero__panel-inner,
+  .article-hero--plain .article-hero__panel-inner {
+    max-width: none;
+  }
+
+  .article-hero__title {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: clamp(30px, 7vw, 42px);
   }
 
   .article-related__grid {
@@ -542,28 +495,30 @@
 
 @media (max-width: 760px) {
   .article-body {
-    padding: 32px 24px 8px;
+    padding: 28px 24px 8px;
   }
 
-  .article-figure {
-    margin-top: 4px;
-    padding: 0 24px;
+  /* Label above the buttons; four pills and a label won't sit on one line. */
+  .article-byline {
+    align-items: flex-start;
+  }
+
+  .article-share {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .article-share__actions {
+    flex-wrap: wrap;
   }
 
   .article-related {
-    padding: 40px 24px 64px;
+    padding: 40px 24px 24px;
   }
 
-  .article-cta {
-    padding: 26px;
-  }
-
-  .article-cta__form {
-    flex-direction: column;
-  }
-
-  .article-cta__button {
-    width: 100%;
+  .article-overview {
+    font-size: 19px;
   }
 
   .article-prose p {

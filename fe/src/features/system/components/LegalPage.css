@@ -18,11 +18,29 @@
 .legal__inner {
   max-width: 820px;
   margin: 0 auto;
-  padding: 40px 40px 96px;
+  padding: 40px 40px 48px;
 }
 
-.legal .breadcrumbs {
-  color: rgba(255, 255, 255, 0.75);
+/* --- reveal on mount --- */
+@media (prefers-reduced-motion: no-preference) {
+  .legal__head,
+  .legal__section {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .legal.is-in .legal__head,
+  .legal.is-in .legal__section {
+    opacity: 1;
+    transform: none;
+  }
+
+  .legal.is-in .legal__section:nth-of-type(1) { transition-delay: 0.08s; }
+  .legal.is-in .legal__section:nth-of-type(2) { transition-delay: 0.14s; }
+  .legal.is-in .legal__section:nth-of-type(3) { transition-delay: 0.2s; }
 }
 
 .legal__head {
@@ -88,6 +106,6 @@
 
 @media (max-width: 760px) {
   .legal__inner {
-    padding: 24px 24px 72px;
+    padding: 24px 24px 40px;
   }
 }

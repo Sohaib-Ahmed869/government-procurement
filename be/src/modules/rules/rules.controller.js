@@ -49,7 +49,10 @@ export const list = asyncHandler(async (req, res) => {
   if (req.query.state) filter.state = req.query.state;
   if (req.query.category) filter.category = req.query.category;
 
-  const items = await ProcurementRule.find(filter).sort('state order createdAt');
+  // `order` was retired from the CMS, so rules sort themselves: by jurisdiction,
+  // then alphabetically by title. The site re-orders jurisdiction and category to
+  // its own sequences (see JurisdictionsList) and keeps this as the tie-break.
+  const items = await ProcurementRule.find(filter).collation({ locale: 'en' }).sort('state title');
   return ok(res, items);
 });
 

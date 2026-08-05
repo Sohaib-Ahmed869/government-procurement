@@ -120,11 +120,11 @@ export default function JurisdictionsList() {
       );
     });
 
-    // The API sorts alphabetically by jurisdiction code, so the cards are
-    // re-ordered here: first by the sequence the jurisdiction filter lists them
-    // in, then alphabetically by category within each — CATEGORIES is held in
-    // alphabetical order, so its index gives that for free. Sorting a copy keeps
-    // the API's own order as the final tie-break.
+    // The API sorts by jurisdiction code, so the cards are re-ordered here:
+    // first by the sequence the jurisdiction filter lists them in, then
+    // alphabetically by category within each — CATEGORIES is held in
+    // alphabetical order, so its index gives that for free — and finally by
+    // title. Nothing is hand-ordered any more, so the list arranges itself.
     const rank = (list, value) => {
       const i = list.findIndex((item) => item.value === value);
       return i === -1 ? list.length : i;
@@ -132,7 +132,8 @@ export default function JurisdictionsList() {
     return [...matched].sort(
       (a, b) =>
         rank(JURISDICTIONS, a.state) - rank(JURISDICTIONS, b.state) ||
-        rank(CATEGORIES, a.category) - rank(CATEGORIES, b.category),
+        rank(CATEGORIES, a.category) - rank(CATEGORIES, b.category) ||
+        (a.title || '').localeCompare(b.title || ''),
     );
   }, [rules, state, category, query]);
 
@@ -183,9 +184,6 @@ export default function JurisdictionsList() {
               />
             </div>
 
-            <p className="jl__count">
-              {visible.length} {visible.length === 1 ? 'rule' : 'rules'} shown
-            </p>
             {filtered && (
               <button type="button" className="jl__reset" onClick={reset}>
                 Reset filters

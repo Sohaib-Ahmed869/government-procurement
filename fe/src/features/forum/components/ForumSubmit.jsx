@@ -90,8 +90,8 @@ function Select({ id, options, value, onChange, placeholder }) {
 }
 
 export default function ForumSubmit() {
-  const { ref, inView } = useInView();
   const { audience } = useAudience();
+  const { ref, inView } = useInView({ resetKey: audience });
   const [sent, setSent] = useState(false);
   const [topic, setTopic] = useState('');
   const [questionTitle, setQuestionTitle] = useState('');

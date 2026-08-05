@@ -165,7 +165,7 @@ export default function TeamMemberDetail({ slug }) {
             when there's content for it. */}
         <div className="tm__body">
           <div className="tm__main">
-            <section className="tm__block">
+            <section className="tm__block tm__block--about">
               <h2 className="tm__block-title">About {firstName}</h2>
               {(member.about || []).map((paragraph) => (
                 <p className="tm__para" key={paragraph.slice(0, 40)}>
@@ -175,7 +175,7 @@ export default function TeamMemberDetail({ slug }) {
             </section>
 
             {publications.length > 0 && (
-              <section className="tm__block">
+              <section className="tm__block tm__block--publications">
                 <h2 className="tm__block-title">Published work</h2>
                 {publications.map((item) => (
                   <p className="tm__citation" key={item.title}>
@@ -200,7 +200,7 @@ export default function TeamMemberDetail({ slug }) {
             )}
 
             {pastExperience.length > 0 && (
-              <section className="tm__block">
+              <section className="tm__block tm__block--experience">
                 <h2 className="tm__block-title">Past experience</h2>
                 {pastExperience.map((item) => (
                   <div className="tm__entry" key={`${item.org}-${item.role}`}>
@@ -212,7 +212,7 @@ export default function TeamMemberDetail({ slug }) {
             )}
 
             {education.length > 0 && (
-              <section className="tm__block">
+              <section className="tm__block tm__block--education">
                 <h2 className="tm__block-title">Education</h2>
                 {education.map((item) => (
                   <div className="tm__entry" key={`${item.school}-${item.qualification}`}>
@@ -231,7 +231,7 @@ export default function TeamMemberDetail({ slug }) {
             </a>
 
             {(member.expertise || []).length > 0 && (
-              <section className="tm__block">
+              <section className="tm__block tm__block--expertise">
                 <h2 className="tm__block-title">Expertise</h2>
                 <ul className="tm__expertise">
                   {member.expertise.map((item) => (
