@@ -4,10 +4,9 @@
   /* Fill behind the "Get in touch" CTA and the expertise chevrons. Follows the
      segment: mint on Award, grey on Win. */
   --tm-accent: var(--gp-mint-300);
-  /* The lifted tone in the hero band, taken from the fill the FAQ filter pills
-     use when active — so the two segments read the same way here as they do
-     there. */
-  --tm-band-lift: #4a4a4a;
+  /* Light end of the hero band's wash — one step up from the page colour, well
+     short of the segment's brightest lift. */
+  --tm-band-lift: #2e2e2e;
 
   background: var(--tm-bg);
   color: #fff;
@@ -18,14 +17,14 @@
   --tm-bg: var(--gp-green-900);
   --tm-surface: var(--gp-green-800);
   --tm-accent: var(--gp-mint-300);
-  --tm-band-lift: var(--gp-lift-green);
+  --tm-band-lift: var(--gp-green-600);
 }
 
 .tm[data-audience='win'] {
   --tm-bg: var(--gp-ink-900);
   --tm-surface: var(--gp-ink-800);
   --tm-accent: #c9c9c9;
-  --tm-band-lift: var(--gp-lift-grey);
+  --tm-band-lift: #2e2e2e;
 }
 
 .tm__inner {
@@ -35,32 +34,43 @@
 }
 
 /* --- hero band --- */
-/* A lifted wash rising from the right, easing back to the section's own colour
-   before it reaches the edges. Two tones, both the segment's: the page
-   background, and the lighter fill the FAQ filter pills take when active. That
-   keeps the band on-theme under either toggle, and because it resolves to
-   --tm-bg at every edge there is no seam where it meets the body below.
+/* One diagonal wash, oriented as on the reference profile: the page colour
+   holds the top-left corner behind the portrait, and the lifted tone builds
+   across to the right and along the foot of the band. Holding the first fifth
+   at the page colour is what keeps the corner clean rather than starting the
+   blend at the very edge.
+   No rule under the band. The wash carries the segment's lift at the bottom
+   edge, so the step down to the body's flat colour marks the end of the section
+   on its own.
+   Two earlier attempts are worth not repeating. A radial wash anchored at 82%
+   16% pooled bright in one corner and moved as the viewport resized; a straight
+   diagonal holds its shape at every width. Running it from --tm-surface was too
+   faint to read as a gradient at all, since the surface tone is a hair off the
+   page colour — hence the dedicated lift, a clear step up without reaching the
+   segment's brightest tone.
    The oklab pass keeps the midpoint on the hue instead of sagging through a
    grey; browsers without it keep the sRGB blend above. */
 .tm__hero-band {
-  background:
-    radial-gradient(125% 145% at 82% 16%, var(--tm-band-lift) 0%, transparent 62%),
-    var(--tm-bg);
-  background:
-    radial-gradient(125% 145% at 82% 16% in oklab, var(--tm-band-lift) 0%, transparent 62%),
-    var(--tm-bg);
+  background: linear-gradient(
+    135deg,
+    var(--tm-bg) 0%,
+    var(--tm-bg) 20%,
+    var(--tm-band-lift) 100%
+  );
+  background: linear-gradient(
+    135deg in oklab,
+    var(--tm-bg) 0%,
+    var(--tm-bg) 20%,
+    var(--tm-band-lift) 100%
+  );
 }
 
-/* The band wraps the introduction rather than standing to a height of its own. */
+/* Room above the portrait, none below it: the photo stands on the foot of the
+   band, as on the reference profile, and the introduction beside it carries its
+   own bottom padding instead. */
 .tm__inner--hero {
-  padding-top: 28px;
-  padding-bottom: 32px;
-}
-
-/* The body below keeps the section's own dark surface, so it needs the top
-   padding the hero used to carry. */
-.tm__inner:not(.tm__inner--hero) {
   padding-top: 56px;
+  padding-bottom: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -85,11 +95,24 @@
 }
 
 /* --- hero: portrait beside the introduction --- */
+/* The portrait is the taller of the two columns and its height follows its
+   width, so the column width is what sets the height of the whole band —
+   narrowed from 460px to take that height down. Both columns start on the same
+   line, so the top of the portrait is level with "Back to Our Team" rather than
+   either column floating against the other. The portrait is the taller of the
+   two, so it also sets the height of the band and lands on the rule at the
+   foot — the band has no bottom padding of its own. */
 .tm__hero {
   display: grid;
-  grid-template-columns: 460px 1fr;
+  grid-template-columns: 360px 1fr;
   gap: 56px;
-  align-items: center;
+  align-items: start;
+}
+
+/* Keeps the text clear of the rule on the rare profile whose introduction runs
+   longer than the portrait is tall. */
+.tm__intro {
+  padding-bottom: 56px;
 }
 
 .tm__avatar {
@@ -100,10 +123,18 @@
 /* With a real headshot the whole photo shows — no circular crop, and nothing
    trimmed off the sides. Its height follows the source's own proportions, so a
    portrait-orientation file will stand tall on its own. The initials fallback
-   keeps the circle. */
+   keeps the circle.
+   The cut-outs carry headroom above the subject, so aligning the file's own top
+   edge with the text left the head sitting well below the name. The negative
+   margin takes that headroom back up, putting the top of the head on the name's
+   line. It's a percentage, which resolves against the column width, so the pull
+   scales with the portrait rather than needing a value per breakpoint — and
+   because the row is sized by this column, the photo still lands on the rule at
+   the foot of the band. */
 .tm__avatar.team-avatar--photo {
   width: 100%;
   height: auto;
+  margin-top: -10%;
   overflow: visible;
   border-radius: 0;
   background: transparent;
@@ -138,17 +169,24 @@
 .tm__name {
   margin: 0;
   /* Geist, inherited from .tm — no display-face override here. */
-  font-size: 50px;
+  font-size: clamp(42px, 4.4vw, 58px);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.015em;
 }
 
+/* Role and location under the name, set quieter than the name and a step above
+   the bio, so the three lines read in order. */
 .tm__role {
   margin: 14px 0 0;
   font-size: 16px;
   font-weight: 500;
-  color: #fff;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.tm__location {
+  color: var(--tm-accent);
 }
 
 .tm__bio {
@@ -188,6 +226,7 @@
 
 /* Bare glyph in the link colour, as in the footer — no disc behind it. */
 .tm__action-icon {
+  display: inline-flex;
   flex: none;
   width: 20px;
   height: 20px;
@@ -199,7 +238,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
   gap: 64px;
-  margin-top: 64px;
+  /* The band's own rule and .tm__inner's padding now carry the space down to
+     "About", so the body doesn't add any of its own. */
+  margin-top: 0;
 }
 
 /* Each block is separated by a rule above its label. */
@@ -464,10 +505,9 @@
 
 /* The mobile audience toggle is painted as an overlay, and index.css reserves
    room for it as top padding on the page's first section — here, on .tm, whose
-   flat background then showed as a dark block behind the toggle with the hero's
-   wash starting below it. Handing that padding to the band instead puts the
-   wash behind the toggle: it now starts directly under the header bar and runs
-   unbroken down to the Contact and LinkedIn buttons.
+   own background then showed as a dark strip above the band. Handing that
+   padding to the band instead carries the band's tone up behind the toggle, so
+   it starts directly under the header bar.
 
    Matched to the 860px breakpoint the reserved space itself uses, not the
    760px one below — between the two the toggle is on screen and still needs
@@ -487,28 +527,17 @@
     padding: 32px 24px 40px;
   }
 
+  /* Stacked, the portrait sits above the text rather than beside it, so there's
+     nothing to ground on the rule — the band carries its own bottom padding
+     again and the introduction drops its. */
   .tm__inner--hero {
-    padding-bottom: 40px;
+    padding-top: 32px;
+    padding-bottom: 36px;
   }
 
-  .tm__inner:not(.tm__inner--hero) {
-    padding-top: 40px;
+  .tm__intro {
+    padding-bottom: 0;
   }
-
-  /* Stacked, the wash rises from the foot of the band: full strength around the
-     Contact and LinkedIn buttons, easing back to the page colour on the way up
-     to the header. Because it resolves to --tm-bg before it gets there, the top
-     of the band matches the bar above it exactly and the two meet with no seam,
-     even though the band runs up behind the audience toggle.
-
-     Angled off the bottom-right, so it carries the same direction as the wash
-     on wider screens. Colour to colour rather than to transparent: an alpha
-     fade sags through grey across the middle of the band. */
-  .tm__hero-band {
-    background: linear-gradient(340deg, var(--tm-band-lift) 0%, var(--tm-bg) 78%);
-    background: linear-gradient(340deg in oklab, var(--tm-band-lift) 0%, var(--tm-bg) 78%);
-  }
-
 
   /* Stacked: the portrait leads, centred above the introduction. */
   .tm__hero {
@@ -523,9 +552,12 @@
     height: 180px;
   }
 
-  /* Stacked: cap the portrait so it doesn't dominate the top of the page. */
+  /* Stacked: cap the portrait so it doesn't dominate the top of the page, and
+     drop the pull that levels it with the name on desktop — here it sits above
+     the text, with nothing to line up against. */
   .tm__avatar.team-avatar--photo {
     width: min(100%, 360px);
+    margin-top: 0;
   }
 
   .tm__avatar .team-avatar__initials {
@@ -533,7 +565,7 @@
   }
 
   .tm__name {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(32px, 9vw, 44px);
   }
 
@@ -546,7 +578,7 @@
   .tm__body {
     grid-template-columns: 1fr;
     gap: 36px;
-    margin-top: 44px;
+    margin-top: 32px;
     text-align: left;
   }
 

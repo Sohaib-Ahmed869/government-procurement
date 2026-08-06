@@ -8,8 +8,9 @@
   --control-pad-y: 6px;
   --control-pad-x: 18px;
   --control-radius: 4px;
-  --control-font: 13px;
-  --control-hint-font: 11px;
+  /* STANDARDISED PREVIEW: one size for every label in the bar. */
+  --control-font: 13.5px;
+  --control-hint-font: 13.5px;
   --control-edge: rgba(255, 255, 255, 0.28);
   /* Outer edge of both controls: the glass edge the tender cards carry — lit
      from the top left, fading to the bottom right — rather than an even ring. */
@@ -18,6 +19,10 @@
     inset -1px -1px 1px rgba(255, 255, 255, 0.12);
   /* Fill of the chosen segment, which the CTA also takes. */
   --control-active: rgba(255, 255, 255, 0.16);
+  /* One width for all three cells in the bar — the two toggle segments and the
+     CTA. Applied as a floor rather than a fixed size so a longer label still
+     fits; it sits above the widest of them, so in practice they come out equal. */
+  --control-width: 190px;
 
   /* The bar stays on screen while the page scrolls, at every width — pinned by
      .page-layout__chrome, which holds the announcement banner above it and
@@ -26,7 +31,7 @@
   position: relative;
   z-index: 100;
   background: var(--header-bg);
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   color: #fff;
 }
 
@@ -86,11 +91,12 @@
 .site-header__wordmark {
   display: flex;
   flex-direction: column;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13.5px;
+  /* Matches the toggle labels and the CTA, so every heavy element in the bar
+     carries the same weight. */
+  font-weight: 400;
   line-height: 1.12;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 /* --- nav --- */
@@ -99,6 +105,9 @@
    competing with the links for one line's worth of width. */
 .site-header__nav {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
+  /* Closes the row underneath as well, so the links read as a band of cells
+     rather than as a set hanging off a single rule. */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .site-header__nav-list {
@@ -123,7 +132,7 @@
   font-size: 13.5px;
   font-weight: 400;
   /* Slightly dimmed at rest so hover reads as a gentle brighten. */
-  color: rgba(255, 255, 255, 0.78);
+  color: #fff;
   text-decoration: none;
   white-space: nowrap;
   /* Hairline between cells; the row's own top border closes the set. */
@@ -133,11 +142,8 @@
     background-color 0.18s ease-out;
 }
 
-.site-header__nav-list > li:first-child .site-header__nav-link {
-  box-shadow:
-    inset 1px 0 0 rgba(255, 255, 255, 0.12),
-    inset -1px 0 0 rgba(255, 255, 255, 0.12);
-}
+/* The first cell carries no rule on its leading edge — the row opens at the page
+   gutter, and a line there read as a stray mark rather than as a divider. */
 
 .site-header__nav-link:hover,
 .site-header__nav-link:focus-visible {
@@ -201,9 +207,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: var(--control-width);
   padding: var(--control-pad-y) var(--control-pad-x);
   font-size: var(--control-font);
-  font-weight: 600;
+  font-weight: 400;
   color: #fff;
   text-decoration: none;
   white-space: nowrap;
@@ -294,9 +301,10 @@
   align-items: flex-start;
   justify-content: center;
   gap: 1px;
+  min-width: var(--control-width, 190px);
   padding: var(--control-pad-y, 6px) var(--control-pad-x, 18px);
   font: inherit;
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
   text-align: left;
   white-space: nowrap;
   background: transparent;
@@ -313,14 +321,14 @@
 
 .audience-toggle__label {
   font-size: var(--control-font, 13px);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .audience-toggle__hint {
-  font-size: var(--control-hint-font, 11px);
+  font-size: var(--control-hint-font, 13.5px);
   font-weight: 400;
   color: inherit;
-  opacity: 0.75;
+  opacity: 1;
 }
 
 .audience-toggle__option:hover:not(.is-active) {
@@ -562,7 +570,9 @@
   .site-header {
     --control-pad-x: 14px;
     --control-font: 12.5px;
-    --control-hint-font: 10.5px;
+    --control-hint-font: 12.5px;
+    /* Steps down with the type, so three equal cells still fit the bar here. */
+    --control-width: 172px;
   }
 
   .site-header__inner,
@@ -612,7 +622,7 @@
     display: flex;
     flex-direction: row;
     gap: 0.34em;
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .site-header__mobile-actions {

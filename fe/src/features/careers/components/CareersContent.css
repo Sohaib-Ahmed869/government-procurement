@@ -21,7 +21,9 @@
 .careers__inner {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 40px 48px;
+  /* 28px below the hero's rule, matching the drop below every other rule on
+     the page. */
+  padding: 28px 40px 48px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -43,9 +45,11 @@
   .careers.is-in .careers__block:nth-of-type(3) { transition-delay: 0.16s; }
 }
 
+/* Every rule on the page sits in the same 28px of clear space above and below,
+   so the sections read as one rhythm rather than each carrying its own. */
 .careers__block + .careers__block {
-  margin-top: 64px;
-  padding-top: 56px;
+  margin-top: 28px;
+  padding-top: 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
@@ -194,16 +198,16 @@
 
 @media (max-width: 760px) {
   .careers__inner {
-    padding: 16px 24px 40px;
+    padding: 24px 24px 40px;
   }
 
   .careers__block + .careers__block {
-    margin-top: 48px;
-    padding-top: 40px;
+    margin-top: 24px;
+    padding-top: 24px;
   }
 
   .careers__heading {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(28px, 8vw, 36px);
   }
 

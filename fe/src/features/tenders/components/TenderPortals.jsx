@@ -5,16 +5,25 @@ import { tenderSitesApi } from '../../../api';
 import './TenderPortals.css';
 
 // Tender portals come from the CMS (Tenders). Each entry carries a name, a
-// subtitle, a logo and up to three destinations — a button appears only for the
-// links that have been filled in.
-const DESTINATIONS = [
-  { key: 'openTendersUrl', label: 'Open Tenders' },
-  { key: 'upcomingTendersUrl', label: 'Upcoming Tenders' },
-  { key: 'createAccountUrl', label: 'Create Free Account' },
-];
+// subtitle, a logo and its destinations — a button appears only for the links
+// that have been filled in.
+//
+// The two sections offer different destinations: the Australian portals are
+// free to search once you have an account, while the others are paywalled and
+// carry a single sign-in link plus the note printed under it.
+const DESTINATIONS = {
+  australian: [
+    { key: 'openTendersUrl', label: 'Open Tenders (Login Required)' },
+    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders (Login Required)' },
+    { key: 'createAccountUrl', label: 'Create Free Account' },
+  ],
+  other: [{ key: 'loginUrl', label: 'Login (Paid wall)' }],
+};
 
 // Keyed in the parent so it remounts and replays its reveal when the list loads.
-function TenderList({ sites }) {
+function TenderList({ sites, group = 'australian' }) {
+  const destinations = DESTINATIONS[group] || DESTINATIONS.australian;
+
   const [shown, setShown] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setShown(true));
@@ -45,17 +54,22 @@ function TenderList({ sites }) {
           </span>
 
           <span className="tp__links">
-            {DESTINATIONS.filter(({ key }) => site[key]).map(({ key, label }) => (
-              <a
-                key={key}
-                className="tp__explore"
-                href={site[key]}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {label}
-              </a>
-            ))}
+            {destinations
+              .filter(({ key }) => site[key])
+              .map(({ key, label }) => (
+                <a
+                  key={key}
+                  className="tp__explore"
+                  href={site[key]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {label}
+                </a>
+              ))}
+
+            {/* Sits under the buttons: the fee disclaimer for paywalled sites. */}
+            {site.note && <span className="tp__note">{site.note}</span>}
           </span>
         </li>
       ))}
@@ -89,13 +103,17 @@ export default function TenderPortals() {
   // Reveal on mount, and again each time the audience toggle changes.
   const mounted = useMountReveal(audience);
 
+  // The CMS marks each entry as 'australian' or 'other'; entries saved before
+  // that field existed carry no group and belong to the Australian list.
+  const australian = sites.filter((s) => (s.group || 'australian') === 'australian');
+  const other = sites.filter((s) => s.group === 'other');
+
   return (
     <section className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="tp__inner">
-        <h1 className="tp__title">Explore Tenders</h1>
-        <p className="tp__sub">
-          Government tender opportunities, updated regularly across all sectors.
-        </p>
+        <h1 className="tp__title">
+          Explore Federal, State and Territory Tender Websites
+        </h1>
 
         {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
         {status === 'error' && (
@@ -103,7 +121,20 @@ export default function TenderPortals() {
             We couldn&apos;t load the tender websites right now. Please try again shortly.
           </p>
         )}
-        {status === 'ready' && <TenderList sites={sites} />}
+        {status === 'ready' && (
+          <>
+            <TenderList sites={australian} />
+
+            {/* Only drawn once something has been filed under it, so the page
+                doesn't carry an empty heading. */}
+            {other.length > 0 && (
+              <>
+                <h2 className="tp__group-title">Other Tender Websites</h2>
+                <TenderList sites={other} group="other" />
+              </>
+            )}
+          </>
+        )}
       </div>
     </section>
   );

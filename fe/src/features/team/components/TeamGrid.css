@@ -116,14 +116,21 @@
 }
 
 /* Headshots are supplied with a margin of background around the subject, so at
-   its natural size the person sits small inside the disc. A modest scale fills
-   the circle with the face — the disc clips the overspill. Kept to 1.15 and
-   centred rather than pushed further: past that the crop starts taking the top
-   of the head off, and the framing has to hold for every member's photo, not
-   just one. */
+   its natural size the person sits small inside the disc. Scaling up fills the
+   circle with the face — the disc clips the overspill.
+   The origin sits near the top of the frame rather than at its centre. A
+   centred scale grows the image away from the middle in both directions, which
+   lifts the head — already in the upper third of a headshot — towards the top
+   of the disc; anchoring above it pushes the subject down instead, so the face
+   lands around the middle of the circle and the crop comes off the shoulders.
+   Tuned by eye against the founder's portrait: raise the 18% to sit the face
+   lower, drop it to sit higher. The translate lifts the subject and pulls it
+   slightly left — percentages are of the disc itself, so 2% is about 3px on the
+   desktop avatar and scales down with it. */
 .team-card__avatar .team-avatar__img {
   object-position: center;
-  transform: scale(1.15);
+  transform: translate(-2%, -4%) scale(1.5);
+  transform-origin: center 18%;
 }
 
 .team-card__avatar .team-avatar__initials {

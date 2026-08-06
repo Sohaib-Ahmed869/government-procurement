@@ -70,7 +70,9 @@
      had full-bleed, so the card grows to fit rather than clipping its text. */
   min-height: 336px;
   border-radius: 14px;
-  background: var(--ee-bg);
+  /* Matches the copy panel so the photo's rounded inner corners reveal that
+     surface rather than a darker notch. */
+  background: var(--ee-content-bg);
 }
 
 .ee__media img {
@@ -79,6 +81,10 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+  /* Outer corners are clipped by the card; the inner (right) edge carries its
+     own curve so it meets the copy panel smoothly — mirroring the "Your Trusted
+     Partner" panel above. */
+  border-radius: 0 20px 20px 0;
 }
 
 .ee__content {
@@ -281,7 +287,7 @@
   }
 
   .ee__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(34px, 11vw, 48px);
     line-height: 1.15;
   }

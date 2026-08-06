@@ -19,7 +19,6 @@ import CourseEditorPage from '../admin/pages/CourseEditorPage.jsx';
 import ModerationQueuePage from '../admin/pages/ModerationQueuePage.jsx';
 import SubscribersPage from '../admin/pages/SubscribersPage.jsx';
 import ConsultationQueuePage from '../admin/pages/ConsultationQueuePage.jsx';
-import RegisterInterestPage from '../admin/pages/RegisterInterestPage.jsx';
 import AnnouncementPage from '../admin/pages/AnnouncementPage.jsx';
 import LinksManagerPage from '../admin/pages/LinksManagerPage.jsx';
 import MediaLibraryPage from '../admin/pages/MediaLibraryPage.jsx';
@@ -67,7 +66,6 @@ export default function AdminRoutes() {
           {/* Submissions */}
           <Route path="subscribers" element={<SubscribersPage />} />
           <Route path="consultations" element={<ConsultationQueuePage />} />
-          <Route path="register-interest" element={<RegisterInterestPage />} />
 
           {/* Site */}
           <Route path="announcements" element={<AnnouncementPage />} />

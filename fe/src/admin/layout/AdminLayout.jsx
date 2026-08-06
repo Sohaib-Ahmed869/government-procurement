@@ -22,7 +22,6 @@ const SECTION_TITLES = {
   moderation: 'Q&A',
   subscribers: 'Subscribers',
   consultations: 'Consultations',
-  'register-interest': 'Register interest',
   announcements: 'Announcements',
   links: 'Links',
   media: 'Media library',

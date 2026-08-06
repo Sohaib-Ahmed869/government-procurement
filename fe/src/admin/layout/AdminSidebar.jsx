@@ -75,7 +75,6 @@ const NAV = [
     group: 'Submissions',
     items: [
       { to: '/admin/consultations', label: 'Consultations', icon: 'calendar' },
-      { to: '/admin/register-interest', label: 'Register interest', icon: 'hand' },
       { to: '/admin/subscribers', label: 'Subscribers', icon: 'users' },
     ],
   },

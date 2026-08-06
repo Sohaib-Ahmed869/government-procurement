@@ -135,7 +135,7 @@
   }
 
   .di__heading {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     margin-bottom: 28px;
     font-size: clamp(28px, 8vw, 36px);
     line-height: 1.1;

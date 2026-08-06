@@ -15,22 +15,9 @@ export const CAPABILITY_ICON_BY_KEY = Object.fromEntries(
   CAPABILITY_ICONS.map((i) => [i.key, i]),
 );
 
-// Cards shipped with the page, shown until the CMS holds any of its own — so the
-// section is never empty, including before a single card has been added.
-export const FALLBACK_CAPABILITIES = [
-  {
-    icon: 'target',
-    title: 'Strategy Development',
-    body: "We craft comprehensive bid strategies that not only showcase your organisation's unique strengths, but also align seamlessly with buyer expectations.",
-  },
-  {
-    icon: 'document',
-    title: 'Tender Design & Documentation',
-    body: 'Building persuasive proposals, pricing models, and supporting documentation that address requirements clearly and convincingly.',
-  },
-  {
-    icon: 'graph',
-    title: 'Evaluation & Assessment',
-    body: 'Structuring responses to meet evaluation criteria and demonstrate measurable value, ensuring your bid stands out.',
-  },
-];
+// The cards themselves live in the CMS (Capabilities), seeded by
+// `npm run seed:capabilities`. This file used to carry a FALLBACK_CAPABILITIES
+// copy of them, which the page rendered on every mount while the request was
+// still out — so an edited card visibly flashed the shipped wording before the
+// saved one arrived. Only the icon set is built in, since a card names one of
+// these by key rather than storing artwork of its own.

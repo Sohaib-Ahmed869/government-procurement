@@ -1,8 +1,8 @@
 /* The banner takes its colour from the segment rather than from a tone chosen
-   per message: the green the old "success" tone used on Award, light grey on
-   Win. The text colour follows, since one is dark and the other light. */
+   per message: the green the old "success" tone used on Award, white on Win.
+   The text colour follows, since one is dark and the other light. */
 .announce {
-  --announce-bg: #e6e6e6;
+  --announce-bg: #fff;
   --announce-fg: var(--gp-ink-900);
 
   display: flex;
@@ -24,7 +24,7 @@
 }
 
 .announce[data-audience='win'] {
-  --announce-bg: #e6e6e6;
+  --announce-bg: #fff;
   --announce-fg: var(--gp-ink-900);
 }
 

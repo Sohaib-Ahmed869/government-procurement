@@ -290,7 +290,7 @@
   }
 
   .forum-hero__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     /* Shared with the article and submit page headings. */
     font-size: clamp(38px, 11vw, 52px);
   }

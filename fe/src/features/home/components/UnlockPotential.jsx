@@ -146,7 +146,7 @@ export default function UnlockPotential() {
       data-audience={audience}
     >
       <div className="uy__inner">
-        <p className="uy__eyebrow">Courses &amp; artefacts</p>
+        <p className="uy__eyebrow">Courses &amp; Artefacts</p>
         <h2 className="uy__title">Unlock your potential</h2>
 
         {/* Bento grid (desktop) / swipeable carousel (mobile). The layout adapts

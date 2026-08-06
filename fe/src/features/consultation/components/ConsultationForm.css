@@ -1,7 +1,5 @@
 .consult {
   --consult-bg: var(--gp-ink-900);
-  /* Dropdown panel follows the segment: green for Award, grey for Win. */
-  --consult-menu-bg: var(--gp-ink-800);
 
   position: relative;
   overflow: hidden;
@@ -12,12 +10,10 @@
 
 .consult[data-audience='award'] {
   --consult-bg: var(--gp-green-900);
-  --consult-menu-bg: var(--gp-green-800);
 }
 
 .consult[data-audience='win'] {
   --consult-bg: var(--gp-ink-900);
-  --consult-menu-bg: var(--gp-ink-800);
 }
 
 /* --- reveal on scroll into view --- */
@@ -91,31 +87,22 @@
   max-width: 420px;
 }
 
-.consult__expect {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 32px 0 0;
-  padding: 0;
-  list-style: none;
+/* Photo at the foot of the intro column, taking up the space the shorter column
+   leaves beside the form. Sits directly on the section's background with the
+   corners rounded, no frame or border of its own. */
+.consult__figure {
+  margin: 40px 0 0;
 }
 
-.consult__expect-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 15px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.consult__expect-dot {
-  margin-top: 7px;
-  width: 8px;
-  height: 8px;
-  flex: none;
-  border-radius: 50%;
-  background: #fff;
+.consult__photo {
+  display: block;
+  width: 100%;
+  /* The source is already a wide landscape shot — left at its own proportions
+     rather than cropped to a fixed ratio, which would cut the people at the
+     edges of the frame. */
+  height: auto;
+  border-radius: 22px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.3);
 }
 
 /* --- form --- */
@@ -195,83 +182,12 @@
   cursor: pointer;
 }
 
+/* The box grew about 30%: five rows measured ~126px with the field padding, so
+   it's now seven rows, and the floor is raised to match in case the line height
+   resolves differently. */
 .consult__textarea {
-  min-height: 120px;
+  min-height: 164px;
   resize: vertical;
-}
-
-/* --- select: a custom listbox, so the panel can be themed like the fields --- */
-.consult__select-wrap {
-  position: relative;
-}
-
-.consult__select {
-  padding-right: 44px;
-  text-align: left;
-  /* A chosen reason is a full sentence — let it wrap inside the field. */
-  line-height: 1.4;
-  cursor: pointer;
-}
-
-.consult__select.is-placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.consult__chevron {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  transform: translateY(-50%);
-  display: inline-flex;
-  color: #fff;
-  pointer-events: none;
-  transition: transform 0.18s ease;
-}
-
-.consult__chevron.is-open {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-/* Rounded, themed panel — a native <select> popup is drawn by the OS. */
-.consult__menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  z-index: 30;
-  margin: 0;
-  padding: 6px;
-  list-style: none;
-  background: var(--consult-menu-bg);
-  border-radius: 14px;
-  /* The reasons are full sentences, so the panel can run long — cap it and let
-     it scroll rather than pushing off the bottom of the viewport. */
-  max-height: 320px;
-  overflow-y: auto;
-  box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.38),
-    inset 1px 1px 1px rgba(255, 255, 255, 0.18);
-}
-
-.consult__option {
-  display: block;
-  width: 100%;
-  padding: 12px 14px;
-  font: inherit;
-  font-size: 15px;
-  line-height: 1.4;
-  color: #fff;
-  text-align: left;
-  cursor: pointer;
-  background: none;
-  border: 0;
-  border-radius: 10px;
-  transition: background-color 0.15s ease;
-}
-
-.consult__option:hover,
-.consult__option.is-active {
-  background: rgba(255, 255, 255, 0.12);
 }
 
 /* --- inline validation --- */
@@ -359,7 +275,7 @@
   }
 
   .consult__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
   }
 
   .consult__row {

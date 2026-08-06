@@ -2,7 +2,7 @@ import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ok } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
-import { HomeHero } from '../../models/HomeHero.js';
+import { CapabilitiesHero } from '../../models/CapabilitiesHero.js';
 
 const AUDIENCES = ['win', 'award'];
 const EDITABLE = ['eyebrow', 'heading', 'subheading'];
@@ -12,29 +12,29 @@ const EDITABLE = ['eyebrow', 'heading', 'subheading'];
 // the page is never blank on a database that has no row for it yet, and the
 // browser only ever paints one version of the copy — the built-in wording can't
 // flash on screen ahead of the saved wording, because the client never sees it
-// as a separate thing. That flash is exactly what this replaced.
-const SHARED_SUBHEADING =
-  'Supporting government agencies and public sector organisations with end-to-end procurement advisory, ensuring that contracts are awarded fairly, efficiently, and in line with best practice.';
-
+// as a separate thing.
+//
+// `subheading` has no default: the hero never carried one. The field is there
+// for whoever wants to add it, and stays off the page until they do.
 const DEFAULT_COPY = {
   win: {
     eyebrow: 'Win Government Contracts',
-    heading: 'Procure with Confidence',
-    subheading: SHARED_SUBHEADING,
+    heading: 'Our Capabilities',
+    subheading: '',
   },
   award: {
     eyebrow: 'Award Government Contracts',
-    heading: 'Procure with Confidence',
-    subheading: SHARED_SUBHEADING,
+    heading: 'Our Capabilities',
+    subheading: '',
   },
 };
 
-// GET / — PUBLIC. Both segments in one call, so the homepage can switch between
-// them on the toggle without a second request. A field nobody has written falls
-// back to the default above — including for the CMS editor, which reads this
-// same endpoint and so opens showing the copy that is actually live.
+// GET / — PUBLIC. Both segments in one call, so the page can switch between them
+// on the toggle without a second request. A field nobody has written falls back
+// to the default above — including for the CMS editor, which reads this same
+// endpoint and so opens showing the copy that is actually live.
 export const list = asyncHandler(async (_req, res) => {
-  const docs = await HomeHero.find({});
+  const docs = await CapabilitiesHero.find({});
   const byAudience = Object.fromEntries(
     AUDIENCES.map((audience) => {
       const found = docs.find((d) => d.audience === audience);
@@ -64,7 +64,7 @@ export const save = asyncHandler(async (req, res) => {
     if (req.body[field] !== undefined) update[field] = req.body[field];
   }
 
-  const doc = await HomeHero.findOneAndUpdate(
+  const doc = await CapabilitiesHero.findOneAndUpdate(
     { audience },
     { $set: update, $setOnInsert: { audience } },
     { new: true, upsert: true, setDefaultsOnInsert: true },
@@ -72,10 +72,10 @@ export const save = asyncHandler(async (req, res) => {
 
   recordAudit({
     req,
-    action: 'homeHero.update',
-    entity: 'HomeHero',
+    action: 'capabilitiesHero.update',
+    entity: 'CapabilitiesHero',
     entityId: doc._id,
-    summary: `Updated homepage hero copy for "${audience}"`,
+    summary: `Updated Capabilities hero copy for "${audience}"`,
   });
   return ok(res, doc);
 });

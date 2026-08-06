@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { questionsApi } from '../../api';
+import { CATEGORY_LABEL } from '../../features/forum/data.js';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 
@@ -353,7 +354,9 @@ export default function ModerationQueuePage() {
                   <Fragment key={id}>
                     <tr onClick={() => openRow(row)} style={{ cursor: 'pointer' }}>
                       <td>{row.title}</td>
-                      <td>{row.category || '—'}</td>
+                      {/* The stored value is win/award/general — show the same
+                          label the site does, so "general" reads as "Other". */}
+                      <td>{CATEGORY_LABEL[row.category] || row.category || '—'}</td>
                       <td>
                         <StatusBadge status={row.status} />
                       </td>

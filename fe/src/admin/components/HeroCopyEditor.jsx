@@ -122,7 +122,7 @@ export default function HeroCopyEditor({ title, subtitle, load, save }) {
               />
 
               <p className="admin-field__hint" style={{ marginLeft: 0 }}>
-                Leaving a field empty falls back to the copy built into the page.
+                Clearing a field restores the wording the page was built with.
               </p>
 
               <div className="admin-form-actions" style={{ marginTop: 12 }}>

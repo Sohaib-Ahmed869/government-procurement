@@ -42,8 +42,36 @@ export const homeHeroApi = {
   save: (audience, body) => api.patch(`/home-hero/${audience}`, body),
 };
 
+// A hero's copy, held for the life of the tab. The heroes carry no built-in
+// copy any more, so without this each would paint empty for the length of a
+// round-trip every time a visitor navigated back to its page. Seeding the
+// component's state from here means only the first visit waits; the request
+// still goes out behind it, so an edit made in the CMS lands on the next load.
+function createCopyCache() {
+  let value = null;
+  return {
+    get: () => value,
+    set: (next) => {
+      value = next;
+    },
+  };
+}
+
+export const heroCopyCache = createCopyCache();
+
+// The Capabilities page hero — eyebrow, heading and an optional sub-heading,
+// held per audience segment exactly as the homepage hero is.
+export const capabilitiesHeroApi = {
+  get: () => api.get('/capabilities-hero'),
+  save: (audience, body) => api.patch(`/capabilities-hero/${audience}`, body),
+};
+
+export const capabilitiesHeroCopyCache = createCopyCache();
+
 // Cards in the "Deliver with Impact" row on the Capabilities page.
 export const capabilitiesApi = createResource('capabilities');
+
+export const capabilityCardsCache = createCopyCache();
 
 export const teamApi = {
   ...createResource('team'),

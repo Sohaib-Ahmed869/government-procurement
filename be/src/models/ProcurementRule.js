@@ -12,6 +12,7 @@ export const RULE_STATES = ['FED', 'ACT', 'NSW', 'NT', 'QLD', 'SA', 'TAS', 'VIC'
 // fe/src/features/jurisdictions/data.js).
 export const RULE_CATEGORIES = [
   'aboriginal-procurement-policy',
+  'bidding',
   'complaints',
   'contracting-frameworks',
   'governance',
@@ -20,6 +21,7 @@ export const RULE_CATEGORIES = [
   'prequalification-panel',
   'probity',
   'procurement-legislation',
+  'sourcing',
 ];
 
 // A single procurement rule shown on the Jurisdictional links page.

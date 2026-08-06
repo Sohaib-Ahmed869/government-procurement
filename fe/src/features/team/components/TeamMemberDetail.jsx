@@ -133,8 +133,14 @@ export default function TeamMemberDetail({ slug }) {
               <BackLink />
 
               <h1 className="tm__name">{member.name}</h1>
+              {/* "Partner, Melbourne" — the location picked out from the role
+                  in the accent colour, as on the reference profile. */}
               <p className="tm__role">
-                {[member.role, member.location].filter(Boolean).join(', ')}
+                {member.role}
+                {member.role && member.location && ', '}
+                {member.location && (
+                  <span className="tm__location">{member.location}</span>
+                )}
               </p>
 
               <p className="tm__bio">{member.summary}</p>

@@ -100,7 +100,7 @@
 
 .home-hero__title {
   margin: 26px 0 0;
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   /* Shared page-title size: homepage, advisory, contact, insights. */
   font-size: clamp(36px, 3.6vw, 60px);
   font-weight: 400;
@@ -211,13 +211,25 @@
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 64px;
+  /* The photo fills its column edge to edge — same as the "Enhance your
+     Experience" card below — so the two sections read as the same shape. */
+  align-items: stretch;
+  gap: 0;
   width: min(1020px, calc(100% - 80px));
   margin: 24px auto 72px;
-  padding: 48px;
+  overflow: hidden;
   background: var(--home-surface);
   border-radius: 14px;
+}
+
+/* Padding moved off the panel so the media column can bleed to its edges. */
+.home-hero__advisory-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Tighter block padding than the 48px gutters — the panel's height is set by
+     this column, so the vertical padding is what keeps it compact. */
+  padding: 32px 48px;
 }
 
 .home-hero__advisory .home-hero__eyebrow {
@@ -226,7 +238,7 @@
 }
 
 .home-hero__subtitle {
-  margin: 18px 0 0;
+  margin: 12px 0 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(30px, 3.6vw, 46px);
   font-weight: 400;
@@ -234,22 +246,29 @@
 }
 
 .home-hero__advisory-copy {
-  margin: 22px 0 0;
+  margin: 16px 0 0;
   max-width: 480px;
   font-size: 15px;
   line-height: 1.65;
   color: #fff;
 }
 
+/* The copy column is a flex column now, so the pill has to opt out of the
+   default stretch and keep its shrink-to-fit width. */
 .home-hero__advisory .home-hero__btn {
-  margin-top: 34px;
+  align-self: flex-start;
+  margin-top: 24px;
 }
 
 .home-hero__advisory-media img {
   display: block;
   width: 100%;
-  height: auto;
-  border-radius: 20px;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Outer corners are clipped by the panel; the inner (left) edge carries its
+     own curve so it meets the copy panel smoothly. */
+  border-radius: 20px 0 0 20px;
 }
 
 /* WCAG 2.1 AA focus visibility */
@@ -262,13 +281,24 @@
 @media (max-width: 900px) {
   .home-hero__advisory {
     grid-template-columns: 1fr;
-    gap: 32px;
     text-align: center;
   }
 
   /* Image sits above the text on narrow screens. */
   .home-hero__advisory-media {
     order: -1;
+  }
+
+  /* Stacked, so the photo keeps its own proportions rather than filling a
+     column, and the curve moves to the edge it shares with the copy. */
+  .home-hero__advisory-media img {
+    height: auto;
+    aspect-ratio: 790 / 466;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .home-hero__advisory .home-hero__btn {
+    align-self: center;
   }
 
   .home-hero__advisory-copy {
@@ -294,10 +324,10 @@
     font-size: clamp(38px, 11vw, 52px);
   }
 
-  /* Advisory-block headings switch to Segoe UI on small screens. */
+  /* Advisory-block headings drop the display face on small screens. */
   .home-hero__advisory .home-hero__eyebrow,
   .home-hero__subtitle {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
   }
 
   /* Body copy under the headings matches the footer blurb. */
@@ -345,8 +375,11 @@
   .home-hero__advisory {
     width: 100%;
     margin: 16px 0 48px;
-    padding: 40px 24px 48px;
     border-radius: 0;
+  }
+
+  .home-hero__advisory-text {
+    padding: 40px 24px 48px;
   }
 
   /* Advisory "Request a consultation" button: identical to the intro button —

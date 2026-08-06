@@ -39,8 +39,9 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
       try {
         // A search spans the whole forum, so the category filter comes off —
         // otherwise a Win-page search would never surface an Award answer.
+        // "all" is the sidebar's unfiltered view, so it drops the filter too.
         const list = await questionsApi.publicList(
-          query ? { limit: 100 } : { limit: 100, category },
+          query || category === 'all' ? { limit: 100 } : { limit: 100, category },
         );
         if (!alive) return;
         setAnswers(list || []);

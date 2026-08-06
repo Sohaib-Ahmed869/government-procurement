@@ -58,11 +58,9 @@ export default function ForumHero({ compact = false }) {
       data-audience={audience}
     >
       <div className="forum-hero__inner">
-        <h1 className="forum-hero__title">Get your answers</h1>
-        <p className="forum-hero__sub">
-          Your guide to navigating complex tenders, compliance challenges, and
-          contract decisions. Practical insights for both agencies and suppliers.
-        </p>
+        <h1 className="forum-hero__title">
+          Question and Answers - Complementary Service
+        </h1>
 
         <div className="forum-hero__tools">
           <form className="forum-hero__search" role="search" onSubmit={onSearch}>

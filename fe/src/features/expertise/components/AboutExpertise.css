@@ -141,7 +141,7 @@
 
   .ab__heading {
     margin-bottom: 32px;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(38px, 11vw, 52px);
   }
 

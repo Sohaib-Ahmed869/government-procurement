@@ -6,20 +6,12 @@ import ForumSidebar from './ForumSidebar.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import './ForumSubmit.css';
 
-const TOPIC_OPTIONS = [
+// Matches CATEGORIES in ../data.js, less the sidebar's "All categories" view —
+// a question is filed under exactly one of these.
+const CATEGORY_OPTIONS = [
   { value: 'award', label: 'Award Contracts' },
   { value: 'win', label: 'Win Contracts' },
-  { value: 'general', label: 'General' },
-];
-
-// PLACEHOLDER — the real question titles are still to come. Only the values and
-// labels below need swapping; nothing else depends on them.
-const TITLE_OPTIONS = [
-  { value: 'evaluation', label: 'Evaluation and scoring' },
-  { value: 'compliance', label: 'Compliance and conformance' },
-  { value: 'probity', label: 'Probity and governance' },
-  { value: 'contracts', label: 'Contracts and variations' },
-  { value: 'other', label: 'Other' },
+  { value: 'general', label: 'Other' },
 ];
 
 // A native <select> renders its list with the OS palette and square corners, so
@@ -93,8 +85,7 @@ export default function ForumSubmit() {
   const { audience } = useAudience();
   const { ref, inView } = useInView({ resetKey: audience });
   const [sent, setSent] = useState(false);
-  const [topic, setTopic] = useState('');
-  const [questionTitle, setQuestionTitle] = useState('');
+  const [category, setCategory] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -103,23 +94,21 @@ export default function ForumSubmit() {
     const formEl = event.target;
     const data = new FormData(formEl);
     const message = (data.get('message') || '').toString().trim();
-    const chosen = (data.get('topic') || '').toString();
-    const chosenTitle = (data.get('title') || '').toString();
+    const chosen = (data.get('category') || '').toString();
+    const typedTitle = (data.get('title') || '').toString().trim();
     setSubmitting(true);
     setError('');
     try {
-      const titleLabel = TITLE_OPTIONS.find((o) => o.value === chosenTitle)?.label;
       await questionsApi.submit({
-        // Use the chosen title; with none picked, derive one from the message.
-        title: titleLabel || message.slice(0, 80) || 'Forum question',
+        // Use the title as typed; left blank, derive one from the message.
+        title: typedTitle || message.slice(0, 80) || 'Forum question',
         body: message,
         category: ['award', 'general'].includes(chosen) ? chosen : 'win',
         name: (data.get('name') || '').toString().trim(),
         email: (data.get('email') || '').toString().trim(),
       });
       setSent(true);
-      setTopic('');
-      setQuestionTitle('');
+      setCategory('');
       formEl.reset();
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -163,29 +152,31 @@ export default function ForumSubmit() {
               />
             </div>
 
+            {/* Category leads the title: it frames the question the visitor is
+                about to write, rather than following it. */}
             <div className="forum-submit__field" style={{ '--i': 2 }}>
-              <label className="forum-submit__label" htmlFor="fq-title">
-                Question title
+              <label className="forum-submit__label" htmlFor="fq-category">
+                Question category
               </label>
               <Select
-                id="fq-title"
-                options={TITLE_OPTIONS}
-                value={questionTitle}
-                onChange={setQuestionTitle}
-                placeholder="Select a question title"
+                id="fq-category"
+                options={CATEGORY_OPTIONS}
+                value={category}
+                onChange={setCategory}
+                placeholder="Select a question category"
               />
             </div>
 
             <div className="forum-submit__field" style={{ '--i': 3 }}>
-              <label className="forum-submit__label" htmlFor="fq-topic">
-                Enter topic
+              <label className="forum-submit__label" htmlFor="fq-title">
+                Question title
               </label>
-              <Select
-                id="fq-topic"
-                options={TOPIC_OPTIONS}
-                value={topic}
-                onChange={setTopic}
-                placeholder="Enter your topic"
+              <input
+                id="fq-title"
+                name="title"
+                type="text"
+                className="forum-submit__input"
+                placeholder="Enter your question title"
               />
             </div>
 
@@ -198,7 +189,7 @@ export default function ForumSubmit() {
                 name="message"
                 className="forum-submit__input forum-submit__textarea"
                 placeholder="Enter your Message"
-                rows={5}
+                rows={8}
                 required
               />
             </div>

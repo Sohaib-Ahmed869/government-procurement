@@ -18,7 +18,7 @@ export default function ForumCategoriesPage() {
         <ForumLayout>
           <ForumHero />
           <ForumAnswers
-            heading={`Answers with Category: ${CATEGORY_LABEL[category]}`}
+            heading={`Answer Category: ${CATEGORY_LABEL[category]}`}
             category={category}
           />
         </ForumLayout>

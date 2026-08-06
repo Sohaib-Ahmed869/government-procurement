@@ -1,117 +1,31 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { consultationsApi } from '../../../api';
+import consultPhoto from '../../../assets/images/EnhanceExpImage.png';
 import './ConsultationForm.css';
 
-// What a booking gets you — mirrors the contact details column, but as a short
-// "what to expect" list rather than phone/email pills.
-const EXPECTATIONS = [
-  'A 30-minute call with one of our procurement specialists.',
-  'A tailored view of where we can add value to your bids.',
-  'Clear next steps, no obligation, no hard sell.',
-];
-
-const REASON_OPTIONS = [
-  { value: 'business', label: "Business — I'm exploring hiring Government Procurement" },
-  {
-    value: 'press',
-    label: "Press — I'm a media representative seeking an expert perspective",
-  },
-  {
-    value: 'events',
-    label:
-      "Events — I'm looking to invite Government Procurement to participate in an upcoming event",
-  },
-  { value: 'other', label: 'Other' },
-];
-
-// Fields the user must fill before we let the booking through. Role is the only
-// optional one, so it's absent here.
+// Fields the user must fill before we let the request through. Role and contact
+// number are the optional ones, so they're absent here. The organisation
+// message is a function because the label changes with the audience.
 const REQUIRED_FIELDS = {
-  name: 'Please enter your full name.',
-  email: 'Please enter your work email.',
-  organisation: 'Please enter your organisation.',
-  reason: 'Please choose a reason for contacting us.',
-  message: 'Please tell us a little about what you need.',
+  name: () => 'Please enter your full name.',
+  email: () => 'Please enter your work email.',
+  organisation: (orgLabel) => `Please enter your ${orgLabel.toLowerCase()}.`,
+  reason: () => 'Please tell us your reason for contacting us.',
+  message: () => 'Please tell us a little about what you need.',
 };
 
 const EMPTY_FORM = {
   name: '',
   email: '',
+  phone: '',
   organisation: '',
   role: '',
   reason: '',
   message: '',
 };
-
-// Custom listbox rather than a native <select>: the popup on a native select is
-// drawn by the OS, so it can't take the rounded, glass treatment the rest of the
-// form uses. Mirrors the contact form's topic picker.
-function ThemedSelect({ id, options, value, placeholder, invalid, onChange }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function onDocClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    function onKey(e) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('mousedown', onDocClick);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocClick);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  const current = options.find((o) => o.value === value);
-
-  return (
-    <div className="consult__select-wrap" ref={ref}>
-      <button
-        type="button"
-        id={id}
-        className={`consult__input consult__select${current ? '' : ' is-placeholder'}`}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-invalid={invalid}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {current ? current.label : placeholder}
-      </button>
-
-      <span className={`consult__chevron${open ? ' is-open' : ''}`} aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </span>
-
-      {open && (
-        <ul className="consult__menu" role="listbox" aria-labelledby={id}>
-          {options.map((o) => (
-            <li key={o.value} role="option" aria-selected={o.value === value}>
-              <button
-                type="button"
-                className={`consult__option${o.value === value ? ' is-active' : ''}`}
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
-              >
-                {o.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 export default function ConsultationForm() {
   // Reveal on scroll into view, matching the contact form's on-enter animation.
@@ -122,6 +36,10 @@ export default function ConsultationForm() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Award is the buyer-side segment, where the visitor works for an agency
+  // rather than a supplier organisation.
+  const orgLabel = audience === 'award' ? 'Agency' : 'Organisation';
 
   function setField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -142,7 +60,7 @@ export default function ConsultationForm() {
   function validate() {
     const next = {};
     for (const [field, message] of Object.entries(REQUIRED_FIELDS)) {
-      if (!form[field].trim()) next[field] = message;
+      if (!form[field].trim()) next[field] = message(orgLabel);
     }
     // A lightweight email sanity check on top of the required rule.
     if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -163,9 +81,10 @@ export default function ConsultationForm() {
       await consultationsApi.submit({
         name: form.name.trim(),
         email: form.email.trim(),
+        phone: form.phone.trim(),
         organisation: form.organisation.trim(),
         role: form.role.trim(),
-        reason: form.reason,
+        reason: form.reason.trim(),
         message: form.message.trim(),
       });
       navigate('/contact-sent');
@@ -185,22 +104,25 @@ export default function ConsultationForm() {
         <div className="consult__grid">
           {/* --- intro / what to expect --- */}
           <aside className="consult__intro">
-            <p className="consult__eyebrow">Talk to us</p>
-            <h1 className="consult__title">Book a Consultation</h1>
+            <p className="consult__eyebrow">Talk to Us</p>
+            <h1 className="consult__title">Request a Consultation</h1>
             <p className="consult__lead">
-              Tell us where you are in your procurement journey and we&rsquo;ll
-              match you with the right specialist. Pick a time that suits and
-              we&rsquo;ll take it from there.
+              Connect with a member of our team for a complimentary,
+              no-obligation consultation, in person or online, to discuss where
+              you are in your journey. We&rsquo;ll share insights on how we can
+              assist and help you plan your next steps. Please note: We do not
+              advise bidders on open tenders.
             </p>
 
-            <ul className="consult__expect">
-              {EXPECTATIONS.map((item) => (
-                <li key={item} className="consult__expect-item">
-                  <span className="consult__expect-dot" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            {/* Fills the space the intro column leaves beside the taller form. */}
+            <figure className="consult__figure">
+              <img
+                className="consult__photo"
+                src={consultPhoto}
+                alt="Five colleagues in discussion around a table of documents."
+                loading="lazy"
+              />
+            </figure>
           </aside>
 
           {/* --- form --- */}
@@ -248,15 +170,30 @@ export default function ConsultationForm() {
             </div>
 
             <div className="consult__field">
+              <label className="consult__label" htmlFor="consult-phone">
+                Contact number <span className="consult__optional">(optional)</span>
+              </label>
+              <input
+                id="consult-phone"
+                name="phone"
+                type="tel"
+                className="consult__input"
+                placeholder="Enter your contact number"
+                value={form.phone}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="consult__field">
               <label className="consult__label" htmlFor="consult-org">
-                Organisation
+                {orgLabel}
               </label>
               <input
                 id="consult-org"
                 name="organisation"
                 type="text"
                 className="consult__input"
-                placeholder="Enter your organisation"
+                placeholder={`Enter your ${orgLabel.toLowerCase()}`}
                 value={form.organisation}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.organisation)}
@@ -287,13 +224,15 @@ export default function ConsultationForm() {
               <label className="consult__label" htmlFor="consult-reason">
                 Reason for contacting
               </label>
-              <ThemedSelect
+              <input
                 id="consult-reason"
-                options={REASON_OPTIONS}
+                name="reason"
+                type="text"
+                className="consult__input"
+                placeholder="Tell us why you're getting in touch"
                 value={form.reason}
-                placeholder="Select a reason"
-                invalid={Boolean(errors.reason)}
-                onChange={(value) => setField('reason', value)}
+                onChange={handleChange}
+                aria-invalid={Boolean(errors.reason)}
               />
               {errors.reason && (
                 <p className="consult__error" role="alert">
@@ -311,7 +250,7 @@ export default function ConsultationForm() {
                 name="message"
                 className="consult__input consult__textarea"
                 placeholder="Tell us what you'd like to cover"
-                rows={5}
+                rows={7}
                 value={form.message}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.message)}
@@ -330,7 +269,7 @@ export default function ConsultationForm() {
             )}
 
             <button type="submit" className="consult__submit" disabled={submitting}>
-              {submitting ? 'Sending…' : 'Book consultation'}
+              {submitting ? 'Sending…' : 'Request consultation'}
             </button>
           </form>
         </div>

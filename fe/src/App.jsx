@@ -20,6 +20,7 @@ import ArticleDetailPage from './pages/public/ArticleDetailPage.jsx';
 // System / utility pages
 import PrivacyPolicyPage from './pages/system/PrivacyPolicyPage.jsx';
 import TermsPage from './pages/system/TermsPage.jsx';
+import ConflictsOfInterestPage from './pages/system/ConflictsOfInterestPage.jsx';
 import ContactSentPage from './pages/system/ContactSentPage.jsx';
 import InterestRegisteredPage from './pages/system/InterestRegisteredPage.jsx';
 import QuestionSubmittedPage from './pages/system/QuestionSubmittedPage.jsx';
@@ -97,6 +98,7 @@ function PublicSite() {
           {/* System / utility */}
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/conflicts-of-interest" element={<ConflictsOfInterestPage />} />
           <Route path="/contact-sent" element={<ContactSentPage />} />
           <Route path="/interest-registered" element={<InterestRegisteredPage />} />
           <Route path="/question-submitted" element={<QuestionSubmittedPage />} />
