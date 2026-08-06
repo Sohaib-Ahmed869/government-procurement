@@ -1,4 +1,4 @@
-/* Geist for everything except the wordmark (Segoe UI, matched to the header). */
+/* Geist throughout, wordmark included — matched to the header. */
 .site-footer {
   --footer-bg: var(--gp-ink-900);
 
@@ -21,10 +21,13 @@
 .site-footer__subscribe {
   max-width: 1100px;
   margin: 0 auto;
-  /* The page's last section carries its own bottom padding above this, so a
-     light top pad here keeps the run-in to "Remain Connected" the same size as
-     the gaps between sections further up the page. */
-  padding: 40px 40px 40px;
+  /* Ruled off from the page above as well as from the footer below, so
+     "Remain Connected" reads as its own band on every page. The page's last
+     section carries its own bottom padding above the top rule, so the padding
+     here is kept short — enough to clear the line, not enough to leave the
+     block floating in empty space. */
+  padding: 28px 40px 36px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -34,11 +37,15 @@
      the row runs short the link columns narrow and their longest labels wrap —
      nothing drops to a second row. */
   display: grid;
-  /* The contact track is sized off its widest line — the head office email, one
-     unbreakable ~28-character token at 13.5px. At 200px it wrapped its last
-     letter onto a line of its own, so the track takes 230px and the column gap
-     gives the difference back rather than the link columns paying for it. */
-  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) 230px;
+  /* The contact track is sized off its widest line — "Room 830 of the Regus
+     Flinders Centre", the first line of the head office address. At 230px it
+     dropped "Centre" onto a line of its own; 258px holds it whole, and still
+     clears the email below it (one unbreakable ~28-character token at 13.5px).
+     The column gaps give the difference back.
+
+     The brand track's floor is what "Government Procurement" needs on one line
+     beside the 26px logo — ~150px of text plus the logo and its 8px gap. */
+  grid-template-columns: minmax(190px, 200px) minmax(0, 1fr) 258px;
   /* Baseline, not start: top-aligning the three tracks left the brand wordmark
      sitting a few pixels below the column headings across the row, because it is
      centred against the 23px logo beside it. Aligning on first baseline puts the
@@ -78,10 +85,24 @@
      to the logo's bottom edge. Opting the wordmark in makes the text's baseline
      the one the inner grid aligns the column headings to. */
   align-self: baseline;
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 15px;
+  /* One line at every width — the brand track below is sized to hold it beside
+     the 26px logo. */
+  white-space: nowrap;
+}
+
+/* --- top row --- */
+/* The wordmark and the four column headings sit on one baseline across the top
+   of the footer, so they share one type treatment rather than each carrying its
+   own size and tracking. Change it here and the whole row moves together. */
+.site-footer__wordmark,
+.site-footer__heading,
+.site-footer__contact-heading {
+  margin: 0;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: normal;
+  color: #fff;
 }
 
 /* --- social links --- */
@@ -100,7 +121,11 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
-  gap: 6px;
+  /* Six cells rather than the channel row's five, so the gap is the tighter of
+     the two — that difference is what lets the glyphs match in size without the
+     row spilling onto a second line. The grid is fixed at six columns, so it
+     can't wrap either way. */
+  gap: 4px;
   max-width: 300px;
   /* The heading above carries the gap from the wordmark. */
   margin: 14px 0 0;
@@ -129,13 +154,15 @@
   transition: opacity 0.15s ease;
 }
 
-/* react-icons default to 1em; size the glyph off its box instead of inheriting,
-   capped so it never outgrows the 22px it sits at on the roomy layouts. */
+/* react-icons default to 1em; size the glyph off its box instead of inheriting.
+   Six cells share the ~200px brand track, so the box is ~30px against the
+   channel row's ~35px — the glyph takes a larger share of it to land at the
+   same drawn size as the marks below, rather than reading a step smaller. */
 .site-footer__social-icon {
-  width: 62%;
-  height: 62%;
-  max-width: 22px;
-  max-height: 22px;
+  width: 74%;
+  height: 74%;
+  max-width: 24px;
+  max-height: 24px;
 }
 
 .site-footer__social-link:hover,
@@ -160,7 +187,10 @@
   /* The columns are content-width, so a narrow gap left the track's slack
      pooling after the last one as a wide void before the contact block. A
      roomier gap spends most of that slack between the columns instead. */
-  --links-gap: 64px;
+  /* Tightened from 64px when "Conflicts of Interest" joined Policies — that
+     column is now as wide as the two beside it, so the slack it used to leave
+     has gone into the label. */
+  --links-gap: 48px;
 
   display: flex;
   gap: var(--links-gap);
@@ -168,7 +198,7 @@
      applies equally to both track boundaries and so can't be raised on its own.
      The track's right edge doesn't move, so the void before the contact block
      narrows by the same amount. */
-  margin-left: 28px;
+  margin-left: 18px;
   /* Lets the track shrink below the columns' natural width, so long labels wrap
      inside their column instead of widening the row. */
   min-width: 0;
@@ -184,14 +214,8 @@
   margin-left: calc(var(--links-gap) * -0.3);
 }
 
-/* The rule below carries the space down to the list, so the heading only needs
-   to clear the rule itself. */
-.site-footer__heading {
-  margin: 0 0 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-}
+/* .site-footer__heading takes its type and margins from the top-row rule near
+   the wordmark — the rule below it carries the space down to the list. */
 
 .site-footer__list {
   margin: 0;
@@ -285,26 +309,6 @@
   }
 }
 
-/* The number on its own line under the channels — plain text, not a pill, the
-   same treatment the contact page gives it. */
-.site-footer__phone {
-  margin: 12px 0 0;
-  font-size: 16px;
-  letter-spacing: 0.01em;
-  color: #fff;
-}
-
-.site-footer__phone-link {
-  color: inherit;
-  text-decoration: none;
-  transition: opacity 0.15s ease;
-}
-
-.site-footer__phone-link:hover,
-.site-footer__phone-link:focus-visible {
-  opacity: 0.75;
-}
-
 /* The WeChat entry opens a dialog rather than navigating, so it's a <button>.
    Strip the native chrome so it reads as a link beside the others. */
 .site-footer__channel-button {
@@ -391,9 +395,6 @@
 
 .site-footer__contact-heading {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
 }
 
 .site-footer__contact-heading-link {
@@ -446,6 +447,12 @@
   white-space: nowrap;
 }
 
+/* Shares a line with its "Contact Number:" label, so if that pair ever runs out
+   of room the break falls after the label rather than inside the number. */
+.site-footer__contact-phone {
+  white-space: nowrap;
+}
+
 .site-footer__contact-link {
   color: #fff;
   text-decoration: none;
@@ -482,21 +489,22 @@
    little back. The row itself holds — only the link columns get tighter. */
 @media (max-width: 1100px) {
   .site-footer__inner {
-    /* Contact holds its 230px — the email needs it at every width — so the give
-       comes from the brand track and the gaps. */
-    grid-template-columns: minmax(160px, 200px) minmax(0, 1fr) 230px;
+    /* Contact holds its 258px — the address line needs it at every width — and
+       the brand track holds the 190px the wordmark needs, so the give comes
+       from the gaps and the link columns. */
+    grid-template-columns: minmax(190px, 200px) minmax(0, 1fr) 258px;
     gap: 48px 16px;
   }
 
   /* The columns are content-width and the track narrows fast through this band,
-     so the gap has to give the space back as the viewport shrinks — a flat 48px
-     still fits at 1000px but squeezes "Jurisdictional links" onto two lines by
-     901px, where the band ends. Fluid from 48px down to the 20px this used to
-     hold, reaching it just as the layout stacks. */
+     so the gap has to give the space back as the viewport shrinks, or the
+     longest labels — "Jurisdictional Links", "Conflicts of Interest" — start
+     wrapping onto two lines. Fluid from the 48px it holds above down to 14px,
+     reaching it just as the layout stacks. */
   .site-footer__links {
-    --links-gap: clamp(20px, calc((100vw - 900px) / 4 + 20px), 48px);
+    --links-gap: clamp(14px, calc((100vw - 900px) / 5 + 14px), 48px);
 
-    margin-left: 16px;
+    margin-left: 12px;
   }
 }
 
@@ -536,7 +544,7 @@
   }
 
   .site-footer__subscribe {
-    padding: 32px 24px 36px;
+    padding: 24px 24px 32px;
   }
 
   .site-footer__inner {
@@ -602,12 +610,6 @@
   .site-footer__channel-icon--wechat {
     width: 62%;
     height: 62%;
-  }
-
-  /* Tracks the headings, which step up on the stacked layout. */
-  .site-footer__phone {
-    margin-top: 14px;
-    font-size: 20px;
   }
 
   /* The widest row is "Insights / Capabilities / Our team / Courses": ~17.5em of

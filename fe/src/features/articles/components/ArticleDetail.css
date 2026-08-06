@@ -484,7 +484,7 @@
   }
 
   .article-hero__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(30px, 7vw, 42px);
   }
 

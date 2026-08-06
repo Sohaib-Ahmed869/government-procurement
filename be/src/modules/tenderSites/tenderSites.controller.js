@@ -2,15 +2,18 @@ import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
-import { TenderSite } from '../../models/TenderSite.js';
+import { TenderSite, TENDER_SITE_GROUPS } from '../../models/TenderSite.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
 
 const EDITABLE = [
   'name',
   'subtitle',
+  'group',
   'openTendersUrl',
   'upcomingTendersUrl',
   'createAccountUrl',
+  'loginUrl',
+  'note',
   'order',
   'active',
 ];
@@ -19,6 +22,11 @@ function pickEditable(body) {
   const out = {};
   for (const field of EDITABLE) {
     if (body[field] !== undefined) out[field] = body[field];
+  }
+  // An unknown group would be rejected by the schema enum on save; drop it here
+  // so a stray value falls back to the default section instead of erroring.
+  if (out.group !== undefined && !TENDER_SITE_GROUPS.includes(out.group)) {
+    delete out.group;
   }
   return out;
 }

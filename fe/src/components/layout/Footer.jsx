@@ -54,6 +54,7 @@ const LINK_COLUMNS = [
     links: [
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
+      { label: 'Conflicts of Interest', href: '/conflicts-of-interest' },
     ],
   },
 ];
@@ -89,6 +90,7 @@ const FLAT_ROWS = [
   [
     { label: 'Privacy', href: '/privacy' },
     { label: 'Terms', href: '/terms' },
+    { label: 'Conflicts of Interest', href: '/conflicts-of-interest' },
   ],
 ];
 
@@ -208,12 +210,8 @@ export default function Footer({ audience: audienceProp }) {
               );
             })}
           </ul>
-
-          <p className="site-footer__phone">
-            <a className="site-footer__phone-link" href={CONTACT_PHONE_HREF}>
-              {CONTACT_PHONE}
-            </a>
-          </p>
+          {/* The number itself isn't repeated here — it's listed once, under
+              "Contact Us" on the right of the row. */}
         </div>
 
         <nav className="site-footer__links" aria-label="Footer">
@@ -267,9 +265,13 @@ export default function Footer({ audience: audienceProp }) {
               ))}
             </li>
             <li>
-              <span className="site-footer__contact-label">Contact Number:</span>
-              <br />
-              <a className="site-footer__contact-link" href={CONTACT_PHONE_HREF}>
+              {/* Short enough to share its label's line — the address and email
+                  are not, so they keep the value on the line beneath. */}
+              <span className="site-footer__contact-label">Contact Number:</span>{' '}
+              <a
+                className="site-footer__contact-link site-footer__contact-phone"
+                href={CONTACT_PHONE_HREF}
+              >
                 {CONTACT_PHONE}
               </a>
             </li>

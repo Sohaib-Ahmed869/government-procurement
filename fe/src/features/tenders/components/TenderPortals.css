@@ -47,6 +47,7 @@
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
   .tp__title,
+  .tp__group-title,
   .tp__sub,
   .tp__controls,
   .tp__featured,
@@ -60,6 +61,7 @@
 
   /* Section header reveals on mount. */
   .tp.is-in .tp__title,
+  .tp.is-in .tp__group-title,
   .tp.is-in .tp__sub,
   .tp.is-in .tp__controls,
   .tp.is-in .tp__featured {
@@ -109,6 +111,16 @@
 
 .tp__title strong {
   font-weight: 700;
+}
+
+/* Heading for the second list. A step down from the page title so it reads as a
+   section within the page rather than a second page title. */
+.tp__group-title {
+  margin: 64px 0 0;
+  font-size: clamp(24px, 2.4vw, 32px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .tp__sub {
@@ -292,7 +304,10 @@
   margin: 40px 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* 320px rather than 280px: the widest portal names ("Quotations and Tenders
+     Online") then fit on one line at the size below, instead of wrapping and
+     pushing that card's buttons out of line with its neighbours. */
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 20px;
 }
 
@@ -345,11 +360,15 @@
   object-fit: contain;
 }
 
+/* The block reserves two title lines plus a subtitle whether or not it needs
+   them, so the buttons underneath start at the same height in every card —
+   a name that wraps no longer knocks its own card's row of buttons down. */
 .tp__name {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 19px;
+  min-height: 3.95em;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1.25;
 }
@@ -363,6 +382,16 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+}
+
+/* Fee disclaimer under the paywalled sign-in button. Quieter and smaller than
+   the card's own copy — it qualifies the button rather than selling it. */
+.tp__note {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .tp__desc {
@@ -458,8 +487,14 @@
   }
 
   .tp__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(34px, 10vw, 46px);
+  }
+
+  .tp__group-title {
+    margin-top: 48px;
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: clamp(26px, 7.5vw, 34px);
   }
 
   /* Matches the footer blurb. */

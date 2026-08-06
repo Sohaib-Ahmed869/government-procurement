@@ -1,16 +1,20 @@
 // Forum content keyed by audience category. "win" = supplier-side questions,
 // "award" = agency/buyer-side questions, "general" = neither segment in
-// particular. The three match the options the submission form offers.
+// particular (shown as "Other"). The three match the options the submission
+// form offers. "all" is not a stored category — it's the sidebar's unfiltered
+// view, so it has a label but never comes back on a question.
 export const CATEGORY_LABEL = {
+  all: 'All categories',
   win: 'Win Contracts',
   award: 'Award Contracts',
-  general: 'General',
+  general: 'Other',
 };
 
 export const CATEGORIES = [
+  { key: 'all', label: 'All categories' },
   { key: 'award', label: 'Award Contracts' },
   { key: 'win', label: 'Win Contracts' },
-  { key: 'general', label: 'General' },
+  { key: 'general', label: 'Other' },
 ];
 
 // Each item drives both the answer card (title, date, body excerpt) and its

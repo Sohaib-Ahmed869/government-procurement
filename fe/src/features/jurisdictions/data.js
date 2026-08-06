@@ -1,7 +1,9 @@
 import {
+  FaCartShopping,
   FaFileContract,
   FaFileLines,
   FaGavel,
+  FaHandshake,
   FaLocationDot,
   FaPeopleGroup,
   FaShieldHalved,
@@ -33,6 +35,7 @@ export const JURISDICTION_BY_VALUE = Object.fromEntries(
 // top-right on each card.
 export const CATEGORIES = [
   { value: 'aboriginal-procurement-policy', label: 'Aboriginal Procurement Policy', Icon: FaPeopleGroup },
+  { value: 'bidding', label: 'Bidding', Icon: FaHandshake },
   { value: 'complaints', label: 'Complaints', Icon: FaTriangleExclamation },
   { value: 'contracting-frameworks', label: 'Contracting Frameworks', Icon: FaFileContract },
   { value: 'governance', label: 'Governance', Icon: FaSitemap },
@@ -41,6 +44,7 @@ export const CATEGORIES = [
   { value: 'prequalification-panel', label: 'Prequalification / Panel', Icon: FaUsers },
   { value: 'probity', label: 'Probity', Icon: FaShieldHalved },
   { value: 'procurement-legislation', label: 'Procurement Legislation', Icon: FaGavel },
+  { value: 'sourcing', label: 'Sourcing', Icon: FaCartShopping },
 ];
 
 export const CATEGORY_BY_VALUE = Object.fromEntries(

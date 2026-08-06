@@ -6,12 +6,28 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
 
+// Which of the two lists on the Tender Websites page an entry is shown in.
+const GROUPS = [
+  { value: 'australian', label: 'Australian tender website' },
+  { value: 'other', label: 'Other tender website' },
+];
+
+// Prefilled the first time an entry is filed under "Other", since every one of
+// them needs the same disclaimer. It stays editable — the operator's name in it
+// has to match the site being linked.
+const DEFAULT_NOTE =
+  'Government Procurement has no affiliation with, and receives no commission ' +
+  'or benefit from VendorPanel. All access fees are set solely by VendorPanel';
+
 const EMPTY = {
   name: '',
   subtitle: '',
+  group: 'australian',
   openTendersUrl: '',
   upcomingTendersUrl: '',
   createAccountUrl: '',
+  loginUrl: '',
+  note: '',
   order: 0,
   active: true,
 };
@@ -49,7 +65,15 @@ export default function TendersAdminPage() {
 
   const onChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+    setForm((f) => {
+      const next = { ...f, [name]: type === 'checkbox' ? checked : value };
+      // Switching to "Other" brings the standard disclaimer with it, unless a
+      // note has already been written.
+      if (name === 'group' && value === 'other' && !f.note.trim()) {
+        next.note = DEFAULT_NOTE;
+      }
+      return next;
+    });
   };
 
   const openCreate = () => {
@@ -65,9 +89,12 @@ export default function TendersAdminPage() {
     setForm({
       name: row.name || '',
       subtitle: row.subtitle || '',
+      group: row.group || 'australian',
       openTendersUrl: row.openTendersUrl || '',
       upcomingTendersUrl: row.upcomingTendersUrl || '',
       createAccountUrl: row.createAccountUrl || '',
+      loginUrl: row.loginUrl || '',
+      note: row.note || '',
       order: row.order ?? 0,
       active: row.active !== false,
     });
@@ -89,14 +116,30 @@ export default function TendersAdminPage() {
     }
     setSaving(true);
     setSaveError(null);
+    const group = form.group || 'australian';
     const body = {
       name: form.name,
       subtitle: form.subtitle,
-      openTendersUrl: form.openTendersUrl,
-      upcomingTendersUrl: form.upcomingTendersUrl,
-      createAccountUrl: form.createAccountUrl,
+      group,
       order: Number(form.order) || 0,
       active: Boolean(form.active),
+      // Only the selected section's fields are kept, so an entry moved between
+      // the two doesn't hold on to links the page no longer draws.
+      ...(group === 'other'
+        ? {
+            loginUrl: form.loginUrl,
+            note: form.note,
+            openTendersUrl: '',
+            upcomingTendersUrl: '',
+            createAccountUrl: '',
+          }
+        : {
+            openTendersUrl: form.openTendersUrl,
+            upcomingTendersUrl: form.upcomingTendersUrl,
+            createAccountUrl: form.createAccountUrl,
+            loginUrl: '',
+            note: '',
+          }),
     };
     try {
       if (editingId) {
@@ -142,11 +185,14 @@ export default function TendersAdminPage() {
   // A tick per destination that's filled in, so the table shows at a glance
   // which entries are still missing a link.
   const linkSummary = (r) =>
-    [
-      r.openTendersUrl ? 'Open' : null,
-      r.upcomingTendersUrl ? 'Upcoming' : null,
-      r.createAccountUrl ? 'Account' : null,
-    ]
+    (r.group === 'other'
+      ? [r.loginUrl ? 'Login' : null]
+      : [
+          r.openTendersUrl ? 'Open' : null,
+          r.upcomingTendersUrl ? 'Upcoming' : null,
+          r.createAccountUrl ? 'Account' : null,
+        ]
+    )
       .filter(Boolean)
       .join(', ') || '—';
 
@@ -169,6 +215,12 @@ export default function TendersAdminPage() {
     },
     { key: 'name', header: 'Name' },
     { key: 'subtitle', header: 'Subtitle', render: (r) => r.subtitle || '—' },
+    {
+      key: 'group',
+      header: 'Section',
+      width: 120,
+      render: (r) => (r.group === 'other' ? 'Other' : 'Australian'),
+    },
     { key: 'links', header: 'Links', render: linkSummary },
     {
       key: 'active',
@@ -269,26 +321,60 @@ export default function TendersAdminPage() {
             hint="e.g. NSW State Government"
           />
           <FormField
-            label="Open Tenders"
-            name="openTendersUrl"
-            value={form.openTendersUrl}
+            label="Section"
+            name="group"
+            as="select"
+            value={form.group}
             onChange={onChange}
-            hint="Link to the portal's open tender search. Leave empty to hide the button."
+            options={GROUPS}
+            hint="Which list on the Tender Websites page this appears under."
           />
-          <FormField
-            label="Upcoming Tenders"
-            name="upcomingTendersUrl"
-            value={form.upcomingTendersUrl}
-            onChange={onChange}
-            hint="Link to forecast or upcoming notices. Leave empty to hide the button."
-          />
-          <FormField
-            label="Create Free Account"
-            name="createAccountUrl"
-            value={form.createAccountUrl}
-            onChange={onChange}
-            hint="Link to registration or sign-in. Leave empty to hide the button."
-          />
+          {/* The two sections list different destinations, so each shows only
+              its own links. */}
+          {form.group === 'other' ? (
+            <>
+              <FormField
+                label="Login (Paid wall)"
+                name="loginUrl"
+                value={form.loginUrl}
+                onChange={onChange}
+                hint="Link to the paid sign-in. Leave empty to hide the button."
+              />
+              <FormField
+                label="Note"
+                name="note"
+                as="textarea"
+                rows={3}
+                value={form.note}
+                onChange={onChange}
+                hint="Printed under the Login button. Name the operator this entry links to."
+              />
+            </>
+          ) : (
+            <>
+              <FormField
+                label="Open Tenders"
+                name="openTendersUrl"
+                value={form.openTendersUrl}
+                onChange={onChange}
+                hint="Link to the portal's open tender search. Leave empty to hide the button."
+              />
+              <FormField
+                label="Upcoming Tenders"
+                name="upcomingTendersUrl"
+                value={form.upcomingTendersUrl}
+                onChange={onChange}
+                hint="Link to forecast or upcoming notices. Leave empty to hide the button."
+              />
+              <FormField
+                label="Create Free Account"
+                name="createAccountUrl"
+                value={form.createAccountUrl}
+                onChange={onChange}
+                hint="Link to registration or sign-in. Leave empty to hide the button."
+              />
+            </>
+          )}
 
           <div className="admin-field">
             <span className="admin-field__label">Logo</span>

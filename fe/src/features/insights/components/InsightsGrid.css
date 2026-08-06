@@ -119,13 +119,12 @@
 .insights__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  /* No gap: each card's own padding provides the gutter, so the panel that
-     appears on hover has room to sit around the content. */
-  gap: 0;
-  /* That same padding would otherwise indent the first column past the page
-     title above it. Pulling the grid out by it puts the card content back on
-     the container's own edge, so the row lines up with "Insights". */
-  margin: 0 -16px;
+  /* The cards are boxed, so the grid needs a real gutter between them — the
+     same 24px the homepage's "Latest Insights" row uses. Each box's own edge
+     now sits on the container's edge, so the row still lines up with the
+     "Insights" title above it. */
+  gap: 24px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -152,17 +151,40 @@
   }
 }
 
-/* Flat against the page at rest — the raised panel only appears on hover. */
+/* Boxed at rest, matching the homepage's "Latest Insights" cards — the grey
+   panel and hairline border for Win, the translucent glass treatment for Award
+   (see the audience rule below). The hover lift still applies on top. */
 .insights-card__inner {
   position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 16px;
-  background: transparent;
+  /* No side padding: the image runs the full width of the box, as on the
+     homepage. The text below carries its own gutters. */
+  padding: 0 0 16px;
+  overflow: hidden;
   color: inherit;
   text-decoration: none;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+/* Everything under the image is inset from the box's edges; the image itself is
+   not, so it meets the border on three sides. */
+.insights-card__inner > :not(.insights-card__art) {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Award-contract audience: the translucent glass boxes used across the site. */
+.insights[data-audience='award'] .insights-card__inner {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
 }
 
 /* Status / empty message shown while insights load or when none exist. */
@@ -179,7 +201,9 @@
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 10px;
+  /* Square — the box's own 14px radius and overflow clip the two top corners,
+     so the image sits in the corner rather than floating inside it. */
+  border-radius: 0;
   background: var(--insights-bg);
 }
 
@@ -233,6 +257,7 @@
     transition:
       transform 0.2s ease-out,
       box-shadow 0.2s ease-out,
+      border-color 0.2s ease-out,
       background-color 0.2s ease-out;
   }
 
@@ -242,6 +267,7 @@
     transition:
       transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
       box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
+      border-color 0.45s ease-out 0.18s,
       background-color 0.45s ease-out 0.18s;
   }
 
@@ -250,6 +276,7 @@
     z-index: 1;
     transform: translateY(-10px) scale(1.04);
     background-color: var(--insights-surface);
+    border-color: rgba(255, 255, 255, 0.2);
     box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
   }
 

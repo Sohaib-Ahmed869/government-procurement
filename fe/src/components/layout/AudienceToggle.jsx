@@ -5,8 +5,8 @@ import { useAudience } from '../../context/AudienceContext.jsx';
 // `hint` says who each segment is for, so the choice doesn't rest on the label
 // alone. It's hidden in the compact placements (see .audience-toggle--plain).
 const OPTIONS = [
-  { value: AUDIENCE.AWARD, label: 'Award Contracts', hint: 'For agencies & officials' },
-  { value: AUDIENCE.WIN, label: 'Win Contracts', hint: 'For suppliers & bidders' },
+  { value: AUDIENCE.AWARD, label: 'Award Contracts', hint: 'For agencies and officials' },
+  { value: AUDIENCE.WIN, label: 'Win Contracts', hint: 'For suppliers and bidders' },
 ];
 
 export default function AudienceToggle({ plain = false }) {

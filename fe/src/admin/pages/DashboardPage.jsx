@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { dashboardApi } from '../../api';
+import { CATEGORY_LABEL } from '../../features/forum/data.js';
 import StatusBadge from '../components/StatusBadge.jsx';
 
 // Inline stat-tile icons (no external icon dependency).
@@ -212,7 +213,7 @@ export default function DashboardPage() {
                     <span className="dash-list__primary">{q.title}</span>
                     <span className="dash-list__secondary">
                       {q.submitter?.name || q.submitter?.email || 'Anonymous'}
-                      {q.category ? ` · ${q.category}` : ''}
+                      {q.category ? ` · ${CATEGORY_LABEL[q.category] || q.category}` : ''}
                     </span>
                   </span>
                   <span className="dash-list__trail">

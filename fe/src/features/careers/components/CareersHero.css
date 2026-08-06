@@ -39,8 +39,9 @@
 .careers-hero__inner {
   max-width: 1100px;
   margin: 0 auto;
-  /* Half the gap to the section heading below; .careers__inner pays the rest. */
-  padding: 56px 40px 24px;
+  /* The rule under the title closes the hero off, so the space down to "Roles
+     we are hiring for" is paid entirely by .careers__inner below. */
+  padding: 56px 40px 0;
 }
 
 .careers-hero__eyebrow {
@@ -58,18 +59,23 @@
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.015em;
+  /* Closes the hero off from the sections below, which are separated the same
+     way. Carried on the title rather than .careers-hero__inner so it spans the
+     container's content box and lines up with the rule between the blocks. */
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 /* Shared page-title breakpoint, matching the homepage and advisory heroes. */
 @media (max-width: 860px) {
   .careers-hero__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(38px, 11vw, 52px);
   }
 }
 
 @media (max-width: 760px) {
   .careers-hero__inner {
-    padding: 40px 24px 16px;
+    padding: 40px 24px 0;
   }
 }

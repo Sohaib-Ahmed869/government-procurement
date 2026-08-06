@@ -1,18 +1,29 @@
 import { useEffect, useState } from 'react';
-import { capabilitiesApi } from '../../api';
+import { capabilitiesApi, capabilitiesHeroApi } from '../../api';
 import { CAPABILITY_ICONS, CAPABILITY_ICON_BY_KEY } from '../../features/advisory/capabilityIcons.js';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
+import HeroCopyEditor from '../components/HeroCopyEditor.jsx';
 
 const ICON_OPTS = CAPABILITY_ICONS.map((i) => ({ value: i.key, label: i.label }));
+
+// Which side of the site's audience toggle a card is written for. "Both" is the
+// default, and what every card saved before this option existed shows as.
+const AUDIENCE_OPTS = [
+  { value: 'both', label: 'Both segments' },
+  { value: 'win', label: 'Win contracts' },
+  { value: 'award', label: 'Award contracts' },
+];
+const AUDIENCE_LABEL = Object.fromEntries(AUDIENCE_OPTS.map((o) => [o.value, o.label]));
 
 const EMPTY = {
   title: '',
   body: '',
   icon: CAPABILITY_ICONS[0].key,
+  audience: 'both',
   order: 0,
   active: true,
 };
@@ -59,6 +70,7 @@ export default function CapabilitiesPage() {
       title: row.title || '',
       body: row.body || '',
       icon: row.icon || CAPABILITY_ICONS[0].key,
+      audience: row.audience || 'both',
       order: row.order ?? 0,
       active: row.active !== false,
     });
@@ -83,6 +95,7 @@ export default function CapabilitiesPage() {
       title: form.title,
       body: form.body,
       icon: form.icon,
+      audience: form.audience,
       order: Number(form.order) || 0,
       active: Boolean(form.active),
     };
@@ -121,6 +134,12 @@ export default function CapabilitiesPage() {
     },
     { key: 'title', header: 'Title' },
     {
+      key: 'audience',
+      header: 'Segment',
+      width: 140,
+      render: (r) => AUDIENCE_LABEL[r.audience] || AUDIENCE_LABEL.both,
+    },
+    {
       key: 'body',
       header: 'Description',
       render: (r) => {
@@ -156,12 +175,23 @@ export default function CapabilitiesPage() {
 
   return (
     <div>
-      <div className="admin-page__head">
+      {/* The page's hero copy sits with its cards rather than under a sidebar
+          entry of its own, so everything on the Capabilities page is edited in
+          one place. */}
+      <HeroCopyEditor
+        title="Capabilities hero"
+        subtitle="The eyebrow and heading at the top of the Capabilities page. Each segment has its own copy — pick a tab to edit that version."
+        load={() => capabilitiesHeroApi.get()}
+        save={(audience, body) => capabilitiesHeroApi.save(audience, body)}
+      />
+
+      <div className="admin-page__head" style={{ marginTop: 40 }}>
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Capabilities</h2>
           <p className="admin-page__subtitle">
             The cards under &ldquo;Deliver with Impact&rdquo; on the Capabilities page, in the
-            order shown.
+            order shown. Each one can be written for Win contracts, for Award contracts, or
+            for both.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -234,6 +264,15 @@ export default function CapabilitiesPage() {
             value={form.icon}
             onChange={onChange}
             hint="Shown above the title."
+          />
+          <FormField
+            label="Segment"
+            name="audience"
+            as="select"
+            options={AUDIENCE_OPTS}
+            value={form.audience}
+            onChange={onChange}
+            hint="Which side of the site's Win / Award toggle this card appears under."
           />
           <FormField
             label="Order"

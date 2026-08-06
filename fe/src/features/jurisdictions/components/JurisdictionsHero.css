@@ -62,7 +62,7 @@
 /* Shared page-title breakpoint, matching the homepage and advisory heroes. */
 @media (max-width: 860px) {
   .jl-hero__title {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(38px, 11vw, 52px);
   }
 }

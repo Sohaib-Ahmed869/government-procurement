@@ -11,11 +11,7 @@ export default function JurisdictionsHero() {
   return (
     <section className={`jl-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="jl-hero__inner">
-        <h1 className="jl-hero__title">Procurement rules by state</h1>
-        <p className="jl-hero__sub">
-          Explore the procurement rules and thresholds that apply in each
-          Australian state and territory, filter by jurisdiction or rule type.
-        </p>
+        <h1 className="jl-hero__title">Procurement Resources by Jurisdiction</h1>
       </div>
     </section>
   );

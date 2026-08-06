@@ -64,12 +64,13 @@
   color: var(--sysmsg-accent);
 }
 
+/* Sentence case, like every other eyebrow on the site — the copy each page
+   passes in is already written that way. */
 .sysmsg__eyebrow {
   margin: 0 0 18px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
 }
 

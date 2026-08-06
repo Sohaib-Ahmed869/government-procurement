@@ -19,7 +19,8 @@
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
   .adv-hero__eyebrow,
-  .adv-hero__title {
+  .adv-hero__title,
+  .adv-hero__lede {
     opacity: 0;
     transform: translateY(28px);
     transition:
@@ -36,6 +37,11 @@
     opacity: 1;
     transform: none;
     transition-delay: 0.15s;
+  }
+  .adv-hero.is-in .adv-hero__lede {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.25s;
   }
 }
 
@@ -77,6 +83,16 @@
   letter-spacing: -0.015em;
 }
 
+/* Optional line under the heading. The hero shipped without one; it appears
+   only if somebody writes a sub-heading in the CMS. */
+.adv-hero__lede {
+  max-width: 620px;
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.86);
+}
+
 .adv-hero :is(a):focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
@@ -95,7 +111,7 @@
 
   .adv-hero__title {
     margin-top: 0;
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Geist Variable', system-ui, sans-serif;
     /* Shared page-title size on small screens. */
     font-size: clamp(38px, 11vw, 52px);
   }

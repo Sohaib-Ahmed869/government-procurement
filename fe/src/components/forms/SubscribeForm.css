@@ -3,7 +3,11 @@
      win — so the input's focus ring matches the active theme. */
   --mint: var(--gp-mint-300);
 
-  max-width: 460px;
+  /* Sized to the blurb's own single-line width, so the field row below lines up
+     with it exactly — input's left edge under the "H", button's right edge under
+     the full stop. Capped at the footer's gutters, where the copy wraps again. */
+  width: max-content;
+  max-width: 100%;
   margin: 0 auto;
   text-align: center;
   font-family: 'Geist Variable', system-ui, sans-serif;

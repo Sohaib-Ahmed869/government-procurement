@@ -5,6 +5,8 @@ const consultationSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true, lowercase: true },
+    // Optional on the form — the admin queue shows a dash when it's not given.
+    phone: { type: String, default: '', trim: true },
     organisation: { type: String, default: '' },
     role: { type: String, default: '' },
     service: {

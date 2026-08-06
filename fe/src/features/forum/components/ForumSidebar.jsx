@@ -8,7 +8,7 @@ export default function ForumSidebar() {
 
   return (
     <aside className="forum-sidebar">
-      <h2 className="forum-sidebar__heading">Categories</h2>
+      <h2 className="forum-sidebar__heading">Answer Categories</h2>
       <div className="forum-sidebar__cats">
         {CATEGORIES.map(({ key, label }) => (
           <Link
