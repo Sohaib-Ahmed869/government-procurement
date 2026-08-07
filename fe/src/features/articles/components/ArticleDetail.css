@@ -97,7 +97,7 @@
 
 .article-hero__title {
   margin: 0;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(34px, 3.6vw, 52px);
   font-weight: 400;
   line-height: 1.08;
@@ -197,7 +197,7 @@
 .article-prose h2,
 .article-prose h3 {
   margin: 44px 0 18px;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(24px, 3vw, 30px);
   font-weight: 400;
   line-height: 1.2;
@@ -317,9 +317,10 @@
 .article-related {
   border-top: 1px solid var(--art-border);
   background: var(--art-bg);
-  /* Light at the foot: the footer's subscribe block adds its own 48px on top,
-     and that spacing is shared by every page. */
-  padding: 56px 40px 32px;
+  /* Tight under the rule, which is what separates this from the article above
+     it — 56px left the heading floating well clear of its own divider. Light at
+     the foot too: the footer's subscribe block adds its own spacing on top. */
+  padding: 24px 40px 32px;
 }
 
 .article-related__inner {
@@ -329,7 +330,7 @@
 
 .article-related__title {
   margin: 0 0 28px;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(24px, 3vw, 32px);
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -514,7 +515,7 @@
   }
 
   .article-related {
-    padding: 40px 24px 24px;
+    padding: 20px 24px 24px;
   }
 
   .article-overview {

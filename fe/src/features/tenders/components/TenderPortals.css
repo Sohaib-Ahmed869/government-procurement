@@ -103,11 +103,15 @@
 
 .tp__title {
   margin: 0;
-  font-size: clamp(30px, 3.4vw, 44px);
+  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
+  font-size: var(--gp-page-title);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
+
+/* This is the headline the shared size is set by — it's the longest on the
+   site. No override here: --gp-page-title already sizes it to hold one line. */
 
 .tp__title strong {
   font-weight: 700;
@@ -488,7 +492,8 @@
 
   .tp__title {
     font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: clamp(34px, 10vw, 46px);
+    /* Shared phone size — see --gp-page-title-phone in styles/tokens.css. */
+    font-size: var(--gp-page-title-phone);
   }
 
   .tp__group-title {

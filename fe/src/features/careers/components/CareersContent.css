@@ -22,8 +22,10 @@
   max-width: 1100px;
   margin: 0 auto;
   /* 28px below the hero's rule, matching the drop below every other rule on
-     the page. */
-  padding: 28px 40px 48px;
+     the page. Almost nothing at the foot: "Propose a role" is the last thing on
+     the page, and the footer's own top rule follows immediately — the 48px that
+     used to sit here read as an empty band between the two. */
+  padding: 28px 40px 12px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -55,7 +57,7 @@
 
 .careers__heading {
   margin: 0 0 22px;
-  font-size: clamp(28px, 3.2vw, 40px);
+  font-size: var(--gp-section-title);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
@@ -67,22 +69,6 @@
   font-size: 16px;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.82);
-}
-
-.careers__linkedin {
-  display: inline-block;
-  /* Enough to clear the paragraph it follows in the empty state. */
-  margin-top: 6px;
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.65);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.15s ease;
-}
-
-.careers__linkedin:hover,
-.careers__linkedin:focus-visible {
-  color: #fff;
 }
 
 /* --- roles --- */

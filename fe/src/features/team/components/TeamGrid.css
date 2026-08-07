@@ -140,7 +140,7 @@
 /* --- card text --- */
 .team-card__name {
   margin: 22px 0 0;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: 22px;
   font-weight: 500;
   line-height: 1.2;

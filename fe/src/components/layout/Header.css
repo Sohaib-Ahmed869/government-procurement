@@ -70,21 +70,47 @@
   white-space: nowrap;
 }
 
+/* Both dimensions are whole numbers, and no transform touches the mark at any
+   point. Three separate things soften a small logo, and this is what each one
+   needed:
+
+   1. Scaling. Any transform on the element resamples what the browser has
+      already drawn, so it blurs — including a downscale, and including one
+      sitting there at rest. An earlier version laid the mark out at its hover
+      size and held it at scale(0.9434) the rest of the time, which fixed the
+      blur during the hover animation by making it permanent instead. There is
+      no transform here now, so nothing is ever resampled; the hover reads as a
+      fade, which changes no geometry.
+
+   2. Fractional edges. `width: auto` derived the width from the 1.15334 ratio,
+      which put the right edge at .29 of a pixel and left it permanently
+      anti-aliased — the soft "sides". 30 × 26 is the closest whole-number pair
+      to that ratio anywhere near this size: it is off by 0.04%, about a
+      hundredth of a pixel across the whole mark, and both edges now land on
+      exact pixels even at 1× device pixel ratio.
+
+   3. Detail. The mark is a serif monogram whose hairlines run about 6 units of
+      its 153-unit viewBox. Below roughly 1px they can't be drawn as strokes and
+      grey out instead. At 26px they come to 1.02px — over the line, where 23px
+      gave 0.90px and was under it. */
 .site-header__logo {
+  --logo-w: 30px;
+  --logo-h: 26px;
+
   display: block;
-  /* Height is the constant; the raster's own ratio sets the width. */
-  height: 23px;
-  width: auto;
+  width: var(--logo-w);
+  height: var(--logo-h);
 }
 
-/* Brand logo lifts and scales a touch on hover. */
+/* Fades rather than grows: opacity leaves the geometry alone, so there is
+   nothing for the compositor to stretch. */
 @media (prefers-reduced-motion: no-preference) {
   .site-header__logo {
-    transition: transform 0.18s ease-out;
+    transition: opacity 0.18s ease-out;
   }
 
   .site-header__brand:hover .site-header__logo {
-    transform: scale(1.06);
+    opacity: 0.78;
   }
 }
 
@@ -319,9 +345,15 @@
   box-shadow: inset 1px 0 0 var(--control-edge, rgba(255, 255, 255, 0.28));
 }
 
+/* Underlined so both segments read as the choices they are, rather than as a
+   heading over the hint below. Drawn under the words only, not the whole cell —
+   the option is a block, so the rule goes on the label's own inline box. */
 .audience-toggle__label {
   font-size: var(--control-font, 13px);
   font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
 }
 
 .audience-toggle__hint {
@@ -678,8 +710,11 @@
     gap: 6px;
   }
 
+  /* 23 × 20 — the whole-number pair nearest the ratio at this size, 0.29% off.
+     Set both, so the width can't fall back to a fractional derived value. */
   .site-header__logo {
-    height: 20px;
+    --logo-w: 23px;
+    --logo-h: 20px;
   }
 
   .site-header__wordmark {

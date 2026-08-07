@@ -21,6 +21,10 @@ const tenderSiteSchema = new mongoose.Schema(
       default: 'australian',
       index: true,
     },
+    // Whether the tender buttons are labelled "(Login Required)". Only some
+    // portals put their listings behind a sign-in, so this is off by default
+    // and ticked per entry rather than assumed for all of them.
+    loginRequired: { type: Boolean, default: false },
     // The three destinations an 'australian' entry can carry.
     openTendersUrl: { type: String, default: '', trim: true },
     upcomingTendersUrl: { type: String, default: '', trim: true },

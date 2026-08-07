@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import logo from '../../assets/icons/GPLogo.svg';
+import logo from '../../assets/icons/gp-02.svg';
 
 // Small inline-SVG icon set (no external icon dependency). Each is a 24x24
 // stroke icon that inherits currentColor.
@@ -120,7 +120,16 @@ export default function AdminSidebar({
           onClick={onCloseMobile}
           title="Government Procurement CMS"
         >
-          <img src={logo} alt="Government Procurement" className="admin-sidebar__logo" />
+          {/* Height drives the size, width follows; the attributes carry the
+              viewBox's 176.68 × 153.19 as whole numbers so the ratio is right
+              before it loads. */}
+          <img
+            src={logo}
+            alt="Government Procurement"
+            className="admin-sidebar__logo"
+            width="1153"
+            height="1000"
+          />
           <span className="admin-sidebar__wordmark">
             <strong>Government Procurement</strong>
             <span>CMS</span>

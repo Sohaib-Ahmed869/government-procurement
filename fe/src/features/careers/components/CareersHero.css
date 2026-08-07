@@ -15,7 +15,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .careers-hero__eyebrow,
   .careers-hero__title {
     opacity: 0;
     transform: translateY(28px);
@@ -24,15 +23,12 @@
       transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
-  .careers-hero.is-in .careers-hero__eyebrow {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.05s;
-  }
+  /* The title leads the reveal now that the eyebrow above it has gone, so it
+     takes the delay the eyebrow used to carry rather than following it. */
   .careers-hero.is-in .careers-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.12s;
+    transition-delay: 0.05s;
   }
 }
 
@@ -44,18 +40,10 @@
   padding: 56px 40px 0;
 }
 
-.careers-hero__eyebrow {
-  margin: 0 0 14px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: #fff;
-}
-
 .careers-hero__title {
   margin: 0;
-  /* Shared page-title size: homepage, advisory, contact, insights. */
-  font-size: clamp(36px, 3.6vw, 60px);
+  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
+  font-size: var(--gp-page-title);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.015em;
@@ -70,7 +58,7 @@
 @media (max-width: 860px) {
   .careers-hero__title {
     font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: clamp(38px, 11vw, 52px);
+    font-size: var(--gp-page-title-phone);
   }
 }
 

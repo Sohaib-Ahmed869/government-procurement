@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
-import Breadcrumbs from '../../../components/seo/Breadcrumbs.jsx';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
@@ -104,11 +103,13 @@ export default function ForumAnswerDetail() {
   const lessons = answer.answer?.lessons ?? [];
 
   return (
-    <section ref={ref} className={`forum-article${inView ? ' is-in' : ''}`}>
+    <section
+      ref={ref}
+      className={`forum-article${inView ? ' is-in' : ''}`}
+      data-audience={audience}
+    >
       <div className="forum-article__inner">
         <div className="forum-article__main">
-          <Breadcrumbs items={[{ label: 'Q&A', to: '/q-and-a' }, { label: answer.title }]} />
-
           <h1 className="forum-article__title">{answer.title}</h1>
           <div className="forum-article__meta">
             <span className="forum-tag">{CATEGORY_LABEL[answer.category] ?? answer.category}</span>

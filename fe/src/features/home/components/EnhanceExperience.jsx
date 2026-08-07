@@ -26,12 +26,6 @@ export default function EnhanceExperience() {
               For over two decades, we've helped top organisations worldwide transform
               procurement through platforms, training, and consulting.
             </p>
-
-            <div className="ee__actions">
-              <a className="ee__btn" href="/book-a-consultation">
-                Request a Consultation
-              </a>
-            </div>
           </div>
         </div>
       </div>

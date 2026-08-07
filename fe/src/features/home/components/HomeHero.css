@@ -101,8 +101,8 @@
 .home-hero__title {
   margin: 26px 0 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
-  /* Shared page-title size: homepage, advisory, contact, insights. */
-  font-size: clamp(36px, 3.6vw, 60px);
+  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
+  font-size: var(--gp-page-title);
   font-weight: 400;
   line-height: 1.02;
   letter-spacing: -0.01em;
@@ -240,7 +240,7 @@
 .home-hero__subtitle {
   margin: 12px 0 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(30px, 3.6vw, 46px);
+  font-size: var(--gp-section-title);
   font-weight: 400;
   line-height: 1.05;
 }
@@ -321,7 +321,7 @@
   }
 
   .home-hero__title {
-    font-size: clamp(38px, 11vw, 52px);
+    font-size: var(--gp-page-title-phone);
   }
 
   /* Advisory-block headings drop the display face on small screens. */

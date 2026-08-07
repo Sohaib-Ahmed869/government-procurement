@@ -9,6 +9,7 @@ const EDITABLE = [
   'name',
   'subtitle',
   'group',
+  'loginRequired',
   'openTendersUrl',
   'upcomingTendersUrl',
   'createAccountUrl',

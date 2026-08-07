@@ -67,9 +67,12 @@
 
 /* Room above the portrait, none below it: the photo stands on the foot of the
    band, as on the reference profile, and the introduction beside it carries its
-   own bottom padding instead. */
+   own bottom padding instead.
+   The band takes its height from the portrait, so this padding is the only
+   thing adding to it — kept short so the photo fills as much of the band as it
+   can rather than sitting in a tall field of background. */
 .tm__inner--hero {
-  padding-top: 56px;
+  padding-top: 12px;
   padding-bottom: 0;
 }
 
@@ -97,22 +100,26 @@
 /* --- hero: portrait beside the introduction --- */
 /* The portrait is the taller of the two columns and its height follows its
    width, so the column width is what sets the height of the whole band —
-   narrowed from 460px to take that height down. Both columns start on the same
-   line, so the top of the portrait is level with "Back to Our Team" rather than
-   either column floating against the other. The portrait is the taller of the
-   two, so it also sets the height of the band and lands on the rule at the
-   foot — the band has no bottom padding of its own. */
+   widened to 440px so the portrait clears the height of the introduction beside
+   it. That matters because the band takes its height from the taller column: if
+   the text were taller, the photo would stop short and leave a gap above the
+   foot of the band. */
 .tm__hero {
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 440px 1fr;
   gap: 56px;
   align-items: start;
 }
 
-/* Keeps the text clear of the rule on the rare profile whose introduction runs
-   longer than the portrait is tall. */
+/* Centred against the portrait rather than starting level with it. The text is
+   the shorter column, so top-aligning it left all of the slack in one run of
+   empty background under the buttons — which is what made the band read as tall
+   and the photo as small inside it. Splitting that slack above and below drops
+   the text down the band and lets the portrait, which spans the full height,
+   carry the section. */
 .tm__intro {
-  padding-bottom: 56px;
+  align-self: center;
+  padding-bottom: 24px;
 }
 
 .tm__avatar {
@@ -243,14 +250,17 @@
   margin-top: 0;
 }
 
-/* Each block is separated by a rule above its label. */
+/* Each block is separated by a rule above its label. The clear space is kept
+   tight on both sides of the rule — 16px under it and 20px over the next one —
+   so the rules read as dividers between sections rather than as bands of empty
+   page in their own right. */
 .tm__block {
-  padding-top: 28px;
+  padding-top: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.24);
 }
 
 .tm__block + .tm__block {
-  margin-top: 36px;
+  margin-top: 20px;
 }
 
 /* Section heading above each block. */
@@ -337,8 +347,11 @@
   filter: brightness(1.06);
 }
 
+/* No head start: Expertise begins on the same line as About, so the two columns
+   read as one row. It used to be pushed down by the "Get in touch" button that
+   stood above it, which has since gone. */
 .tm__aside .tm__block {
-  margin-top: 36px;
+  margin-top: 0;
 }
 
 .tm__expertise {
@@ -366,8 +379,11 @@
 }
 
 /* --- published work: the insights feed, full width under the body --- */
+/* The same 20px every other block leaves above its rule — this one sat outside
+   .tm__body, so it never picked up the .tm__block + .tm__block spacing and kept
+   a gap almost three times as deep. */
 .tm__work {
-  margin-top: 56px;
+  margin-top: 20px;
 }
 
 .tm__work-grid {
@@ -379,22 +395,49 @@
   list-style: none;
 }
 
+/* Boxed, the same way the Insights cards are: a panel with the image running
+   full width across its top, the text inset below it. The grey fill and
+   hairline are the Win treatment; Award swaps in the glass box further down. */
 .tm__work-card {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* No side padding: the image meets the box edge on three sides. The text
+     below carries its own gutters. */
+  padding: 0 0 16px;
+  overflow: hidden;
   color: inherit;
   text-decoration: none;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+}
+
+/* Everything under the image is inset from the box's edges; the image is not. */
+.tm__work-card > :not(.tm__work-art) {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Award-contract audience: the translucent glass boxes used across the site. */
+.tm[data-audience='award'] .tm__work-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
 }
 
 /* Fixed ratio so the row of titles starts at the same height whether or not a
-   given article has a hero image. */
+   given article has a hero image. Square-cornered — the box's own 14px radius
+   and overflow clip the two top corners, so the image sits in the corner rather
+   than floating inside it. */
 .tm__work-art {
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-radius: 10px;
-  background: var(--tm-surface);
+  border-radius: 0;
+  background: var(--tm-bg);
 }
 
 .tm__work-art img {
@@ -404,9 +447,9 @@
 }
 
 .tm__work-type {
-  margin-top: 14px;
+  margin-top: 16px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .tm__work-title {
@@ -423,19 +466,46 @@
   color: var(--tm-accent);
 }
 
+/* Pushed to the foot of the card, so the dates line up across a row however
+   many lines each title runs to. */
 .tm__work-date {
-  margin-top: 10px;
+  margin-top: auto;
+  padding-top: 14px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.78);
 }
 
+/* Hover lifts the card clear of the grid, as on the Insights grid: it rises and
+   scales over its neighbours, settles to the lighter fill and drops a shadow. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .tm__work-art img {
-    transition: transform 0.3s ease-out;
+  /* Two-speed hover so sweeping across the grid doesn't leave two cards raised
+     at once. Leaving is quick and immediate — the card drops back in 0.2s. */
+  .tm__work-card {
+    transition:
+      transform 0.2s ease-out,
+      box-shadow 0.2s ease-out,
+      border-color 0.2s ease-out,
+      background-color 0.2s ease-out;
   }
 
-  .tm__work-card:hover .tm__work-art img {
-    transform: scale(1.04);
+  /* Arriving is slower and held back by 0.18s, so the card you just left has
+     settled before this one starts to rise. */
+  .tm__work-card:hover {
+    transition:
+      transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
+      box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
+      border-color 0.45s ease-out 0.18s,
+      background-color 0.45s ease-out 0.18s;
+  }
+
+  .tm__work-card:hover {
+    /* Above the neighbouring cards so the shadow falls on them, not under. */
+    position: relative;
+    z-index: 1;
+    transform: translateY(-10px) scale(1.04);
+    background-color: var(--tm-surface);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
   }
 
   .tm__work-card:hover .tm__work-title {
@@ -487,7 +557,7 @@
   }
 
   .tm__hero {
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 380px 1fr;
     gap: 40px;
   }
 
@@ -535,7 +605,10 @@
     padding-bottom: 36px;
   }
 
+  /* Stacked: nothing to centre against, so the text sits normally under the
+     portrait. */
   .tm__intro {
+    align-self: stretch;
     padding-bottom: 0;
   }
 
@@ -585,15 +658,14 @@
   /* Stacked, the two columns stop being boxes so their blocks become items of
      .tm__body directly — that's what lets the running profile and the sidebar
      interleave, which `order` alone can't do across two containers.
-     Reading order on a phone: About, the contact button, then the credentials
-     shortest-first, with the published work last. */
+     Reading order on a phone: About, then the credentials shortest-first, with
+     the published work last. */
   .tm__main,
   .tm__aside {
     display: contents;
   }
 
   .tm__block--about { order: 1; }
-  .tm__cta { order: 2; }
   .tm__block--expertise { order: 3; }
   .tm__block--education { order: 4; }
   .tm__block--experience { order: 5; }

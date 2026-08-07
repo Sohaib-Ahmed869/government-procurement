@@ -18,7 +18,10 @@
 .legal__inner {
   max-width: 820px;
   margin: 0 auto;
-  padding: 40px 40px 48px;
+  /* Almost nothing at the foot: the last clause is the end of the page and the
+     footer's own top rule follows immediately, so the 48px that used to sit
+     here read as an empty band between the two. */
+  padding: 40px 40px 12px;
 }
 
 /* --- reveal on mount --- */
@@ -106,6 +109,6 @@
 
 @media (max-width: 760px) {
   .legal__inner {
-    padding: 24px 24px 40px;
+    padding: 24px 24px 12px;
   }
 }
