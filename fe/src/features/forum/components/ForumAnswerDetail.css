@@ -1,19 +1,6 @@
-/* Additions layered on top of ForumArticle.css for the single-answer view.
-   Breadcrumbs, the "Related questions" block, and the not-found state. */
-
-.forum-article__main .breadcrumbs {
-  margin-bottom: 20px;
-}
-
-.forum-article__main .breadcrumbs__link,
-.forum-article__main .breadcrumbs__current,
-.forum-article__main .breadcrumbs__sep {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.forum-article__main .breadcrumbs__current {
-  color: #fff;
-}
+/* Additions layered on top of ForumArticle.css for the single-answer view:
+   the "Related questions" block and the not-found state. The breadcrumb trail
+   that used to open this page has been removed, and its styling with it. */
 
 /* --- related questions --- */
 .forum-related {
@@ -64,10 +51,21 @@
   color: #fff;
 }
 
+/* The category, sitting at the right-hand end of the row. */
 .forum-related__tag {
   flex-shrink: 0;
   font-size: 12px;
   color: var(--gp-mint-300);
+}
+
+/* The Win segment carries no green: the hover edge and the category label both
+   drop to the grey that side uses for accents. */
+.forum-article[data-audience='win'] .forum-related__link:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.forum-article[data-audience='win'] .forum-related__tag {
+  color: #c9c9c9;
 }
 
 /* --- not found --- */

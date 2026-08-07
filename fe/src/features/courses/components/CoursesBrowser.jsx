@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
@@ -6,11 +6,6 @@ import { coursesApi } from '../../../api';
 import menuIcon from '../../../assets/icons/Menu.png';
 import levelIcon from '../../../assets/icons/LevelIcon.png';
 import './CoursesBrowser.css';
-
-const SORT_OPTIONS = [
-  { value: 'popular', label: 'Popular' },
-  { value: 'newest', label: 'Newest' },
-];
 
 // Availability badge copy keyed on the course's `availability` state.
 const AVAILABILITY_LABEL = {
@@ -59,63 +54,6 @@ function FilterGroup({ icon, heading, name, options, value, onChange }) {
   );
 }
 
-function SortDropdown({ value, onChange }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function onDocClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener('mousedown', onDocClick);
-    return () => document.removeEventListener('mousedown', onDocClick);
-  }, [open]);
-
-  const current = SORT_OPTIONS.find((o) => o.value === value) ?? SORT_OPTIONS[0];
-
-  return (
-    <div className="courses-sort" ref={ref}>
-      <span className="courses-sort__label">Sort by:</span>
-      <div className="courses-sort__control">
-        <button
-          type="button"
-          className="courses-sort__button"
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-        >
-          {current.label}
-          <span className={`courses-sort__chevron${open ? ' is-open' : ''}`} aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </span>
-        </button>
-
-        {open && (
-          <ul className="courses-sort__menu" role="listbox">
-            {SORT_OPTIONS.map((o) => (
-              <li key={o.value} role="option" aria-selected={o.value === value}>
-                <button
-                  type="button"
-                  className={`courses-sort__option${o.value === value ? ' is-active' : ''}`}
-                  onClick={() => {
-                    onChange(o.value);
-                    setOpen(false);
-                  }}
-                >
-                  {o.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function CoursesBrowser() {
   const { audience } = useAudience();
   // Revealed with the hero rather than on scroll. This section sits directly
@@ -125,7 +63,6 @@ export default function CoursesBrowser() {
   const inView = useMountReveal(audience);
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
-  const [sort, setSort] = useState('popular');
 
   const [courses, setCourses] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -166,8 +103,11 @@ export default function CoursesBrowser() {
     };
   }, [filtersOpen]);
 
-  // Apply the side filters and the sort. Missing fields fall back to their
-  // model defaults so older records aren't hidden.
+  // Apply the side filters. Missing fields fall back to their model defaults so
+  // older records aren't hidden.
+  //
+  // The order is fixed at featured-first, then newest — what the "Popular" sort
+  // did, and the only order left now that the sort control has gone.
   const visible = useMemo(() => {
     const filtered = courses.filter((c) => {
       if (category !== 'all' && (c.segment || 'general') !== category) return false;
@@ -178,19 +118,10 @@ export default function CoursesBrowser() {
     const byNewest = (a, b) =>
       new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
 
-    const sorted = [...filtered];
-    switch (sort) {
-      case 'newest':
-        sorted.sort(byNewest);
-        break;
-      case 'popular':
-      default:
-        // Featured first, then newest.
-        sorted.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byNewest(a, b));
-        break;
-    }
-    return sorted;
-  }, [courses, category, level, sort]);
+    return [...filtered].sort(
+      (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byNewest(a, b),
+    );
+  }, [courses, category, level]);
 
   return (
     <section className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
@@ -248,11 +179,6 @@ export default function CoursesBrowser() {
             </span>
           </button>
 
-          <div className="courses-main__head">
-            <h2 className="courses-main__title">All Resources</h2>
-            <SortDropdown value={sort} onChange={setSort} />
-          </div>
-
           {status === 'loading' && <p className="courses-main__title">Loading courses…</p>}
           {status === 'error' && (
             <p className="courses-main__title">
@@ -291,8 +217,9 @@ export default function CoursesBrowser() {
                           <span className="courses-card__level">{course.durationLabel}</span>
                         )}
                       </div>
+                      {/* Title only — the summary belongs on the course's own
+                          page, not on the card. */}
                       <h3 className="courses-card__title">{course.title}</h3>
-                      {course.summary && <p className="courses-card__desc">{course.summary}</p>}
                     </div>
                   </Link>
                 </li>

@@ -72,8 +72,8 @@
 
 .consult__title {
   margin: 18px 0 0;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(36px, 3.6vw, 60px);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  font-size: var(--gp-page-title);
   font-weight: 400;
   line-height: 1.02;
   letter-spacing: -0.015em;
@@ -265,7 +265,7 @@
 
   /* Shared page-title breakpoint, matching the homepage / contact heroes. */
   .consult__title {
-    font-size: clamp(38px, 11vw, 52px);
+    font-size: var(--gp-page-title-phone);
   }
 }
 

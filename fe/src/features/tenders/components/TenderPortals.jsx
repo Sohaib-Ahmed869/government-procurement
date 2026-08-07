@@ -11,10 +11,13 @@ import './TenderPortals.css';
 // The two sections offer different destinations: the Australian portals are
 // free to search once you have an account, while the others are paywalled and
 // carry a single sign-in link plus the note printed under it.
+// `gated` marks the labels that pick up "(Login Required)" — only on the
+// portals whose listings actually sit behind a sign-in, which is a per-entry
+// tick in the CMS rather than something true of every portal.
 const DESTINATIONS = {
   australian: [
-    { key: 'openTendersUrl', label: 'Open Tenders (Login Required)' },
-    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders (Login Required)' },
+    { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
+    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
     { key: 'createAccountUrl', label: 'Create Free Account' },
   ],
   other: [{ key: 'loginUrl', label: 'Login (Paid wall)' }],
@@ -56,7 +59,7 @@ function TenderList({ sites, group = 'australian' }) {
           <span className="tp__links">
             {destinations
               .filter(({ key }) => site[key])
-              .map(({ key, label }) => (
+              .map(({ key, label, gated }) => (
                 <a
                   key={key}
                   className="tp__explore"
@@ -64,7 +67,7 @@ function TenderList({ sites, group = 'australian' }) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {label}
+                  {gated && site.loginRequired ? `${label} (Login Required)` : label}
                 </a>
               ))}
 

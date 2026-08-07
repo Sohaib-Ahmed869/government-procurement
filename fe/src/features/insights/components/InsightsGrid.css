@@ -227,15 +227,24 @@
   color: #fff;
 }
 
+/* Mint on Award; the Win segment carries no green, so it takes the grey the
+   rest of that side uses for accents. */
 .insights-card__chevron {
   margin-left: 6px;
   vertical-align: -2px;
   color: var(--gp-mint-300);
 }
 
-/* Date leads the excerpt on one flowing line, as in the reference. */
+.insights[data-audience='win'] .insights-card__chevron {
+  color: #c9c9c9;
+}
+
+/* Pushed to the foot of the card rather than sitting straight under the title,
+   so the dates line up across a row however many lines each title runs to.
+   The card is a flex column at a shared height, so auto takes up the slack. */
 .insights-card__summary {
-  margin: 14px 0 0;
+  margin: auto 0 0;
+  padding-top: 14px;
   font-size: 14.5px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.78);

@@ -11,7 +11,6 @@ export default function TeamHero() {
   return (
     <section className={`team-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="team-hero__inner">
-        <p className="team-hero__eyebrow">The people behind the work</p>
         <h1 className="team-hero__title">Our Team</h1>
       </div>
     </section>

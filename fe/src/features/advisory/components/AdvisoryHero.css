@@ -62,8 +62,10 @@
   z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
-  /* Half the gap to the section heading below; .di__inner pays the rest. */
-  padding: 72px 40px 24px;
+  /* 56px/40px/32px, matching every other page hero, so the headline sits at the
+     same height below the header. The gap down to the section heading below is
+     shared with .di__inner, which pays the rest. */
+  padding: 56px 40px 32px;
 }
 
 .adv-hero__eyebrow {
@@ -76,8 +78,8 @@
 
 .adv-hero__title {
   margin: 26px 0 0;
-  font-family: 'Schibsted Grotesk Variable', 'Geist Variable', system-ui, sans-serif;
-  font-size: clamp(36px, 3.6vw, 60px);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  font-size: var(--gp-page-title);
   font-weight: 400;
   line-height: 1.02;
   letter-spacing: -0.015em;
@@ -112,7 +114,7 @@
   .adv-hero__title {
     margin-top: 0;
     font-family: 'Geist Variable', system-ui, sans-serif;
-    /* Shared page-title size on small screens. */
-    font-size: clamp(38px, 11vw, 52px);
+    /* Shared phone size — see --gp-page-title-phone in styles/tokens.css. */
+    font-size: var(--gp-page-title-phone);
   }
 }

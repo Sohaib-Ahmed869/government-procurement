@@ -231,11 +231,8 @@ export default function TeamMemberDetail({ slug }) {
           </div>
 
           <aside className="tm__aside">
-            <a className="tm__cta" href={`mailto:${member.email}`}>
-              <FaEnvelope aria-hidden="true" />
-              Get in touch
-            </a>
-
+            {/* Contact sits in the hero beside the portrait — no second call to
+                action down here. */}
             {(member.expertise || []).length > 0 && (
               <section className="tm__block tm__block--expertise">
                 <h2 className="tm__block-title">Expertise</h2>

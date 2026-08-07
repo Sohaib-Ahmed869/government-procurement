@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import logo from '../../assets/icons/GPLogo.png';
+import logo from '../../assets/icons/gp-02.svg';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
@@ -99,8 +99,11 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
           onClick={closeMenu}
           aria-label="Government Procurement"
         >
-          {/* Source is 738×640; height drives the size, width follows. */}
-          <img className="site-header__logo" src={logo} alt="" width="26" height="23" />
+          {/* Vector, so it stays crisp at any screen density. Height drives the
+              size and width follows; the attributes are only here to declare the
+              ratio before it loads, and carry the viewBox's 176.68 × 153.19 as
+              whole numbers. */}
+          <img className="site-header__logo" src={logo} alt="" width="1153" height="1000" />
           <span className="site-header__wordmark">
             <span>Government</span>
             <span>Procurement</span>

@@ -9,7 +9,6 @@ const CV_EMAIL = 'mkheir@govprocurement.com.au';
 // A proposed role rather than an application to an advertised one — its own
 // subject line so those land distinctly in the same inbox.
 const OWN_ROLE_HREF = `mailto:${CV_EMAIL}?subject=${encodeURIComponent('Role proposal')}`;
-const LINKEDIN_HREF = 'https://www.linkedin.com/company/governmentprocurement/';
 
 // An opening's Apply link is optional in the CMS. Left blank, Apply emails the
 // careers inbox with the role in the subject line.
@@ -96,14 +95,6 @@ export default function CareersContent() {
             </p>
           )}
 
-          <a
-            className="careers__linkedin"
-            href={LINKEDIN_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Follow us on LinkedIn to hear when we&rsquo;re hiring
-          </a>
         </section>
 
         {/* --- reverse brief: propose a role rather than answer an advert --- */}

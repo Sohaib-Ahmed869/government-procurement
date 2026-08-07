@@ -113,6 +113,10 @@
 
 /* The logo artwork is light, so on the white sidebar it sits on a compact
    dark-green tile to stay visible and on-brand. */
+/* White mark on the segment's dark green, as a rounded chip. The padding is
+   even now the artwork is wider than it is tall — the extra 3px it used to
+   carry on the sides was making up for the old file, whose viewBox squeezed the
+   mark into a portrait box. */
 .admin-sidebar__logo {
   height: 26px;
   width: auto;
@@ -121,7 +125,7 @@
   object-fit: contain;
   display: block;
   background: var(--admin-green);
-  padding: 6px 9px;
+  padding: 6px;
   border-radius: 9px;
   box-sizing: content-box;
 }

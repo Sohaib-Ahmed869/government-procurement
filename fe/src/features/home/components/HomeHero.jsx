@@ -84,10 +84,6 @@ export default function HomeHero() {
             competitive, compliant, and compelling, giving you the edge in a highly contested
             marketplace.
           </p>
-
-          <a className="home-hero__btn home-hero__btn--trailing" href="/book-a-consultation">
-            Request a Consultation
-          </a>
         </div>
 
         <div className="home-hero__advisory-media">

@@ -27,4 +27,37 @@
      and a mismatch between them would show as a seam. */
   --gp-lift-green: #2f7d45;
   --gp-lift-grey: #4a4a4a;
+
+  /* The opening headline of every page hero. Held here so the pages all open at
+     the same size by construction, rather than by ten copies of the same clamp
+     kept in step by hand — which is how they drifted apart in the first place.
+
+     The size is set by the longest headline on the site: "Explore Federal,
+     State and Territory Tender Websites". Summed glyph by glyph against Geist's
+     advance widths at this weight, and with its letter-spacing applied, that
+     line measures 23.1em — the next longest, the Q&A heading, is 20.6em.
+
+     Every hero column is capped at 1100px with 40px gutters, so from roughly
+     1180px of viewport upward the line always has the same 1020px to sit in.
+     23.1em is what decides the size: 1020 / 23.1 puts the ceiling at 44px, and
+     42px is that with about 5% held back, since the widths above are the
+     published metrics rather than a measurement of the rendered line.
+
+     That fixed column is also why the size stops growing rather than tracking
+     the viewport: past 44px the tender headline wraps however wide the screen
+     gets, because the column it sits in doesn't get any wider. Under 1180px the
+     calc takes over — the divisor is the same 23.1em plus the same margin — so
+     the line holds down to the phone breakpoint.
+
+     The phone value is a separate token: below ~720px no size keeps the long
+     headlines on one line, so they wrap and this is simply a readable size. */
+  --gp-page-title: min(42px, calc((100vw - 96px) / 24.5));
+  --gp-page-title-phone: clamp(38px, 11vw, 52px);
+
+  /* Section headings inside a page — "Recent Answers", "Latest Insights",
+     "Create your own role" and the rest. Held a clear step under the page title
+     so the hero always reads as the largest thing on its page: several of these
+     had crept to 44–46px, above the 42px the headline settles at on a laptop,
+     which inverted the hierarchy on the Q&A and home pages. */
+  --gp-section-title: clamp(26px, 3vw, 34px);
 }

@@ -51,7 +51,7 @@
 .di__heading {
   margin: 0 0 40px;
   /* A step below the page title above it — matches .careers__heading. */
-  font-size: clamp(28px, 3.2vw, 40px);
+  font-size: var(--gp-section-title);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.01em;

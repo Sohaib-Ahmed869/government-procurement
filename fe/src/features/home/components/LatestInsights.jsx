@@ -61,7 +61,6 @@ export default function LatestInsights() {
       <div className="li__inner">
         <div className="li__head">
           <div>
-            <p className="li__eyebrow">Insights</p>
             <h2 className="li__heading">Latest Insights</h2>
           </div>
           <Link className="li__viewall" to="/insights">

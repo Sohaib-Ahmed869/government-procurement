@@ -28,6 +28,7 @@ const EMPTY = {
   createAccountUrl: '',
   loginUrl: '',
   note: '',
+  loginRequired: false,
   order: 0,
   active: true,
 };
@@ -95,6 +96,7 @@ export default function TendersAdminPage() {
       createAccountUrl: row.createAccountUrl || '',
       loginUrl: row.loginUrl || '',
       note: row.note || '',
+      loginRequired: Boolean(row.loginRequired),
       order: row.order ?? 0,
       active: row.active !== false,
     });
@@ -129,6 +131,7 @@ export default function TendersAdminPage() {
         ? {
             loginUrl: form.loginUrl,
             note: form.note,
+            loginRequired: false,
             openTendersUrl: '',
             upcomingTendersUrl: '',
             createAccountUrl: '',
@@ -137,6 +140,7 @@ export default function TendersAdminPage() {
             openTendersUrl: form.openTendersUrl,
             upcomingTendersUrl: form.upcomingTendersUrl,
             createAccountUrl: form.createAccountUrl,
+            loginRequired: Boolean(form.loginRequired),
             loginUrl: '',
             note: '',
           }),
@@ -373,6 +377,25 @@ export default function TendersAdminPage() {
                 onChange={onChange}
                 hint="Link to registration or sign-in. Leave empty to hide the button."
               />
+
+              <div className="admin-field">
+                <div className="admin-checkgroup">
+                  <label className="admin-checkgroup__item">
+                    <input
+                      type="checkbox"
+                      name="loginRequired"
+                      checked={Boolean(form.loginRequired)}
+                      onChange={onChange}
+                    />
+                    <span>Listings need a sign-in</span>
+                  </label>
+                </div>
+                <p className="admin-field__hint" style={{ marginLeft: 0 }}>
+                  Adds &ldquo;(Login Required)&rdquo; to the Open and Upcoming
+                  Tenders buttons. Leave off for portals you can search without
+                  an account.
+                </p>
+              </div>
             </>
           )}
 
