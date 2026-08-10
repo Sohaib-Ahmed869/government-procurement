@@ -23,6 +23,18 @@
      CTA. Applied as a floor rather than a fixed size so a longer label still
      fits; it sits above the widest of them, so in practice they come out equal. */
   --control-width: 190px;
+  /* One height for everything in the bar. It is what the toggle comes to on its
+     own at the default type size — two 13.5px lines, a 1px gap and 6px of
+     padding at each end — pinned here as a number so the brand can be built to
+     the same size rather than left at whatever its own type happens to measure.
+     Applied as a floor, like the width, so a taller label is never clipped. */
+  --control-height: 49px;
+  /* The brand stands the full control height, so the mark and the wordmark's two
+     lines start and finish exactly where the Award Contracts toggle beside them
+     does. Kept as its own name rather than used inline: it is the brand's size,
+     which happens to equal the controls' — see .site-header__logo and
+     .site-header__wordmark, which both take it. */
+  --brand-height: var(--control-height);
 
   /* The bar stays on screen while the page scrolls, at every width — pinned by
      .page-layout__chrome, which holds the announcement banner above it and
@@ -91,11 +103,17 @@
 
    3. Detail. The mark is a serif monogram whose hairlines run about 6 units of
       its 153-unit viewBox. Below roughly 1px they can't be drawn as strokes and
-      grey out instead. At 26px they come to 1.02px — over the line, where 23px
-      gave 0.90px and was under it. */
+      grey out instead. At 26px they came to 1.02px — over the line, where 23px
+      gave 0.90px and was under it. At 49px there is no question.
+
+   Sized to --brand-height, so the mark's top and bottom edges land on the top
+   and bottom of the Award Contracts toggle beside it. 56 × 49 is the closest
+   whole-number pair to the 1.15334 ratio at that height — 0.9% narrow, about
+   half a pixel across the whole mark — so both edges still land on exact
+   pixels. */
 .site-header__logo {
-  --logo-w: 30px;
-  --logo-h: 26px;
+  --logo-w: 56px;
+  --logo-h: var(--brand-height);
 
   display: block;
   width: var(--logo-w);
@@ -114,14 +132,18 @@
   }
 }
 
+/* Two lines, each half the brand height — so the pair together stands exactly as
+   tall as the toggle and the CTA, and the wordmark's first and last lines sit on
+   their top and bottom edges. The type size is then chosen to fill that height
+   rather than the height following the type. */
 .site-header__wordmark {
   display: flex;
   flex-direction: column;
-  font-size: 13.5px;
+  font-size: 22px;
   /* Matches the toggle labels and the CTA, so every heavy element in the bar
      carries the same weight. */
   font-weight: 400;
-  line-height: 1.12;
+  line-height: calc(var(--brand-height) / 2);
   letter-spacing: 0.02em;
 }
 
@@ -234,6 +256,7 @@
   align-items: center;
   justify-content: center;
   min-width: var(--control-width);
+  min-height: var(--control-height);
   padding: var(--control-pad-y) var(--control-pad-x);
   font-size: var(--control-font);
   font-weight: 400;
@@ -328,6 +351,9 @@
   justify-content: center;
   gap: 1px;
   min-width: var(--control-width, 190px);
+  /* Held to the bar's shared height, so the segment stays the same size as the
+     CTA and the brand when the type steps down at the narrower widths. */
+  min-height: var(--control-height, 49px);
   padding: var(--control-pad-y, 6px) var(--control-pad-x, 18px);
   font: inherit;
   color: #fff;
@@ -618,8 +644,10 @@
     font-size: 12.5px;
   }
 
+  /* Steps down with the rest of the bar, but only in type size — the height is
+     the brand height either way, so the brand stays aligned with the toggle. */
   .site-header__wordmark {
-    font-size: 12.5px;
+    font-size: 20px;
   }
 }
 
@@ -655,6 +683,15 @@
     flex-direction: row;
     gap: 0.34em;
     font-size: 13.5px;
+    line-height: 1.12;
+  }
+
+  /* The toggle it was sized against isn't in the bar here — it has moved to its
+     own row below — so the mark goes back to the small pair it carried before:
+     30 × 26, the whole-number pair nearest the 1.15334 ratio at that size. */
+  .site-header__logo {
+    --logo-w: 30px;
+    --logo-h: 26px;
   }
 
   .site-header__mobile-actions {

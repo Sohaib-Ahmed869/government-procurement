@@ -104,7 +104,6 @@ export default function ConsultationForm() {
         <div className="consult__grid">
           {/* --- intro / what to expect --- */}
           <aside className="consult__intro">
-            <p className="consult__eyebrow">Talk to Us</p>
             <h1 className="consult__title">Request a Consultation</h1>
             <p className="consult__lead">
               Connect with a member of our team for a complimentary,

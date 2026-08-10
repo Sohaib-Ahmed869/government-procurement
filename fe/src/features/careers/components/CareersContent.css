@@ -21,11 +21,10 @@
 .careers__inner {
   max-width: 1100px;
   margin: 0 auto;
-  /* 28px below the hero's rule, matching the drop below every other rule on
-     the page. Almost nothing at the foot: "Propose a role" is the last thing on
-     the page, and the footer's own top rule follows immediately — the 48px that
-     used to sit here read as an empty band between the two. */
-  padding: 28px 40px 12px;
+  /* 28px on both ends, the same clearance every rule on the page carries: below
+     the hero's rule down to "Roles we are hiring for", and below "Propose a
+     role" up to the footer's own top rule. */
+  padding: 28px 40px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -53,6 +52,14 @@
   margin-top: 28px;
   padding-top: 28px;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+/* A block's last element carries no trailing margin of its own — .careers__copy
+   has 18px, which would otherwise be added to the 28px above and push the rule
+   below a block that ends in a paragraph further away than one that ends in the
+   role cards. The 28px is the whole gap, either way. */
+.careers__block > :last-child {
+  margin-bottom: 0;
 }
 
 .careers__heading {
@@ -184,7 +191,7 @@
 
 @media (max-width: 760px) {
   .careers__inner {
-    padding: 24px 24px 40px;
+    padding: 24px;
   }
 
   .careers__block + .careers__block {
