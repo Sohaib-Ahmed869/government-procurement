@@ -62,16 +62,10 @@
   position: relative;
 }
 
-.consult__eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: #fff;
-}
-
+/* The eyebrow that used to sit above the title has gone, so the title now opens
+   the column — no top margin to clear a line that isn't there. */
 .consult__title {
-  margin: 18px 0 0;
+  margin: 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: var(--gp-page-title);
   font-weight: 400;

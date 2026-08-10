@@ -22,13 +22,12 @@
   max-width: 1100px;
   margin: 0 auto;
   /* Ruled off from the page above as well as from the footer below, so
-     "Remain Connected" reads as its own band on every page. The page's last
-     section carries its own bottom padding above the top rule, so the padding
-     here is kept short — enough to clear the line, not enough to leave the
-     block floating in empty space. Tightened from 28px at the top: with the
-     pages above it now ending close to the rule, the old value left the rule
-     stranded between two runs of empty space. */
-  padding: 16px 40px 36px;
+     "Remain Connected" reads as its own band on every page. Equal top and
+     bottom padding, so the block sits centred in its band — the same clearance
+     from the rule above it as from the rule below. Nothing inside adds a margin
+     at either end (the heading and the form both start at 0), so the two rules
+     stand exactly as far from the content as each other. */
+  padding: 36px 40px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -553,8 +552,9 @@
     display: block;
   }
 
+  /* Equal top and bottom here too — see the desktop rule. */
   .site-footer__subscribe {
-    padding: 24px 24px 32px;
+    padding: 32px 24px;
   }
 
   .site-footer__inner {
