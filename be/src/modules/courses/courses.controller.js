@@ -11,6 +11,7 @@ import {
   COURSE_SEGMENTS,
   COURSE_LEVELS,
 } from '../../constants/statuses.js';
+import { STAFF_ROLES } from '../../constants/roles.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
 import { parseYouTubeId } from '../../utils/youtube.js';
@@ -76,7 +77,10 @@ function mediaKindFromMime(mime) {
 export const list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = parsePaging(req.query);
   const filter = {};
-  const isStaff = Boolean(req.user);
+  // Role, not merely "is signed in". These are now the same user collection as
+  // the LMS, so a student holding a valid token would otherwise count as staff
+  // and could ask for ?status=draft. Staff behaviour is unchanged.
+  const isStaff = STAFF_ROLES.includes(req.user?.role);
 
   if (!isStaff) {
     filter.status = CONTENT_STATUS.PUBLISHED;

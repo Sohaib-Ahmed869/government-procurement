@@ -1841,3 +1841,254 @@
   .admin-media__folder { max-width: none; flex: 1; }
   .admin-media__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 }
+
+/* Courses review (LMS submissions) ------------------------------------------
+   Courses are authored in the LMS; this screen approves them and picks what the
+   homepage features. */
+.admin-seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--admin-border); border-radius: 999px; background: var(--admin-surface); }
+.admin-seg__btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 15px; border: 0; border-radius: 999px; background: none; color: var(--admin-muted); font-family: inherit; font-size: 13.5px; font-weight: 550; cursor: pointer; }
+.admin-seg__btn:hover { background: var(--admin-surface-3); color: var(--admin-text); }
+.admin-seg__btn.is-active { background: var(--admin-green); color: #fff; }
+.admin-seg__count { padding: 1px 7px; border-radius: 999px; background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; }
+.admin-seg__btn.is-active .admin-seg__count { background: rgba(255,255,255,0.18); color: #fff; }
+
+.admin-courses { display: flex; flex-direction: column; gap: 14px; }
+.admin-course { padding: 18px 20px; }
+.admin-course__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.admin-course__title { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.admin-course__meta { margin: 3px 0 0; font-size: 12.5px; color: var(--admin-muted); }
+.admin-course__stats { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--admin-muted); }
+.admin-course__stats strong { color: var(--admin-text); }
+.admin-course__note { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; background: #fdf1d8; color: #6f4e12; font-size: 13px; }
+.admin-course__foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--admin-border); }
+.admin-course__feature { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--admin-text-2); cursor: pointer; }
+.admin-course__feature input { width: 16px; height: 16px; accent-color: var(--admin-green); }
+.admin-course__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.admin-badge { padding: 3px 10px; border-radius: 999px; background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.admin-badge--ok { background: var(--admin-mint-soft); color: var(--admin-green); }
+.admin-badge--warn { background: #fdf1d8; color: #8a6316; }
+.admin-badge--danger { background: #fbecea; color: var(--admin-danger); }
+
+/* Curriculum review -----------------------------------------------------------
+   NOTE: `.admin-modal` is defined once, further up, as the PANEL that sits
+   inside `.admin-modal__backdrop`. A second definition of it lived here and
+   turned the panel into a fixed overlay while keeping its 420px max-width, so
+   the dialog rendered as a narrow box pinned to the left of the screen with no
+   dimmed backdrop. Don't reintroduce it — widths belong on a modifier. */
+.admin-modal--wide { max-width: 720px; }
+
+/* Header: the course, and what a reviewer is being asked to sign off. */
+.admin-curric__head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-bottom: 4px;
+}
+.admin-curric__by { margin: 2px 0 0; font-size: 13px; color: var(--admin-muted); }
+.admin-curric__totals {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 14px 0 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--admin-border);
+}
+.admin-curric__total {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--admin-mint-soft); color: var(--admin-green);
+  font-size: 12.5px;
+}
+.admin-curric__total strong { font-size: 13.5px; font-weight: 650; }
+.admin-curric__total--warn { background: #fbe0dd; color: var(--admin-danger); }
+
+/* Scrolls inside the dialog so the actions stay reachable on a long course. */
+.admin-curric {
+  max-height: 56vh; overflow-y: auto;
+  margin: 0 -4px; padding: 0 4px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.admin-curric__mod {
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--admin-surface);
+}
+.admin-curric__mod-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+  background: var(--admin-bg-soft, #f4f7f4);
+  border-bottom: 1px solid var(--admin-border);
+}
+.admin-curric__mod-no {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 7px;
+  background: var(--admin-green); color: #fff;
+  font-size: 12px; font-weight: 650;
+}
+.admin-curric__mod-title {
+  margin: 0; font-size: 14px; font-weight: 600; color: var(--admin-green);
+}
+.admin-curric__mod-count {
+  margin-left: auto; font-size: 12px; color: var(--admin-muted); white-space: nowrap;
+}
+
+.admin-curric__lessons { margin: 0; padding: 0; list-style: none; }
+.admin-curric__lesson {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--admin-border);
+  font-size: 13.5px; color: var(--admin-text-2);
+}
+.admin-curric__lesson:first-child { border-top: none; }
+
+/* The lesson kind, as a chip rather than a word in a run-on meta line. */
+.admin-curric__kind {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 52px; padding: 2px 8px; flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--admin-mint-soft); color: var(--admin-green);
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.admin-curric__kind--quiz { background: #ece4fa; color: #5b3fa8; }
+.admin-curric__kind--video { background: #dceaf8; color: #1f5c8f; }
+
+.admin-curric__lesson-title { flex: 1; min-width: 0; }
+.admin-curric__flags { display: flex; gap: 6px; flex-shrink: 0; }
+.admin-curric__flag {
+  padding: 2px 7px; border-radius: 999px;
+  font-size: 11px; white-space: nowrap;
+  background: var(--admin-mint-soft); color: var(--admin-green);
+}
+/* Something a reviewer should notice: a video with no file, a quiz with no
+   questions. Stated as a fault, not as neutral metadata. */
+.admin-curric__flag--missing { background: #fbe0dd; color: var(--admin-danger); }
+
+.admin-curric__empty {
+  padding: 18px 14px; text-align: center;
+  border: 1px dashed var(--admin-border); border-radius: 10px;
+  color: var(--admin-muted); font-size: 13px;
+}
+
+/* Expandable lesson content in the review dialog ------------------------------
+   The row stays compact; the content opens beneath it, so a long course is
+   still scannable but a reviewer can read what they are approving. */
+.admin-curric__lesson { display: block; padding: 0; }
+.admin-curric__lesson-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: var(--admin-text-2);
+}
+.admin-curric__toggle {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: var(--admin-surface);
+  font-size: 12px;
+  color: var(--admin-text-2);
+  cursor: pointer;
+}
+.admin-curric__toggle:hover { border-color: var(--admin-green); color: var(--admin-green); }
+.admin-curric__toggle.is-empty {
+  border-style: dashed;
+  color: var(--admin-muted);
+  cursor: default;
+}
+.admin-curric__kind--youtube { background: #fbe3e0; color: #a8392c; }
+.admin-curric__kind--doc { background: #e4eef0; color: #24606b; }
+
+.admin-curric__content {
+  padding: 4px 14px 16px;
+  border-top: 1px dashed var(--admin-border);
+  background: var(--admin-bg-soft, #f7faf8);
+}
+.admin-curric__block { margin-top: 14px; }
+.admin-curric__block h5 {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+.admin-curric__prose p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.6; }
+.admin-curric__kv { margin: 4px 0 0; font-size: 13px; color: var(--admin-text-2); }
+
+.admin-curric__embed {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 420px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+.admin-curric__embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* Capped and scrollable: a transcript can run to hundreds of cues and would
+   otherwise bury the quiz below it. */
+.admin-curric__cues {
+  max-height: 190px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  background: var(--admin-surface);
+}
+.admin-curric__cues p { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; }
+.admin-curric__cues span {
+  display: inline-block;
+  min-width: 44px;
+  color: var(--admin-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-curric__questions { margin: 0; padding-left: 18px; }
+.admin-curric__questions > li { margin-bottom: 12px; }
+.admin-curric__prompt { margin: 0 0 5px; font-size: 13.5px; font-weight: 600; color: var(--admin-text); }
+.admin-curric__questions ul { margin: 0; padding-left: 16px; list-style: none; }
+.admin-curric__questions ul li {
+  position: relative;
+  margin-bottom: 3px;
+  font-size: 13px;
+  color: var(--admin-text-2);
+}
+.admin-curric__questions ul li::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--admin-border);
+  border-radius: 50%;
+}
+/* The answer key, visible because this route is staff-only and a marking
+   scheme a reviewer can't see is one they can't check. */
+.admin-curric__questions ul li.is-correct { color: var(--admin-green); font-weight: 600; }
+.admin-curric__questions ul li.is-correct::before {
+  background: var(--admin-green);
+  border-color: var(--admin-green);
+}
+.admin-curric__questions ul li.is-correct span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 6px;
+}
+.admin-curric__why {
+  margin: 5px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--admin-border);
+  font-size: 12.5px;
+  color: var(--admin-muted);
+}
+
+.admin-curric__video {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 8px;
+  background: #000;
+  display: block;
+}

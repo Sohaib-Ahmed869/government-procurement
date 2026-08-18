@@ -2,27 +2,63 @@
 // JSON vs multipart bodies, and unwrapping the { success, data, meta } envelope.
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api';
 
-const TOKEN_KEY = 'gp.admin.token';
+/* ---- Sessions, one per audience ---------------------------------------------
 
-export function getToken() {
+   Staff and learners share a user collection and one login endpoint, but they
+   are two different sessions and must not share a token slot. With a single
+   key, signing into /learn as a student overwrote the CMS admin's token, and
+   logging out of either app logged you out of both.
+
+   Which slot a request uses is derived from the URL rather than held in a
+   module variable. Both route trees exist in one SPA and only one is mounted at
+   a time, so the path IS the audience — and a derived value can't fall out of
+   sync with the app that's actually on screen, which a mutable global can. */
+export const SCOPES = { ADMIN: 'admin', LEARN: 'learn' };
+
+const TOKEN_KEYS = {
+  [SCOPES.ADMIN]: 'gp.admin.token',
+  [SCOPES.LEARN]: 'gp.learn.token',
+};
+
+// Staff belong to the CMS session; instructors and students to the LMS one.
+// Kept in step with be/src/constants/roles.js — STAFF_ROLES there.
+const STAFF_ROLES = ['superadmin', 'editor', 'moderator'];
+
+// Where a role's token belongs. The sign-in page is shared, so the ROLE that
+// comes back decides which session is being started — not the page it was
+// started from. A super admin signing in at /learn/login is starting a CMS
+// session and is redirected there.
+export function scopeForRole(role) {
+  return STAFF_ROLES.includes(role) ? SCOPES.ADMIN : SCOPES.LEARN;
+}
+
+// The audience of whatever is on screen. The public site isn't a session of its
+// own; its few authenticated reads belong to the learner.
+export function currentScope() {
+  if (typeof window === 'undefined') return SCOPES.LEARN;
+  return window.location.pathname.startsWith('/admin') ? SCOPES.ADMIN : SCOPES.LEARN;
+}
+
+export function getToken(scope = currentScope()) {
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEYS[scope] ?? TOKEN_KEYS[SCOPES.LEARN]);
   } catch {
     return null;
   }
 }
 
-export function setToken(token) {
+export function setToken(token, scope = currentScope()) {
+  const key = TOKEN_KEYS[scope] ?? TOKEN_KEYS[SCOPES.LEARN];
   try {
-    if (token) localStorage.setItem(TOKEN_KEY, token);
-    else localStorage.removeItem(TOKEN_KEY);
+    if (token) localStorage.setItem(key, token);
+    else localStorage.removeItem(key);
   } catch {
     /* storage unavailable — ignore */
   }
 }
 
-export function clearToken() {
-  setToken(null);
+export function clearToken(scope = currentScope()) {
+  setToken(null, scope);
 }
 
 // A thrown API error carries the HTTP status and any field-level errors so the
@@ -48,12 +84,15 @@ function buildQuery(params) {
 
 // Core request. `body` may be a plain object (sent as JSON) or a FormData
 // (sent as multipart — the browser sets the boundary Content-Type itself).
-export async function request(path, { method = 'GET', body, params, headers = {}, auth = true } = {}) {
+export async function request(
+  path,
+  { method = 'GET', body, params, headers = {}, auth = true, scope = currentScope() } = {},
+) {
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   const finalHeaders = { ...headers };
   if (!isForm && body !== undefined) finalHeaders['Content-Type'] = 'application/json';
 
-  const token = auth ? getToken() : null;
+  const token = auth ? getToken(scope) : null;
   if (token) finalHeaders.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${BASE_URL}${path}${buildQuery(params)}`, {
@@ -67,7 +106,9 @@ export async function request(path, { method = 'GET', body, params, headers = {}
   const payload = await res.json().catch(() => null);
   if (!res.ok) {
     const message = payload?.message ?? `Request failed (${res.status})`;
-    if (res.status === 401) clearToken();
+    // Only the session that made the call. Clearing both is what let a stale
+    // LMS token sign the admin out of the CMS.
+    if (res.status === 401) clearToken(scope);
     throw new ApiError(message, res.status, payload?.errors);
   }
   return payload; // { success, data, meta }

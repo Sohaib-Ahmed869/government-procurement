@@ -101,9 +101,96 @@ const courseSchema = new mongoose.Schema(
     featured: { type: Boolean, default: false },
     status: { type: String, enum: CONTENT_STATUSES, default: CONTENT_STATUS.DRAFT, index: true },
     publishedAt: { type: Date },
+
+    // ---- LMS authoring (added for the instructor workflow) -------------------
+    // All optional, so every existing CMS-authored course keeps working
+    // unchanged: no owner means a staff-authored course, and no review state
+    // means the CMS's own draft/published status is the only one that applies.
+
+    // Who wrote it. Set when an instructor creates the course; absent on the
+    // courses the CMS already had.
+    //
+    // Named `author`, NOT `instructor`: this schema already has an `instructor`
+    // object holding the byline the website prints ({ name, role, avatarUrl }).
+    // A second key of the same name would silently replace it and take the
+    // course page's byline with it.
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
+
+    // The review workflow. Separate from `status` on purpose: `status` is what
+    // the WEBSITE shows (draft/published/archived), while this is where the
+    // course sits in the approval queue. An instructor moves it to 'pending';
+    // only an admin can move it on from there, and only that admin action sets
+    // status to published.
+    // Two ways a submission can come back, and they mean different things to
+    // the instructor:
+    //   rejected  sent back to be fixed. The work is fine in principle; these
+    //             specific things need changing, then resubmit.
+    //   declined  not going on the site. A judgement about the course itself,
+    //             not a list of corrections.
+    // Collapsing them into one status left an admin unable to say the second
+    // thing, so every refusal read as "nearly there, just tidy it up".
+    reviewStatus: {
+      type: String,
+      enum: ['none', 'pending', 'approved', 'rejected', 'declined'],
+      default: 'none',
+      index: true,
+    },
+    submittedAt: { type: Date },
+    reviewedAt: { type: Date },
+    reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    reviewNote: { type: String, default: '' },
+
+    // How this course's certificate reads (L4). Per course, and the
+    // instructor's to set: they know what the course actually attests to, and
+    // "Certificate of Completion" is not always the right words for it.
+    //
+    // Every field has a default, so a course that is never customised still
+    // issues a sensible certificate. CERTIFICATE_DEFAULTS below is the one
+    // place those defaults live, shared with the builder's preview.
+    certificate: {
+      enabled: { type: Boolean, default: true },
+      heading: { type: String, default: 'Certificate of Completion' },
+      // Sits above the recipient's name, e.g. "This is to certify that".
+      preamble: { type: String, default: 'This is to certify that' },
+      // Sits between the name and the course title.
+      statement: { type: String, default: 'has successfully completed' },
+      // Free text under the title. The place for an accreditation reference or
+      // a CPD note, which differs course to course.
+      footnote: { type: String, default: '' },
+      issuerName: { type: String, default: 'Government Procurement' },
+      signatoryName: { type: String, default: '' },
+      signatoryRole: { type: String, default: '' },
+      // Three independent colours: the accent (border, heading, issuer line),
+      // the paper behind it, and the body text. Free-form hex rather than a
+      // fixed palette, because an instructor may be matching an agency's
+      // branding that no palette of ours would contain.
+      accent: { type: String, default: '#0a3114' },
+      background: { type: String, default: '#ffffff' },
+      textColor: { type: String, default: '#1a1a1a' },
+      showHours: { type: Boolean, default: true },
+      showCredentialId: { type: Boolean, default: true },
+    },
   },
   { timestamps: true },
 );
+
+// The shape a brand-new course starts from, and what the builder shows as the
+// "default view" before an instructor changes anything.
+export const CERTIFICATE_DEFAULTS = {
+  enabled: true,
+  heading: 'Certificate of Completion',
+  preamble: 'This is to certify that',
+  statement: 'has successfully completed',
+  footnote: '',
+  issuerName: 'Government Procurement',
+  signatoryName: '',
+  signatoryRole: '',
+  accent: '#0a3114',
+  background: '#ffffff',
+  textColor: '#1a1a1a',
+  showHours: true,
+  showCredentialId: true,
+};
 
 courseSchema.index({ title: 'text', summary: 'text', body: 'text' });
 

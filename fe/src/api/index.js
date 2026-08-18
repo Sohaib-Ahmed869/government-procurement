@@ -145,4 +145,4 @@ export const authApi = {
 };
 
 export { api, BASE_URL } from './client.js';
-export { getToken, setToken, clearToken, ApiError } from './client.js';
+export { getToken, setToken, clearToken, ApiError, SCOPES, scopeForRole, currentScope } from './client.js';

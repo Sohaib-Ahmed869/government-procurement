@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { subscribersApi, getToken } from '../../api';
+import { subscribersApi, getToken, SCOPES } from '../../api';
 import { BASE_URL } from '../../api/client.js';
 import DataTable from '../components/DataTable.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
@@ -50,8 +50,10 @@ export default function SubscribersPage() {
   const exportCsv = async () => {
     setError('');
     try {
+      // A raw fetch rather than the api client, because this returns a CSV blob
+      // instead of the JSON envelope — so it has to name the session itself.
       const res = await fetch(`${BASE_URL}/subscribers/export`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${getToken(SCOPES.ADMIN)}` },
       });
       if (!res.ok) throw new Error(`Export failed (${res.status})`);
       const blob = await res.blob();
