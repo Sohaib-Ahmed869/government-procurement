@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-audience="award">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GP Palette — award &amp; win ramps</title>
+<style>
+/* Reference sheet for the two ramps index.html runs on. Every value here is
+   the same literal as the :root block in index.html — if one changes, change
+   both. Rows marked "GP" are the shipped tokens from fe/src/styles/tokens.css
+   and must not be edited here; the rest were added for this page. */
+:root {
+  --paper: #f8f6f1;
+  --ink: #191817;
+  --muted: #6b665c;
+  --line: #ddd6c7;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: clamp(28px, 5vw, 64px);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.55;
+}
+h1 { font-size: clamp(28px, 4vw, 42px); margin: 0 0 10px; letter-spacing: -0.03em; }
+.sub { color: var(--muted); max-width: 640px; margin: 0 0 44px; }
+h2 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+.ramp-note { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+section { margin-bottom: 56px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.sw { border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: #fff; }
+.sw__chip { height: 86px; }
+.sw__meta { padding: 10px 12px 12px; }
+.sw__role { font-size: 13px; font-weight: 600; }
+.sw__var { font-size: 11px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.sw__hex { font-size: 12px; margin-top: 4px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.tag--gp { background: #e6efe4; color: #2f5c3a; }
+.tag--new { background: #f3e6da; color: #8a4a24; }
+</style>
+</head>
+<body>
+
+<h1>Two ramps, one system</h1>
+<p class="sub">
+  Award and win each get a full ramp — five dark steps, three papers, a rule, two text
+  greys and two accents — so the segment toggle recolours the whole page rather than only
+  the dark bands. <strong>GP</strong> marks a value shipped in
+  <code>fe/src/styles/tokens.css</code>; <strong>new</strong> marks one added for this page.
+</p>
+
+<section>
+  <h2>Award — the green family</h2>
+  <p class="ramp-note">Public sector. Mint leads, clay is the counterweight.</p>
+  <div class="grid">
+    <div class="sw"><div class="sw__chip" style="background:#061c0c"></div><div class="sw__meta"><p class="sw__role">Deepest<span class="tag tag--new">new</span></p><p class="sw__var">--award-950</p><p class="sw__hex">#061C0C</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#0a3114"></div><div class="sw__meta"><p class="sw__role">Ground<span class="tag tag--gp">GP</span></p><p class="sw__var">--award-900 / green-900</p><p class="sw__hex">#0A3114</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#0e3e1b"></div><div class="sw__meta"><p class="sw__role">Raised surface<span class="tag tag--gp">GP</span></p><p class="sw__var">--award-800 / green-800</p><p class="sw__hex">#0E3E1B</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#14572a"></div><div class="sw__meta"><p class="sw__role">Mid<span class="tag tag--gp">GP</span></p><p class="sw__var">--award-700 / green-600</p><p class="sw__hex">#14572A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#2f7d45"></div><div class="sw__meta"><p class="sw__role">Lift / active pill<span class="tag tag--gp">GP</span></p><p class="sw__var">--award-600 / lift-green</p><p class="sw__hex">#2F7D45</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#3f9a58"></div><div class="sw__meta"><p class="sw__role">Hover<span class="tag tag--new">new</span></p><p class="sw__var">--award-500</p><p class="sw__hex">#3F9A58</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#0d3f3c"></div><div class="sw__meta"><p class="sw__role">Second dark band<span class="tag tag--new">new</span></p><p class="sw__var">--award-alt</p><p class="sw__hex">#0D3F3C</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#7ee2a8"></div><div class="sw__meta"><p class="sw__role">Accent<span class="tag tag--gp">GP</span></p><p class="sw__var">--award-accent / mint-300</p><p class="sw__hex">#7EE2A8</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#c1663a"></div><div class="sw__meta"><p class="sw__role">Warm accent<span class="tag tag--new">new</span></p><p class="sw__var">--award-warm</p><p class="sw__hex">#C1663A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#f4f7f1"></div><div class="sw__meta"><p class="sw__role">Paper<span class="tag tag--new">new</span></p><p class="sw__var">--award-paper</p><p class="sw__hex">#F4F7F1</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#e8efe4"></div><div class="sw__meta"><p class="sw__role">Paper alt<span class="tag tag--new">new</span></p><p class="sw__var">--award-paper-alt</p><p class="sw__hex">#E8EFE4</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#dbe6d6"></div><div class="sw__meta"><p class="sw__role">Paper deep / hover<span class="tag tag--new">new</span></p><p class="sw__var">--award-paper-deep</p><p class="sw__hex">#DBE6D6</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#cfdcc9"></div><div class="sw__meta"><p class="sw__role">Rule<span class="tag tag--new">new</span></p><p class="sw__var">--award-line</p><p class="sw__hex">#CFDCC9</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#10281a"></div><div class="sw__meta"><p class="sw__role">Body text<span class="tag tag--new">new</span></p><p class="sw__var">--award-ink</p><p class="sw__hex">#10281A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#5b6f60"></div><div class="sw__meta"><p class="sw__role">Muted text<span class="tag tag--new">new</span></p><p class="sw__var">--award-muted</p><p class="sw__hex">#5B6F60</p></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Win — the ink family</h2>
+  <p class="ramp-note">Suppliers. Amber leads, mint keeps a role as the second accent.</p>
+  <div class="grid">
+    <div class="sw"><div class="sw__chip" style="background:#0e0e0d"></div><div class="sw__meta"><p class="sw__role">Deepest<span class="tag tag--new">new</span></p><p class="sw__var">--win-950</p><p class="sw__hex">#0E0E0D</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#1a1a1a"></div><div class="sw__meta"><p class="sw__role">Ground<span class="tag tag--gp">GP</span></p><p class="sw__var">--win-900 / ink-900</p><p class="sw__hex">#1A1A1A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#242424"></div><div class="sw__meta"><p class="sw__role">Raised surface<span class="tag tag--gp">GP</span></p><p class="sw__var">--win-800 / ink-800</p><p class="sw__hex">#242424</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#333331"></div><div class="sw__meta"><p class="sw__role">Mid<span class="tag tag--new">new</span></p><p class="sw__var">--win-700</p><p class="sw__hex">#333331</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#4a4a4a"></div><div class="sw__meta"><p class="sw__role">Lift / active pill<span class="tag tag--gp">GP</span></p><p class="sw__var">--win-600 / lift-grey</p><p class="sw__hex">#4A4A4A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#6a675f"></div><div class="sw__meta"><p class="sw__role">Hover<span class="tag tag--new">new</span></p><p class="sw__var">--win-500</p><p class="sw__hex">#6A675F</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#2a231a"></div><div class="sw__meta"><p class="sw__role">Second dark band<span class="tag tag--new">new</span></p><p class="sw__var">--win-alt</p><p class="sw__hex">#2A231A</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#e0a63f"></div><div class="sw__meta"><p class="sw__role">Accent<span class="tag tag--new">new</span></p><p class="sw__var">--win-accent</p><p class="sw__hex">#E0A63F</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#7ee2a8"></div><div class="sw__meta"><p class="sw__role">Warm accent<span class="tag tag--gp">GP</span></p><p class="sw__var">--win-warm / mint-300</p><p class="sw__hex">#7EE2A8</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#f8f6f1"></div><div class="sw__meta"><p class="sw__role">Paper<span class="tag tag--new">new</span></p><p class="sw__var">--win-paper</p><p class="sw__hex">#F8F6F1</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#ece7dc"></div><div class="sw__meta"><p class="sw__role">Paper alt<span class="tag tag--new">new</span></p><p class="sw__var">--win-paper-alt</p><p class="sw__hex">#ECE7DC</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#ddd6c7"></div><div class="sw__meta"><p class="sw__role">Paper deep / hover<span class="tag tag--new">new</span></p><p class="sw__var">--win-paper-deep</p><p class="sw__hex">#DDD6C7</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#d8d0c1"></div><div class="sw__meta"><p class="sw__role">Rule<span class="tag tag--new">new</span></p><p class="sw__var">--win-line</p><p class="sw__hex">#D8D0C1</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#191817"></div><div class="sw__meta"><p class="sw__role">Body text<span class="tag tag--new">new</span></p><p class="sw__var">--win-ink</p><p class="sw__hex">#191817</p></div></div>
+    <div class="sw"><div class="sw__chip" style="background:#6b665c"></div><div class="sw__meta"><p class="sw__role">Muted text<span class="tag tag--new">new</span></p><p class="sw__var">--win-muted</p><p class="sw__hex">#6B665C</p></div></div>
+  </div>
+</section>
+
+</body>
+</html>

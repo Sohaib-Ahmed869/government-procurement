@@ -1,0 +1,1734 @@
+<!doctype html>
+<html lang="en" data-audience="award">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Government Procurement — Procure with Confidence</title>
+<meta name="description" content="Government Procurement helps public sector teams award contracts fairly and helps suppliers win them — advisory, training and evaluation support across Australia." />
+<link rel="icon" href="../public/favicon.svg" />
+<style>
+/* ==========================================================================
+   Government Procurement — standalone homepage concept
+   Layout takes its cues from fticonsulting.com/australia: a full-bleed hero
+   with the headline over the image, a stat rail, offering columns, insight
+   cards and an office block.
+
+   COLOUR
+   The shipped GP tokens (fe/src/styles/tokens.css) are reproduced verbatim
+   under "shipped" below and still carry the page — green-900 is award, ink-900
+   is win, mint-300 is the accent on both. What is new is that each segment now
+   has a full ramp rather than one ground colour: five dark steps, three paper
+   steps, a rule, two text greys and two accents. That is what lets the toggle
+   recolour the whole page instead of only the dark bands — the light sections
+   were previously fixed neutrals, so they sat out the switch.
+
+   Nothing below the ":root" block names a hex. Components resolve
+   --brand* / --paper* / --line / --ink / --muted / --accent*, and the two
+   [data-audience] blocks are the only place those get pointed at a ramp. Every
+   themed rule carries a transition on the properties that change, so the switch
+   plays as a colour fade under the reveal fade rather than as a snap.
+   ========================================================================== */
+
+:root {
+  /* ---- Shipped GP tokens (fe/src/styles/tokens.css) ---------------------- */
+  --gp-green-900: #0a3114;
+  --gp-green-800: #0e3e1b;
+  --gp-green-750: #0d3a1a;
+  --gp-green-600: #14572a;
+  --gp-mint-300: #7ee2a8;
+  --gp-ink-900: #1a1a1a;
+  --gp-ink-800: #242424;
+  --gp-lift-green: #2f7d45;
+  --gp-lift-grey: #4a4a4a;
+
+  /* ---- AWARD ramp — the green family, extended ---------------------------
+     900/800/750/600 and the mint are shipped GP. The steps added here are the
+     ones a full page needs and the site never had: a companion deep tone for a
+     second dark band, three green-tinted papers, a rule, and text greys with
+     enough green in them to sit on those papers. */
+  --award-950: #061c0c;          /* new — deepest, footer base + scrims */
+  --award-900: var(--gp-green-900);
+  --award-800: var(--gp-green-800);
+  --award-700: var(--gp-green-600);
+  --award-600: var(--gp-lift-green);
+  --award-500: #3f9a58;          /* new — hover lift on dark surfaces */
+  --award-alt: #0d3f3c;          /* new — deep teal, the second dark band */
+  --award-paper: #f4f7f1;        /* new — sage paper */
+  --award-paper-alt: #e8efe4;    /* new */
+  --award-paper-deep: #dbe6d6;   /* new */
+  --award-line: #cfdcc9;         /* new */
+  --award-ink: #10281a;          /* new — green-black body text */
+  --award-muted: #5b6f60;        /* new */
+  --award-accent: var(--gp-mint-300);
+  --award-warm: #c1663a;         /* new — clay, the counterweight to mint */
+
+  /* ---- WIN ramp — the ink family, extended -------------------------------
+     ink-900/800 and lift-grey are shipped GP. The greys added here are warmed a
+     few degrees so the paper steps read as paper rather than as grey card, and
+     amber replaces mint as the lead accent — the one change that makes the
+     segment legible at a glance from the colour alone. */
+  --win-950: #0e0e0d;            /* new */
+  --win-900: var(--gp-ink-900);
+  --win-800: var(--gp-ink-800);
+  --win-700: #333331;            /* new */
+  --win-600: var(--gp-lift-grey);
+  --win-500: #6a675f;            /* new */
+  --win-alt: #2a231a;            /* new — warm charcoal, the second dark band */
+  --win-paper: #f8f6f1;          /* new — sand paper */
+  --win-paper-alt: #ece7dc;      /* new */
+  --win-paper-deep: #ddd6c7;     /* new */
+  --win-line: #d8d0c1;           /* new */
+  --win-ink: #191817;            /* new */
+  --win-muted: #6b665c;          /* new */
+  --win-accent: #e0a63f;         /* new — amber */
+  --win-warm: var(--gp-mint-300);/* mint keeps a role, as the second accent */
+
+  /* ---- Type -------------------------------------------------------------- */
+  --gp-page-title: min(64px, calc((100vw - 96px) / 13));
+  --gp-section-title: clamp(28px, 3.4vw, 42px);
+  --shell: 1400px;
+  --gutter: clamp(20px, 4vw, 60px);
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --swap: 380ms;
+  --fade: background-color var(--swap) var(--ease), color var(--swap) var(--ease), border-color var(--swap) var(--ease);
+}
+
+/* ---- The toggle. The only place a ramp is chosen; everything else reads the
+   role names below. ---------------------------------------------------------*/
+[data-audience='award'] {
+  --brand-deep: var(--award-950);
+  --brand: var(--award-900);
+  --brand-soft: var(--award-800);
+  --brand-mid: var(--award-700);
+  --brand-lift: var(--award-600);
+  --brand-hover: var(--award-500);
+  --brand-alt: var(--award-alt);
+  --paper: var(--award-paper);
+  --paper-alt: var(--award-paper-alt);
+  --paper-deep: var(--award-paper-deep);
+  --line: var(--award-line);
+  --ink: var(--award-ink);
+  --muted: var(--award-muted);
+  --accent: var(--award-accent);
+  --accent-warm: var(--award-warm);
+}
+[data-audience='win'] {
+  --brand-deep: var(--win-950);
+  --brand: var(--win-900);
+  --brand-soft: var(--win-800);
+  --brand-mid: var(--win-700);
+  --brand-lift: var(--win-600);
+  --brand-hover: var(--win-500);
+  --brand-alt: var(--win-alt);
+  --paper: var(--win-paper);
+  --paper-alt: var(--win-paper-alt);
+  --paper-deep: var(--win-paper-deep);
+  --line: var(--win-line);
+  --ink: var(--win-ink);
+  --muted: var(--win-muted);
+  --accent: var(--win-accent);
+  --accent-warm: var(--win-warm);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist Variable', 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+  transition: var(--fade);
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+
+.shell {
+  width: min(var(--shell), 100%);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  transition: var(--fade);
+}
+.eyebrow--dark { color: var(--muted); }
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.02em; line-height: 1.08; }
+p { margin: 0; }
+
+.section-title { font-size: var(--gp-section-title); }
+.lede { font-size: clamp(17px, 1.5vw, 20px); line-height: 1.55; color: var(--muted); transition: var(--fade); }
+
+/* --------------------------------------------------------------------------
+   Reveal + segment swap.
+
+   Two motions share one system. `.reveal` fades a block up the first time it
+   scrolls into view. The toggle then sets [data-swapping] on <html>, which
+   fades every revealed block back out; once it has, the audience attribute
+   flips — palette and copy both change while nothing is on screen — and the
+   observer plays the reveals again. So a segment switch reads as the page
+   re-entering in its new colours, which is the behaviour the React homepage
+   gets from useMountReveal/useInView keyed on the audience.
+   -------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 700ms var(--ease), transform 700ms var(--ease);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+.reveal[data-delay='1'] { transition-delay: 90ms; }
+.reveal[data-delay='2'] { transition-delay: 180ms; }
+.reveal[data-delay='3'] { transition-delay: 270ms; }
+.reveal[data-delay='4'] { transition-delay: 360ms; }
+
+/* Fading out is the same two properties in reverse, but fast and with no
+   stagger — a staggered exit reads as the page falling apart. */
+[data-swapping] .reveal {
+  opacity: 0 !important;
+  transform: translateY(-14px) !important;
+  transition-duration: var(--swap) !important;
+  transition-delay: 0ms !important;
+}
+
+/* Copy that differs per segment. Both strings are in the markup; the inactive
+   one is display:none, so it neither reads out nor takes up space. */
+.seg { display: none; }
+[data-audience='award'] .seg--award,
+[data-audience='win'] .seg--win { display: inline; }
+[data-audience='award'] p.seg--award,
+[data-audience='win'] p.seg--win { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal, [data-swapping] .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- Header — ported from fe/src/components/layout/Header.css -------------
+   Two rows, as the shipped site has it: brand + audience toggle + CTA across
+   the top bar, and the nav beneath as a band of divided cells rather than a
+   spaced-out row. The shared control metrics below are that stylesheet's, so
+   the toggle, the CTA and the brand come out the same height by construction
+   instead of by three sets of numbers kept in step by hand.
+
+   One thing is changed and one is added. Changed: --header-bg is this page's
+   --brand, so the bar follows the segment ramp rather than naming green-900 /
+   ink-900 itself. Added: the sticky wrapper, which on the real site is
+   .page-layout__chrome in index.css rather than part of the header. */
+.chrome { position: sticky; top: 0; z-index: 100; }
+
+.site-header {
+  /* Shared metrics for the bar's controls — the toggle and the CTA. */
+  --control-pad-y: 6px;
+  --control-pad-x: 18px;
+  --control-radius: 4px;
+  --control-font: 13.5px;
+  --control-hint-font: 13.5px;
+  --control-edge: rgba(255, 255, 255, 0.28);
+  /* The glass edge the tender cards carry — lit from the top left, fading to
+     the bottom right — rather than an even ring. */
+  --control-edge-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  --control-active: rgba(255, 255, 255, 0.16);
+  /* One width and one height for the two toggle segments and the CTA alike,
+     applied as floors so a longer label still fits. The brand is built to the
+     same height, so the mark and the wordmark start and finish exactly where
+     the Award Contracts segment beside them does. */
+  --control-width: 190px;
+  --control-height: 49px;
+  --brand-height: var(--control-height);
+
+  position: relative;
+  z-index: 100;
+  background: var(--brand);
+  color: #fff;
+  transition: var(--fade);
+}
+
+/* Once the page has scrolled, a shadow separates the pinned bar from the
+   content passing underneath it. */
+.site-header.is-stuck { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: 1440px;
+  min-height: 60px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* --- brand --- */
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Whole-number dimensions and no transform at any point: 56 x 49 is the closest
+   whole-number pair to the mark's 1.15334 ratio at the control height, so both
+   edges land on exact pixels, and the hover is a fade so nothing is resampled. */
+.site-header__logo {
+  --logo-w: 56px;
+  --logo-h: var(--brand-height);
+
+  display: block;
+  width: var(--logo-w);
+  height: var(--logo-h);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__logo { transition: opacity 0.18s ease-out; }
+  .site-header__brand:hover .site-header__logo { opacity: 0.78; }
+}
+
+/* Two lines, each half the brand height, so the pair stands exactly as tall as
+   the toggle and the CTA. The type size fills that height rather than setting it. */
+.site-header__wordmark {
+  display: flex;
+  flex-direction: column;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: calc(var(--brand-height) / 2);
+  letter-spacing: 0.02em;
+}
+
+/* --- nav --- */
+/* A row of its own beneath the top bar, divided into cells rather than spaced
+   by a gap — so the bar reads as a set of tabs and the brand above it is not
+   competing with the links for one line of width. */
+.site-header__nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-header__nav-list {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 40px;
+  list-style: none;
+}
+
+.site-header__nav-list > li { display: flex; }
+
+.site-header__nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 20px;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  /* Hairline between cells; the row's own borders close the set. */
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.12);
+  transition: color 0.18s ease-out, background-color 0.18s ease-out;
+}
+
+/* The page you are on: full white on a faintly raised cell, and a permanent
+   underline so it is still marked for anyone who cannot tell 78% white from
+   100%. Nothing is current on the homepage, but the state ships with the row. */
+.site-header__nav-link.is-current {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+.site-header__nav-link.is-current::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: currentColor;
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Animated underline that slides in from the left on hover/focus. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 3px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.2s ease-out;
+  }
+  .site-header__nav-link:hover::after,
+  .site-header__nav-link:focus-visible::after { transform: scaleX(1); }
+}
+
+/* --- right-hand actions --- */
+.site-header__actions {
+  display: flex;
+  /* Stretch, so the CTA matches the toggle's height without either being told
+     what that height is — the toggle's two lines of text set it. */
+  align-items: stretch;
+  gap: 14px;
+}
+
+/* Same fill, size and type as the chosen segment beside it, so the bar reads as
+   one set of controls rather than a toggle plus a button from somewhere else. */
+.site-header__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-width);
+  min-height: var(--control-height);
+  padding: var(--control-pad-y) var(--control-pad-x);
+  font-size: var(--control-font);
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--control-active);
+  border-radius: var(--control-radius);
+  box-shadow: var(--control-edge-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__cta {
+    transition: transform 0.18s ease-out, background-color 0.18s ease-out;
+  }
+  .site-header__cta:hover,
+  .site-header__cta:focus-visible {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.24);
+  }
+}
+
+/* --- audience toggle --- */
+/* Two squared segments in a single outlined track. Each carries a label over a
+   line saying who it is for, so the two paths are told apart by what they mean
+   rather than by which cell is lit. */
+.audience-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--control-radius, 4px);
+  box-shadow: var(
+    --control-edge-shadow,
+    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 1px rgba(255, 255, 255, 0.12)
+  );
+  background: rgba(241, 238, 234, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.audience-toggle__option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  min-width: var(--control-width, 190px);
+  min-height: var(--control-height, 49px);
+  padding: var(--control-pad-y, 6px) var(--control-pad-x, 18px);
+  font: inherit;
+  color: #fff;
+  text-align: left;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.audience-toggle__option + .audience-toggle__option {
+  box-shadow: inset 1px 0 0 var(--control-edge, rgba(255, 255, 255, 0.28));
+}
+
+/* Underlined so both segments read as the choices they are, rather than as a
+   heading over the hint below. */
+.audience-toggle__label {
+  font-size: var(--control-font, 13px);
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.audience-toggle__hint {
+  font-size: var(--control-hint-font, 13.5px);
+  font-weight: 400;
+  color: inherit;
+  opacity: 1;
+}
+
+.audience-toggle__option:hover:not(.is-active) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.audience-toggle__option.is-active {
+  color: #fff;
+  background: var(--control-active, rgba(255, 255, 255, 0.16));
+}
+
+/* The compact placement (the mobile row) shows labels only, centred. */
+.audience-toggle--plain .audience-toggle__option {
+  align-items: center;
+  padding: 8px 20px;
+}
+.audience-toggle--plain .audience-toggle__hint { display: none; }
+
+/* --- mobile-only toggle row (sits under the top bar) --- */
+.site-header__toggle-row {
+  display: none;
+  justify-content: center;
+  padding: 80px 24px 0;
+}
+.site-header__toggle-row.is-hidden { display: none; }
+.site-header__toggle-row .audience-toggle__option {
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+/* --- hamburger (mobile only) --- */
+.site-header__mobile-actions {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+/* WCAG 2.1 AA: keyboard operability needs a visible focus state. */
+.site-header :is(a, button):focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.site-header__burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 10px 9px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.site-header__burger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__burger-line {
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  }
+}
+/* Open: the outer lines cross and the middle one goes. */
+.site-header__burger.is-open .site-header__burger-line:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.site-header__burger.is-open .site-header__burger-line:nth-child(2) { opacity: 0; }
+.site-header__burger.is-open .site-header__burger-line:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* --- mobile menu overlay --- */
+.site-header__mobile {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--brand);
+  padding: clamp(78px, 11vh, 96px) 28px clamp(24px, 4vh, 48px);
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.32s ease,
+    transform 0.32s var(--ease),
+    visibility 0.32s,
+    background-color var(--swap) var(--ease);
+}
+.site-header__mobile.is-open { opacity: 1; visibility: visible; transform: none; }
+
+.site-header__mobile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2.6vh, 26px);
+}
+.site-header__mobile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, 2vh, 18px);
+  font-size: clamp(16px, 3vh, 26px);
+  line-height: 1.15;
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+}
+/* Every label here is already white, so the current page is marked with an
+   underline instead of a colour change. */
+.site-header__mobile-link.is-current {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 6px;
+}
+.site-header__mobile-cta { margin-top: clamp(2px, 0.6vh, 6px); }
+
+/* Staggered reveal of the menu items when the panel opens. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__mobile-list li {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s var(--ease);
+  }
+  .site-header__mobile.is-open .site-header__mobile-list li { opacity: 1; transform: none; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(1) { transition-delay: 0.10s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(2) { transition-delay: 0.15s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(3) { transition-delay: 0.20s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(4) { transition-delay: 0.25s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(5) { transition-delay: 0.30s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(6) { transition-delay: 0.35s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(7) { transition-delay: 0.40s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(8) { transition-delay: 0.45s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(9) { transition-delay: 0.50s; }
+  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(10) { transition-delay: 0.55s; }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 260ms var(--ease), color 260ms var(--ease), border-color 260ms var(--ease), transform 260ms var(--ease);
+}
+.btn--accent { background: var(--accent); color: var(--brand-deep); }
+.btn--accent:hover { transform: translateY(-2px); }
+.btn--ghost { border: 1px solid rgba(255, 255, 255, 0.4); color: #fff; }
+.btn--ghost:hover { background: rgba(255, 255, 255, 0.1); }
+.btn--dark { background: var(--brand); color: #fff; }
+.btn--dark:hover { transform: translateY(-2px); background: var(--brand-lift); }
+
+/* ---- Hero ---------------------------------------------------------------- */
+.hero { position: relative; background: var(--brand); color: #fff; transition: var(--fade); }
+.hero__media { position: absolute; inset: 0; }
+.hero__media img { width: 100%; height: 100%; object-fit: cover; }
+/* Two washes: a brand-tinted one so the photo belongs to the active segment,
+   and a plain vertical scrim so the headline holds contrast wherever the crop
+   lands. */
+.hero__tint {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.84) 100%),
+    linear-gradient(90deg, var(--brand) 0%, rgba(0,0,0,0) 72%);
+  opacity: 0.94;
+  transition: background var(--swap) var(--ease);
+}
+.hero__inner { position: relative; padding: clamp(90px, 12vw, 150px) 0 0; }
+.hero__col { max-width: 780px; }
+.hero__title { font-size: var(--gp-page-title); letter-spacing: -0.035em; }
+.hero__lede { margin-top: 22px; max-width: 620px; font-size: clamp(17px, 1.5vw, 19px); color: rgba(255, 255, 255, 0.82); }
+.hero__actions { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* Stat rail — sits half over the hero, half over the band below it. */
+.rail {
+  position: relative;
+  margin-top: clamp(56px, 8vw, 96px);
+  transform: translateY(clamp(28px, 4vw, 46px));
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  transition: var(--fade);
+}
+.rail__cell { padding: 26px 28px; border-left: 1px solid var(--line); transition: var(--fade); }
+.rail__cell:first-child { border-left: 0; }
+.rail__num { font-size: 34px; font-weight: 600; letter-spacing: -0.03em; color: var(--brand); transition: var(--fade); }
+.rail__num em { font-style: normal; color: var(--accent-warm); transition: var(--fade); }
+.rail__label { margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--muted); transition: var(--fade); }
+
+/* ---- Generic bands ------------------------------------------------------- */
+.band { padding: clamp(76px, 9vw, 118px) 0; transition: var(--fade); }
+.band--paper { background: var(--paper); }
+.band--paper-alt { background: var(--paper-alt); }
+.band--brand { background: var(--brand); color: #fff; }
+.band--alt { background: var(--brand-alt); color: #fff; }
+.band--hero-tail { padding-top: clamp(92px, 10vw, 128px); }
+
+.band__head { max-width: 720px; margin-bottom: clamp(38px, 5vw, 60px); }
+.band__head p.lede { margin-top: 18px; }
+.band--brand .lede, .band--alt .lede { color: rgba(255, 255, 255, 0.74); }
+
+/* ---- Spotlight (split) --------------------------------------------------- */
+.split { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+.split__media { position: relative; }
+.split__media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 4px; }
+/* A brand-coloured corner block, so the photo picks up the segment colour. */
+.split__media::after {
+  content: "";
+  position: absolute;
+  left: -18px; bottom: -18px;
+  width: 42%; height: 46%;
+  border-left: 3px solid var(--accent);
+  border-bottom: 3px solid var(--accent);
+  transition: var(--fade);
+  pointer-events: none;
+}
+.split__body h2 { font-size: var(--gp-section-title); }
+.split__body p { margin-top: 20px; color: var(--muted); transition: var(--fade); }
+.band--brand .split__body p, .band--alt .split__body p { color: rgba(255, 255, 255, 0.76); }
+.split__list { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.split__list li { position: relative; padding-left: 26px; font-size: 15px; }
+.split__list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 9px;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: var(--fade);
+}
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--accent-warm);
+  transition: color var(--swap) var(--ease), gap 220ms var(--ease);
+}
+.link-arrow:hover { gap: 15px; }
+.band--brand .link-arrow, .band--alt .link-arrow { color: var(--accent); }
+
+/* ---- Capability cards ---------------------------------------------------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-block: 1px solid var(--line);
+  transition: var(--fade);
+}
+.card { background: var(--paper); padding: 34px 30px 40px; transition: var(--fade); }
+.card:hover { background: var(--paper-deep); }
+.card__no { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: var(--accent-warm); transition: var(--fade); }
+.card__title { margin-top: 18px; font-size: 21px; }
+.card__body { margin-top: 14px; font-size: 15px; color: var(--muted); transition: var(--fade); }
+
+/* ---- Offerings: the Services / Industries / Experts row on the FTI page --- */
+.offers { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 26px); }
+.offer {
+  position: relative;
+  display: block;
+  min-height: 340px;
+  padding: 32px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-decoration: none;
+  color: #fff;
+  isolation: isolate;
+}
+.offer img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 700ms var(--ease); }
+.offer::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.58) 62%, rgba(0,0,0,0.86) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0) 40%, var(--brand) 100%);
+  transition: background var(--swap) var(--ease);
+}
+.offer:hover img { transform: scale(1.05); }
+.offer__label { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); transition: var(--fade); }
+.offer__title { position: absolute; left: 32px; right: 32px; bottom: 62px; font-size: 26px; }
+.offer__more { position: absolute; left: 32px; bottom: 30px; font-size: 14px; font-weight: 600; display: inline-flex; gap: 8px; align-items: center; transition: gap 220ms var(--ease); }
+.offer:hover .offer__more { gap: 14px; }
+
+/* ---- Tender portals ------------------------------------------------------ */
+.portals { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 24px); }
+.portal {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
+}
+.portal:hover { background: rgba(255, 255, 255, 0.09); border-color: var(--accent); }
+.portal__sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); transition: var(--fade); }
+.portal__name { font-size: 20px; }
+.portal__links { margin-top: auto; padding-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  text-decoration: none;
+  transition: background-color 240ms var(--ease), color 240ms var(--ease), border-color 240ms var(--ease);
+}
+.chip:hover { background: var(--accent); border-color: var(--accent); color: var(--brand-deep); }
+
+/* ---- Insights ------------------------------------------------------------ */
+.insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(18px, 2.4vw, 30px); }
+.insight {
+  grid-column: span 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0 0;
+  border-top: 2px solid var(--brand);
+  text-decoration: none;
+  transition: var(--fade);
+}
+.insight--lead { grid-column: span 2; grid-row: span 2; }
+.insight--lead .insight__title { font-size: clamp(24px, 2.6vw, 32px); }
+.insight--lead .insight__media { display: block; }
+.insight__media { display: none; margin-bottom: 24px; }
+.insight__media img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; }
+.insight__topic { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-warm); transition: var(--fade); }
+.insight__title { margin-top: 12px; font-size: 19px; line-height: 1.25; transition: color 240ms var(--ease); }
+.insight__excerpt { margin-top: 12px; font-size: 15px; color: var(--muted); transition: var(--fade); }
+.insight__date { margin-top: auto; padding-top: 20px; font-size: 13px; color: var(--muted); opacity: 0.7; transition: var(--fade); }
+.insight:hover .insight__title { color: var(--brand-lift); }
+
+/* ---- Careers ------------------------------------------------------------- */
+.roles { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(16px, 2vw, 24px); }
+.role { padding: 26px; border-radius: 4px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); }
+.role h3 { font-size: 19px; }
+.role p { margin-top: 12px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+
+/* ---- Contact + subscribe ------------------------------------------------- */
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 60px); align-items: start; }
+.office { background: var(--paper); border-radius: 4px; padding: 34px; border-top: 3px solid var(--accent); transition: var(--fade); }
+.office h3 { font-size: 22px; }
+.office address { margin-top: 16px; font-style: normal; font-size: 15px; color: var(--muted); line-height: 1.7; transition: var(--fade); }
+.office__rows { margin-top: 22px; display: grid; gap: 10px; font-size: 15px; }
+.office__rows a { text-decoration: none; font-weight: 500; }
+.office__rows a:hover { color: var(--accent-warm); }
+
+.subscribe h3 { font-size: var(--gp-section-title); }
+.subscribe p { margin-top: 16px; color: var(--muted); transition: var(--fade); }
+.subscribe form { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; }
+.subscribe input {
+  flex: 1 1 260px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  transition: var(--fade);
+}
+.subscribe input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.subscribe small { display: block; margin-top: 14px; font-size: 13px; color: var(--muted); opacity: 0.8; }
+
+/* ---- Footer -------------------------------------------------------------- */
+.footer { background: var(--brand-deep); color: rgba(255, 255, 255, 0.72); padding: clamp(56px, 7vw, 84px) 0 0; transition: var(--fade); }
+.footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: clamp(24px, 3vw, 48px); }
+.footer h4 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; transition: var(--fade); }
+.footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 14px; }
+.footer a { text-decoration: none; }
+.footer a:hover { color: #fff; }
+.footer__blurb { font-size: 14px; max-width: 320px; margin-top: 18px; }
+.socials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.socials a {
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 12px; font-weight: 600;
+  transition: background-color 240ms var(--ease), color 240ms var(--ease), border-color 240ms var(--ease);
+}
+.socials a:hover { background: var(--accent); border-color: var(--accent); color: var(--brand-deep); }
+.footer__base {
+  margin-top: clamp(44px, 6vw, 66px);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 22px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+/* The header steps are Header.css's own: the gutters and the shared control
+   metrics come down together, then at 860 the nav row is replaced by the
+   hamburger and the toggle moves to a row of its own below the bar. The page
+   sections keep their own breakpoints alongside. */
+@media (max-width: 1440px) {
+  .site-header__inner,
+  .site-header__nav-list { padding-left: 24px; padding-right: 24px; }
+  .site-header__nav-link { padding: 11px 16px; }
+}
+
+@media (max-width: 1120px) {
+  .cards, .roles { grid-template-columns: repeat(2, 1fr); }
+  .rail { grid-template-columns: repeat(2, 1fr); }
+  .rail__cell:nth-child(3) { border-left: 0; }
+  .rail__cell:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .insight--lead { grid-column: span 3; grid-row: auto; }
+}
+
+@media (max-width: 1105px) {
+  .site-header {
+    --control-pad-x: 14px;
+    --control-font: 12.5px;
+    --control-hint-font: 12.5px;
+    /* Steps down with the type, so three equal cells still fit the bar here. */
+    --control-width: 172px;
+  }
+  .site-header__inner,
+  .site-header__nav-list { padding-left: 18px; padding-right: 18px; }
+  .site-header__nav-link { padding: 10px 13px; font-size: 12.5px; }
+  /* Type only — the height is the brand height either way, so the brand stays
+     aligned with the toggle. */
+  .site-header__wordmark { font-size: 20px; }
+}
+
+@media (max-width: 860px) {
+  /* Mobile only: the audience toggle sits in its own row below the bar, painted
+     as an overlay. Once scrolled it drops away, so the pinned bar stays a
+     single slim row rather than leaving pills floating over the page. */
+  .site-header.is-stuck .site-header__toggle-row { display: none; }
+
+  .site-header__inner {
+    position: relative;
+    z-index: 100;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  .site-header__nav,
+  .site-header__actions { display: none; }
+
+  /* The nav and CTA are gone here, so there is room for the full wordmark on
+     one line. Laid out as a row rather than `inline`: the two words are
+     separate spans, and inline ran them together as one. */
+  .site-header__wordmark {
+    flex-direction: row;
+    gap: 0.34em;
+    font-size: 13.5px;
+    line-height: 1.12;
+  }
+  /* The toggle it was sized against has moved out of the bar, so the mark goes
+     back to the small whole-number pair: 30 x 26. */
+  .site-header__logo { --logo-w: 30px; --logo-h: 26px; }
+
+  .site-header__mobile-actions { display: flex; }
+  .site-header__burger { display: flex; }
+
+  .site-header__toggle-row {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    z-index: 95;
+  }
+  /* Anchored below the bar rather than to the viewport, so a taller bar cannot
+     overlap the menu. */
+  .site-header__mobile {
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 0; bottom: auto; left: 0;
+    height: 100vh;
+    padding: 28px 28px 48px;
+  }
+
+  /* The toggle row is painted over the page, so the hero opens below it —
+     the same clearance --mobile-toggle-space gives every page on the real site. */
+  .hero__inner { padding-top: 150px; }
+
+  .split, .contact { grid-template-columns: 1fr; }
+  .offers, .portals, .insights { grid-template-columns: 1fr; }
+  .insight--lead { grid-column: span 1; }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+  .cards, .roles, .rail { grid-template-columns: 1fr; }
+  .rail__cell { border-left: 0; border-top: 1px solid var(--line); }
+  .rail__cell:first-child { border-top: 0; }
+  .footer__grid { grid-template-columns: 1fr; }
+  :root { --gp-page-title: clamp(38px, 11vw, 52px); }
+}
+
+/* At 320px the brand is wide enough to push the hamburger off the right edge:
+   the bar is a space-between row and the brand carries `white-space: nowrap`,
+   so it refuses to give ground. */
+@media (max-width: 380px) {
+  .site-header__inner { gap: 12px; padding-left: 14px; padding-right: 14px; }
+  .site-header__brand { min-width: 0; gap: 6px; }
+  .site-header__logo { --logo-w: 23px; --logo-h: 20px; }
+  .site-header__wordmark { font-size: 11px; letter-spacing: 0.05em; }
+  .site-header__toggle-row { padding-left: 14px; padding-right: 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====================== Header ======================
+     Markup mirrors fe/src/components/layout/Header.jsx: the sticky chrome
+     wrapper, the top bar (brand + AudienceToggle + CTA), the nav row, the
+     mobile-only toggle row, and the mobile menu overlay. Same eight links, in
+     the same order, and the toggle carries the same labels and hints. -->
+<div class="chrome">
+<header class="site-header" data-stuck="false">
+  <div class="site-header__inner">
+    <!-- aria-label keeps the accessible name when the wordmark is hidden to
+         save width at the narrow widths. -->
+    <a class="site-header__brand" href="/" aria-label="Government Procurement">
+      <img class="site-header__logo" src="../src/assets/icons/gp-02.svg" alt="" width="1153" height="1000" />
+      <span class="site-header__wordmark">
+        <span>Government</span>
+        <span>Procurement</span>
+      </span>
+    </a>
+
+    <div class="site-header__actions">
+      <!-- Switching segment fades the page out, swaps the palette and the copy
+           while nothing is on screen, then plays every reveal again — the same
+           replay AudienceToggle triggers through useMountReveal/useInView. -->
+      <div class="audience-toggle" role="group" aria-label="Choose your pathway">
+        <button type="button" class="audience-toggle__option is-active" data-audience-value="award" aria-pressed="true">
+          <span class="audience-toggle__label">Award Contracts</span>
+          <span class="audience-toggle__hint">For agencies and officials</span>
+        </button>
+        <button type="button" class="audience-toggle__option" data-audience-value="win" aria-pressed="false">
+          <span class="audience-toggle__label">Win Contracts</span>
+          <span class="audience-toggle__hint">For suppliers and bidders</span>
+        </button>
+      </div>
+
+      <a class="site-header__cta" href="/book-a-consultation" aria-label="Request a Consultation">
+        <span class="site-header__cta-label">Request a Consultation</span>
+      </a>
+    </div>
+
+    <!-- Mobile-only: the hamburger that opens the menu. -->
+    <div class="site-header__mobile-actions">
+      <button
+        type="button"
+        class="site-header__burger"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="site-mobile-menu"
+      >
+        <span class="site-header__burger-line"></span>
+        <span class="site-header__burger-line"></span>
+        <span class="site-header__burger-line"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="site-header__nav" aria-label="Primary">
+    <ul class="site-header__nav-list">
+      <li><a class="site-header__nav-link" href="/capabilities">Capabilities</a></li>
+      <li><a class="site-header__nav-link" href="/our-team">Our Team</a></li>
+      <li><a class="site-header__nav-link" href="/courses">Courses</a></li>
+      <li><a class="site-header__nav-link" href="/insights">Insights</a></li>
+      <li><a class="site-header__nav-link" href="/q-and-a">Q&amp;A</a></li>
+      <li><a class="site-header__nav-link" href="/aus-list">Tender Websites</a></li>
+      <li><a class="site-header__nav-link" href="/careers">Careers</a></li>
+      <li><a class="site-header__nav-link" href="/jurisdictional-links">Jurisdictional Links</a></li>
+    </ul>
+  </nav>
+
+  <!-- The toggle sits in the top bar on desktop; on mobile the bar only has
+       room for the logo and hamburger, so it moves to its own row directly
+       beneath. -->
+  <div class="site-header__toggle-row">
+    <div class="audience-toggle audience-toggle--plain" role="group" aria-label="Choose your pathway">
+      <button type="button" class="audience-toggle__option is-active" data-audience-value="award" aria-pressed="true">
+        <span class="audience-toggle__label">Award Contracts</span>
+      </button>
+      <button type="button" class="audience-toggle__option" data-audience-value="win" aria-pressed="false">
+        <span class="audience-toggle__label">Win Contracts</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="site-mobile-menu" class="site-header__mobile">
+    <nav class="site-header__mobile-nav" aria-label="Mobile">
+      <ul class="site-header__mobile-list">
+        <li><a class="site-header__mobile-link" href="/capabilities">Capabilities</a></li>
+        <li><a class="site-header__mobile-link" href="/our-team">Our Team</a></li>
+        <li><a class="site-header__mobile-link" href="/courses">Courses</a></li>
+        <li><a class="site-header__mobile-link" href="/insights">Insights</a></li>
+        <li><a class="site-header__mobile-link" href="/q-and-a">Q&amp;A</a></li>
+        <li><a class="site-header__mobile-link" href="/aus-list">Tender Websites</a></li>
+        <li><a class="site-header__mobile-link" href="/careers">Careers</a></li>
+        <li><a class="site-header__mobile-link" href="/jurisdictional-links">Jurisdictional Links</a></li>
+        <li><a class="site-header__mobile-link site-header__mobile-cta" href="/book-a-consultation">Request a Consultation</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+</div>
+
+<main>
+
+<!-- ====================== Hero ====================== -->
+<section class="hero">
+  <div class="hero__media">
+    <img src="../src/assets/images/MainPictureHomepage.png" alt="" />
+    <div class="hero__tint"></div>
+  </div>
+
+  <div class="shell hero__inner">
+    <div class="hero__col reveal">
+      <p class="eyebrow">
+        <span class="seg seg--award">Award Government Contracts</span>
+        <span class="seg seg--win">Win Government Contracts</span>
+      </p>
+      <h1 class="hero__title">Procure with Confidence</h1>
+
+      <p class="hero__lede seg seg--award">
+        Supporting government agencies and public sector organisations with end-to-end
+        procurement advisory, ensuring that contracts are awarded fairly, efficiently,
+        and in line with best practice.
+      </p>
+      <p class="hero__lede seg seg--win">
+        We help private sector organisations and suppliers strengthen their bids and win
+        more contracts. Our end-to-end advisory services ensure your proposals are
+        competitive, compliant, and compelling.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--accent" href="/book-a-consultation">Request a Consultation</a>
+        <a class="btn btn--ghost" href="/capabilities">Explore our capabilities</a>
+      </div>
+    </div>
+
+    <!-- Stat rail, straddling the hero and the band under it. -->
+    <div class="rail reveal" data-delay="2">
+      <div class="rail__cell">
+        <div class="rail__num">20<em>+</em></div>
+        <p class="rail__label">Years transforming procurement through platforms, training and consulting</p>
+      </div>
+      <div class="rail__cell">
+        <div class="rail__num">4</div>
+        <p class="rail__label">Capability pillars, from sourcing strategy through to evaluation</p>
+      </div>
+      <div class="rail__cell">
+        <div class="rail__num">2</div>
+        <p class="rail__label">Sides of the table — our advisers have written bids and scored them</p>
+      </div>
+      <div class="rail__cell">
+        <div class="rail__num">1</div>
+        <p class="rail__label">Directory of federal, state and territory tender portals</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Spotlight ====================== -->
+<section class="band band--paper band--hero-tail">
+  <div class="shell">
+    <div class="split">
+      <div class="split__media reveal">
+        <img src="../src/assets/images/EnhanceExpImage.png" alt="Advisory team collaborating around a table" />
+      </div>
+
+      <div class="split__body reveal" data-delay="1">
+        <p class="eyebrow">Advisory Services</p>
+        <h2>Your Trusted Partner</h2>
+
+        <p class="seg seg--award">
+          We help public sector teams get government procurement right, from shaping a
+          sourcing strategy to running fair, defensible tenders that stand up to scrutiny.
+          The result is stronger competition, better value for money, and outcomes that
+          are transparent and easy to justify to stakeholders and auditors alike.
+        </p>
+        <p class="seg seg--win">
+          We help private sector organisations and suppliers strengthen their bids and win
+          more contracts, giving you the edge in a highly contested marketplace. Our
+          advisers have sat on both sides of the table, evaluating bids and writing them —
+          experience that turns into practical guidance you can act on, not theory.
+        </p>
+
+        <ul class="split__list">
+          <li>Strategy Development</li>
+          <li>Tender Design &amp; Documentation</li>
+          <li>Evaluation &amp; Assessment</li>
+          <li>Capacity Building &amp; Training</li>
+        </ul>
+
+        <a class="link-arrow" href="/capabilities">See how we work &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Capabilities ====================== -->
+<section class="band band--paper-alt">
+  <div class="shell band__head reveal">
+    <p class="eyebrow eyebrow--dark">Capabilities</p>
+    <h2 class="section-title">Deliver with impact</h2>
+    <p class="lede">
+      Four pillars that run the length of a procurement — the same discipline whether you
+      are taking a requirement to market or answering one.
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="cards">
+      <article class="card reveal">
+        <p class="card__no">01</p>
+        <h3 class="card__title">Strategy Development</h3>
+        <p class="card__body">
+          We craft comprehensive bid strategies that not only showcase your
+          organisation's unique strengths, but also align seamlessly with buyer expectations.
+        </p>
+      </article>
+
+      <article class="card reveal" data-delay="1">
+        <p class="card__no">02</p>
+        <h3 class="card__title">Tender Design &amp; Documentation</h3>
+        <p class="card__body">
+          Building persuasive proposals, pricing models, and supporting documentation that
+          address requirements clearly and convincingly.
+        </p>
+      </article>
+
+      <article class="card reveal" data-delay="2">
+        <p class="card__no">03</p>
+        <h3 class="card__title">Evaluation &amp; Assessment</h3>
+        <p class="card__body">
+          Structuring responses to meet evaluation criteria and demonstrate measurable
+          value, ensuring your bid stands out.
+        </p>
+      </article>
+
+      <article class="card reveal" data-delay="3">
+        <p class="card__no">04</p>
+        <h3 class="card__title">Capacity Building &amp; Training</h3>
+        <p class="card__body">
+          Courses, artefacts and coaching that leave the capability inside your team, so
+          the next procurement runs better than the last one.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Offerings ====================== -->
+<section class="band band--paper">
+  <div class="shell band__head reveal">
+    <p class="eyebrow eyebrow--dark">Our Offerings</p>
+    <h2 class="section-title">Where to start</h2>
+  </div>
+
+  <div class="shell">
+    <div class="offers">
+      <a class="offer reveal" href="/capabilities">
+        <img src="../src/assets/images/ExpertiseImage.png" alt="" />
+        <span class="offer__label">Capabilities</span>
+        <h3 class="offer__title">End-to-end procurement advisory</h3>
+        <span class="offer__more">Explore &rarr;</span>
+      </a>
+
+      <a class="offer reveal" data-delay="1" href="/courses">
+        <img src="../src/assets/images/HomepageCourse.png" alt="" />
+        <span class="offer__label">Courses &amp; Artefacts</span>
+        <h3 class="offer__title">Unlock your potential</h3>
+        <span class="offer__more">Browse the catalogue &rarr;</span>
+      </a>
+
+      <a class="offer reveal" data-delay="2" href="/our-team">
+        <img src="../src/assets/images/OurexpertiseEnhance.png" alt="" />
+        <span class="offer__label">Our Team</span>
+        <h3 class="offer__title">Advisers who have sat on both sides</h3>
+        <span class="offer__more">Meet the team &rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Tender portals ====================== -->
+<section class="band band--brand">
+  <div class="shell band__head reveal">
+    <p class="eyebrow">Tender Websites</p>
+    <h2 class="section-title">Every portal, in one place</h2>
+    <p class="lede">
+      Federal, state and territory tender sites, with the registration and open-tender
+      links you actually need — not the homepage you have to dig through.
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="portals">
+      <article class="portal reveal">
+        <p class="portal__sub">Queensland State Government</p>
+        <h3 class="portal__name">QBuild (Construction Only)</h3>
+        <div class="portal__links">
+          <a class="chip" href="https://etender.hpw.qld.gov.au/public/TendersListingCurrent.aspx" target="_blank" rel="noopener">Open tenders</a>
+          <a class="chip" href="https://etender.hpw.qld.gov.au/public/CompanyRegistration.aspx" target="_blank" rel="noopener">Create an account</a>
+        </div>
+      </article>
+
+      <article class="portal reveal" data-delay="1">
+        <p class="portal__sub">Queensland State Government</p>
+        <h3 class="portal__name">QTenders (Non-Construction)</h3>
+        <div class="portal__links">
+          <a class="chip" href="https://qtenders.hpw.qld.gov.au/search?keywords=" target="_blank" rel="noopener">Open tenders</a>
+          <a class="chip" href="https://qtenders.hpw.qld.gov.au/fpp/" target="_blank" rel="noopener">Upcoming</a>
+          <a class="chip" href="https://www.supply.qld.gov.au/" target="_blank" rel="noopener">Create an account</a>
+        </div>
+      </article>
+
+      <article class="portal reveal" data-delay="2">
+        <p class="portal__sub">Tasmanian State Government</p>
+        <h3 class="portal__name">Tasmanian Government Tenders</h3>
+        <div class="portal__links">
+          <a class="chip" href="https://www.tenders.tas.gov.au/OpenForBids/List/Public/ClosingDate" target="_blank" rel="noopener">Open tenders</a>
+          <a class="chip" href="https://www.tenders.tas.gov.au/FutureOpportunity/List/Public/Agency" target="_blank" rel="noopener">Upcoming</a>
+          <a class="chip" href="https://www.tenders.tas.gov.au/Account/register" target="_blank" rel="noopener">Create an account</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="reveal" data-delay="3">
+      <a class="link-arrow" href="/aus-list">See the full list of tender websites &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Insights ====================== -->
+<section class="band band--paper">
+  <div class="shell band__head reveal">
+    <p class="eyebrow eyebrow--dark">Insights</p>
+    <h2 class="section-title">Latest thinking</h2>
+  </div>
+
+  <div class="shell">
+    <div class="insights">
+      <a class="insight insight--lead reveal" href="/insights">
+        <div class="insight__media">
+          <img src="../src/assets/images/ExpertiseImage.png" alt="" />
+        </div>
+        <p class="insight__topic">Strategy</p>
+        <h3 class="insight__title">Writing evaluation criteria that actually discriminate</h3>
+        <p class="insight__excerpt">
+          Criteria that every bidder can satisfy tell a panel nothing. How to write ones
+          that separate strong bids from weak.
+        </p>
+        <p class="insight__date">Insights</p>
+      </a>
+
+      <a class="insight reveal" data-delay="1" href="/insights">
+        <p class="insight__topic">Public Sector</p>
+        <h3 class="insight__title">What a good approach to market looks like</h3>
+        <p class="insight__excerpt">
+          The decisions made before a tender opens shape everything that follows — scope,
+          timing and the questions you ask.
+        </p>
+        <p class="insight__date">Insights</p>
+      </a>
+
+      <a class="insight reveal" data-delay="2" href="/insights">
+        <p class="insight__topic">Compliance</p>
+        <h3 class="insight__title">Running a defensible shortlisting process</h3>
+        <p class="insight__excerpt">
+          Shortlisting is where challenges most often begin. Keeping the reasoning on the
+          record protects the outcome.
+        </p>
+        <p class="insight__date">Insights</p>
+      </a>
+
+      <a class="insight reveal" data-delay="3" href="/insights">
+        <p class="insight__topic">Suppliers</p>
+        <h3 class="insight__title">Reading a tender like an evaluator</h3>
+        <p class="insight__excerpt">
+          Suppliers who understand how bids are scored write differently — and score better.
+        </p>
+        <p class="insight__date">Insights</p>
+      </a>
+
+      <a class="insight reveal" data-delay="4" href="/insights">
+        <p class="insight__topic">Data</p>
+        <h3 class="insight__title">Spend analysis as a starting point</h3>
+        <p class="insight__excerpt">
+          Before changing how you buy, it helps to know what you already spend and with whom.
+        </p>
+        <p class="insight__date">Insights</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Founder quote ====================== -->
+<section class="band band--alt">
+  <div class="shell">
+    <div class="split">
+      <div class="split__body reveal">
+        <p class="eyebrow">Our Team</p>
+        <h2 class="section-title">Advisers who have sat on both sides of the table</h2>
+        <p>
+          Our advisers have sat on both sides of the table, evaluating bids and writing
+          them. That experience shapes practical guidance you can act on, not theory.
+          Whether you are building capability across a procurement function or preparing a
+          single high-stakes tender, we tailor our support to where you are and what you
+          need to achieve.
+        </p>
+        <p style="margin-top: 22px; font-weight: 600; color: #fff;">
+          Mohammed Kheir &middot; <span style="font-weight: 400; opacity: 0.72;">Founder, Government Procurement</span>
+        </p>
+        <a class="link-arrow" href="/our-team">Meet the team &rarr;</a>
+      </div>
+
+      <div class="split__media reveal" data-delay="1">
+        <img src="../src/assets/images/OurexpertiseEnhance.png" alt="" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Careers ====================== -->
+<section class="band band--brand">
+  <div class="shell band__head reveal">
+    <p class="eyebrow">Careers</p>
+    <h2 class="section-title">Build a career in procurement</h2>
+    <p class="lede">
+      From a structured graduate year through to leading engagements — every role works on
+      live procurements from day one.
+    </p>
+  </div>
+
+  <div class="shell">
+    <div class="roles">
+      <article class="role reveal">
+        <h3>Graduate</h3>
+        <p>
+          A structured first year in procurement, working alongside senior advisers on live
+          engagements across the public and private sectors.
+        </p>
+      </article>
+      <article class="role reveal" data-delay="1">
+        <h3>Analyst</h3>
+        <p>
+          Market research, spend and data analysis, drafting tender documentation, and
+          helping evaluation panels reach defensible decisions.
+        </p>
+      </article>
+      <article class="role reveal" data-delay="2">
+        <h3>Consultant</h3>
+        <p>
+          Run end-to-end procurement processes with clients, from sourcing strategy through
+          approach to market and award.
+        </p>
+      </article>
+      <article class="role reveal" data-delay="3">
+        <h3>Senior Consultant</h3>
+        <p>
+          Lead engagements and client relationships, advise on complex procurements, and
+          mentor the team working with you.
+        </p>
+      </article>
+    </div>
+
+    <div class="reveal" data-delay="4">
+      <a class="link-arrow" href="/careers">See open roles &rarr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== Contact + subscribe ====================== -->
+<section class="band band--paper-alt">
+  <div class="shell">
+    <div class="contact">
+      <div class="office reveal">
+        <p class="eyebrow eyebrow--dark">Head Office</p>
+        <h3>Bankstown, New South Wales</h3>
+        <address>
+          Room 830 of the Regus Flinders Centre<br />
+          25 Restwell Street<br />
+          BANKSTOWN, NSW, AUSTRALIA
+        </address>
+        <div class="office__rows">
+          <p><a href="tel:+61478669922">+61 478 669 922</a></p>
+          <p><a href="mailto:mkheir@govprocurement.com.au">mkheir@govprocurement.com.au</a></p>
+        </div>
+        <a class="link-arrow" href="/book-a-consultation">Request a Consultation &rarr;</a>
+      </div>
+
+      <div class="subscribe reveal" data-delay="1">
+        <h3>Stay across procurement</h3>
+        <p>
+          Guidance on running and answering tenders, straight from the engagements we are
+          working on. No more than one email a month.
+        </p>
+        <form onsubmit="return false;">
+          <input type="email" placeholder="you@organisation.gov.au" aria-label="Email address" />
+          <button class="btn btn--dark" type="submit">Subscribe</button>
+        </form>
+        <small>This is a design concept — the form is not wired to the subscribe API.</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ====================== Footer ====================== -->
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__grid">
+      <div>
+        <a class="brand" href="/" aria-label="Government Procurement">
+          <img src="../src/assets/icons/GPLogo.svg" alt="" />
+        </a>
+        <p class="footer__blurb">
+          Government Procurement helps public sector teams award contracts fairly, and
+          helps suppliers win them.
+        </p>
+        <div class="socials">
+          <a href="https://www.linkedin.com/company/governmentprocurement/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a href="https://www.instagram.com/govprocurement/?hl=en" target="_blank" rel="noopener" aria-label="Instagram">ig</a>
+          <a href="https://www.facebook.com/profile.php?id=61585039209265" target="_blank" rel="noopener" aria-label="Facebook">fb</a>
+          <a href="https://www.youtube.com/@GovernmentProcurement" target="_blank" rel="noopener" aria-label="YouTube">yt</a>
+          <a href="https://www.tiktok.com/@govprocurement" target="_blank" rel="noopener" aria-label="TikTok">tt</a>
+          <a href="https://www.threads.com/@govprocurement" target="_blank" rel="noopener" aria-label="Threads">th</a>
+        </div>
+      </div>
+
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="/capabilities">Capabilities</a></li>
+          <li><a href="/our-team">Our Team</a></li>
+          <li><a href="/insights">Insights</a></li>
+          <li><a href="/q-and-a">Q&amp;A</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/courses">Courses &amp; Artefacts</a></li>
+          <li><a href="/aus-list">Tender Websites</a></li>
+          <li><a href="/jurisdictional-links">Jurisdictional Links</a></li>
+          <li><a href="/careers">Careers</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+61478669922">+61 478 669 922</a></li>
+          <li><a href="mailto:mkheir@govprocurement.com.au">mkheir@govprocurement.com.au</a></li>
+          <li><a href="https://wa.me/61478669922" target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href="https://t.me/+61478669922" target="_blank" rel="noopener">Telegram</a></li>
+          <li><a href="https://m.me/61585039209265" target="_blank" rel="noopener">FB Messenger</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__base">
+      <span>&copy; Government Procurement. All rights reserved.</span>
+      <span>Room 830, Regus Flinders Centre, 25 Restwell Street, Bankstown NSW</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var header = document.querySelector('.site-header');
+  var burger = document.querySelector('.site-header__burger');
+  var menu = document.getElementById('site-mobile-menu');
+  var toggleRow = document.querySelector('.site-header__toggle-row');
+  // Both toggles — the one in the bar and the plain one in the mobile row — are
+  // driven together, so whichever the visitor uses, the other stays in step.
+  var options = Array.prototype.slice.call(document.querySelectorAll('.audience-toggle__option'));
+  var blocks = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  var SWAP = 380; // keep in step with --swap in the stylesheet
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- reveal on scroll --------------------------------------------------
+     Once a block is in, it stays in. The only thing that takes it back out is a
+     segment change, which replays the whole page. */
+  var observer = 'IntersectionObserver' in window
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0.05 })
+    : null;
+
+  function observeAll() {
+    if (!observer) {
+      blocks.forEach(function (b) { b.classList.add('is-in'); });
+      return;
+    }
+    blocks.forEach(function (b) { observer.observe(b); });
+  }
+
+  observeAll();
+
+  /* ---- segment toggle ----------------------------------------------------
+     Three beats: fade the revealed blocks out, swap the audience while nothing
+     is on screen (so the palette change and the copy change both happen under
+     the fade), then let the observer play the reveals again. Without the middle
+     beat the colours would snap mid-fade and the copy would visibly rewrite
+     itself. Scrolling back to the top first is what AudienceToggle.pick() does,
+     and for the same reason: otherwise the replay happens above the fold. */
+  function syncOptions(audience) {
+    options.forEach(function (o) {
+      var active = o.dataset.audienceValue === audience;
+      o.classList.toggle('is-active', active);
+      o.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  var swapping = false;
+  function setAudience(next) {
+    if (next === root.dataset.audience || swapping) return;
+
+    if (reduced) {
+      root.dataset.audience = next;
+      syncOptions(next);
+      return;
+    }
+
+    swapping = true;
+    root.setAttribute('data-swapping', '');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
+    window.setTimeout(function () {
+      root.dataset.audience = next;
+      syncOptions(next);
+
+      // Take every block back to its pre-reveal state and re-observe, so the
+      // ones already on screen animate in rather than simply reappearing.
+      blocks.forEach(function (b) { b.classList.remove('is-in'); });
+      void root.offsetHeight; // flush the class removal before the fade-out lifts
+
+      root.removeAttribute('data-swapping');
+      observeAll();
+      swapping = false;
+    }, SWAP);
+  }
+
+  options.forEach(function (o) {
+    o.addEventListener('click', function () {
+      closeMenu();
+      setAudience(o.dataset.audienceValue);
+    });
+  });
+
+  /* ---- mobile menu -------------------------------------------------------
+     Background scroll is locked while it is open, Escape closes it, and it
+     closes on its own once the viewport grows past the mobile breakpoint so the
+     lock is never left on with the desktop nav showing. */
+  var menuOpen = false;
+  var prevOverflow = '';
+
+  function setMenu(open) {
+    if (open === menuOpen) return;
+    menuOpen = open;
+
+    menu.classList.toggle('is-open', open);
+    burger.classList.toggle('is-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    // Belongs to the bar, not the menu — so it goes away while the menu is
+    // open, letting the overlay sit flush under the top bar.
+    if (toggleRow) toggleRow.classList.toggle('is-hidden', open);
+
+    if (open) {
+      prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = prevOverflow;
+    }
+  }
+
+  function closeMenu() { setMenu(false); }
+
+  burger.addEventListener('click', function () { setMenu(!menuOpen); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  Array.prototype.slice.call(document.querySelectorAll('.site-header__mobile-link'))
+    .forEach(function (a) { a.addEventListener('click', closeMenu); });
+
+  var wide = window.matchMedia('(min-width: 861px)');
+  var onWide = function (e) { if (e.matches) closeMenu(); };
+  if (wide.addEventListener) wide.addEventListener('change', onWide);
+  else wide.addListener(onWide);
+
+  /* ---- stuck state -------------------------------------------------------
+     Only the threshold crossing touches the class, so this does no work on the
+     rest of the scroll. */
+  var stuck = false;
+  function onScroll() {
+    var next = window.scrollY > 8;
+    if (next === stuck) return;
+    stuck = next;
+    header.classList.toggle('is-stuck', stuck);
+  }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---- deep link ---------------------------------------------------------
+     ?audience=win|award, matching the shipped site. */
+  var param = new URLSearchParams(window.location.search).get('audience');
+  if (param === 'win' || param === 'award') root.dataset.audience = param;
+  syncOptions(root.dataset.audience);
+})();
+</script>
+
+</body>
+</html>
