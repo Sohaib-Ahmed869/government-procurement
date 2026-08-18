@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Government Procurement, LMS Data Model</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+:root{
+  --navy:#183860; --ink:#14181d; --paper:#faf8f1; --sheet:#ffffff;
+  --gold:#a87c3d; --gold-soft:#c9a463; --green:#1f6b4a; --green-soft:#e7f1ec;
+  --line:#e4e0d6; --line2:#ecebe4; --grey:#5a626c; --grey2:#8a8f98;
+  --tag:#f3ede1; --shadow:0 1px 2px rgba(20,24,29,.04),0 8px 30px rgba(20,24,29,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',system-ui,Arial,sans-serif;background:var(--paper);
+  color:var(--ink);line-height:1.62;font-weight:400;-webkit-font-smoothing:antialiased;
+  font-size:15.5px}
+.sheet{background:var(--sheet);margin:30px auto 60px;max-width:1040px;
+  box-shadow:var(--shadow);border:1px solid var(--line);position:relative}
+.sheet:before{content:"";position:absolute;top:0;left:0;width:48px;height:5px;background:var(--ink)}
+.pad{padding:56px 72px}
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding:20px 72px;border-bottom:1px solid var(--line2)}
+.brand{font-weight:800;color:var(--navy);letter-spacing:-.3px}
+.meta{text-align:right;font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--grey2);font-weight:600}
+.meta b{color:var(--navy);font-weight:700}
+.kicker{color:var(--gold);font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  font-size:11px;margin-bottom:20px}
+h1.title{font-size:48px;line-height:1.05;font-weight:300;color:var(--ink);
+  letter-spacing:-1px;margin-bottom:20px}
+h1.title b{font-weight:800}
+.lead{font-size:17px;color:var(--grey);max-width:760px;line-height:1.55}
+.heroline{height:1px;background:var(--line);margin:32px 0}
+.factrow{display:flex;gap:56px;flex-wrap:wrap}
+.fact .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--grey2);
+  font-weight:700;margin-bottom:7px}
+.fact .v{font-size:15px;color:var(--navy);font-weight:600}
+section{margin-top:50px}
+.sec-h{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+.sec-n{color:var(--gold);font-weight:700;font-size:13px;letter-spacing:1px;min-width:30px}
+h2{font-size:26px;font-weight:300;letter-spacing:-.4px;color:var(--ink)}
+h2 b{font-weight:800}
+.sub{color:var(--grey);font-size:15px;margin:6px 0 22px;max-width:820px}
+h3{font-size:15px;font-weight:700;color:var(--navy);margin:30px 0 8px;
+  display:flex;align-items:center;gap:10px}
+h3 .pill{background:var(--tag);color:#7a5a1f;border-radius:4px;padding:2px 9px;
+  font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.erd{width:100%;height:auto;display:block;margin:8px 0 6px}
+.legend{display:flex;gap:26px;flex-wrap:wrap;margin-top:6px;font-size:11.5px;
+  color:var(--grey);letter-spacing:.3px;align-items:center}
+.legend i{display:inline-block;width:26px;height:0;border-top:2px solid var(--navy);
+  margin-right:8px;vertical-align:middle}
+.legend i.dash{border-top-style:dashed;border-color:var(--gold)}
+.legend i.key{border:none;width:11px;height:11px;border-radius:2px;background:var(--gold);
+  vertical-align:-1px}
+table.tbl{width:100%;border-collapse:collapse;margin:10px 0 8px;font-size:12.5px}
+table.tbl th{text-align:left;font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--grey2);font-weight:700;padding:9px 12px;border-bottom:2px solid var(--line);
+  background:#fbfaf6;white-space:nowrap}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--line2);vertical-align:top;
+  color:#2c333b}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl td b{color:var(--navy)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;
+  color:#7a5a1f;background:#fbf7ee;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.callout{border-left:3px solid var(--gold);background:#fbf7ee;padding:15px 22px;
+  border-radius:0 8px 8px 0;margin:22px 0}
+.callout.n{border-color:var(--navy);background:#eef2f7}
+.callout .h{font-weight:700;color:var(--navy);font-size:12.5px;letter-spacing:.4px;
+  text-transform:uppercase;margin-bottom:5px}
+.callout p{font-size:13.5px;margin:0;color:#39414a}
+.scroll{overflow-x:auto}
+.foot{border-top:1px solid var(--line);margin-top:52px;padding-top:20px;
+  font-size:11px;color:var(--grey2);letter-spacing:.6px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="topbar">
+    <div class="brand">Government&nbsp;Procurement</div>
+    <div class="meta">CAL-GP-2026-ERD-006<br><b>11 August 2026</b></div>
+  </div>
+
+  <div class="pad">
+
+    <div class="kicker">Phase 2, Data Model</div>
+    <h1 class="title">LMS <b>entity relationship</b>.</h1>
+    <p class="lead">The five collections behind the learning platform, how they join, and a worked example
+    of one learner buying a course, working through it and being issued a certificate.</p>
+
+    <div class="heroline"></div>
+    <div class="factrow">
+      <div class="fact"><div class="l">Database</div><div class="v">MongoDB, Mongoose</div></div>
+      <div class="fact"><div class="l">New collections</div><div class="v">Lesson, Enrollment, Certificate</div></div>
+      <div class="fact"><div class="l">Reused</div><div class="v">User, Course</div></div>
+      <div class="fact"><div class="l">Scope refs</div><div class="v">L1, L3, L4, L6</div></div>
+    </div>
+
+    <!-- ============ 01 DIAGRAM ============ -->
+    <section>
+      <div class="sec-h"><div class="sec-n">01</div><h2>The <b>diagram</b>.</h2></div>
+      <p class="sub">Grey boxes already exist in the backend. Gold-cornered boxes are the three new LMS models.
+      Fields in gold are references to another collection.</p>
+
+      <div class="scroll">
+      <svg class="erd" viewBox="0 0 1000 880" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Entity relationship diagram: User and Course each have many Enrollments; Course has many Lessons; an Enrollment yields one Certificate.">
+        <defs>
+          <style>
+            .bx{fill:#fff;stroke:#d9d4c6;stroke-width:1}
+            .hd{fill:#183860}
+            .hd.new{fill:#a87c3d}
+            .ht{fill:#fff;font:700 12.5px Montserrat,Arial;letter-spacing:1.2px}
+            .hs{fill:#cfd8e4;font:600 9px Montserrat,Arial;letter-spacing:1px}
+            .hs.new{fill:#f0e2c9}
+            .f{fill:#39414a;font:400 11.5px Montserrat,Arial}
+            .f.pk{fill:#14181d;font-weight:700}
+            .f.fk{fill:#a87c3d;font-weight:600}
+            .t{fill:#9aa0a8;font:400 10.5px Montserrat,Arial}
+            .ln{stroke:#183860;stroke-width:1.6;fill:none}
+            .ln.d{stroke:#a87c3d;stroke-dasharray:5 4}
+            .cd{fill:#183860;font:700 11px Montserrat,Arial}
+            .cd.d{fill:#a87c3d}
+            .rel{fill:#8a8f98;font:600 9.5px Montserrat,Arial;letter-spacing:.8px}
+            .sep{stroke:#ecebe4;stroke-width:1}
+          </style>
+        </defs>
+
+        <!-- ---------- USER ---------- -->
+        <g>
+          <rect class="bx" x="40" y="40" width="250" height="147" rx="6"/>
+          <path class="hd" d="M40 46a6 6 0 0 1 6-6h238a6 6 0 0 1 6 6v24H40z"/>
+          <text class="ht" x="56" y="59">USER</text>
+          <text class="hs" x="274" y="59" text-anchor="end">EXISTING</text>
+          <text class="f pk" x="56" y="92">_id</text>            <text class="t" x="274" y="92" text-anchor="end">ObjectId, PK</text>
+          <text class="f"    x="56" y="113">name</text>           <text class="t" x="274" y="113" text-anchor="end">String</text>
+          <text class="f"    x="56" y="134">email</text>          <text class="t" x="274" y="134" text-anchor="end">String, unique</text>
+          <text class="f"    x="56" y="155">role</text>           <text class="t" x="274" y="155" text-anchor="end">enum + student</text>
+          <text class="f"    x="56" y="176">password</text>       <text class="t" x="274" y="176" text-anchor="end">hashed</text>
+        </g>
+
+        <!-- ---------- COURSE ---------- -->
+        <g>
+          <rect class="bx" x="700" y="40" width="250" height="168" rx="6"/>
+          <path class="hd" d="M700 46a6 6 0 0 1 6-6h238a6 6 0 0 1 6 6v24H700z"/>
+          <text class="ht" x="716" y="59">COURSE</text>
+          <text class="hs" x="934" y="59" text-anchor="end">EXISTING</text>
+          <text class="f pk" x="716" y="92">_id</text>            <text class="t" x="934" y="92" text-anchor="end">ObjectId, PK</text>
+          <text class="f"    x="716" y="113">title</text>          <text class="t" x="934" y="113" text-anchor="end">String</text>
+          <text class="f"    x="716" y="134">slug</text>           <text class="t" x="934" y="134" text-anchor="end">String, unique</text>
+          <text class="f"    x="716" y="155">price</text>          <text class="t" x="934" y="155" text-anchor="end">Number, AUD</text>
+          <text class="f"    x="716" y="176">availability</text>   <text class="t" x="934" y="176" text-anchor="end">enum</text>
+          <text class="f"    x="716" y="197">status</text>         <text class="t" x="934" y="197" text-anchor="end">enum</text>
+        </g>
+
+        <!-- ---------- LESSON ---------- -->
+        <g>
+          <rect class="bx" x="700" y="300" width="250" height="210" rx="6"/>
+          <path class="hd new" d="M700 306a6 6 0 0 1 6-6h238a6 6 0 0 1 6 6v24H700z"/>
+          <text class="ht" x="716" y="319">LESSON</text>
+          <text class="hs new" x="934" y="319" text-anchor="end">NEW</text>
+          <text class="f pk" x="716" y="352">_id</text>            <text class="t" x="934" y="352" text-anchor="end">ObjectId, PK</text>
+          <text class="f fk" x="716" y="373">course</text>         <text class="t" x="934" y="373" text-anchor="end">ref Course</text>
+          <text class="f"    x="716" y="394">moduleTitle</text>    <text class="t" x="934" y="394" text-anchor="end">String</text>
+          <text class="f"    x="716" y="415">title</text>          <text class="t" x="934" y="415" text-anchor="end">String</text>
+          <text class="f"    x="716" y="436">type</text>           <text class="t" x="934" y="436" text-anchor="end">video/text/pdf/quiz</text>
+          <text class="f"    x="716" y="457">order</text>          <text class="t" x="934" y="457" text-anchor="end">Number</text>
+          <text class="f"    x="716" y="478">isPreview</text>      <text class="t" x="934" y="478" text-anchor="end">Boolean</text>
+          <text class="f"    x="716" y="499">questions[]</text>    <text class="t" x="934" y="499" text-anchor="end">quiz items</text>
+        </g>
+
+        <!-- ---------- ENROLLMENT ---------- -->
+        <g>
+          <rect class="bx" x="350" y="300" width="290" height="231" rx="6"/>
+          <path class="hd new" d="M350 306a6 6 0 0 1 6-6h278a6 6 0 0 1 6 6v24H350z"/>
+          <text class="ht" x="366" y="319">ENROLLMENT</text>
+          <text class="hs new" x="624" y="319" text-anchor="end">NEW</text>
+          <text class="f pk" x="366" y="352">_id</text>                 <text class="t" x="624" y="352" text-anchor="end">ObjectId, PK</text>
+          <text class="f fk" x="366" y="373">student</text>             <text class="t" x="624" y="373" text-anchor="end">ref User</text>
+          <text class="f fk" x="366" y="394">course</text>              <text class="t" x="624" y="394" text-anchor="end">ref Course</text>
+          <text class="f"    x="366" y="415">status</text>              <text class="t" x="624" y="415" text-anchor="end">active/completed</text>
+          <text class="f"    x="366" y="436">source</text>              <text class="t" x="624" y="436" text-anchor="end">purchase/org/manual</text>
+          <text class="f"    x="366" y="457">payment</text>             <text class="t" x="624" y="457" text-anchor="end">Stripe snapshot</text>
+          <text class="f fk" x="366" y="478">completedLessons[]</text>  <text class="t" x="624" y="478" text-anchor="end">ref Lesson</text>
+          <text class="f"    x="366" y="499">progressPercent</text>     <text class="t" x="624" y="499" text-anchor="end">Number 0-100</text>
+          <text class="f"    x="366" y="520">completedAt</text>         <text class="t" x="624" y="520" text-anchor="end">Date</text>
+        </g>
+
+        <!-- ---------- CERTIFICATE ---------- -->
+        <g>
+          <rect class="bx" x="350" y="620" width="290" height="210" rx="6"/>
+          <path class="hd new" d="M350 626a6 6 0 0 1 6-6h278a6 6 0 0 1 6 6v24H350z"/>
+          <text class="ht" x="366" y="639">CERTIFICATE</text>
+          <text class="hs new" x="624" y="639" text-anchor="end">NEW</text>
+          <text class="f pk" x="366" y="672">_id</text>              <text class="t" x="624" y="672" text-anchor="end">ObjectId, PK</text>
+          <text class="f fk" x="366" y="693">enrollment</text>       <text class="t" x="624" y="693" text-anchor="end">ref, unique</text>
+          <text class="f fk" x="366" y="714">student</text>          <text class="t" x="624" y="714" text-anchor="end">ref User</text>
+          <text class="f fk" x="366" y="735">course</text>           <text class="t" x="624" y="735" text-anchor="end">ref Course</text>
+          <text class="f"    x="366" y="756">code</text>             <text class="t" x="624" y="756" text-anchor="end">public, unique</text>
+          <text class="f"    x="366" y="777">studentName</text>      <text class="t" x="624" y="777" text-anchor="end">snapshot</text>
+          <text class="f"    x="366" y="798">issuedAt</text>         <text class="t" x="624" y="798" text-anchor="end">Date</text>
+          <text class="f"    x="366" y="819">revokedAt</text>        <text class="t" x="624" y="819" text-anchor="end">Date, nullable</text>
+        </g>
+
+        <!-- ---------- RELATIONSHIPS ---------- -->
+
+        <!-- User 1 --- N Enrollment -->
+        <path class="ln" d="M165 187 V400 H350"/>
+        <text class="cd" x="174" y="205">1</text>
+        <text class="cd" x="336" y="393" text-anchor="end">N</text>
+        <text class="rel" x="180" y="392">ENROLS IN</text>
+
+        <!-- Course 1 --- N Enrollment -->
+        <path class="ln" d="M700 124 H670 V345 H640"/>
+        <text class="cd" x="694" y="116" text-anchor="end">1</text>
+        <text class="cd" x="654" y="338" text-anchor="end">N</text>
+        <text class="rel" x="664" y="240" text-anchor="end">SOLD AS</text>
+
+        <!-- Course 1 --- N Lesson -->
+        <path class="ln" d="M825 208 V300"/>
+        <text class="cd" x="834" y="226">1</text>
+        <text class="cd" x="834" y="294">N</text>
+        <text class="rel" x="843" y="262">CONTAINS</text>
+
+        <!-- Enrollment 1 --- 1 Certificate -->
+        <path class="ln" d="M495 531 V620"/>
+        <text class="cd" x="504" y="549">1</text>
+        <text class="cd" x="504" y="614">1</text>
+        <text class="rel" x="513" y="584">EARNS</text>
+
+        <!-- Enrollment N --- N Lesson (progress) -->
+        <path class="ln d" d="M640 470 H700"/>
+        <text class="cd d" x="646" y="462">N</text>
+        <text class="cd d" x="694" y="462" text-anchor="end">N</text>
+        <text class="rel" x="670" y="494" text-anchor="middle">COMPLETED</text>
+      </svg>
+      </div>
+
+      <div class="legend">
+        <span><i></i>Reference, one to many</span>
+        <span><i class="dash"></i>Embedded array of references, progress tracking</span>
+        <span><i class="key"></i>Foreign key field</span>
+      </div>
+
+      <div class="callout">
+        <div class="h">Why Enrollment sits in the middle</div>
+        <p>Everything gated behind a purchase reads from one record. "Can this person watch this video"
+        is a single lookup on <code>{ student, course }</code>, which is also the unique index, so a
+        learner can never end up with two enrolments in the same course.</p>
+      </div>
+    </section>
+
+    <!-- ============ 02 ENTITIES ============ -->
+    <section>
+      <div class="sec-h"><div class="sec-n">02</div><h2>The <b>entities</b>.</h2></div>
+      <p class="sub">Five collections. Two already exist and are reused as-is; three are new for the
+      learning platform.</p>
+
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>Entity</th><th>Status</th><th>What it holds</th><th>Key rule</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>User</b></td><td>Existing</td>
+            <td>One account for a website visitor and a student, single sign-on.</td>
+            <td>New <code>student</code> role, in no privileged group.</td>
+          </tr>
+          <tr>
+            <td><b>Course</b></td><td>Existing</td>
+            <td>The sellable product: title, price, availability, marketing copy.</td>
+            <td>Stays the catalogue record, no learner data on it.</td>
+          </tr>
+          <tr>
+            <td><b>Lesson</b></td><td>New</td>
+            <td>One step of a course: video, text, PDF or quiz, grouped into modules.</td>
+            <td><code>slug</code> unique per course, not globally.</td>
+          </tr>
+          <tr>
+            <td><b>Enrollment</b></td><td>New</td>
+            <td>A learner's access to a course, payment snapshot, progress and quiz scores.</td>
+            <td>One per <code>{ student, course }</code> pair.</td>
+          </tr>
+          <tr>
+            <td><b>Certificate</b></td><td>New</td>
+            <td>The issued, publicly verifiable completion record with its PDF.</td>
+            <td>Immutable once issued, revoked rather than deleted.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- ============ 03 SAMPLE DATA ============ -->
+    <section>
+      <div class="sec-h"><div class="sec-n">03</div><h2>Some <b>data</b>.</h2></div>
+      <p class="sub">One learner, one course, five lessons, straight through to a certificate.
+      Ids are shortened for readability.</p>
+
+      <h3>User <span class="pill">2 rows</span></h3>
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>_id</th><th>name</th><th>email</th><th>role</th></tr></thead>
+        <tbody>
+          <tr><td><code>usr_8f21</code></td><td>Amelia Hart</td><td>a.hart@northbay.com.au</td><td>student</td></tr>
+          <tr><td><code>usr_0c47</code></td><td>David Lang</td><td>d.lang@calcite.io</td><td>editor</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Course <span class="pill">2 rows</span></h3>
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>_id</th><th>title</th><th>slug</th><th>price</th><th>availability</th><th>status</th></tr></thead>
+        <tbody>
+          <tr><td><code>crs_1a90</code></td><td>Winning Government Tenders</td><td>winning-government-tenders</td><td>890</td><td>open</td><td>published</td></tr>
+          <tr><td><code>crs_3d12</code></td><td>Evaluating Bids Fairly</td><td>evaluating-bids-fairly</td><td>640</td><td>coming_soon</td><td>draft</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Lesson <span class="pill">5 rows, all for crs_1a90</span></h3>
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>_id</th><th>moduleTitle</th><th>title</th><th>type</th><th>order</th><th>isPreview</th></tr></thead>
+        <tbody>
+          <tr><td><code>lsn_a1</code></td><td>Getting started</td><td>How government buys</td><td>video</td><td>1</td><td>true</td></tr>
+          <tr><td><code>lsn_a2</code></td><td>Getting started</td><td>Reading a tender pack</td><td>text</td><td>2</td><td>false</td></tr>
+          <tr><td><code>lsn_b1</code></td><td>Writing the bid</td><td>Structuring your response</td><td>video</td><td>1</td><td>false</td></tr>
+          <tr><td><code>lsn_b2</code></td><td>Writing the bid</td><td>Response template pack</td><td>pdf</td><td>2</td><td>false</td></tr>
+          <tr><td><code>lsn_c1</code></td><td>Assessment</td><td>Final knowledge check</td><td>quiz</td><td>1</td><td>false</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Enrollment <span class="pill">2 rows</span></h3>
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>_id</th><th>student</th><th>course</th><th>status</th><th>source</th><th>completedLessons</th><th>progress</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>enr_77e1</code></td><td><code>usr_8f21</code></td><td><code>crs_1a90</code></td>
+            <td>completed</td><td>purchase</td>
+            <td>a1, a2, b1, b2, c1</td><td>100%</td>
+          </tr>
+          <tr>
+            <td><code>enr_77e2</code></td><td><code>usr_8f21</code></td><td><code>crs_3d12</code></td>
+            <td>active</td><td>organisation</td>
+            <td>—</td><td>0%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Certificate <span class="pill">1 row</span></h3>
+      <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>_id</th><th>enrollment</th><th>code</th><th>studentName</th><th>courseTitle</th><th>score</th><th>issuedAt</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>cer_5510</code></td><td><code>enr_77e1</code></td><td><code>GP-2026-A7F3K9</code></td>
+            <td>Amelia Hart</td><td>Winning Government Tenders</td><td>92%</td><td>2026-08-09</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="callout n">
+        <div class="h">Reading the example</div>
+        <p>Amelia bought <b>Winning Government Tenders</b>, worked through all five lessons, passed the
+        final quiz at 92% and was issued certificate <code>GP-2026-A7F3K9</code>. She also holds a seat
+        on a second course through her organisation that she has not started. Her second enrolment has
+        no certificate, because certificates only exist once an enrolment completes.</p>
+      </div>
+    </section>
+
+    <div class="foot">
+      <span>Calcite Technologies, Government Procurement Platform</span>
+      <span>CAL-GP-2026-ERD-006, Rev 11 Aug 2026</span>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

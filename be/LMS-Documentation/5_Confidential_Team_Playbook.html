@@ -1,0 +1,296 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Government Procurement, Team Playbook</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+:root{
+  --navy:#183860; --ink:#14181d; --paper:#faf8f1; --sheet:#ffffff;
+  --gold:#a87c3d; --gold-soft:#c9a463; --green:#1f6b4a; --green-soft:#e7f1ec;
+  --line:#e4e0d6; --line2:#ecebe4; --grey:#5a626c; --grey2:#8a8f98;
+  --tag:#f3ede1; --shadow:0 1px 2px rgba(20,24,29,.04),0 8px 30px rgba(20,24,29,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',system-ui,Arial,sans-serif;background:var(--paper);
+  color:var(--ink);line-height:1.62;font-weight:400;-webkit-font-smoothing:antialiased;
+  font-size:15.5px}
+.progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:99;
+  background:linear-gradient(90deg,var(--green),var(--gold-soft),var(--gold))}
+.wrap{max-width:1040px;margin:0 auto;padding:0 26px}
+.sheet{background:var(--sheet);margin:30px auto 60px;max-width:1040px;
+  box-shadow:var(--shadow);border:1px solid var(--line)}
+.pad{padding:60px 72px}
+/* top bar */
+.topbar{display:flex;justify-content:space-between;align-items:center;
+  padding:20px 72px;border-bottom:1px solid var(--line2)}
+.sheet{position:relative}
+.sheet:before{content:"";position:absolute;top:0;left:0;width:48px;height:5px;background:var(--ink)}
+.brand{display:flex;align-items:center}
+.brandimg{height:40px;width:auto;display:block}
+.meta{text-align:right;font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--grey2);font-weight:600}
+.meta b{color:var(--navy);font-weight:700}
+.badge-conf{display:inline-block;margin-top:6px;background:#fbeceb;color:#8c2f26;
+  border:1px solid #eccbc8;border-radius:3px;padding:3px 9px;font-size:9px;
+  letter-spacing:1.5px;font-weight:700}
+/* hero */
+.kicker{color:var(--gold);font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  font-size:11px;margin-bottom:20px}
+h1.title{font-size:52px;line-height:1.05;font-weight:300;color:var(--ink);
+  letter-spacing:-1px;margin-bottom:22px}
+h1.title b{font-weight:800}
+.lead{font-size:18px;color:var(--grey);font-weight:400;max-width:760px;line-height:1.55}
+.heroline{height:1px;background:var(--line);margin:34px 0}
+.factrow{display:flex;gap:56px;flex-wrap:wrap}
+.fact{}
+.fact .l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--grey2);
+  font-weight:700;margin-bottom:7px}
+.fact .v{font-size:15px;color:var(--navy);font-weight:600}
+/* sections */
+section{margin-top:52px}
+.sec-h{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+.sec-n{color:var(--gold);font-weight:700;font-size:13px;letter-spacing:1px;min-width:30px}
+h2{font-size:27px;font-weight:300;letter-spacing:-.4px;color:var(--ink)}
+h2 b{font-weight:800}
+.sub{color:var(--grey);font-size:15px;margin:6px 0 22px;max-width:820px}
+h3{font-size:16px;font-weight:700;color:var(--navy);margin:26px 0 10px}
+p{margin-bottom:12px;color:#2c333b}
+.rule{height:1px;background:var(--line);margin:30px 0}
+/* tables */
+table.tbl{width:100%;border-collapse:collapse;margin:14px 0 8px;font-size:13.5px}
+table.tbl th{text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--grey2);font-weight:700;padding:10px 14px;border-bottom:2px solid var(--line);
+  background:#fbfaf6}
+table.tbl td{padding:12px 14px;border-bottom:1px solid var(--line2);vertical-align:top;
+  color:#2c333b}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl td b{color:var(--navy)}
+.code{font-weight:700;color:var(--gold);white-space:nowrap}
+/* tags */
+.tag{display:inline-block;background:var(--tag);color:#7a5a1f;border-radius:4px;
+  padding:3px 10px;font-size:11px;font-weight:600;letter-spacing:.3px;margin:2px 4px 2px 0}
+.tag.g{background:var(--green-soft);color:#155c3c}
+.tag.n{background:#eef2f7;color:var(--navy)}
+.tag.r{background:#fbeceb;color:#8c2f26}
+/* cards */
+.grid{display:grid;gap:16px;margin:16px 0}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.card{border:1px solid var(--line);border-radius:8px;padding:20px 22px;background:#fffdf9}
+.card .ct{font-weight:700;color:var(--navy);font-size:14.5px;margin-bottom:7px;
+  display:flex;align-items:center;gap:8px}
+.card .cn{font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.5px}
+.card p{font-size:13px;color:var(--grey);margin:0}
+.card ul{margin:8px 0 0 0;padding-left:16px}
+.card li{font-size:12.5px;color:#39414a;margin-bottom:4px}
+/* callout */
+.callout{border-left:3px solid var(--gold);background:#fbf7ee;padding:16px 22px;
+  border-radius:0 8px 8px 0;margin:18px 0}
+.callout.g{border-color:var(--green);background:var(--green-soft)}
+.callout.n{border-color:var(--navy);background:#eef2f7}
+.callout .h{font-weight:700;color:var(--navy);font-size:13px;letter-spacing:.4px;
+  text-transform:uppercase;margin-bottom:6px}
+.callout p{font-size:13.5px;margin:0;color:#39414a}
+/* timeline */
+.tl{margin:26px 0 6px}
+.tl-head{display:grid;grid-template-columns:170px 1fr;font-size:10px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--grey2);font-weight:700;padding-bottom:10px;
+  border-bottom:1px solid var(--line)}
+.tl-scale{display:flex;justify-content:space-between}
+.tl-row{display:grid;grid-template-columns:170px 1fr;align-items:center;
+  padding:14px 0;border-bottom:1px solid var(--line2)}
+.tl-row:last-child{border-bottom:none}
+.tl-lab b{display:block;color:var(--ink);font-weight:700;font-size:13.5px}
+.tl-lab span{font-size:11px;color:var(--grey2)}
+.tl-track{position:relative;height:16px}
+.tl-bar{position:absolute;height:8px;top:4px;border-radius:5px}
+.tl-bar.gold{background:var(--gold)}
+.tl-bar.navy{background:var(--navy)}
+.tl-bar.green{background:var(--green)}
+.tl-bar.grey{background:#cfd3d8}
+.tl-dot{position:absolute;top:1px;width:14px;height:14px;border-radius:50%;
+  background:#fff;border:2px solid var(--navy)}
+.tl-legend{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;font-size:11px;
+  color:var(--grey);letter-spacing:.5px}
+.tl-legend i{display:inline-block;width:22px;height:5px;border-radius:3px;
+  margin-right:7px;vertical-align:middle}
+/* milestone strip */
+.mstrip{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);
+  margin-top:26px}
+.mstrip .m{padding:16px 12px;border-right:1px solid var(--line2)}
+.mstrip .m:last-child{border-right:none}
+.mstrip .mk{font-weight:800;color:var(--ink);font-size:15px}
+.mstrip .md{color:var(--gold);font-weight:700;font-size:12px;margin:3px 0}
+.mstrip .ml{color:var(--grey);font-size:12px}
+/* steps */
+.step{display:grid;grid-template-columns:52px 1fr;gap:18px;padding:18px 0;
+  border-bottom:1px solid var(--line2)}
+.step:last-child{border-bottom:none}
+.step .num{font-size:30px;font-weight:200;color:var(--gold-soft);line-height:1}
+.step .st{font-weight:700;color:var(--navy);font-size:15px;margin-bottom:5px}
+.step p{font-size:13px;color:var(--grey);margin:0}
+/* kpi */
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);
+  border-radius:8px;overflow:hidden;margin:16px 0}
+.kpi .k{padding:20px;border-right:1px solid var(--line2);background:#fffdf9}
+.kpi .k:last-child{border-right:none}
+.kpi .kn{font-size:30px;font-weight:800;color:var(--navy);line-height:1}
+.kpi .kl{font-size:11px;color:var(--grey);margin-top:6px;letter-spacing:.3px}
+/* footer */
+.foot{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;
+  display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--grey2);font-weight:600}
+ul.clean{list-style:none;padding:0;margin:10px 0}
+ul.clean li{padding:9px 0 9px 26px;position:relative;border-bottom:1px solid var(--line2);
+  font-size:13.5px;color:#2c333b}
+ul.clean li:before{content:"";position:absolute;left:2px;top:16px;width:7px;height:7px;
+  border-radius:50%;background:var(--gold-soft)}
+ul.clean li:last-child{border-bottom:none}
+ul.clean li b{color:var(--navy)}
+@media print{
+  body{background:#fff;font-size:11px}
+  .sheet{box-shadow:none;border:none;margin:0}
+  .progress{display:none}
+  section{page-break-inside:avoid}
+  .pad{padding:26px 20px}
+  .topbar{padding:12px 20px}
+}
+@media(max-width:820px){.pad{padding:34px 24px}.topbar{padding:16px 24px}
+  h1.title{font-size:38px}.g2,.g3{grid-template-columns:1fr}
+  .kpi,.mstrip{grid-template-columns:1fr 1fr}.factrow{gap:24px}}
+</style></head><body>
+<div class="progress"></div>
+<div class="sheet">
+<div class="topbar">
+  <div class="brand"><img class="brandimg" src="data:image/png;base64,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" alt="Calcite Technologies"></div>
+  <div class="meta"><b>CAL-GP-2026-INT-007</b><br>Government Procurement<br>10 August 2026 <div class="badge-conf">Confidential, internal only</div></div>
+</div>
+<div class="pad">
+<div class="kicker">Phase 2, Internal Playbook</div>
+<h1 class="title">Team <b>playbook.</b></h1>
+<p class="lead">The internal master for Phase 2. Team and responsibilities, commercials and payment schedule, full scope, build stages and ownership, dependencies, risks, and the governance and feedback model.</p>
+
+<div class="heroline"></div>
+<div class="factrow">
+  <div class="fact"><div class="l">Classification</div><div class="v">Confidential, internal</div></div>
+  <div class="fact"><div class="l">Owner</div><div class="v">Ayna Sulaiman, Project Manager</div></div>
+  <div class="fact"><div class="l">Delivery</div><div class="v">31 August 2026, core</div></div>
+  <div class="fact"><div class="l">Model</div><div class="v">Iterative, weekly feedback</div></div>
+</div>
+
+<section>
+  <div class="sec-h"><div class="sec-n">01</div><h2>The <b>team.</b></h2></div>
+  <p class="sub">Everything routes through one relationship, the client and the Project Manager. Engineers are never client facing without the PM present, so context never fragments and nothing is promised twice.</p>
+  <table class="tbl">
+    <tr><th style="width:150px">Person</th><th style="width:150px">Role</th><th>Responsibility on Phase 2</th></tr>
+    <tr><td><b>Zain Sheikh</b></td><td>Founder and CEO</td><td>Senior accountability, commercial owner, escalation point.</td></tr>
+    <tr><td><b>Ayna Sulaiman</b></td><td>Project Manager</td><td>Single point of contact, runs the plan, the reporting, the feedback loop and sign off.</td></tr>
+    <tr><td><b>Bushra Sajid</b></td><td>Developer</td><td>Builds the learning platform and the website enhancements, public and admin.</td></tr>
+    <tr><td><b>Sohaib Ahmed</b></td><td>Technical Lead</td><td>Architecture and engineering standards, code review, forward compatible decisions.</td></tr>
+    <tr><td><b>Zainab Fatima</b></td><td>QA and Testing</td><td>Quality gate, tests every screen, browser and flow before the client sees it.</td></tr>
+  </table>
+  <h3>Responsibility by area</h3>
+  <table class="tbl">
+    <tr><th>Area</th><th style="width:90px">Lead</th><th style="width:90px">Review</th><th style="width:90px">QA</th><th style="width:110px">Approves</th></tr>
+    <tr><td>Learning platform</td><td>Bushra</td><td>Sohaib</td><td>Zainab</td><td>Ayna, client</td></tr>
+    <tr><td>Website enhancements</td><td>Bushra</td><td>Sohaib</td><td>Zainab</td><td>Ayna, client</td></tr>
+    <tr><td>Payments and GST</td><td>Bushra</td><td>Sohaib</td><td>Zainab</td><td>Ayna, client</td></tr>
+    <tr><td>Timeline and client comms</td><td>Ayna</td><td>Zain</td><td></td><td>Client</td></tr>
+    <tr><td>Commercials</td><td>Zain</td><td>Ayna</td><td></td><td>Client</td></tr>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">02</div><h2>Commercials and <b>payments.</b></h2></div>
+  <p class="sub">Recommended milestone linked schedule tying payment to delivered, demonstrable value on staging. Amounts and the trading entity are to be confirmed with the client before Week 1 close and entered below.</p>
+  <table class="tbl">
+    <tr><th style="width:180px">Milestone</th><th style="width:120px">Trigger</th><th style="width:110px">Share</th><th>Amount</th></tr>
+    <tr><td><b>Kickoff</b></td><td>Phase 2 start, Mon 11 Aug</td><td>30 percent</td><td class="code">to confirm</td></tr>
+    <tr><td><b>Core flows on staging</b></td><td>Checkpoint 2, Fri 22 Aug</td><td>30 percent</td><td class="code">to confirm</td></tr>
+    <tr><td><b>Feature complete and UAT</b></td><td>Checkpoint 3, Fri 29 Aug</td><td>30 percent</td><td class="code">to confirm</td></tr>
+    <tr><td><b>Go live</b></td><td>Presentation, Mon 31 Aug</td><td>10 percent</td><td class="code">to confirm</td></tr>
+  </table>
+  <div class="callout">
+    <div class="h">Commercial notes</div>
+    <p>Trading entity for GST, Australia or United Arab Emirates, to be confirmed before payment go live. The September fast follow, the Service Offering rebuild, Policies pages and advanced learning items, is scoped and priced separately once content readiness is known. Find a Bid Writer is a future revenue line for the client, placement fees from bid management companies, and does not affect this schedule.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">03</div><h2>Full scope <b>snapshot.</b></h2></div>
+  <div class="grid g2">
+    <div class="card"><div class="ct">Learning platform, Release 2.1</div>
+      <ul><li>Accounts and single sign on, student dashboard</li><li>Courses, modules, lessons, resources, transcripts</li><li>Secure video, quizzes, progress, certificates</li><li>Stripe and GST, memberships, one off, coupons, bulk enrolment</li><li>Notifications, reporting, Q and A, reviews</li><li>Admin and instructor interfaces, catalogue and pricing</li><li>Privacy Act and APP compliance, penetration test</li></ul></div>
+    <div class="card"><div class="ct">Website, Release 2.1</div>
+      <ul><li>A1 homepage, A2 loader, A3 fade transitions, A4 palette</li><li>A6 Procurement Advisor, New South Wales</li><li>B1 articles bar, B2 panels, B3 tender links and SA login fix</li><li>B4 prompt library, B6 templates</li><li>B7 Find a Bid Writer, built and held</li></ul></div>
+    <div class="card"><div class="ct">Release 2.2, September fast follow</div>
+      <ul><li>A5 Service Offering rebuild, needs client copy</li><li>B5 Policies pages, needs client content</li><li>Advisor tool, additional jurisdictions</li><li>Affiliate, live sessions, course coach, deeper CRM, gamification</li></ul></div>
+    <div class="card"><div class="ct">Client supplied</div>
+      <ul><li>Course content, videos and resources</li><li>Service Offering copy, policy content</li><li>New South Wales rule file</li><li>Pricing, payment entity, template sources and licences</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">04</div><h2>Build stages and <b>ownership.</b></h2></div>
+  <table class="tbl">
+    <tr><th style="width:60px">Stage</th><th>Focus</th><th style="width:110px">Week</th><th style="width:90px">Lead</th></tr>
+    <tr><td><b>1 to 3</b></td><td>Environments, schema, auth and single sign on</td><td>Week 1</td><td>Bushra, Sohaib</td></tr>
+    <tr><td><b>4</b></td><td>Learning core, video, quizzes, progress</td><td>Week 1 to 2</td><td>Bushra</td></tr>
+    <tr><td><b>5</b></td><td>Commerce, Stripe, GST, memberships</td><td>Week 2</td><td>Bushra</td></tr>
+    <tr><td><b>6</b></td><td>Certificates, notifications, reporting</td><td>Week 2</td><td>Bushra</td></tr>
+    <tr><td><b>7</b></td><td>Website enhancements</td><td>Week 1 to 3</td><td>Bushra</td></tr>
+    <tr><td><b>8</b></td><td>Transitions and polish</td><td>Week 3</td><td>Bushra</td></tr>
+    <tr><td><b>9</b></td><td>Hardening, testing, content load, UAT</td><td>Week 3</td><td>Zainab, Sohaib</td></tr>
+    <tr><td><b>10</b></td><td>Launch and handover</td><td>31 Aug</td><td>Ayna, Sohaib</td></tr>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">05</div><h2>Dependencies and <b>critical path.</b></h2></div>
+  <ul class="clean">
+    <li><b>Palette approval by Fri 15 Aug.</b> Blocks the site wide visual build and the multi shaded background. Present shortlisted palettes at Checkpoint 1.</li>
+    <li><b>Pricing and payment entity by Fri 15 Aug.</b> Blocks checkout and GST configuration.</li>
+    <li><b>New South Wales rule file by Fri 15 Aug.</b> Blocks the advisor tool logic load.</li>
+    <li><b>Course content by Fri 22 Aug.</b> Blocks content load and a clean UAT.</li>
+    <li><b>Service Offering copy by Fri 22 Aug.</b> If late, A5 moves to the September fast follow.</li>
+    <li><b>Policy content, when ready.</b> B5 structure is built now, content lands later.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">06</div><h2>Risks and <b>mitigations.</b></h2></div>
+  <table class="tbl">
+    <tr><th style="width:230px">Risk</th><th style="width:90px">Level</th><th>Mitigation</th></tr>
+    <tr><td>Full learning platform plus 13 website items in three weeks</td><td><span class="tag r">High</span></td><td>Release 2.1 and 2.2 split. Content dependent items deferred. Parallel build with a clear stage sequence.</td></tr>
+    <tr><td>Client inputs arrive late</td><td><span class="tag r">High</span></td><td>Inputs mapped to feedback days with clear needed by dates. Late Service Offering and Policies auto move to September.</td></tr>
+    <tr><td>Payment and GST complexity across two possible entities</td><td><span class="tag">Medium</span></td><td>Confirm trading entity in Week 1. Stripe test mode through Week 2, live only after sign off.</td></tr>
+    <tr><td>Secure video and anti download expectations</td><td><span class="tag">Medium</span></td><td>Protected expiring links, tested in hardening. Communicated as reasonable protection, not absolute.</td></tr>
+    <tr><td>Scope creep through iterative feedback</td><td><span class="tag">Medium</span></td><td>New scope is exchanged openly and never silently absorbed. Change control on every feedback day.</td></tr>
+    <tr><td>Find a Bid Writer accidentally exposed</td><td><span class="tag">Low</span></td><td>Feature flag off, excluded from production deploy, nav and sitemap until go live is confirmed.</td></tr>
+  </table>
+</section>
+
+<section>
+  <div class="sec-h"><div class="sec-n">07</div><h2>Governance and <b>feedback.</b></h2></div>
+  <p class="sub">The internal view of the loop the client sees. Tight, iterative, and evidenced.</p>
+  <ul class="clean">
+    <li><b>Weekly written report</b> on what is done, what comes next, blockers, and decisions needed.</li>
+    <li><b>Friday staging demo and feedback day.</b> Client tries the work. Feedback in by end of Friday is actioned Monday.</li>
+    <li><b>Same day paper trail.</b> Any agreement, especially over chat, is confirmed in writing the same day or it did not happen.</li>
+    <li><b>Sign off releases go live.</b> Client acceptance at the 31 August walkthrough releases production deploy behind the go live runbook.</li>
+  </ul>
+  <div class="callout n">
+    <div class="h">Confidentiality</div>
+    <p>This document contains team, commercial and internal delivery detail. It is for the Calcite team only and is not shared with the client. The client facing guide, CAL-GP-2026-CLIENT-006, is the version shared externally.</p>
+  </div>
+</section>
+<div class="foot"><div>Calcite Technologies, Government Procurement Platform</div><div>CAL-GP-2026-INT-007, Confidential, Rev 10 Aug 2026</div></div></div></div>
+<script>
+var p=document.querySelector('.progress');
+window.addEventListener('scroll',function(){
+  var h=document.documentElement,b=document.body;
+  var st=h.scrollTop||b.scrollTop;
+  var sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+  p.style.width=(sh>0?(st/sh*100):0)+'%';
+});
+</script>
+</body></html>
