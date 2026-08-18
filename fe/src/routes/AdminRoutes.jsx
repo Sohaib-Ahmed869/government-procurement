@@ -15,7 +15,6 @@ import HomeHeroPage from '../admin/pages/HomeHeroPage.jsx';
 import CapabilitiesPage from '../admin/pages/CapabilitiesPage.jsx';
 import TendersAdminPage from '../admin/pages/TendersAdminPage.jsx';
 import CoursesAdminPage from '../admin/pages/CoursesAdminPage.jsx';
-import CourseEditorPage from '../admin/pages/CourseEditorPage.jsx';
 import ModerationQueuePage from '../admin/pages/ModerationQueuePage.jsx';
 import SubscribersPage from '../admin/pages/SubscribersPage.jsx';
 import ConsultationQueuePage from '../admin/pages/ConsultationQueuePage.jsx';
@@ -50,8 +49,6 @@ export default function AdminRoutes() {
           <Route path="articles/new" element={<ArticleEditorPage />} />
           <Route path="articles/:id" element={<ArticleEditorPage />} />
           <Route path="courses" element={<CoursesAdminPage />} />
-          <Route path="courses/new" element={<CourseEditorPage />} />
-          <Route path="courses/:id" element={<CourseEditorPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="team" element={<TeamAdminPage />} />
           <Route path="careers" element={<CareersAdminPage />} />

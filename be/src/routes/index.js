@@ -2,6 +2,8 @@ import { Router } from 'express';
 
 // Public + admin API modules. Each module default-exports an express.Router.
 import authRoutes from '../modules/auth/auth.routes.js';
+import accountRoutes from '../modules/accounts/accounts.routes.js';
+import lmsRoutes from '../modules/lms/lms.routes.js';
 import userRoutes from '../modules/users/users.routes.js';
 import articleRoutes from '../modules/articles/articles.routes.js';
 import categoryRoutes from '../modules/categories/categories.routes.js';
@@ -30,6 +32,11 @@ import auditRoutes from '../modules/audit/audit.routes.js';
 const router = Router();
 
 router.use('/auth', authRoutes);
+// LMS self-service accounts (student + instructor signup). Kept apart from
+// /auth/register, which is admin-only staff provisioning.
+router.use('/accounts', accountRoutes);
+// LMS: authoring, learning, assessment, certificates and the review queue.
+router.use('/lms', lmsRoutes);
 router.use('/users', userRoutes);
 router.use('/articles', articleRoutes);
 router.use('/categories', categoryRoutes);
