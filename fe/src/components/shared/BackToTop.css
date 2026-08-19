@@ -1,0 +1,78 @@
+/* Jump to the top of a long page. Bottom left, clear of the site's own chrome.
+
+   Left rather than right on purpose: on the browse pages the filter rail is on
+   the left, so the button sits on the same side as the thing it takes you back
+   to. The right-hand edge is also where browsers put their own scrollbar and
+   where most sites put a chat widget, so the left is simply the quieter corner.
+
+   Painted from the segment tokens, which resolve out here because
+   `data-audience` is on <html> (see AudienceContext). */
+
+.back-to-top {
+  position: fixed;
+  left: clamp(14px, 2vw, 30px);
+  bottom: clamp(16px, 3vh, 32px);
+  z-index: 120;
+
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+
+  color: var(--gp-paper);
+  background: var(--gp-brand);
+  border: 1px solid var(--gp-brand);
+  border-radius: 50%;
+  cursor: pointer;
+
+  /* Hidden until there is something to go back to. Faded and lifted out rather
+     than displayed none, so it arrives and leaves rather than blinking. */
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 10px 26px rgba(0, 0, 0, 0.18);
+
+  transition:
+    opacity 220ms var(--gp-ease),
+    transform 220ms var(--gp-ease),
+    background-color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease);
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: var(--gp-brand-soft);
+  border-color: var(--gp-brand-soft);
+}
+
+.back-to-top:focus-visible {
+  outline: 2px solid var(--gp-accent);
+  outline-offset: 3px;
+}
+
+.back-to-top svg { display: block; }
+
+/* The component already swaps to an instant jump under this preference; the
+   button's own arrival should not animate either. */
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transform: none;
+    transition: opacity 1ms linear;
+  }
+}
+
+@media (max-width: 620px) {
+  .back-to-top {
+    width: 42px;
+    height: 42px;
+  }
+}

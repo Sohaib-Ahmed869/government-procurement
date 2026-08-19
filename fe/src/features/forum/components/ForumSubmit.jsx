@@ -83,7 +83,7 @@ function Select({ id, options, value, onChange, placeholder }) {
 
 export default function ForumSubmit() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
   const [sent, setSent] = useState(false);
   const [category, setCategory] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -118,7 +118,7 @@ export default function ForumSubmit() {
   }
 
   return (
-    <section ref={ref} className={`forum-submit${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section ref={ref} className={`forum-submit hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="forum-submit__inner">
         <div className="forum-submit__main">
           <h1 className="forum-submit__heading">Submit a Question</h1>

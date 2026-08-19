@@ -1,0 +1,207 @@
+/* A6 — the result.
+
+   Read top to bottom: what the rules require, then anything to check first,
+   then every pathway with its status, then the obligations that attach whatever
+   you choose. Each item shows what it rests on and how firmly. */
+
+.adv-result {
+  max-width: 900px;
+}
+
+.adv-result__head {
+  padding-bottom: clamp(22px, 2.5vw, 32px);
+  border-bottom: 1px solid var(--gp-line);
+}
+
+.adv-result__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gp-accent-ink);
+}
+
+.adv-result__title {
+  margin: 12px 0 0;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--gp-ink);
+}
+
+.adv-result__statement {
+  margin: 14px 0 0;
+  max-width: 68ch;
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.adv-result__section { margin-top: clamp(30px, 3.5vw, 44px); }
+
+.adv-result__h3 {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gp-ink);
+}
+
+/* --- pathways ------------------------------------------------------------- */
+
+.adv-paths, .adv-list, .adv-flags {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adv-path {
+  padding: 20px 22px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-left: 3px solid var(--gp-line);
+  border-radius: 6px;
+  transition: var(--gp-fade);
+}
+
+/* The status is carried by the card's own edge as well as the label, so the
+   recommended pathway is findable without reading every heading. */
+.adv-path.is-recommended,
+.adv-path.is-required { border-left-color: var(--gp-accent-ink); background: var(--gp-paper); }
+.adv-path.is-conditional { border-left-color: #8a5d10; }
+.adv-path.is-unavailable { opacity: 0.72; }
+
+.adv-path__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adv-path__title {
+  margin: 0;
+  font-size: clamp(16px, 1.5vw, 19px);
+  font-weight: 600;
+  color: var(--gp-ink);
+}
+
+.adv-path__status {
+  flex: 0 0 auto;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: var(--gp-paper-deep);
+  color: var(--gp-muted);
+}
+
+.adv-path__status.is-recommended,
+.adv-path__status.is-required {
+  background: var(--gp-accent-ink);
+  color: var(--gp-paper);
+}
+
+.adv-path__summary {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.adv-path__reasons {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+/* --- flat lists ----------------------------------------------------------- */
+
+.adv-list li, .adv-flag {
+  padding: 16px 18px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 6px;
+  transition: var(--gp-fade);
+}
+
+.adv-flag { border-left: 3px solid #8a5d10; }
+
+.adv-list__title, .adv-flag__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gp-ink);
+}
+
+.adv-list__detail, .adv-flag__detail {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+/* --- basis and confidence ------------------------------------------------- */
+
+.adv-basis { margin-top: 12px; }
+
+.adv-basis__list {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.adv-basis__list a {
+  color: var(--gp-accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.adv-conf {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gp-muted);
+}
+
+.adv-conf__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.adv-conf.is-high { color: #1f6b4a; }
+.adv-conf.is-medium { color: #8a5d10; }
+.adv-conf.is-low { color: #8c2f26; }
+.adv-conf.is-judgement { color: var(--gp-muted); }
+
+.adv-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(28px, 3vw, 40px);
+}
+
+@media (max-width: 420px) {
+  .adv-result__actions .adv-btn { flex: 1 1 100%; }
+}

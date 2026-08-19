@@ -30,7 +30,7 @@ const EMPTY_FORM = {
 export default function ConsultationForm() {
   // Reveal on scroll into view, matching the contact form's on-enter animation.
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
   const navigate = useNavigate();
 
   const [form, setForm] = useState(EMPTY_FORM);

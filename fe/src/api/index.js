@@ -1,6 +1,6 @@
 // Single entry point for the CMS API. Import the resource you need:
 //   import { coursesApi, authApi } from '../api';
-import { api } from './client.js';
+import { api, BASE_URL } from './client.js';
 import { createResource } from './resource.js';
 
 // ---- Content ---------------------------------------------------------------
@@ -29,6 +29,31 @@ export const careersApi = {
 };
 
 export const rulesApi = createResource('rules');
+
+// B2 — government panels and prequalification schemes, listed by jurisdiction
+// on /government-panels and edited in Content → Government Panels.
+export const panelsApi = createResource('panels');
+
+// B4 — the AI Prompt Library: master prompts by topic, use case and tool.
+export const promptsApi = createResource('prompts');
+
+// B7 — Find a Bid Writer. The public read is held behind FEATURE_BID_WRITERS on
+// the server; admin CRUD is always available so placements can be prepared.
+export const bidWritersApi = {
+  ...createResource('bid-writers'),
+  uploadLogo: (id, file) => api.upload(`/bid-writers/${id}/logo`, file),
+};
+
+// B6 — the Templates library: sourced, licence-checked, downloadable documents.
+export const templatesApi = {
+  ...createResource('templates'),
+  uploadFile: (id, file) => api.upload(`/templates/${id}/file`, file),
+  // A plain URL rather than a fetch. The browser performs the download itself,
+  // so middle-click and "save link as" behave the way a download should, and
+  // the server's Content-Disposition names the file. Built from BASE_URL
+  // because the API is not same-origin.
+  downloadUrl: (id) => `${BASE_URL}/templates/${id}/download`,
+};
 
 // Tender portals listed on the Tender Websites page — name, subtitle, the three
 // destination links and a logo.
@@ -69,7 +94,23 @@ export const capabilitiesHeroApi = {
 export const capabilitiesHeroCopyCache = createCopyCache();
 
 // Cards in the "Deliver with Impact" row on the Capabilities page.
-export const capabilitiesApi = createResource('capabilities');
+export const capabilitiesApi = {
+  ...createResource('capabilities'),
+  // The service photograph. Its own endpoints because the file has to be stored
+  // before there is a URL to save — same shape as a team member's photo.
+  uploadImage: (id, file) => api.upload(`/capabilities/${id}/image`, file),
+  removeImage: (id) => api.del(`/capabilities/${id}/image`),
+};
+
+// A6 — versioned rule overlays for the Procurement Advisor.  is the
+// public read the advisor makes; it returns null when nothing is published,
+// which is a normal state — the built-in rule pack is complete on its own.
+export const rulePacksApi = {
+  ...createResource('rule-packs'),
+  active: (jurisdiction) =>
+    api.get(`/rule-packs/active/${jurisdiction}`, undefined, { auth: false }),
+  publish: (id) => api.post(`/rule-packs/${id}/publish`),
+};
 
 export const capabilityCardsCache = createCopyCache();
 

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import AdminLayout from '../admin/layout/AdminLayout.jsx';
@@ -11,8 +11,13 @@ import CategoriesPage from '../admin/pages/CategoriesPage.jsx';
 import TeamAdminPage from '../admin/pages/TeamAdminPage.jsx';
 import CareersAdminPage from '../admin/pages/CareersAdminPage.jsx';
 import RulesAdminPage from '../admin/pages/RulesAdminPage.jsx';
+import PanelsAdminPage from '../admin/pages/PanelsAdminPage.jsx';
+import PromptsAdminPage from '../admin/pages/PromptsAdminPage.jsx';
+import TemplatesAdminPage from '../admin/pages/TemplatesAdminPage.jsx';
+import BidWritersAdminPage from '../admin/pages/BidWritersAdminPage.jsx';
 import HomeHeroPage from '../admin/pages/HomeHeroPage.jsx';
-import CapabilitiesPage from '../admin/pages/CapabilitiesPage.jsx';
+import ServiceOfferingAdminPage from '../admin/pages/ServiceOfferingAdminPage.jsx';
+import AdvisorRulesPage from '../admin/pages/AdvisorRulesPage.jsx';
 import TendersAdminPage from '../admin/pages/TendersAdminPage.jsx';
 import CoursesAdminPage from '../admin/pages/CoursesAdminPage.jsx';
 import ModerationQueuePage from '../admin/pages/ModerationQueuePage.jsx';
@@ -53,8 +58,20 @@ export default function AdminRoutes() {
           <Route path="team" element={<TeamAdminPage />} />
           <Route path="careers" element={<CareersAdminPage />} />
           <Route path="rules" element={<RulesAdminPage />} />
+          {/* B2 — panels and prequalification schemes. */}
+          <Route path="panels" element={<PanelsAdminPage />} />
+          {/* B4 — the AI Prompt Library. */}
+          <Route path="prompts" element={<PromptsAdminPage />} />
+          {/* B6 — the Templates library. */}
+          <Route path="templates" element={<TemplatesAdminPage />} />
+          {/* B7 — not flag-gated: placements are prepared before go-live. */}
+          <Route path="bid-writers" element={<BidWritersAdminPage />} />
           <Route path="home-hero" element={<HomeHeroPage />} />
-          <Route path="capabilities" element={<CapabilitiesPage />} />
+          <Route path="service-offering" element={<ServiceOfferingAdminPage />} />
+          <Route path="advisory-rules" element={<AdvisorRulesPage />} />
+          {/* A5: the CMS entry is "Service Offering" now. The old path is kept
+              so an editor's bookmark still lands somewhere. */}
+          <Route path="capabilities" element={<Navigate to="/admin/service-offering" replace />} />
           <Route path="tenders" element={<TendersAdminPage />} />
 
           {/* Community */}

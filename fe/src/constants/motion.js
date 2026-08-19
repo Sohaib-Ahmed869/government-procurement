@@ -1,16 +1,16 @@
-// Timings for replaying the page's reveal animations when the audience toggle
-// is switched.
+// Reveal and segment-swap timings.
 //
-// The two work together. Switching segment hides every revealed section and
-// shows it again; left alone, the hide is itself animated by the same 0.7s
-// transition, so the section eases a few percent out of view and straight back
-// in — a flicker rather than a reveal. So:
+// REVEAL_RESET_MS holds a section's reveal back for a beat after it is hidden.
+// A section already on screen reports as intersecting in the same frame it was
+// hidden, so observing it straight away reveals it again before the hidden
+// state has been painted — and the animation is a flicker rather than a fade.
+// The wait costs nothing on a section the visitor still has to scroll to.
 //
-//   1. transitions are suppressed for SNAP_MS, making the hide instant;
-//   2. the reveal is held back until RESET_MS, by which point transitions are
-//      live again and the section animates in from its start state.
-//
-// RESET_MS must stay comfortably above SNAP_MS or the reveal begins before
-// transitions are back on and simply snaps into place.
-export const REVEAL_SNAP_MS = 60;
+// There used to be a REVEAL_SNAP_MS alongside it, which suppressed transitions
+// while the audience toggle replayed every reveal on the page. Nothing replays
+// on the toggle any more — see the note on the cross-fade below — so it had
+// nothing left to suppress.
 export const REVEAL_RESET_MS = 110;
+
+export const SWAP_FADE_OUT_MS = 380;
+export const SWAP_FADE_IN_MS = 640;

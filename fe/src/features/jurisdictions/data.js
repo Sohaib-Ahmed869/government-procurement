@@ -24,6 +24,10 @@ export const JURISDICTIONS = [
   { value: 'NSW', label: 'New South Wales' },
   { value: 'ACT', label: 'Australian Capital Territory' },
   { value: 'VIC', label: 'Victoria' },
+  // Tasmania was missing here while RULE_STATES on the server has always
+  // accepted it, so a TAS rule could be saved in the CMS and then render with
+  // no label on the site.
+  { value: 'TAS', label: 'Tasmania' },
 ];
 
 export const JURISDICTION_BY_VALUE = Object.fromEntries(

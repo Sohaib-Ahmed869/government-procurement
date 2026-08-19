@@ -1,27 +1,21 @@
 .team {
-  --team-bg: var(--gp-ink-900);
   /* Raised surface the cards and avatar discs sit on. */
-  --team-surface: var(--gp-ink-800);
 
-  background: var(--team-bg);
-  color: #fff;
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
 .team[data-audience='award'] {
-  --team-bg: var(--gp-green-900);
-  --team-surface: var(--gp-green-800);
 }
 
 .team[data-audience='win'] {
-  --team-bg: var(--gp-ink-900);
-  --team-surface: var(--gp-ink-800);
 }
 
 .team__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 24px 40px 48px;
+  padding: 24px clamp(20px, 4vw, 60px) 48px;
 }
 
 /* Status / empty message shown while the roster loads or when none exist. */
@@ -29,7 +23,7 @@
   margin: 0;
   padding: 24px 0 40px;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--band-muted);
 }
 
 .team__grid {
@@ -44,8 +38,17 @@
 }
 
 /* --- card --- */
-/* Square-cornered, on the segment's raised surface — enough to lift the block
-   off the section background around it. */
+/* Square-cornered, and filled in the segment's lift step rather than the paper
+   tint it used to take: #4a4a4a on Win, #2f7d45 on Award. Both are already in
+   the palette as --gp-brand-lift, so the two segments need one declaration, not
+   a rule each.
+
+   That makes the card a dark island on a paper page, so it carries the DARK
+   band's text roles instead of the section's. Redefining them here is what
+   flips the name, role, summary, rule, icons and focus ring in one move — the
+   alternative was overriding --band-ink at seven separate call sites and
+   missing one. The values are copied from .hm-band--dark in styles/bands.css;
+   if that set changes, this follows it. */
 .team-card {
   position: relative;
   display: flex;
@@ -54,31 +57,52 @@
   height: 100%;
   padding: 40px 28px 32px;
   text-align: center;
-  background: var(--team-surface);
+  background: var(--gp-brand-lift);
+  color: #fff;
+
+  --band-ink: #fff;
+  /* 0.82 rather than the dark band's 0.72. These fills are lighter than a dark
+     band, so the summary line loses contrast against them faster: at 0.72 it
+     measures 3.5:1 on the Award green, under the 4.5:1 AA wants at 13.5px.
+     0.82 brings it to about 4:1 and still reads as secondary to the name. */
+  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-line: rgba(255, 255, 255, 0.12);
+  --band-surface: rgba(255, 255, 255, 0.06);
+  --band-surface-hover: rgba(255, 255, 255, 0.16);
+  --band-accent: var(--gp-accent);
+  --band-on-accent: var(--gp-brand-deep);
 }
 
-/* Hover lifts the card clear of the grid: over ~0.8s it rises and scales up
-   over its neighbours, settles to the lighter 4% fill, and drops a shadow onto
-   them. The easing eases in and out, so the card is slowest at the start and
-   end of the travel and the lift is clearly readable rather than a snap. */
+/* Hover is a shadow and nothing else. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .team-card {
-    transition:
-      transform 0.8s cubic-bezier(0.33, 0, 0.2, 1),
-      box-shadow 0.8s cubic-bezier(0.33, 0, 0.2, 1),
-      background-color 0.8s ease-in-out;
+    /* 220ms, in line with every other hover on the site. It was 0.8s, which was
+       chosen to make a large travel readable — with the travel gone there is
+       nothing left for that length to carry, and a shadow taking most of a
+       second to appear only reads as lag. */
+    transition: box-shadow 220ms var(--gp-ease);
   }
 
-  /* Every card lifts, whether or not it links anywhere — only the members with
-     a profile carry a link on the name (see .team-card--static in TeamGrid.jsx). */
+  /* Every card responds, whether or not it links anywhere — only the members
+     with a profile carry a link on the name (see .team-card--static in
+     TeamGrid.jsx).
+
+     A shadow and nothing else. It used to also run
+     `translateY(-10px) scale(1.04)`, and the scale is what made the card grow
+     under the pointer: at 1.04 a 300px card gains 12px and pushes visibly into
+     the gaps around it.
+
+     There is no fill change either, now that the card rests on --gp-brand-lift.
+     The step above it (--gp-*-500: #6a675f / #3f9a58) drops white text to about
+     3.5:1, so hovering a card would have made its own bio harder to read than
+     the five around it. The shadow says the card is live without that. */
   .team-card:hover {
     /* Above the neighbouring cards so the shadow falls on them, not under. */
     z-index: 1;
-    transform: translateY(-10px) scale(1.04);
-    /* Sits over the section colour, so this resolves to the same tone the cards
-       used to rest at. */
-    background-color: rgba(255, 255, 255, 0.04);
-    box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
+    /* Softer than the 0.45/50px it carried on the dark ramp. That shadow was
+       black-on-near-black and barely showed; under a dark card on paper the
+       same values read as a grey smudge on the page. */
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
   }
 }
 
@@ -90,9 +114,9 @@
   overflow: hidden;
   flex: none;
   border-radius: 50%;
-  /* Solid white, so portraits shot on a light background sit on their own tone
-     rather than the card's. Reads against both card states — the card rests on
-     --team-surface and drops to the 4% fill on hover. */
+  /* Solid white, and it stays white on the paper ground: a portrait shot on a
+     light background should sit on its own tone rather than the card's, which
+     is as true on paper as it was on the dark ramp. */
   background: #fff;
 }
 
@@ -148,7 +172,7 @@
 }
 
 .team-card__link {
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: none;
 }
 
@@ -164,7 +188,7 @@
   margin: 10px 0 0;
   font-size: 13.5px;
   font-weight: 500;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .team-card__rule {
@@ -172,14 +196,14 @@
   width: 48px;
   height: 1px;
   margin: 18px 0;
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--band-surface-hover);
 }
 
 .team-card__summary {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--band-muted);
   /* Keeps every card's text block the same depth however long the bio runs. */
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -207,7 +231,7 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  color: #fff;
+  color: var(--band-ink);
   background: transparent;
   transition: opacity 0.15s ease;
 }
@@ -224,7 +248,7 @@
 }
 
 .team :is(a):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -233,22 +257,22 @@
 @media (prefers-reduced-motion: no-preference) {
   .team__grid .team-card {
     opacity: 0;
-    transform: translateY(24px);
+    translate: 0 var(--gp-reveal-shift);
     transition:
-      opacity 0.6s ease,
-      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      translate var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .team.is-in .team__grid .team-card {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 
-  .team.is-in .team__grid > li:nth-child(2) .team-card { transition-delay: 0.06s; }
-  .team.is-in .team__grid > li:nth-child(3) .team-card { transition-delay: 0.12s; }
-  .team.is-in .team__grid > li:nth-child(4) .team-card { transition-delay: 0.18s; }
-  .team.is-in .team__grid > li:nth-child(5) .team-card { transition-delay: 0.24s; }
-  .team.is-in .team__grid > li:nth-child(6) .team-card { transition-delay: 0.3s; }
+  .team.is-in .team__grid > li:nth-child(2) .team-card { transition-delay: var(--gp-reveal-step); }
+  .team.is-in .team__grid > li:nth-child(3) .team-card { transition-delay: calc(var(--gp-reveal-step) * 2); }
+  .team.is-in .team__grid > li:nth-child(4) .team-card { transition-delay: calc(var(--gp-reveal-step) * 3); }
+  .team.is-in .team__grid > li:nth-child(5) .team-card { transition-delay: calc(var(--gp-reveal-step) * 4); }
+  .team.is-in .team__grid > li:nth-child(6) .team-card { transition-delay: calc(var(--gp-reveal-step) * 4); }
 }
 
 @media (max-width: 1024px) {

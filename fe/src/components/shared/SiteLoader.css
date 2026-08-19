@@ -1,0 +1,218 @@
+/* A2 — first-load overlay.
+
+   Painted in the active segment's deepest step with its mid step washed across
+   the corners, so the intro is already in the palette the page opens in rather
+   than a neutral splash that has nothing to do with the site. The whole thing
+   resolves role tokens (styles/tokens.css), so a visitor on Award gets the
+   green ramp and one on Win gets the ink ramp with no second stylesheet. */
+.site-loader {
+  /* One scale factor for the whole overlay, stepped at the breakpoints below.
+     Every size here is written against it, so a screen size is a single number
+     to change rather than six.
+
+     The overlay is fixed to the viewport, so it sits outside `.page-scale` and
+     never picks up the `zoom` that scales the page itself on wide screens (see
+     index.css). Left at 1, the mark that reads as generous on a laptop is a
+     small badge in the middle of a 4K display with the page behind it already
+     scaled up around 2.6×. These steps put it back in proportion. */
+  --sl: 1;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(26px * var(--sl));
+
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--gp-brand-soft) 0%, rgba(0, 0, 0, 0) 62%),
+    radial-gradient(90% 70% at 50% 100%, var(--gp-brand-mid) 0%, rgba(0, 0, 0, 0) 58%),
+    var(--gp-brand-deep);
+  color: #fff;
+
+  opacity: 1;
+  transition: opacity 600ms var(--gp-ease);
+}
+
+/* Fading the overlay rather than removing it: the page underneath is already
+   painted, so it is revealed through the fade instead of appearing all at once
+   the frame the overlay unmounts. */
+.site-loader.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- mark ---------------------------------------------------------------- */
+
+.site-loader__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: calc(132px * var(--sl));
+  height: calc(132px * var(--sl));
+}
+
+/* Two arcs of a circle, one on each side, spinning as one ring. Drawn with
+   transparent top/bottom borders rather than as an SVG so there is nothing more
+   to load at the exact moment the point is that nothing has loaded yet. */
+.site-loader__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: calc(2px * var(--sl)) solid transparent;
+  border-left-color: var(--gp-accent);
+  border-right-color: var(--gp-accent);
+  opacity: 0.9;
+  animation: site-loader-spin 1.15s linear infinite;
+}
+
+/* A second, slower ring in the warm accent, turning the other way. Two speeds
+   in two colours from the same segment ramp — the brief's "two distinguishable
+   shades" applied to the loader as well as the bands. */
+.site-loader__mark::after {
+  content: "";
+  position: absolute;
+  inset: calc(12px * var(--sl));
+  border-radius: 50%;
+  border: max(1px, calc(1px * var(--sl))) solid transparent;
+  border-top-color: var(--gp-accent-warm);
+  border-bottom-color: var(--gp-accent-warm);
+  opacity: 0.55;
+  animation: site-loader-spin 2.1s linear infinite reverse;
+}
+
+.site-loader__logo {
+  position: relative;
+  width: calc(60px * var(--sl));
+  height: calc(52px * var(--sl));
+  animation: site-loader-breathe 2.4s var(--gp-ease) infinite;
+}
+
+/* --- wordmark ------------------------------------------------------------ */
+
+.site-loader__wordmark {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(2px * var(--sl));
+
+  font-size: calc(15px * var(--sl));
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+
+  animation: site-loader-rise 700ms var(--gp-ease) both;
+  animation-delay: 120ms;
+}
+
+/* --- bar ----------------------------------------------------------------- */
+
+.site-loader__bar {
+  position: relative;
+  display: block;
+  width: min(calc(220px * var(--sl)), 46vw);
+  height: calc(2px * var(--sl));
+  border-radius: calc(2px * var(--sl));
+  background: rgba(255, 255, 255, 0.16);
+  overflow: hidden;
+}
+
+/* A short fill sweeping the length of the track, on a loop. Indeterminate by
+   construction — it never claims to know how far along the load is. */
+.site-loader__bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 42%;
+  border-radius: calc(2px * var(--sl));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    var(--gp-accent) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: site-loader-sweep 1.35s var(--gp-ease) infinite;
+}
+
+@keyframes site-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes site-loader-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.94); opacity: 0.78; }
+}
+
+@keyframes site-loader-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes site-loader-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(240%); }
+}
+
+/* The component returns null under reduced motion, so this only ever applies if
+   the preference is switched on with the overlay already up. */
+@media (prefers-reduced-motion: reduce) {
+  .site-loader__ring,
+  .site-loader__mark::after,
+  .site-loader__logo,
+  .site-loader__wordmark,
+  .site-loader__bar-fill {
+    animation: none;
+  }
+}
+
+/* --- scale steps ---------------------------------------------------------
+
+   The page itself is laid out at 1440px and zoomed to fill anything wider, so
+   the overlay steps up alongside it. The numbers track that zoom factor rather
+   than being picked by eye: at 1680px the page is at ~1.17, at 2560px ~1.78, at
+   3840px ~2.67. Stepped rather than continuous because `zoom` is not available
+   here — the overlay is `position: fixed`, and a zoomed fixed element resolves
+   its inset against the magnified viewport and drifts off screen. */
+
+.site-loader { --sl: 0.82; }
+
+/* Anything from a small laptop up is the design size. */
+@media (min-width: 561px) {
+  .site-loader { --sl: 1; }
+}
+
+/* Past the page's own scaling threshold. */
+@media (min-width: 1441px) {
+  .site-loader { --sl: 1.2; }
+}
+
+/* 1440p, and a 4K display at 200% OS scaling — which reports 1920 CSS px and is
+   the common way a 4K monitor is actually run. */
+@media (min-width: 1921px) {
+  .site-loader { --sl: 1.7; }
+}
+
+/* 4K at 150% scaling. */
+@media (min-width: 2561px) {
+  .site-loader { --sl: 2.2; }
+}
+
+/* 4K and 5K at native density. Capped here: past this the mark is already the
+   size the page's own 2.67× zoom would give it, and going further would fill
+   the screen rather than sit on it. */
+@media (min-width: 3201px) {
+  .site-loader { --sl: 2.7; }
+}
+
+/* Tracking is the one thing that isn't linear — the wordmark needs to tighten
+   on a phone and open up on a very large screen, independently of the type
+   size. */
+@media (max-width: 560px) {
+  .site-loader__wordmark { letter-spacing: 0.18em; }
+}

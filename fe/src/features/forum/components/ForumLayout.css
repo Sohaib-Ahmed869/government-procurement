@@ -1,18 +1,12 @@
 .forum-page {
-  --forum-page-bg: var(--gp-ink-900);
-
   position: relative;
   overflow: hidden;
-  background: var(--forum-page-bg);
+  /* Paper below the hero, which keeps the shared dark heading colour of its
+     own. Same shape as the Service Offering and Procurement Advisor pages. */
+  background: var(--gp-paper);
 }
 
-.forum-page[data-audience='award'] {
-  --forum-page-bg: var(--gp-green-900);
-}
 
-.forum-page[data-audience='win'] {
-  --forum-page-bg: var(--gp-ink-900);
-}
 
 /* Corner wave, top-right — same placement as the Contact page. */
 .forum-page__wave {

@@ -1,31 +1,19 @@
 .insights {
-  --insights-bg: var(--gp-ink-900);
-  /* Raised surface the cards and dropdown panel sit on. */
-  --insights-surface: var(--gp-ink-800);
-
-  background: var(--insights-bg);
-  color: #fff;
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.insights[data-audience='award'] {
-  --insights-bg: var(--gp-green-900);
-  --insights-surface: var(--gp-green-800);
-}
-
-.insights[data-audience='win'] {
-  --insights-bg: var(--gp-ink-900);
-  --insights-surface: var(--gp-ink-800);
-}
-
 .insights[data-audience='win'] .insights-pill__menu {
-  background: var(--insights-surface);
+  background: var(--band-surface);
 }
 
 .insights__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 0 40px 48px;
+  /* Top padding, so the filter row clears the heading band above it rather than
+     sitting on its edge. */
+  padding: clamp(24px, 3vw, 36px) clamp(20px, 4vw, 60px) 48px;
 }
 
 /* --- filter pills --- */
@@ -47,28 +35,24 @@
   padding: 8px 16px;
   font: inherit;
   font-size: 13px;
-  color: #fff;
+  color: var(--band-ink);
   cursor: pointer;
-  /* Same glass pill as the forum "Submit a question" button. */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border: 0;
+  /* Was a glass pill: a white gradient with white inner bevels, which only ever
+     read on a dark ground. On paper the same trick is invisible, so the pill is
+     a surface with a hairline instead, warming its border on hover. */
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
   border-radius: 100px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  transition: box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.insights-pill__button:hover {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+/* Hover and open both lighten the fill rather than colouring the border. The
+   accent border read as an orange outline on Award, which is a different colour
+   from anything else on the page. */
+.insights-pill__button:hover,
+.insights-pill__button[aria-expanded='true'] {
+  background: var(--band-surface-hover);
+  border-color: var(--band-line);
 }
 
 .insights-pill__chevron {
@@ -90,7 +74,7 @@
   padding: 6px;
   list-style: none;
   background: var(--gp-green-800);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--band-line);
   border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
@@ -101,7 +85,7 @@
   padding: 8px 12px;
   font: inherit;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--band-muted);
   text-align: left;
   cursor: pointer;
   background: none;
@@ -111,8 +95,8 @@
 
 .insights-pill__option:hover,
 .insights-pill__option.is-active {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--band-ink);
+  background: var(--band-surface-hover);
 }
 
 /* --- grid --- */
@@ -137,10 +121,10 @@
 @media (prefers-reduced-motion: no-preference) {
   .insights-card {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.6s ease,
-      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
     /* Stagger down the grid as it scrolls in. */
     transition-delay: calc(var(--i) * 60ms);
   }
@@ -166,8 +150,12 @@
   overflow: hidden;
   color: inherit;
   text-decoration: none;
-  background: #2a2a2a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Was a hardcoded #2a2a2a. The converter only looked for whites, so on Win
+     the card stayed charcoal while everything on it had become ink: dark text
+     on a dark box. Award happened to look right only because it had an override
+     below, which is now redundant and gone. */
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
   border-radius: 14px;
 }
 
@@ -178,21 +166,12 @@
   padding-right: 16px;
 }
 
-/* Award-contract audience: the translucent glass boxes used across the site. */
-.insights[data-audience='award'] .insights-card__inner {
-  background: rgba(255, 255, 255, 0.04);
-  border: 0;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
-}
-
 /* Status / empty message shown while insights load or when none exist. */
 .insights__empty {
   margin: 0;
   padding: 40px 0;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--band-muted);
 }
 
 /* Fixed ratio so every row of titles starts at the same height, whether or not
@@ -204,7 +183,7 @@
   /* Square — the box's own 14px radius and overflow clip the two top corners,
      so the image sits in the corner rather than floating inside it. */
   border-radius: 0;
-  background: var(--insights-bg);
+  background: var(--gp-paper);
 }
 
 .insights-card__art img {
@@ -216,7 +195,7 @@
 .insights-card__topic {
   margin-top: 16px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--band-muted);
 }
 
 .insights-card__title {
@@ -224,7 +203,7 @@
   font-size: 19px;
   font-weight: 600;
   line-height: 1.3;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* Mint on Award; the Win segment carries no green, so it takes the grey the
@@ -247,14 +226,14 @@
   padding-top: 14px;
   font-size: 14.5px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--band-muted);
 }
 
 /* Stated explicitly rather than left to inherit from .insights, so the date
    can't drift onto another face if a wrapper ever sets its own. */
 .insights-card__date {
   font-family: 'Geist Variable', system-ui, sans-serif;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--band-muted);
 }
 
 /* Hover lifts the card clear of the grid, matching the team cards: it rises and
@@ -284,8 +263,8 @@
     /* Above the neighbouring cards so the shadow falls on them, not under. */
     z-index: 1;
     transform: translateY(-10px) scale(1.04);
-    background-color: var(--insights-surface);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--band-surface);
+    border-color: var(--band-muted);
     box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
   }
 
@@ -303,23 +282,22 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--band-surface-hover);
   border: 0;
   border-radius: 999px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease;
 }
 
 .insights__more:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--band-surface-hover);
 }
 
 .insights :is(button):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
 }
 
@@ -397,7 +375,7 @@
     height: 8px;
     padding: 0;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.32);
+    background: var(--band-line);
     border: 0;
     border-radius: 100px;
     transition:
@@ -407,6 +385,6 @@
 
   .insights__dot.is-active {
     width: 26px;
-    background: #fff;
+    background: var(--band-accent);
   }
 }

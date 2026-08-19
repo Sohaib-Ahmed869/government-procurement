@@ -1,0 +1,12 @@
+/* Advisory — the homepage's entry to the Procurement Advisor.
+
+   The cards themselves are the tool's own picker; their styling lives with the
+   component, in features/advisor/components/JurisdictionPicker.css. All that is
+   left here is the band's disclaimer line. */
+
+.ab__note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--band-muted);
+}

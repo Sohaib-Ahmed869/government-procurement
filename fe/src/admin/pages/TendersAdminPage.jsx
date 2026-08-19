@@ -6,11 +6,27 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
 
-// Which of the two lists on the Tender Websites page an entry is shown in.
+// Which of the three lists on the Tender Websites page an entry is shown in,
+// in the order the page renders them. Kept in step with TENDER_SITE_GROUPS in
+// be/src/models/TenderSite.js, which is what the API validates against.
 const GROUPS = [
-  { value: 'australian', label: 'Australian tender website' },
+  { value: 'australian', label: 'Federal, State and Territory' },
+  { value: 'local', label: 'Local Government' },
   { value: 'other', label: 'Other tender website' },
 ];
+
+// Note on the branching below: everything that isn't 'other' is a government
+// tier, and both carry the same three destination links and the same
+// login-required tick. So the form and the save payload test for 'other' and
+// treat the rest as government — which is what makes 'local' work without a
+// third branch.
+
+// Short labels for the table, where the full option text is too long.
+const GROUP_LABEL = {
+  australian: 'Federal/State',
+  local: 'Local Gov',
+  other: 'Other',
+};
 
 // Prefilled the first time an entry is filed under "Other", since every one of
 // them needs the same disclaimer. It stays editable — the operator's name in it
@@ -223,7 +239,7 @@ export default function TendersAdminPage() {
       key: 'group',
       header: 'Section',
       width: 120,
-      render: (r) => (r.group === 'other' ? 'Other' : 'Australian'),
+      render: (r) => GROUP_LABEL[r.group] || GROUP_LABEL.australian,
     },
     { key: 'links', header: 'Links', render: linkSummary },
     {
@@ -392,8 +408,11 @@ export default function TendersAdminPage() {
                 </div>
                 <p className="admin-field__hint" style={{ marginLeft: 0 }}>
                   Adds &ldquo;(Login Required)&rdquo; to the Open and Upcoming
-                  Tenders buttons. Leave off for portals you can search without
-                  an account.
+                  Tenders buttons, so nobody clicks through into a sign-in wall
+                  unaware. Tick it only for a portal whose listings genuinely
+                  cannot be searched without an account &mdash; today that is
+                  South Australia alone. Every other jurisdiction links straight
+                  through and must be left unticked.
                 </p>
               </div>
             </>

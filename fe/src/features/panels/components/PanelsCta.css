@@ -1,0 +1,111 @@
+/* B2 — the closing band.
+
+   Set on the tinted paper step rather than on the dark ground: the page has
+   already gone dark (hero) → paper (list), and a third dark slab at the foot
+   would put the band in competition with the site footer directly under it.
+
+   --gp-paper-alt, NOT --gp-paper-deep. The footer's "Stay across procurement"
+   band sits immediately below this one and is itself --gp-paper-deep (see
+   Footer.css), so matching it ran the two into a single slab with two headings
+   floating in it — the exact failure the footer's own comment describes about
+   the article page's related grid.
+
+   One step lighter instead, which puts the foot of the page on a proper ramp:
+   paper (the list) → paper-alt (this) → paper-deep (subscribe) → the dark
+   footer. On Win the ramp is warm grey (#ece7dc here), on Award light green
+   (#e8efe4), so the band follows the segment without naming either. */
+
+.gp-cta {
+  background: var(--gp-paper-alt);
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gp-cta__copy,
+  .gp-cta__button {
+    opacity: 0;
+    translate: 0 var(--gp-reveal-shift);
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      translate var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .gp-cta.is-in .gp-cta__copy,
+  .gp-cta.is-in .gp-cta__button {
+    opacity: 1;
+    translate: none;
+  }
+
+  .gp-cta.is-in .gp-cta__button { transition-delay: var(--gp-reveal-step); }
+}
+
+.gp-cta__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(20px, 3vw, 40px);
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(40px, 5vw, 64px) clamp(20px, 4vw, 60px);
+}
+
+.gp-cta__copy {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.gp-cta__title {
+  margin: 0;
+  font-size: var(--gp-section-title);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+.gp-cta__body {
+  max-width: 64ch;
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--gp-muted);
+}
+
+/* Filled in the brand rather than the accent — the hero's pill is the accent,
+   and two accent pills on one page read as the same button twice. */
+.gp-cta__button {
+  flex: none;
+  display: inline-block;
+  padding: 15px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gp-paper);
+  text-decoration: none;
+  background: var(--gp-brand);
+  border-radius: 999px;
+  transition:
+    transform 200ms var(--gp-ease),
+    box-shadow 200ms var(--gp-ease),
+    var(--gp-fade);
+}
+
+.gp-cta__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.gp-cta__button:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 3px;
+}
+
+@media (max-width: 620px) {
+  .gp-cta__button {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -30,7 +30,7 @@ function BackLink() {
 
 export default function TeamMemberDetail({ slug }) {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   // The profile comes from the CMS (Content → Team). `null` while loading,
   // `false` once we know there's nothing at this slug.
@@ -83,7 +83,7 @@ export default function TeamMemberDetail({ slug }) {
   // Still loading — hold the page rather than flashing "not found".
   if (member === null) {
     return (
-      <section className="tm" data-audience={audience}>
+      <section className="tm hm-band--light" data-audience={audience}>
         <div className="tm__inner">
           <BackLink />
           <p className="tm__bio">Loading…</p>
@@ -96,7 +96,7 @@ export default function TeamMemberDetail({ slug }) {
   // dropping the visitor on the 404.
   if (!member) {
     return (
-      <section className="tm is-in" data-audience={audience}>
+      <section className="tm hm-band--light is-in" data-audience={audience}>
         <div className="tm__inner">
           <BackLink />
           <h1 className="tm__name">Profile not found</h1>
@@ -119,7 +119,7 @@ export default function TeamMemberDetail({ slug }) {
   return (
     <section
       ref={ref}
-      className={`tm${inView ? ' is-in' : ''}`}
+      className={`tm hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
       {/* The hero sits in its own full-bleed band so its gradient runs edge to

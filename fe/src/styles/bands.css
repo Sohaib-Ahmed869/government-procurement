@@ -1,0 +1,104 @@
+/* Band shades — the alternating dark/light grounds the site is built from.
+
+   Lifted out of features/home/home.css when the Tender Websites page needed the
+   same rhythm (B3). The rules are unchanged; what changed is where they load
+   from. home.css is imported by HomePage.jsx alone, so any other page using
+   .hm-band--light was relying on the two stylesheets happening to end up in one
+   bundle — true today, and a silent breakage the moment CSS is split per route.
+   Imported from index.css instead, so a band shade is available wherever a page
+   asks for one.
+
+   The `.hm-band` base rule (padding, scroll-margin for the homepage ribbon)
+   deliberately stayed behind: it is homepage layout, not a shade. A page that
+   wants only the ground takes a --dark/--light class and pays for its own
+   spacing.
+
+   The homepage alternates dark, light, dark, light down its whole length, so a
+   band only ever needs to know *which of the two* it is. Each variant sets a
+   small set of local `--band-*` roles, and every band's own stylesheet is
+   written against those rather than against the ramp directly. That is what
+   lets a section be flipped from dark to light by changing one class, instead
+   of rewriting its card colours, rules and muted text by hand.
+
+   --band-surface is the raised step a card sits on, one move away from the
+   band's own ground in whichever direction reads as "raised" there. */
+/* Shared by every dark band: only the ground and the card surface change
+   between them, so the text roles and the accent are set once here. */
+.hm-band--dark,
+.hm-band--dark-2,
+.hm-band--dark-3 {
+  color: #fff;
+
+  --band-ink: #fff;
+  --band-muted: rgba(255, 255, 255, 0.72);
+  --band-line: rgba(255, 255, 255, 0.12);
+  /* The bright accent is built for dark grounds — see the note on
+     --gp-accent-ink in tokens.css. */
+  --band-accent: var(--gp-accent);
+  /* Text drawn ON a filled accent. The dark band's accent is bright, so it
+     takes dark text; the light band's is dark, so it takes paper. */
+  --band-on-accent: var(--gp-brand-deep);
+}
+
+.hm-band--light,
+.hm-band--light-2,
+.hm-band--light-3 {
+  color: var(--gp-ink);
+
+  --band-ink: var(--gp-ink);
+  --band-muted: var(--gp-muted);
+  --band-line: var(--gp-line);
+  /* …and the darkened one is what passes AA on paper. */
+  --band-accent: var(--gp-accent-ink);
+  --band-on-accent: var(--gp-paper);
+}
+
+/* Three darks and three lights, cycled down the page so no two bands of the
+   same tone are the same colour. --band-surface is always a step *away* from
+   the band's own ground in the direction that reads as raised there: lighter on
+   the deep grounds, darker on the palest ones. */
+.hm-band--dark {
+  background: var(--gp-brand);
+  --band-surface: var(--gp-brand-soft);
+  --band-surface-hover: var(--gp-brand-mid);
+}
+
+/* The lighter green / warm grey step. There is no step above it that isn't the
+   accent, so a card here has to be *darker* than its band — which reads as a
+   hole punched in the ground rather than a panel raised off it. So this shade
+   is given to bands that carry no cards: the founder quote, and anything else
+   that is type and a photograph. The surfaces below are a fallback, not a
+   pattern to build a card band on. */
+.hm-band--dark-2 {
+  background: var(--gp-brand-alt);
+  --band-surface: var(--gp-brand);
+  --band-surface-hover: var(--gp-brand-deep);
+}
+
+.hm-band--dark-3 {
+  background: var(--gp-brand-deep);
+  --band-surface: var(--gp-brand);
+  --band-surface-hover: var(--gp-brand-soft);
+}
+
+.hm-band--light {
+  background: var(--gp-paper);
+  --band-surface: var(--gp-paper-alt);
+  --band-surface-hover: var(--gp-paper-deep);
+}
+
+.hm-band--light-2 {
+  background: var(--gp-paper-alt);
+  --band-surface: var(--gp-paper);
+  --band-surface-hover: var(--gp-paper-deep);
+}
+
+.hm-band--light-3 {
+  background: var(--gp-paper-deep);
+  --band-surface: var(--gp-paper);
+  --band-surface-hover: var(--gp-paper-alt);
+}
+
+/* The older names, kept so nothing that still uses them breaks mid-refactor. */
+.hm-band--paper { background: var(--gp-paper); color: var(--gp-ink); }
+.hm-band--paper-alt { background: var(--gp-paper-alt); color: var(--gp-ink); }

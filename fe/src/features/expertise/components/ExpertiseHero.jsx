@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import photo from '../../../assets/images/ExpertiseImage.png';
@@ -7,7 +8,7 @@ export default function ExpertiseHero() {
   const { audience } = useAudience();
 
   // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  const mounted = useMountReveal();
 
   return (
     <section className={`xp${mounted ? ' is-in' : ''}`} data-audience={audience}>
@@ -31,9 +32,9 @@ export default function ExpertiseHero() {
           <p className="xp__role">Founder, Government Procurement</p>
 
           <div className="xp__actions">
-            <a className="xp__btn" href="/book-a-consultation">
+            <Link className="xp__btn" to="/book-a-consultation">
               Request a Consultation
-            </a>
+            </Link>
           </div>
         </div>
       </div>

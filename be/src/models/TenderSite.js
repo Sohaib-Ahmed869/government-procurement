@@ -6,10 +6,19 @@ import mongoose from 'mongoose';
 //
 // Superseded the tender entries that used to live in Link (group: 'tender'),
 // which only carried a label, a URL and a description.
-// Which section of the Tender Websites page an entry is listed under.
+// Which section of the Tender Websites page an entry is listed under, in the
+// order the page renders them.
+//
 // 'australian' is the federal/state/territory list the page leads with, and is
-// what every entry saved before this field existed falls back to.
-export const TENDER_SITE_GROUPS = ['australian', 'other'];
+// what every entry saved before this field existed falls back to. 'local' (B3)
+// is the councils and local-government buying groups — Local Buy and its
+// equivalents — which sit between the government list and the paywalled ones:
+// they are still government, so they belong above 'other', and they are a tier
+// below the states, so they belong under 'australian'.
+//
+// 'local' carries the same destination fields as 'australian' (open tenders,
+// upcoming, create account) rather than 'other's single paywalled login.
+export const TENDER_SITE_GROUPS = ['australian', 'local', 'other'];
 
 const tenderSiteSchema = new mongoose.Schema(
   {

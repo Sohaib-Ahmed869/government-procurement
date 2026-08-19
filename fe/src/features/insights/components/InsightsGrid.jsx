@@ -101,7 +101,7 @@ const PAGE_SIZE = 12;
 
 export default function InsightsGrid() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
   // The selected category id, or 'all'.
   const [category, setCategory] = useState('all');
 
@@ -179,7 +179,7 @@ export default function InsightsGrid() {
   };
 
   return (
-    <section ref={ref} className={`insights${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section ref={ref} className={`insights hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="insights__inner">
         {status === 'ready' && articles.length > 0 && (
           <div className="insights__filters">

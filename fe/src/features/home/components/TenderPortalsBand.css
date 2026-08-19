@@ -1,0 +1,84 @@
+/* Tender portals band — sits on the segment's ground colour, with the cards a
+   step lifted off it by a white wash rather than by a second solid, so the two
+   dark shades stay related instead of reading as two different greens. */
+
+.tpb__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 24px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tpb__item { display: flex; }
+
+.tpb__card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px;
+  border-radius: 4px;
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
+  transition:
+    background-color 300ms var(--gp-ease),
+    border-color 300ms var(--gp-ease);
+}
+
+.tpb__card:hover {
+  background: var(--band-surface-hover);
+  border-color: var(--band-accent);
+}
+
+.tpb__sub {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--band-accent);
+  transition: var(--gp-fade);
+}
+
+.tpb__name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+/* Pushed to the foot of the card so three cards of different name lengths still
+   line their chips up along one row. */
+.tpb__links {
+  margin-top: auto;
+  padding-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tpb__chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--band-line);
+  font-size: 13px;
+  color: var(--band-ink);
+  text-decoration: none;
+  transition:
+    background-color 240ms var(--gp-ease),
+    color 240ms var(--gp-ease),
+    border-color 240ms var(--gp-ease);
+}
+
+.tpb__chip:hover {
+  background: var(--band-accent);
+  border-color: var(--band-accent);
+  color: var(--band-on-accent);
+}
+
+@media (max-width: 1000px) {
+  .tpb__grid { grid-template-columns: 1fr; }
+}

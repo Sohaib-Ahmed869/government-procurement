@@ -1,0 +1,171 @@
+/* B2 — the panels we can be engaged through.
+
+   A plain list, matching the reference. Headings set the buying entity, and
+   under each one a run of single lines: agency – panel name (reference). No
+   cards, no chips, no filter bar — a client reading this is looking for the one
+   arrangement they already buy under, and every piece of furniture between them
+   and the rows makes that slower.
+
+   Set on paper with dark ink under the dark hero, which is the same step the
+   article page takes: a run of thirty lines is a reading surface. */
+
+.gp-list {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+.gp-list__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(36px, 5vw, 60px) clamp(20px, 4vw, 60px) clamp(48px, 7vw, 88px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gp-group {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .gp-list.is-in .gp-group {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Two steps only. A page of six headings on a per-group stagger ends on a
+     delay long enough to read as the page still loading. */
+  .gp-list.is-in .gp-group:nth-of-type(n + 2) { transition-delay: var(--gp-reveal-step); }
+}
+
+/* --- headings ------------------------------------------------------------- */
+
+.gp-group + .gp-group { margin-top: clamp(30px, 4vw, 44px); }
+
+.gp-group__head {
+  margin: 0 0 4px;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+/* --- rows ----------------------------------------------------------------- */
+
+.gp-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Indented under the heading, the way the reference sets it — the mark sits in
+   the indent so the text of every row starts at the same x and the eye has one
+   edge to run down. */
+.gp-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding: 9px 0 9px clamp(0px, 2vw, 30px);
+}
+
+/* The GP mark as the bullet — the reference uses its own logo here, and a plain
+   disc read as a list of nothing in particular.
+
+   Two artworks rather than one recoloured mark: GP-03 is the black mark and
+   GP-05 the dark green one, so the bullet follows the segment the way every
+   other surface on the site does. They are used as supplied — no mask, no
+   filter — which means the mark is always exactly the brand colour rather than
+   whatever a token happens to resolve to.
+
+   Win is the default because --gp-brand and friends default to the ink ramp in
+   tokens.css; the award rule below overrides it, matching how the ramps are
+   ordered everywhere else.
+
+   The box is sized to the artwork's own ratio (738x639 and 737x640, both
+   1.153:1) so the mark is never squashed. It has to be reasonably large to be
+   legible at all: unlike a disc, this mark is two letterforms with counters in
+   them, and under about 20px tall the G and the P stop resolving and it reads
+   as a smudge. Centred on the first line's box — in em, so it holds as the row
+   text scales. */
+.gp-row__mark {
+  width: 24px;
+  height: 21px;
+  margin-top: 0.14em;
+  background: url('../../../assets/images/GP-03.png') no-repeat center / contain;
+}
+
+.gp-list[data-audience='award'] .gp-row__mark {
+  background-image: url('../../../assets/images/GP-05.png');
+}
+
+.gp-row__link,
+.gp-row__text {
+  font-size: clamp(15px, 1.3vw, 16.5px);
+  line-height: 1.55;
+}
+
+.gp-row__link {
+  color: var(--gp-accent-ink);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 160ms var(--gp-ease),
+    border-color 160ms var(--gp-ease);
+}
+
+.gp-row__link:hover {
+  color: var(--gp-brand);
+  border-bottom-color: currentColor;
+}
+
+.gp-row__link:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* An entry with no URL yet is still a real credential, so it reads as ink
+   rather than as a disabled link. */
+.gp-row__text { color: var(--gp-ink); }
+
+/* The three parts of a row carry no weight of their own — the line is read as
+   one string. Only the reference is stepped back, because it is what you check
+   against a contract rather than what you scan for. */
+.gp-row__ref { color: var(--gp-muted); }
+
+.gp-row__link .gp-row__ref { color: inherit; opacity: 0.75; }
+
+/* --- states --------------------------------------------------------------- */
+
+.gp-empty {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--gp-muted);
+}
+
+/* --- responsive ----------------------------------------------------------- */
+
+@media (max-width: 620px) {
+  .gp-list__inner { padding: 32px 20px 48px; }
+
+  .gp-row {
+    grid-template-columns: 21px minmax(0, 1fr);
+    gap: 10px;
+    padding-left: 0;
+  }
+
+  /* Ratio held at 1.153:1 here too, so the mark shrinks rather than distorting,
+     and kept above the ~20px floor where the letterforms stop resolving. */
+  .gp-row__mark {
+    width: 21px;
+    height: 18px;
+  }
+}

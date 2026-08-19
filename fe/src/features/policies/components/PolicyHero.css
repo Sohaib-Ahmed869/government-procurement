@@ -1,0 +1,57 @@
+/* The shared page-heading band: --gp-head-bg for the ground and --gp-head-pad
+   for the spacing, same as every other page on the site. */
+
+.polh {
+  background: var(--gp-head-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .polh__title,
+  .polh__sub {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .polh.is-in .polh__title { opacity: 1; transform: none; transition-delay: var(--gp-reveal-step); }
+  .polh.is-in .polh__sub { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 2); }
+}
+
+.polh__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
+}
+
+.polh__title {
+  margin: 0;
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.polh__sub {
+  max-width: 66ch;
+  margin: 18px 0 0;
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+@media (max-width: 860px) {
+  .polh__title {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: var(--gp-page-title-phone);
+  }
+}
+
+@media (max-width: 760px) {
+  .polh__inner { padding: var(--gp-head-pad) 24px; }
+  .polh__sub { max-width: none; font-size: 16px; }
+}

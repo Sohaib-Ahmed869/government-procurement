@@ -1,0 +1,83 @@
+/* B7 — Find a Bid Writer hero. The shared page-heading band, same as every other
+   page: --gp-head-bg for the ground and --gp-head-pad for the spacing. */
+
+.bw-hero {
+  background: var(--gp-head-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bw-hero__title,
+  .bw-hero__sub,
+  .bw-hero__note {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .bw-hero.is-in .bw-hero__title { opacity: 1; transform: none; transition-delay: var(--gp-reveal-step); }
+  .bw-hero.is-in .bw-hero__sub   { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 2); }
+  .bw-hero.is-in .bw-hero__note  { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 3); }
+}
+
+.bw-hero__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
+}
+
+.bw-hero__title {
+  margin: 0;
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.bw-hero__sub {
+  max-width: 68ch;
+  margin: 20px 0 0;
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* The caveat. Quieter than the lede but not hidden — it is the line that keeps
+   the page honest about what a prompt can and cannot do. */
+.bw-hero__note {
+  max-width: 62ch;
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* The preview banner. Loud, because its whole job is to stop somebody mistaking
+   a staging page for a live one. */
+.bw-hero__flag {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--gp-brand-deep);
+  background: var(--gp-accent);
+  border-radius: 999px;
+}
+
+@media (max-width: 860px) {
+  .bw-hero__title {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: var(--gp-page-title-phone);
+  }
+}
+
+@media (max-width: 760px) {
+  .bw-hero__inner { padding: var(--gp-head-pad) 24px; }
+  .bw-hero__sub { max-width: none; font-size: 16px; }
+}

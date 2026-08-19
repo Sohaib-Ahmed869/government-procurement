@@ -1,0 +1,261 @@
+/* A6.7 — the advisory rules form.
+
+   Long, because there are twenty-odd figures and forty sources, so the job here
+   is to make it scannable: grouped, each figure showing what it is today, and
+   anything the editor has changed marked so it can be found again before they
+   save. */
+
+.arp__h3 {
+  margin: 32px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--admin-text, inherit);
+}
+
+.arp__group {
+  margin: 0 0 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--admin-line, #e3e6e4);
+  border-radius: 8px;
+}
+
+.arp__legend {
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.arp__intro {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--admin-muted);
+}
+
+.arp__empty {
+  margin: 24px 0 0;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--admin-muted);
+  background: var(--admin-sunken, #f4f6f5);
+  border-radius: 6px;
+}
+
+/* --- one figure ----------------------------------------------------------- */
+
+.arp__field { padding: 12px 0; }
+.arp__field + .arp__field { border-top: 1px solid var(--admin-line, #e3e6e4); }
+
+.arp__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.arp__help {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--admin-muted);
+}
+
+.arp__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* The value in use, shown beside the field rather than inside it — an empty
+   field has to mean "unchanged", so it cannot be pre-filled. */
+.arp__current {
+  flex: 0 0 auto;
+  min-width: 150px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-muted);
+}
+
+.arp__input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: #fff;
+  border: 1px solid var(--admin-line, #d7dcd9);
+  border-radius: 6px;
+}
+
+.arp__input:focus-within {
+  border-color: var(--admin-accent, #2f5c3a);
+  box-shadow: 0 0 0 2px rgba(47, 92, 58, 0.12);
+}
+
+.arp__input input {
+  width: 140px;
+  padding: 9px 0;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  border: 0;
+  outline: none;
+  background: transparent;
+}
+
+.arp__affix {
+  font-size: 14px;
+  color: var(--admin-muted);
+}
+
+.arp__changed {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #8a5d10;
+}
+
+/* --- sources -------------------------------------------------------------- */
+
+.arp__source {
+  margin-bottom: 8px;
+  border: 1px solid var(--admin-line, #e3e6e4);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.arp__source.is-touched { border-color: #8a5d10; }
+
+.arp__source-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  background: var(--admin-sunken, #f7f8f8);
+  border: 0;
+  cursor: pointer;
+}
+
+.arp__source-head:hover { background: var(--admin-sunken-hover, #eef1ef); }
+
+.arp__source-title { font-weight: 600; }
+
+.arp__source-state {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.arp__source.is-touched .arp__source-state { color: #8a5d10; }
+
+.arp__source-body {
+  padding: 14px;
+  border-top: 1px solid var(--admin-line, #e3e6e4);
+}
+
+/* --- rules in use now ----------------------------------------------------- */
+
+.arp__current-panel {
+  margin: 0 0 28px;
+  border: 1px solid var(--admin-line, #e3e6e4);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.arp__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 18px;
+  font: inherit;
+  text-align: left;
+  background: var(--admin-sunken, #f7f8f8);
+  border: 0;
+  cursor: pointer;
+}
+
+.arp__panel-head:hover { background: var(--admin-sunken-hover, #eef1ef); }
+
+.arp__panel-meta {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--admin-muted);
+}
+
+.arp__panel-toggle {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.arp__panel-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px 32px;
+  padding: 20px 18px;
+  border-top: 1px solid var(--admin-line, #e3e6e4);
+}
+
+.arp__panel-group-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-muted);
+}
+
+.arp__panel-list { margin: 0; }
+
+.arp__panel-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--admin-line, #eef0ef);
+}
+
+.arp__panel-row dt {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.arp__panel-row dd {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* A figure a published version has moved, with what it used to be — so the
+   difference between "this is the rule" and "someone changed this" is visible
+   without opening the version. */
+.arp__panel-row.is-changed dd { color: #8a5d10; }
+
+.arp__panel-was {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--admin-muted);
+  text-decoration: line-through;
+}

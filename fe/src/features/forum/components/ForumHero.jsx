@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import ForumSidebar from './ForumSidebar.jsx';
@@ -11,7 +11,7 @@ export default function ForumHero({ compact = false }) {
   const { audience } = useAudience();
 
   // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  const mounted = useMountReveal();
 
   // Search runs through the URL, the same way the category filter does: the
   // field submits to /forum?q=…, and ForumAnswers reads the term from there.
@@ -80,7 +80,7 @@ export default function ForumHero({ compact = false }) {
             />
           </form>
 
-          <a className="forum-hero__submit" href="/q-and-a/submit" aria-label="Submit a question">
+          <Link className="forum-hero__submit" to="/q-and-a/submit" aria-label="Submit a question">
             <span className="forum-hero__submit-label">Submit a question</span>
             {/* Small screens show the pill as a compact "+" circle instead. */}
             <span className="forum-hero__submit-plus" aria-hidden="true">
@@ -89,7 +89,7 @@ export default function ForumHero({ compact = false }) {
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </span>
-          </a>
+          </Link>
 
           {/* Mobile-only: opens the categories panel. */}
           <button

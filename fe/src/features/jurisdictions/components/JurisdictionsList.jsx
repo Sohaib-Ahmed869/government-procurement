@@ -81,7 +81,7 @@ function FilterSelect({ id, label, value, options, onChange, wide = false }) {
 
 export default function JurisdictionsList() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   const [state, setState] = useState('all');
   const [category, setCategory] = useState('all');
@@ -148,7 +148,7 @@ export default function JurisdictionsList() {
   return (
     <section
       ref={ref}
-      className={`jl${inView ? ' is-in' : ''}`}
+      className={`jl hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
       <div className="jl__inner">

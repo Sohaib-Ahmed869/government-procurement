@@ -1,0 +1,122 @@
+/* A6 — the jurisdiction boxes.
+
+   One implementation, used in two places: the Procurement Advisor's own picker
+   and the homepage's advisory band. They used to be two different card designs
+   with two different jurisdiction lists — the band named VIC and QLD as "coming
+   soon" while the tool listed neither — so a visitor met one shape on the way
+   in and another on arrival, promised two jurisdictions that don't exist. The
+   list now comes from jurisdictions.js in both, and so does the look.
+
+   Written against the site ramp rather than the homepage's --band-* roles: both
+   grounds it sits on are --gp-paper, so the same colours are correct in both
+   and the band cannot drift from the page by picking up a different surface. */
+
+.pa-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 26px);
+  margin: 0 0 clamp(28px, 4vw, 44px);
+  padding: 0;
+  list-style: none;
+}
+
+.pa-grid__item { display: flex; }
+
+/* A live jurisdiction is a link — it opens the tool. The ones that aren't are
+   plain divs, so there is nothing to click and nothing to tab to: a disabled
+   control a keyboard user can still reach is a promise the page can't keep. */
+.pa-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 30px 28px 34px;
+  font-family: inherit;
+  text-align: left;
+  text-decoration: none;
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-radius: 8px;
+  transition:
+    var(--gp-fade),
+    transform 240ms var(--gp-ease),
+    box-shadow 240ms var(--gp-ease);
+}
+
+.pa-card.is-live {
+  cursor: pointer;
+  color: var(--gp-ink);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.pa-card.is-live:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 22px 44px rgba(0, 0, 0, 0.12);
+}
+
+.pa-card.is-live:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 3px;
+}
+
+.pa-card[aria-disabled='true'] {
+  background: var(--gp-paper-alt);
+  opacity: 0.78;
+}
+
+.pa-card__go {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+  transition: var(--gp-fade);
+}
+
+.pa-card__code {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gp-accent-ink);
+}
+
+.pa-card__name {
+  margin: 0;
+  font-size: clamp(18px, 1.8vw, 22px);
+  letter-spacing: -0.02em;
+}
+
+.pa-card__status {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gp-muted);
+}
+
+/* An unnamed placeholder: no code, no jurisdiction, no action. Centred and
+   quieter than a live box so the row still reads as three even though only one
+   of them does anything. */
+.pa-card--soon {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--gp-paper-alt);
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.pa-card--soon .pa-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gp-muted);
+}
+
+@media (max-width: 860px) {
+  .pa-grid { grid-template-columns: 1fr; }
+}

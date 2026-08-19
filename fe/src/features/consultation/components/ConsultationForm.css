@@ -1,52 +1,45 @@
 .consult {
-  --consult-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
-  background: var(--consult-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.consult[data-audience='award'] {
-  --consult-bg: var(--gp-green-900);
-}
 
-.consult[data-audience='win'] {
-  --consult-bg: var(--gp-ink-900);
-}
 
 /* --- reveal on scroll into view --- */
 @media (prefers-reduced-motion: no-preference) {
   .consult__intro,
   .consult__form {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .consult.is-in .consult__intro {
     opacity: 1;
     transform: none;
-    transition-delay: 0.1s;
+    transition-delay: var(--gp-reveal-step);
   }
   .consult.is-in .consult__form {
     opacity: 1;
     transform: none;
-    transition-delay: 0.2s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
 .consult__inner {
   position: relative;
   z-index: 1;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
   /* 40px side gutters, matching every other section's __inner. Without them the
      grid runs edge to edge on any viewport under 1100px. */
-  padding: 40px;
+  padding: 40px clamp(20px, 4vw, 60px);
 }
 
 /* --- two-column layout: intro + form --- */

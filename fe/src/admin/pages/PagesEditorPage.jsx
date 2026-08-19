@@ -202,7 +202,7 @@ export default function PagesEditorPage() {
               <h3 className="editor-panel__title">Status</h3>
               <div className="editor-publish">
                 <span className={`editor-publish__dot${isPublished ? ' is-live' : ''}`} />
-                <span>{isPublished ? 'Published — live on the site' : 'Draft — not visible yet'}</span>
+                <span>{isPublished ? 'Published, live on the site' : 'Draft, not visible yet'}</span>
               </div>
               <FormField
                 label="Status" name="status" as="select" value={form.status} onChange={onChange}

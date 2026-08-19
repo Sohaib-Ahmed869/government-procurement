@@ -1,0 +1,53 @@
+/* Jurisdictions — eight tiles, the abbreviation leading.
+
+   Auto-fit rather than a fixed count: eight divides badly into three or four,
+   and letting the track count follow the width keeps the last row from ending
+   in a single orphaned tile at most sizes. */
+
+.jb__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: clamp(12px, 1.4vw, 18px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jb__item { display: flex; }
+
+.jb__link {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 18px 20px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
+  border-radius: 4px;
+  transition:
+    var(--gp-fade),
+    transform 220ms var(--gp-ease);
+}
+
+.jb__link:hover {
+  transform: translateY(-2px);
+  background: var(--band-surface-hover);
+}
+
+.jb__code {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--band-accent);
+  transition: var(--gp-fade);
+}
+
+.jb__label {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--band-ink);
+  transition: var(--gp-fade);
+}

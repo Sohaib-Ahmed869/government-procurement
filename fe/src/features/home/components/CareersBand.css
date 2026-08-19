@@ -1,0 +1,68 @@
+/* Careers — four across.
+
+   The cards take the band's raised step, so they read as panels on whichever
+   surface the band is: paper-alt on a light band, brand-soft on a dark one.
+   Nothing here names a ramp step directly, which is what lets the band be
+   flipped between the two by changing one class on the section. */
+
+.cb__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(14px, 1.6vw, 22px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cb__item { display: flex; }
+
+.cb__card {
+  flex: 1;
+  padding: 26px 24px 30px;
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
+  border-radius: 4px;
+  transition:
+    var(--gp-fade),
+    transform 260ms var(--gp-ease);
+}
+
+.cb__card:hover {
+  transform: translateY(-3px);
+  background: var(--band-surface-hover);
+}
+
+.cb__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--band-ink);
+}
+
+/* A short accent rule under the heading, the one place the segment's accent
+   appears on these cards. */
+.cb__title::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-top: 12px;
+  background: var(--band-accent);
+  transition: var(--gp-fade);
+}
+
+.cb__body {
+  margin: 14px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--band-muted);
+}
+
+@media (max-width: 1080px) {
+  .cb__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .cb__grid { grid-template-columns: 1fr; }
+}

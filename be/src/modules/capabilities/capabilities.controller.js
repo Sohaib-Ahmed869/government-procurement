@@ -3,8 +3,9 @@ import { ApiError } from '../../utils/ApiError.js';
 import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Capability } from '../../models/Capability.js';
+import { uploadBuffer, deleteObject } from '../../config/s3.js';
 
-const EDITABLE = ['title', 'body', 'icon', 'audience', 'order', 'active'];
+const EDITABLE = ['key', 'title', 'body', 'stage', 'icon', 'audience', 'order', 'active'];
 
 function pickEditable(body) {
   const out = {};
@@ -71,12 +72,77 @@ export const update = asyncHandler(async (req, res) => {
   return ok(res, capability);
 });
 
+// POST /:id/image — attach the photograph shown beside this service on the
+// Service Offering page.
+//
+// Its own endpoint rather than a field on PATCH, because the file has to be
+// stored before there is a URL to save: the same shape as a team member's
+// photo. `image` is deliberately absent from EDITABLE, so a PATCH carrying a
+// stale copy of the card can't overwrite what was just uploaded.
+export const uploadCardImage = asyncHandler(async (req, res) => {
+  if (!req.file) throw ApiError.badRequest('File is required');
+
+  const capability = await Capability.findById(req.params.id);
+  if (!capability) throw ApiError.notFound('Capability not found');
+
+  const { key, url } = await uploadBuffer({
+    buffer: req.file.buffer,
+    mimeType: req.file.mimetype,
+    folder: 'service-offering',
+    originalName: req.file.originalname,
+  });
+
+  const oldKey = capability.image?.key;
+  capability.image = { key, url };
+  await capability.save();
+
+  if (oldKey && oldKey !== key) {
+    // Best-effort cleanup — never fail the request over a stale object.
+    deleteObject(oldKey).catch(() => {});
+  }
+
+  recordAudit({
+    req,
+    action: 'capability.update',
+    entity: 'Capability',
+    entityId: capability._id,
+    summary: `Updated image for capability "${capability.title}"`,
+  });
+  return ok(res, capability);
+});
+
+// DELETE /:id/image — drop the photograph, so the row falls back to the
+// built-in one for that service rather than keeping a picture an editor has
+// decided against.
+export const removeCardImage = asyncHandler(async (req, res) => {
+  const capability = await Capability.findById(req.params.id);
+  if (!capability) throw ApiError.notFound('Capability not found');
+
+  const oldKey = capability.image?.key;
+  capability.image = { key: '', url: '' };
+  await capability.save();
+
+  if (oldKey) deleteObject(oldKey).catch(() => {});
+
+  recordAudit({
+    req,
+    action: 'capability.update',
+    entity: 'Capability',
+    entityId: capability._id,
+    summary: `Removed image for capability "${capability.title}"`,
+  });
+  return ok(res, capability);
+});
+
 // DELETE /:id — remove a card.
 export const remove = asyncHandler(async (req, res) => {
   const capability = await Capability.findById(req.params.id);
   if (!capability) throw ApiError.notFound('Capability not found');
 
+  const imageKey = capability.image?.key;
   await capability.deleteOne();
+  if (imageKey) deleteObject(imageKey).catch(() => {});
+
   recordAudit({
     req,
     action: 'capability.delete',

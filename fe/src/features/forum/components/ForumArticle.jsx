@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
@@ -14,13 +13,12 @@ function formatDate(iso) {
 }
 
 export default function ForumArticle() {
-  const { audience } = useAudience();
   const [article, setArticle] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | empty
 
   // resetKey includes status so the reveal animation replays once the ready
   // content actually mounts (the ref isn't rendered during loading).
-  const { ref, inView } = useInView({ resetKey: `${audience}:${article?._id ?? 'none'}:${status}` });
+  const { ref, inView } = useInView({ resetKey: `${article?._id ?? 'none'}:${status}` });
 
   useEffect(() => {
     let alive = true;
@@ -48,7 +46,7 @@ export default function ForumArticle() {
 
   if (status === 'loading') {
     return (
-      <section className="forum-article">
+      <section className="forum-article hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
             <p className="forum-article__q">Loading question…</p>
@@ -61,7 +59,7 @@ export default function ForumArticle() {
 
   if (status === 'empty' || !article) {
     return (
-      <section className="forum-article">
+      <section className="forum-article hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
             <h1 className="forum-article__title">No questions yet</h1>
@@ -79,7 +77,7 @@ export default function ForumArticle() {
   const lessons = article.answer?.lessons ?? [];
 
   return (
-    <section ref={ref} className={`forum-article${inView ? ' is-in' : ''}`}>
+    <section ref={ref} className={`forum-article hm-band--light${inView ? ' is-in' : ''}`}>
       <div className="forum-article__inner">
         <div className="forum-article__main">
           <h1 className="forum-article__title">{article.title}</h1>

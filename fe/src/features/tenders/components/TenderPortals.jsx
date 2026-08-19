@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
+import { useInView } from '../../../hooks/useInView.js';
 import { tenderSitesApi } from '../../../api';
 import './TenderPortals.css';
 
@@ -8,41 +9,51 @@ import './TenderPortals.css';
 // subtitle, a logo and its destinations — a button appears only for the links
 // that have been filled in.
 //
-// The two sections offer different destinations: the Australian portals are
-// free to search once you have an account, while the others are paywalled and
-// carry a single sign-in link plus the note printed under it.
-// `gated` marks the labels that pick up "(Login Required)" — only on the
-// portals whose listings actually sit behind a sign-in, which is a per-entry
-// tick in the CMS rather than something true of every portal.
+// The three sections offer different destinations. The government portals —
+// federal, state and local alike — carry the same three buttons. The 'other'
+// sites are paywalled and carry a single sign-in link plus the note printed
+// under it.
+//
+// `gated` marks the labels that pick up "(Login Required)" — the two that lead
+// into listings. Creating an account is the thing you do *because* of the wall,
+// so it never carries the suffix. Whether it shows at all is the per-entry tick
+// in the CMS, not something assumed of a whole section: today that is South
+// Australia and nothing else.
+const GOVERNMENT_DESTINATIONS = [
+  { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
+  { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
+  { key: 'createAccountUrl', label: 'Create Free Account' },
+];
+
 const DESTINATIONS = {
-  australian: [
-    { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
-    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
-    { key: 'createAccountUrl', label: 'Create Free Account' },
-  ],
+  australian: GOVERNMENT_DESTINATIONS,
+  local: GOVERNMENT_DESTINATIONS,
   other: [{ key: 'loginUrl', label: 'Login (Paid wall)' }],
 };
 
-// Keyed in the parent so it remounts and replays its reveal when the list loads.
-function TenderList({ sites, group = 'australian' }) {
+// A band of cards, revealed as it is scrolled to rather than on mount.
+//
+// It used to fade in the moment the page loaded, which meant the two lists
+// below the fold had already played by the time anybody reached them — the
+// animation happened, but to nobody. `useInView` is what the homepage bands use
+// and is the site's convention for anything below the hero.
+//
+// threshold 0: a band of cards is taller than a phone viewport, so waiting for
+// 15% of it to be on screen can never fire. Same trap the article body hit.
+function TenderList({ sites, group = 'australian', audience }) {
   const destinations = DESTINATIONS[group] || DESTINATIONS.australian;
-
-  const [shown, setShown] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setShown(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  const { ref, inView } = useInView({ threshold: 0 });
 
   if (sites.length === 0) {
     return (
-      <ul className="tp__list">
+      <ul className="tp__list" ref={ref}>
         <li className="tp__empty-row">No tender websites have been added yet.</li>
       </ul>
     );
   }
 
   return (
-    <ul className={`tp__list${shown ? ' is-in' : ''}`}>
+    <ul ref={ref} className={`tp__list${inView ? ' is-in' : ''}`}>
       {sites.map((site) => (
         <li className="tp__row" key={site._id || site.id || site.name}>
           {/* The tile shows whether or not a logo has been uploaded, so the
@@ -104,41 +115,74 @@ export default function TenderPortals() {
   }, []);
 
   // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  const mounted = useMountReveal();
 
   // The CMS marks each entry as 'australian' or 'other'; entries saved before
   // that field existed carry no group and belong to the Australian list.
   const australian = sites.filter((s) => (s.group || 'australian') === 'australian');
+  // B3 — councils and local-government buying groups, between the government
+  // list above and the paywalled sites below.
+  const local = sites.filter((s) => s.group === 'local');
   const other = sites.filter((s) => s.group === 'other');
 
   return (
-    <section className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>
-      <div className="tp__inner">
-        <h1 className="tp__title">
-          Explore Federal, State and Territory Tender Websites
-        </h1>
+    <div className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>
+      {/* Each section is a full-bleed band, alternating dark and light the way
+          the homepage and Service Offering pages do — the shades come from the
+          shared .hm-band--* set in styles/bands.css, so this page is built from
+          the same grounds rather than its own private ramp.
 
-        {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
-        {status === 'error' && (
-          <p className="tp__featured">
-            We couldn&apos;t load the tender websites right now. Please try again shortly.
-          </p>
-        )}
-        {status === 'ready' && (
-          <>
-            <TenderList sites={australian} />
+          The h1 no longer names one of the lists. It used to read "Explore
+          Federal, State and Territory Tender Websites", which was the page
+          title and the first section's heading at once — so once Local
+          Government and Other were added below it, the page's own title
+          described a third of its contents. The title is now the page, and each
+          list carries its own h2. */}
+      <section className="tp__band tp__band--head hm-band--dark">
+        <div className="tp__inner">
+          <h1 className="tp__title">Explore Tender Websites</h1>
 
-            {/* Only drawn once something has been filed under it, so the page
-                doesn't carry an empty heading. */}
-            {other.length > 0 && (
-              <>
+          {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
+          {status === 'error' && (
+            <p className="tp__featured">
+              We couldn&apos;t load the tender websites right now. Please try again shortly.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {status === 'ready' && (
+        <>
+          <section className="tp__band tp__band--gov hm-band--light">
+            <div className="tp__inner">
+              <h2 className="tp__group-title">Federal, State and Territory Government</h2>
+              <TenderList sites={australian} audience={audience} />
+            </div>
+          </section>
+
+          {/* B3.3 — Local Government sits between the federal/state list and
+              the paywalled sites. Each band is only drawn once something has
+              been filed under it, so the page never carries an empty heading —
+              and never an empty stripe of colour either. */}
+          {local.length > 0 && (
+            <section className="tp__band tp__band--local hm-band--dark">
+              <div className="tp__inner">
+                <h2 className="tp__group-title">Local Government</h2>
+                <TenderList sites={local} group="local" audience={audience} />
+              </div>
+            </section>
+          )}
+
+          {other.length > 0 && (
+            <section className="tp__band tp__band--other hm-band--light-2">
+              <div className="tp__inner">
                 <h2 className="tp__group-title">Other Tender Websites</h2>
-                <TenderList sites={other} group="other" />
-              </>
-            )}
-          </>
-        )}
-      </div>
-    </section>
+                <TenderList sites={other} group="other" audience={audience} />
+              </div>
+            </section>
+          )}
+        </>
+      )}
+    </div>
   );
 }

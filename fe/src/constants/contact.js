@@ -3,6 +3,10 @@
 export const CONTACT_PHONE = '+61 478 669 922';
 export const CONTACT_EMAIL = 'mkheir@govprocurement.com.au';
 
+// The office's place, headlining the contact card. Held apart from the address
+// lines below because it is a heading there, not part of the postal address.
+export const CONTACT_CITY = 'Bankstown, New South Wales';
+
 // Head office, one array entry per line as it should be set.
 export const CONTACT_ADDRESS_LINES = [
   'Room 830 of the Regus Flinders Centre',

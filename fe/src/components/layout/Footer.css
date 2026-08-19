@@ -16,20 +16,54 @@
 }
 
 /* --- newsletter subscribe block (top of footer) --- */
-/* 1100px is the site container every page section uses, so the footer's content
-   lines up with the page above it rather than running 340px wider. */
+/* A full-bleed paper band at the top of the footer, matching the concept in
+   fe/homepage-v2/index.html — which puts "Stay across procurement" on a light
+   band immediately above the dark footer rather than inside it. It used to be a
+   centred, ruled-off panel on the dark ground; the rules are gone because the
+   change of surface is what separates it now.
+
+   The content inside caps itself at --gp-shell (see SubscribeForm.css) — the
+   same container .hm-shell uses — so it lines up with the bands above it. */
 .site-footer__subscribe {
-  max-width: 1100px;
-  margin: 0 auto;
-  /* Ruled off from the page above as well as from the footer below, so
-     "Remain Connected" reads as its own band on every page. Equal top and
-     bottom padding, so the block sits centred in its band — the same clearance
-     from the rule above it as from the rule below. Nothing inside adds a margin
-     at either end (the heading and the form both start at 0), so the two rules
-     stand exactly as far from the content as each other. */
-  padding: 36px 40px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  /* Vertical only. The horizontal gutter belongs to the inner row, which
+     carries the same shell geometry as the bands and the footer row — putting
+     it here as well would inset the content a gutter further than everything
+     it is meant to line up with. */
+  padding-block: clamp(48px, 6vw, 76px);
+  /* The deepest paper step, not paper-alt.
+     On an article page the related-insights grid directly above this is
+     paper-alt, so the two ran together as one long block with a heading
+     floating in the middle of it. Going a step deeper also gives every page a
+     gradient into the dark footer rather than a flat landing. */
+  background: var(--gp-paper-deep);
+  color: var(--gp-ink);
+  /* Pages end on whatever shade their last section happens to be, and two
+     adjacent paper steps are a subtle difference. The rule makes the boundary
+     explicit regardless. */
+  border-top: 1px solid var(--gp-line);
+  transition: var(--gp-fade);
+}
+
+/* Two equal columns, as in the concept. `align-items: center` so the subscribe
+   half — heading, blurb and field, which together are shorter than the office
+   card — sits centred against the card rather than hanging off its top edge. */
+.site-footer__subscribe-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+
+  /* .hm-shell's geometry — same cap, same gutters — so this band lines up with
+     the sections above it and the footer row below. */
+  width: min(var(--gp-shell), 100%);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+@media (max-width: 860px) {
+  .site-footer__subscribe-inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 .site-footer__inner {
@@ -46,7 +80,14 @@
 
      The brand track's floor is what "Government Procurement" needs on one line
      beside the 26px logo — ~150px of text plus the logo and its 8px gap. */
-  grid-template-columns: minmax(190px, 200px) minmax(0, 1fr) 258px;
+  /* Five tracks, not three: brand, the three link columns, contact. The link
+     columns used to be a flex row inside a single 1fr track with
+     `justify-content: space-between`, which meant every pixel of slack in the
+     row pooled *inside* that track — so the three middle columns sat further
+     apart from each other than they did from the brand and the contact block.
+     As real tracks they take the grid's own gap like everything else, and the
+     five columns are evenly spaced by construction. */
+  grid-template-columns: minmax(190px, 200px) repeat(3, minmax(0, 1fr)) 258px;
   /* Baseline, not start: top-aligning the three tracks left the brand wordmark
      sitting a few pixels below the column headings across the row, because it is
      centred against the 23px logo beside it. Aligning on first baseline puts the
@@ -54,12 +95,15 @@
      brand link needs align-self there for its baseline to come from the text
      rather than the logo. */
   align-items: baseline;
-  gap: 48px 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-  /* Short at the top: the subscribe block's own rule sits directly above, and
-     56px left the brand floating well clear of it. */
-  padding: 28px 40px 56px;
+  gap: 48px;
+  /* Matches .hm-shell (features/home/home.css) — same cap, same gutters — so
+     the footer's columns line up with the bands above it instead of sitting in
+     a 300px-narrower column of their own. */
+  width: min(var(--gp-shell), 100%);
+  margin-inline: auto;
+  /* Short at the top: the subscribe block sits directly above, and 56px left
+     the brand floating well clear of it. */
+  padding: 28px clamp(20px, 4vw, 60px) 56px;
 }
 
 /* --- brand column --- */
@@ -192,35 +236,20 @@
 }
 
 /* --- link columns --- */
+/* A subgrid rather than a nested flex row: the three columns line up on the
+   parent's own tracks and inherit its gap, so there is no second spacing system
+   to keep in step with the first. The <nav> stays a real element — `display:
+   contents` would have achieved the same layout by removing it from the box
+   tree, and with it the landmark. */
 .site-footer__links {
-  /* The columns are content-width, so a narrow gap left the track's slack
-     pooling after the last one as a wide void before the contact block. A
-     roomier gap spends most of that slack between the columns instead. */
-  /* Tightened from 64px when "Conflicts of Interest" joined Policies — that
-     column is now as wide as the two beside it, so the slack it used to leave
-     has gone into the label. */
-  --links-gap: 48px;
-
-  display: flex;
-  gap: var(--links-gap);
-  /* Widens the brand-to-Award-Contracts gap past the grid's column gap, which
-     applies equally to both track boundaries and so can't be raised on its own.
-     The track's right edge doesn't move, so the void before the contact block
-     narrows by the same amount. */
-  margin-left: 18px;
-  /* Lets the track shrink below the columns' natural width, so long labels wrap
-     inside their column instead of widening the row. */
+  display: grid;
+  grid-column: 2 / span 3;
+  grid-template-columns: subgrid;
   min-width: 0;
 }
 
 .site-footer__col {
   min-width: 0;
-}
-
-/* Policies sits closer to Win Contracts than the other columns do — as a share
-   of the gap, so it holds through the fluid band below. */
-.site-footer__col:last-child {
-  margin-left: calc(var(--links-gap) * -0.3);
 }
 
 /* .site-footer__heading takes its type and margins from the top-row rule near
@@ -494,26 +523,23 @@
   border-radius: 4px;
 }
 
-/* Below 1100px the container is narrower than its cap, so every track gives a
-   little back. The row itself holds — only the link columns get tighter. */
+/* Below this the container is narrower than its --gp-shell cap and the tracks start
+   to squeeze, so every track gives a little back. The row itself holds — only
+   the link columns get tighter. The threshold stays at 1100px rather than
+   following the cap up: it is set by where the *content* starts to crowd, not
+   by where the container stops growing. */
 @media (max-width: 1100px) {
   .site-footer__inner {
     /* Contact holds its 258px — the address line needs it at every width — and
        the brand track holds the 190px the wordmark needs, so the give comes
        from the gaps and the link columns. */
-    grid-template-columns: minmax(190px, 200px) minmax(0, 1fr) 258px;
-    gap: 48px 16px;
-  }
-
-  /* The columns are content-width and the track narrows fast through this band,
-     so the gap has to give the space back as the viewport shrinks, or the
-     longest labels — "Jurisdictional Links", "Conflicts of Interest" — start
-     wrapping onto two lines. Fluid from the 48px it holds above down to 14px,
-     reaching it just as the layout stacks. */
-  .site-footer__links {
-    --links-gap: clamp(14px, calc((100vw - 900px) / 5 + 14px), 48px);
-
-    margin-left: 12px;
+    grid-template-columns: minmax(190px, 200px) repeat(3, minmax(0, 1fr)) 258px;
+    /* The column gap tightens through this band so the longest labels —
+       "Jurisdictional Links", "Conflicts of Interest" — keep one line as the row
+       narrows. One value now: the link columns are on these tracks, so they get
+       it without a second variable of their own. */
+    column-gap: clamp(14px, calc((100vw - 900px) / 5 + 14px), 48px);
+    row-gap: 48px;
   }
 }
 
@@ -524,16 +550,12 @@
     gap: 40px;
   }
 
-  /* Stacked: the columns wrap into their own block, so the nudges that shaped
-     the single row above no longer apply. */
+  /* Stacked: one parent track, so there is nothing to subgrid onto. The three
+     columns lay themselves out and wrap. */
   .site-footer__links {
-    flex-wrap: wrap;
+    grid-column: 1;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 40px 56px;
-    margin-left: 0;
-  }
-
-  .site-footer__col:last-child {
-    margin-left: 0;
   }
 
   .site-footer__brand-col,
@@ -552,9 +574,10 @@
     display: block;
   }
 
-  /* Equal top and bottom here too — see the desktop rule. */
+  /* Vertical only, as above — the gutter is the inner block's, and the clamp
+     already brings it down to 20px at this width. */
   .site-footer__subscribe {
-    padding: 32px 24px;
+    padding-block: 40px;
   }
 
   .site-footer__inner {

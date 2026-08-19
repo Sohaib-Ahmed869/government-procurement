@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/icons/gp-02.svg';
 import { useAudience } from '../../context/AudienceContext.jsx';
+import { useScrollSpy } from '../../hooks/useScrollSpy.js';
+import { HOME_SECTION_IDS, SECTION_BY_NAV_LABEL } from '../../features/home/sections.js';
+import { bidWritersPublic } from '../../config/features.js';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
@@ -11,7 +14,16 @@ import './Header.css';
 // answer to more than one route (see App.jsx). It defaults to `href` alone, and
 // child paths always count — /courses/:id keeps Courses lit.
 const NAV_LINKS = [
-  { label: 'Capabilities', href: '/capabilities' },
+  // A5: "Capabilities" is now "Service Offering", here and everywhere else.
+  // /capabilities still resolves (App.jsx redirects it) so old links hold, and
+  // it stays in `match` so the item lights up if someone arrives on it.
+  {
+    label: 'Service Offering',
+    href: '/service-offering',
+    match: ['/service-offering', '/capabilities'],
+  },
+  // A6: the Procurement Advisor.
+  { label: 'Advisory', href: '/advisory' },
   // Our Expertise is off the nav while Our Team is trialled in its place. The
   // page, route and components all still exist — restore this line to bring the
   // link back.
@@ -29,12 +41,51 @@ const NAV_LINKS = [
   },
   { label: 'Careers', href: '/careers' },
   { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
+  // B2. Sits next to Jurisdictional Links because the two are the site's
+  // reference pages and a visitor looking for one often wants the other.
+  // There is no homepage band for it, so on the homepage this one navigates
+  // rather than scrolling — scrollToSection falls through when the section
+  // isn't on the page.
+  { label: 'Government Panels', href: '/government-panels' },
+  // B4 — the AI Prompt Library.
+  { label: 'Prompt Library', href: '/prompt-library' },
+  // B6 — the Templates library, on the top ribbon as the brief asks.
+  { label: 'Templates', href: '/templates' },
+  // B7.8 — only on the ribbon once the directory is live. On `preview` the page
+  // works but must not be advertised; on `off` it does not exist.
+  ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
 ];
 
 // Whether `pathname` is this nav item's page — an exact match, or anything
 // beneath it (a course, an article, a team member, a forum sub-page).
 function isCurrent(pathname, { href, match }) {
   return (match ?? [href]).some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
+// A1 — on the homepage the ribbon scrolls rather than navigates.
+//
+// Smooth-scrolls to the section and writes the hash into the URL without a
+// router navigation, so the page never unmounts and the back button still walks
+// the sections. Falls through to the normal link when the section isn't on the
+// page — which is what happens if a band renders null for want of content.
+function scrollToSection(event, id, onDone) {
+  const el = document.getElementById(id);
+  if (!el) return; // let the browser follow the href
+
+  event.preventDefault();
+  const reduced =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Any close handler runs first — the mobile menu locks body scroll while it
+  // is open, so scrolling before it is dismissed simply doesn't happen. The
+  // scroll then waits a frame for the lock to actually be released.
+  onDone?.();
+  window.requestAnimationFrame(() => {
+    el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  window.history.pushState(null, '', `#${id}`);
 }
 
 export default function Header({ showToggle = true, audience: audienceProp }) {
@@ -45,6 +96,11 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
   const navLinks = NAV_LINKS;
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
+
+  // The ribbon behaves as anchors on the homepage and as routed links
+  // everywhere else, so the spy only runs where there is something to spy on.
+  const onHome = pathname === '/';
+  const activeSection = useScrollSpy(HOME_SECTION_IDS, { enabled: onHome });
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -113,13 +169,13 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         <div className="site-header__actions">
           {showToggle && <AudienceToggle />}
 
-          <a
+          <Link
             className="site-header__cta"
-            href="/book-a-consultation"
+            to="/book-a-consultation"
             aria-label="Request a Consultation"
           >
             <span className="site-header__cta-label">Request a Consultation</span>
-          </a>
+          </Link>
         </div>
 
         {/* Mobile-only: the hamburger that opens the menu. */}
@@ -142,16 +198,32 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
       <nav className="site-header__nav" aria-label="Primary">
         <ul className="site-header__nav-list">
           {navLinks.map((item) => {
-            const current = isCurrent(pathname, item);
+            const section = onHome ? SECTION_BY_NAV_LABEL[item.label] : undefined;
+            // On the homepage a section item is current when the visitor has
+            // scrolled to it; everywhere else it's the route that decides.
+            const current = section ? activeSection === section : isCurrent(pathname, item);
+            const className = `site-header__nav-link${current ? ' is-current' : ''}`;
+
             return (
               <li key={item.href}>
-                <Link
-                  className={`site-header__nav-link${current ? ' is-current' : ''}`}
-                  to={item.href}
-                  aria-current={current ? 'page' : undefined}
-                >
-                  {item.label}
-                </Link>
+                {section ? (
+                  <a
+                    className={className}
+                    href={`#${section}`}
+                    aria-current={current ? 'true' : undefined}
+                    onClick={(e) => scrollToSection(e, section)}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    className={className}
+                    to={item.href}
+                    aria-current={current ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </li>
             );
           })}
@@ -175,28 +247,45 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
         <nav className="site-header__mobile-nav" aria-label="Mobile">
           <ul className="site-header__mobile-list">
             {navLinks.map((item) => {
-              const current = isCurrent(pathname, item);
+              const section = onHome ? SECTION_BY_NAV_LABEL[item.label] : undefined;
+              const current = section ? activeSection === section : isCurrent(pathname, item);
+              const className = `site-header__mobile-link${current ? ' is-current' : ''}`;
+
               return (
                 <li key={item.href}>
-                  <Link
-                    className={`site-header__mobile-link${current ? ' is-current' : ''}`}
-                    to={item.href}
-                    onClick={closeMenu}
-                    aria-current={current ? 'page' : undefined}
-                  >
-                    {item.label}
-                  </Link>
+                  {section ? (
+                    <a
+                      className={className}
+                      href={`#${section}`}
+                      aria-current={current ? 'true' : undefined}
+                      // Close first, then scroll: the menu locks body scroll
+                      // while it is open, so scrolling underneath it goes
+                      // nowhere until it has been dismissed.
+                      onClick={(e) => scrollToSection(e, section, closeMenu)}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      className={className}
+                      to={item.href}
+                      onClick={closeMenu}
+                      aria-current={current ? 'page' : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               );
             })}
             <li>
-              <a
+              <Link
                 className="site-header__mobile-link site-header__mobile-cta"
-                href="/book-a-consultation"
+                to="/book-a-consultation"
                 onClick={closeMenu}
               >
                 Request a Consultation
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>

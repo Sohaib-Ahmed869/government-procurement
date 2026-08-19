@@ -1,21 +1,14 @@
 .xp {
-  --xp-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
   min-height: 460px;
-  background: var(--xp-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.xp[data-audience='award'] {
-  --xp-bg: var(--gp-green-900);
-}
 
-.xp[data-audience='win'] {
-  --xp-bg: var(--gp-ink-900);
-}
 
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
@@ -24,31 +17,31 @@
   .xp__actions,
   .xp__photo {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .xp.is-in .xp__name {
     opacity: 1;
     transform: none;
-    transition-delay: 0.1s;
+    transition-delay: var(--gp-reveal-step);
   }
   .xp.is-in .xp__role {
     opacity: 1;
     transform: none;
-    transition-delay: 0.2s;
+    transition-delay: calc(var(--gp-reveal-step) * 3);
   }
   .xp.is-in .xp__actions {
     opacity: 1;
     transform: none;
-    transition-delay: 0.3s;
+    transition-delay: calc(var(--gp-reveal-step) * 4);
   }
   .xp.is-in .xp__photo {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
@@ -86,9 +79,9 @@
 .xp__inner {
   position: relative;
   z-index: 2;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
   min-height: 460px;
   display: flex;
   align-items: center;

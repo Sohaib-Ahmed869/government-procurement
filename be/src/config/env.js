@@ -17,6 +17,28 @@ export const env = {
 
   mongoUri: process.env.MONGO_URI || '',
 
+  /* ---- Feature flags -------------------------------------------------------
+
+     B7 — Find a Bid Writer is built and tested but must not appear in
+     production until the client says so. One switch, three positions, so
+     "go live" is a value change rather than a deploy of different code:
+
+       off      (default) the public endpoint 404s. Nothing to find.
+       preview  serves publicly, but the page marks itself noindex and stays
+                out of the nav. This is what staging runs.
+       live     fully on and indexable.
+
+     Defaulting to `off` is the whole point: a production environment that has
+     never heard of this variable gets the safe answer. The frontend has its own
+     copy of the same switch (VITE_FEATURE_BID_WRITERS) because the nav and the
+     route are built at compile time; both have to be flipped, which is why the
+     procedure is written down in docs/GO-LIVE-BID-WRITERS.md. */
+  features: {
+    bidWriters: ['preview', 'live'].includes(process.env.FEATURE_BID_WRITERS)
+      ? process.env.FEATURE_BID_WRITERS
+      : 'off',
+  },
+
   jwt: {
     secret: process.env.JWT_SECRET || 'dev-insecure-secret',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',

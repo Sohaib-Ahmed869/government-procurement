@@ -1,0 +1,70 @@
+/* Q&A — a two-column run of answered questions, separated by hairlines rather
+   than boxed, so the band reads as a list of answers and not a card grid. */
+
+.qb__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 clamp(28px, 4vw, 56px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qb__item {
+  border-top: 1px solid var(--band-line);
+  transition: var(--gp-fade);
+}
+
+.qb__link {
+  display: block;
+  padding: 22px 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* A quotation-style rule that only appears on hover, so the row the pointer is
+   on is marked without every row carrying furniture. */
+.qb__q {
+  position: relative;
+  margin: 0;
+  padding-left: 18px;
+  font-size: clamp(16px, 1.5vw, 19px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  transition: color 220ms var(--gp-ease);
+}
+
+.qb__q::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  background: var(--band-accent);
+  opacity: 0;
+  transition: opacity 220ms var(--gp-ease);
+}
+
+.qb__link:hover .qb__q { color: var(--band-accent); }
+.qb__link:hover .qb__q::before { opacity: 1; }
+
+.qb__a {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--band-muted);
+  transition: var(--gp-fade);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 860px) {
+  .qb__list { grid-template-columns: 1fr; }
+}

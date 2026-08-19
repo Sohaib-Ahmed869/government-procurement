@@ -1,23 +1,54 @@
 .tp {
-  --tp-bg: var(--gp-ink-900);
   /* Dropdown panel follows the segment: green for Award, grey for Win. */
   --tp-menu-bg: #1c1c1c;
+  /* The ramp's 600 step — green on Award, grey-black on Win. It exists per
+     family as a :root token rather than as a --gp-brand-* role, so unlike
+     everything else here it has to be picked per segment by hand. Used as the
+     button hover fill on the dark band, where the segment ground itself is
+     already the button's surroundings. */
+  --tp-lift: var(--gp-lift-grey);
 
   position: relative;
   overflow: hidden;
-  background: var(--tp-bg);
-  color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+/* --- the bands -----------------------------------------------------------
+
+   The page alternates dark and light the way the homepage and Service Offering
+   pages do, using the shared shades in styles/bands.css rather than a ramp of
+   its own. Everything below the band is written against the --band-* roles
+   those classes set, so a card, a button and a caption all recolour by changing
+   one class on the wrapper.
+
+     head   --gp-head-bg     dark   the shared page-heading colour every other
+                                    page uses, so this title sits where they do
+     gov    .hm-band--light  paper
+     local  .hm-band--dark   dark
+     other  .hm-band--light-2 paper-alt, which hands off to the footer's
+                                    subscribe band (paper-deep) and then the
+                                    dark footer — a ramp, not a cliff
+
+   The head band borrows .hm-band--dark for its roles and overrides only the
+   ground. The two-class selector is deliberate: .tp__band--head and
+   .hm-band--dark have equal specificity, so a single-class rule here would win
+   only by import order, which is not something to rely on. */
+.tp__band {
+  position: relative;
+  z-index: 1;
+  transition: var(--gp-fade);
+}
+
+.tp__band.tp__band--head { background: var(--gp-head-bg); }
+
 .tp[data-audience='award'] {
-  --tp-bg: var(--gp-green-900);
   --tp-menu-bg: var(--gp-green-800);
+  --tp-lift: var(--gp-lift-green);
 }
 
 .tp[data-audience='win'] {
-  --tp-bg: var(--gp-ink-900);
   --tp-menu-bg: #1c1c1c;
+  --tp-lift: var(--gp-lift-grey);
 }
 
 .tp__wave {
@@ -36,32 +67,47 @@
   display: none;
 }
 
+/* Horizontal only now — the vertical rhythm belongs to the band, so a band can
+   set its own height without every child needing to know which one it is in. */
 .tp__inner {
   position: relative;
   z-index: 1;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 56px 40px 48px;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+/* The heading band keeps the shared page-heading spacing (--gp-head-pad), so
+   this page's title sits at the same height as every other page's. The list
+   bands are their own thing and run a little tighter. */
+.tp__band--head .tp__inner { padding-block: var(--gp-head-pad); }
+
+.tp__band--gov .tp__inner,
+.tp__band--local .tp__inner,
+.tp__band--other .tp__inner {
+  padding-block: clamp(36px, 4.5vw, 60px);
 }
 
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
+  /* Same distance, duration and easing as .hm-reveal (styles/reveal.css), so
+     the motion on this page is the site's motion rather than a near miss:
+     28px/0.7s-ease against the shared 22px/700ms/--gp-ease read as two
+     different animations when you moved between pages. */
   .tp__title,
-  .tp__group-title,
   .tp__sub,
   .tp__controls,
   .tp__featured,
   .tp__row {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity 700ms var(--gp-ease),
+      transform 700ms var(--gp-ease);
   }
 
   /* Section header reveals on mount. */
   .tp.is-in .tp__title,
-  .tp.is-in .tp__group-title,
   .tp.is-in .tp__sub,
   .tp.is-in .tp__controls,
   .tp.is-in .tp__featured {
@@ -70,35 +116,26 @@
   }
 
   .tp.is-in .tp__sub {
-    transition-delay: 0.08s;
+    transition-delay: var(--gp-reveal-step);
   }
   .tp.is-in .tp__controls {
-    transition-delay: 0.16s;
+    transition-delay: calc(var(--gp-reveal-step) * 3);
   }
   .tp.is-in .tp__featured {
-    transition-delay: 0.24s;
+    transition-delay: calc(var(--gp-reveal-step) * 4);
   }
 
-  /* Rows reveal on mount and replay when the list changes (country/sort). */
+  /* Rows reveal as their band is scrolled to. The stagger matches the
+     homepage's --  90ms steps, capped at four -- rather than the bespoke 60ms
+     five-step it used to run, so a card here behaves like a card there. */
   .tp__list.is-in .tp__row {
     opacity: 1;
     transform: none;
   }
-  .tp__list.is-in .tp__row:nth-child(1) {
-    transition-delay: 0.05s;
-  }
-  .tp__list.is-in .tp__row:nth-child(2) {
-    transition-delay: 0.11s;
-  }
-  .tp__list.is-in .tp__row:nth-child(3) {
-    transition-delay: 0.17s;
-  }
-  .tp__list.is-in .tp__row:nth-child(4) {
-    transition-delay: 0.23s;
-  }
-  .tp__list.is-in .tp__row:nth-child(5) {
-    transition-delay: 0.29s;
-  }
+  .tp__list.is-in .tp__row:nth-child(2) { transition-delay: calc(var(--gp-reveal-step) * 2); }
+  .tp__list.is-in .tp__row:nth-child(3) { transition-delay: calc(var(--gp-reveal-step) * 4); }
+  .tp__list.is-in .tp__row:nth-child(4) { transition-delay: calc(var(--gp-reveal-step) * 4); }
+  .tp__list.is-in .tp__row:nth-child(n + 5) { transition-delay: calc(var(--gp-reveal-step) * 4); }
 }
 
 .tp__title {
@@ -117,10 +154,33 @@
   font-weight: 700;
 }
 
-/* Heading for the second list. A step down from the page title so it reads as a
-   section within the page rather than a second page title. */
+/* Heading for a list. A step down from the page title so it reads as a section
+   within the page rather than a second page title. No top margin: it is the
+   first thing in its band, and the band's own padding is the space above it. */
+/* Revealed with the band it heads, not with the page. */
+.tp__band .tp__group-title {
+  opacity: 0;
+  transform: translateY(var(--gp-reveal-shift));
+  transition:
+    opacity var(--gp-reveal-dur) var(--gp-ease),
+    transform var(--gp-reveal-dur) var(--gp-ease);
+}
+
+.tp__band:has(.tp__list.is-in) .tp__group-title {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp__band .tp__group-title {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 .tp__group-title {
-  margin: 64px 0 0;
+  margin: 0;
   font-size: clamp(24px, 2.4vw, 32px);
   font-weight: 400;
   line-height: 1.15;
@@ -166,7 +226,7 @@
   width: 100%;
   padding: 0 22px;
   /* Glass edge — matches the boxes below Expertise on the Our Expertise page. */
-  background: rgba(241, 238, 234, 0.05);
+  background: var(--band-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow:
@@ -267,6 +327,9 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* A list under a heading needs the gap the heading's own margin used to give. */
+.tp__group-title + .tp__list { margin-top: 32px; }
+
 /* Glass pill — matches the subscribe button. */
 .tp__search-btn {
   padding: 0 30px;
@@ -284,7 +347,7 @@
 }
 
 .tp :is(input, select, button):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 2px;
 }
 
@@ -295,17 +358,19 @@
 
 /* --- list --- */
 .tp__featured {
-  margin: 56px 0 20px;
-  font-size: 13px;
-  color: #fff;
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--band-muted);
 }
 
 /* A grid of cards, holding the gap down from the subtitle that the removed
    "Australian Tenders" label used to carry. The columns size themselves, so the row count follows the
    number of portals rather than a fixed breakpoint. */
+/* Flush with the top of its band; only a list that follows a heading needs the
+   gap, which the rule below gives it. */
 .tp__list {
   list-style: none;
-  margin: 40px 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
   /* 320px rather than 280px: the widest portal names ("Quotations and Tenders
@@ -322,13 +387,16 @@
   gap: 14px;
   padding: 24px;
   border-radius: 24px;
-  /* Glass edge — matches the boxes below Expertise on the Our Expertise page. */
-  background: rgba(241, 238, 234, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Was a white glass edge, which only ever worked on a dark ground. Raised off
+     the band on its own surface step instead, so the same card reads correctly
+     on paper and on brand. */
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
+  /* Light. These cards sit three to a row on a pale band, so a shadow sized for
+     a single card stacked up across the row and greyed the whole page. */
   box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 6px 14px rgba(0, 0, 0, 0.05);
 }
 
 /* The portal's own mark, on its own tile so logos of different proportions all
@@ -343,7 +411,7 @@
   width: 64px;
   height: 64px;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--band-surface-hover);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -395,17 +463,21 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--band-muted);
 }
 
 .tp__desc {
   font-size: 13.5px;
   font-weight: 400;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--band-muted);
 }
 
-/* Glass pill — matches the subscribe button. */
+
+/* Quiet by default, accent on hover. Three filled accent pills per card — one
+   per destination — would make a grid of cards read as a wall of buttons; the
+   card is the thing being scanned and the buttons are what you reach for once
+   you have found it. */
 .tp__explore {
   flex: none;
   display: block;
@@ -413,25 +485,44 @@
   text-align: center;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: none;
   white-space: nowrap;
   border-radius: 100px;
-  border: 0;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--band-line);
+  background: var(--band-surface-hover);
   -webkit-backdrop-filter: blur(12px);
   transition: background-color 0.15s ease;
 }
 
+/* Hover fills with the segment's own ground: --gp-brand is dark green on Award
+   and near-black on Win, which is the pair asked for and needs no new colour to
+   get it. It is also what the primary buttons elsewhere on the site fill with,
+   so a tender card's action behaves like every other action.
+
+   Not --band-accent, which was the previous fill: on a paper band that resolves
+   to --gp-accent-ink, and on Award that is deep clay (#8a4522) — an orange
+   button on a green site. */
 .tp__explore:hover {
-  background: rgba(255, 255, 255, 0.28);
+  color: var(--gp-paper);
+  background: var(--gp-brand);
+  border-color: var(--gp-brand);
+}
+
+/* The dark band's ground IS --gp-brand, so the rule above would hover a button
+   into invisibility there. Going a step DEEPER doesn't rescue it either —
+   --gp-brand-deep measures 1.24:1 against that ground on Award and 1.11:1 on
+   Win, which is no hover at all. It has to go lighter, so the lift step does
+   the job: still the green on Award and still the grey-black family on Win, and
+   3.5:1 / 2.0:1 clear of the ground rather than invisible. */
+.hm-band--dark .tp__explore:hover {
+  background: var(--tp-lift);
+  border-color: var(--tp-lift);
 }
 
 .tp__empty-row {
   padding: 28px 24px;
-  color: #fff;
+  color: var(--band-muted);
   font-size: 14px;
 }
 

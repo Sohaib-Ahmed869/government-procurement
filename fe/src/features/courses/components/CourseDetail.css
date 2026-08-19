@@ -1,26 +1,20 @@
 .cd {
-  --cd-bg: var(--gp-ink-900);
   /* Fill behind the buy / register CTA, and the accent used by the tick
-     bullets, list markers and inline links. Both follow the segment: green for
-     Award, grey for Win. */
-  --cd-cta: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
-  --cd-accent: var(--gp-mint-300);
+     bullets, list markers and inline links.
+     Both were built for the dark ground this page used to have: the CTA was a
+     mid-green/mid-grey gradient and the accent was mint (Award) or #c9c9c9
+     (Win). On paper the gradient took dark text and the accent all but
+     disappeared. Both come off the segment roles now, so they follow the
+     toggle without naming a colour. */
+  --cd-cta: var(--gp-brand);
+  --cd-accent: var(--gp-accent-ink);
 
-  background: var(--cd-bg);
-  color: #fff;
+  /* Paper. This was still the dark heading colour while everything on it had
+     already been converted to ink, which is why the page came out dark text on
+     a dark ground. */
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
-}
-
-.cd[data-audience='award'] {
-  --cd-bg: var(--gp-green-900);
-  --cd-cta: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
-  --cd-accent: var(--gp-mint-300);
-}
-
-.cd[data-audience='win'] {
-  --cd-bg: var(--gp-ink-900);
-  --cd-cta: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
-  --cd-accent: #c9c9c9;
 }
 
 .cd__inner {
@@ -28,9 +22,9 @@
   grid-template-columns: minmax(0, 1fr) 470px;
   align-items: start;
   gap: 40px;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px 40px 48px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
@@ -38,21 +32,21 @@
   .cd__main,
   .cd__aside {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.6s ease,
-      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .cd.is-in .cd__main {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .cd.is-in .cd__aside {
     opacity: 1;
     transform: none;
-    transition-delay: 0.12s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
@@ -71,7 +65,7 @@
   max-width: 60ch;
   font-size: 16px;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 /* --- instructor row --- */
@@ -81,11 +75,9 @@
   gap: 12px;
   margin-top: 28px;
   padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   border-radius: 14px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--band-line);
 }
 
 .cd-instructor__avatar {
@@ -93,7 +85,7 @@
   height: 34px;
   flex: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--band-surface-hover);
 }
 
 .cd-instructor__name {
@@ -110,8 +102,8 @@
 .cd-instructor__tag {
   padding: 5px 12px;
   font-size: 11.5px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.13);
+  color: var(--band-ink);
+  background: var(--band-surface-hover);
   border-radius: 6px;
 }
 
@@ -120,7 +112,7 @@
   display: inline-flex;
   align-items: center;
   font-size: 11.5px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* --- video --- */
@@ -132,7 +124,7 @@
   object-fit: cover;
   border-radius: 16px;
   background: rgba(0, 0, 0, 0.25);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px var(--band-line);
 }
 
 /* --- primary media (the main video/image at the top of the page) --- */
@@ -147,7 +139,7 @@
   font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: #fff;
+  color: var(--band-ink);
 }
 /* Materials stack vertically for a clear, readable list. */
 .cd-materials__list {
@@ -163,7 +155,7 @@
   border-radius: 14px;
   overflow: hidden;
   background: #000;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px var(--band-line);
 }
 .cd-media__frame iframe,
 .cd-media__frame video,
@@ -186,7 +178,7 @@
 .cd-media__cap {
   margin-top: 8px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--band-muted);
 }
 /* PDF tile */
 .cd-media--pdf {
@@ -196,13 +188,11 @@
   padding: 16px 18px;
   border-radius: 14px;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.14),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.05);
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
   transition: background 0.15s ease;
 }
-.cd-media--pdf:hover { background: rgba(255, 255, 255, 0.09); }
+.cd-media--pdf:hover { background: var(--band-surface); }
 .cd-media__pdf-icon {
   display: inline-flex;
   align-items: center;
@@ -211,7 +201,7 @@
   width: 44px;
   height: 44px;
   border-radius: 11px;
-  color: var(--cd-bg);
+  color: var(--band-on-accent);
   background: var(--cd-accent);
 }
 .cd-media__pdf-icon svg { width: 22px; height: 22px; }
@@ -219,17 +209,17 @@
 .cd-media__pdf-text strong {
   font-size: 14.5px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cd-media__pdf-text span { font-size: 12.5px; color: rgba(255, 255, 255, 0.6); }
+.cd-media__pdf-text span { font-size: 12.5px; color: var(--band-muted); }
 .cd-media__pdf-arrow {
   flex-shrink: 0;
   width: 18px;
   height: 18px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--band-muted);
   transition: color 0.15s ease, transform 0.15s ease;
 }
 .cd-media--pdf:hover .cd-media__pdf-arrow { color: var(--cd-accent); transform: translate(2px, -2px); }
@@ -242,11 +232,9 @@
 .cd-panel {
   margin-top: 24px;
   padding: 26px 28px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   border-radius: 16px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--band-line);
 }
 
 .cd-panel__title {
@@ -270,7 +258,7 @@
   gap: 12px;
   font-size: 14.5px;
   line-height: 1.4;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--band-ink);
 }
 
 .cd-check {
@@ -289,7 +277,7 @@
   gap: 3px;
   font-size: 14px;
   line-height: 1.2;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* --- long-form sections (description / audience), nested in the panel --- */
@@ -311,7 +299,7 @@
 .cd-prose {
   font-size: 14.5px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--band-muted);
 }
 
 .cd-prose p {
@@ -336,7 +324,7 @@
 }
 
 .cd-prose strong {
-  color: #fff;
+  color: var(--band-ink);
   font-weight: 600;
 }
 
@@ -350,7 +338,7 @@
   margin: 0 0 14px;
   font-size: 14.5px;
   line-height: 1.5;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .cd-rich-list {
@@ -361,11 +349,11 @@
   gap: 4px;
   font-size: 14.5px;
   line-height: 1.25;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .cd-rich-list strong {
-  color: #fff;
+  color: var(--band-ink);
   font-weight: 600;
 }
 
@@ -385,11 +373,9 @@
 
 .cd-buy {
   padding: 22px 32px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   border-radius: 20px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--band-line);
 }
 
 .cd-buy__eyebrow {
@@ -412,7 +398,7 @@
   margin: 12px 0 0;
   font-size: 13.5px;
   line-height: 1.45;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .cd-buy__price {
@@ -425,7 +411,7 @@
 .cd-buy__currency {
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .cd-buy__cta {
@@ -436,7 +422,7 @@
   font-family: inherit;
   font-size: 14.5px;
   font-weight: 600;
-  color: #fff;
+  color: var(--gp-paper);
   background: var(--cd-cta);
   border: none;
   border-radius: 12px;
@@ -455,19 +441,19 @@
 }
 
 .cd-buy__cta:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 2px;
 }
 
 .cd-buy__group-label {
   margin: 20px 0 12px;
   padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid var(--band-line);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--band-muted);
 }
 
 .cd-buy__list {
@@ -484,7 +470,7 @@
   align-items: center;
   gap: 11px;
   font-size: 14px;
-  color: #fff;
+  color: var(--band-ink);
 }
 .cd-buy__row svg {
   flex: none;
@@ -495,7 +481,7 @@
 
 .cd-book {
   flex: none;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* --- responsive --- */
@@ -568,14 +554,14 @@
     min-width: 0;
     font-size: 12.5px;
     line-height: 1.25;
-    color: #fff;
+    color: var(--band-ink);
   }
 
   .cd-bar__price {
     flex: none;
     font-size: 20px;
     font-weight: 700;
-    color: #fff;
+    color: var(--band-ink);
   }
 
   .cd-bar__cta {
@@ -584,7 +570,7 @@
     font-family: inherit;
     font-size: 13.5px;
     font-weight: 600;
-    color: #fff;
+    color: var(--band-ink);
     cursor: pointer;
     background: var(--cd-cta);
     border: 0;

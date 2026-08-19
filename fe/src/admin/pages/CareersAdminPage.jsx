@@ -203,7 +203,7 @@ export default function CareersAdminPage() {
             value={form.applyUrl}
             onChange={onChange}
             placeholder={`Leave blank to email ${CAREERS_EMAIL}`}
-            hint="(optional) Where the Apply button goes — a URL or mailto: address."
+            hint="(optional) Where the Apply button goes: a URL or mailto: address."
           />
           <FormField
             label="Order"

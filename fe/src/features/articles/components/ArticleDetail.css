@@ -122,9 +122,9 @@
 
 /* ---------- Body ---------- */
 .article-body {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 36px 40px 8px;
+  padding: 36px clamp(20px, 4vw, 60px) 8px;
 }
 
 /* ---------- Byline + share ---------- */
@@ -324,7 +324,7 @@
 }
 
 .article-related__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
 }
 
@@ -359,34 +359,20 @@
   border: 0;
   border-radius: 16px;
   padding: 24px;
-  background: rgba(255, 255, 255, 0.06);
+  /* The card's own face. It used to be a translucent wash here while the <li>
+     behind it painted --rel-card — two card faces on two elements, and only
+     this one has the 16px radius, so the one behind showed through as a
+     square-cornered block around every card. One face, on the element with the
+     corners. */
+  background: var(--rel-card);
   text-decoration: none;
   color: inherit;
 }
 
-.article-related__link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    160deg,
-    rgba(255, 255, 255, 0.45) 0%,
-    rgba(255, 255, 255, 0.12) 35%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
+/* No ::after ring here any more. It drew a 1px gradient outline around every
+   card, running from rgba(255,255,255,0.45) at the top-left down to 0.04 — so
+   it read as a bright box tracing the card, brightest exactly at the corners.
+   The card's own translucent face is enough to lift it off the band. */
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .article-related__link {
@@ -396,10 +382,12 @@
       border-color 0.24s ease-out;
   }
 
+  /* Hover lifts to the segment's own lift step. It used to swap to a
+     translucent white wash, which was fine over a bare band but reads as a
+     different material now the card has a solid face. */
   .article-related__link:hover {
     transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(126, 226, 168, 0.35);
+    background: var(--rel-card-hover);
   }
 }
 
@@ -442,8 +430,8 @@
   .article .article-body,
   .article .article-related {
     opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translateY(var(--gp-reveal-shift));
+    transition: opacity var(--gp-reveal-dur) var(--gp-ease), transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .article.is-in .article-body,
@@ -453,7 +441,7 @@
   }
 
   .article.is-in .article-related {
-    transition-delay: 0.08s;
+    transition-delay: var(--gp-reveal-step);
   }
 }
 
@@ -524,5 +512,488 @@
 
   .article-prose p {
     font-size: 17px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   B1.6 — print, and by extension the PDF the browser saves from it.
+
+   The page carries a lot that is navigation rather than reading: the site
+   header and footer, the announcement banner, the reading bar, the related
+   grid. None of it belongs on paper, and none of it is useful in a PDF someone
+   has saved to read later. What is left is the title, the byline, the hero
+   image and the prose.
+   -------------------------------------------------------------------------- */
+@media print {
+  /* Chrome, in the literal sense. */
+  .page-layout__chrome,
+  .site-header,
+  .site-footer,
+  .announcement-banner,
+  .article-bar,
+  .article-related,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* The reveal animation leaves elements at opacity 0 until they scroll into
+     view. Printing does not scroll, so anything below the fold would come out
+     blank without this. */
+  .hm-reveal,
+  .article,
+  .article * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Black on white: the segment ramps are for screens, and printing a dark
+     band costs a page of toner to say nothing. */
+  .article,
+  .article-body,
+  .article-prose,
+  .article-hero,
+  .article-hero__panel {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .article-body {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .article-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 12pt;
+  }
+
+  .article-hero__title {
+    font-size: 22pt;
+    line-height: 1.2;
+    color: #000 !important;
+  }
+
+  .article-hero__meta,
+  .article-byline {
+    font-size: 9pt;
+    color: #444 !important;
+  }
+
+  .article-hero__media img {
+    max-width: 100%;
+    max-height: 90mm;
+    object-fit: contain;
+  }
+
+  .article-prose {
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000 !important;
+  }
+
+  /* Keep a heading with the paragraph it introduces, and never leave one line
+     of a paragraph stranded on its own page. */
+  .article-prose h2,
+  .article-prose h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .article-prose p,
+  .article-prose li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .article-prose img,
+  .article-prose figure,
+  .article-prose table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    max-width: 100%;
+  }
+
+  /* A link is useless on paper unless you can see where it goes. Internal
+     anchors are skipped: "#section" tells a reader nothing. */
+  .article-prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  @page {
+    margin: 18mm 16mm;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Pasted formatting.
+
+   The CMS body is authored HTML, and text pasted from Word or a web page
+   arrives carrying inline `color` and `font-family` — commonly
+   `color: rgb(0, 0, 0); font-family: "Times New Roman"`. This page is set on a
+   dark ground, so black text on it is invisible: an article can be published
+   looking fine in the editor and be unreadable on the site.
+
+   Inline styles can only be beaten with !important, so that is what this does,
+   and it does it to those two properties only. Bold, italic, alignment, lists
+   and links all survive; the two that break the page do not. The real fix is to
+   strip them on paste in the editor, which is a change to the CMS rather than
+   to how this page renders what it is given.
+   -------------------------------------------------------------------------- */
+.article-prose [style] {
+  color: inherit !important;
+  font-family: inherit !important;
+  background-color: transparent !important;
+}
+
+/* Links keep their own colour, which is the one place a colour here is the
+   site's rather than the paste's. */
+.article-prose a[style] {
+  color: var(--art-accent) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Shades down the page.
+
+   The page used to be one flat surface from the hero to the footer. It now runs
+   the same way the homepage does: a dark hero, the article itself on paper, and
+   the related grid on the raised paper step. Three shades, and the article body
+   ends up light with dark text, which is both what the reference does and the
+   right ground for a thousand words of prose.
+
+   These come last so they win over the --art-* rules above without those having
+   to be unpicked; the roles they resolve are the segment ramp, so the whole page
+   still follows the Win / Award toggle.
+   -------------------------------------------------------------------------- */
+.article {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+}
+
+/* The body: paper, dark ink. */
+.article-body {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  padding-bottom: clamp(40px, 6vw, 72px);
+  transition: var(--gp-fade);
+}
+
+.article-body .article-byline__author,
+.article-body .article-byline__name {
+  color: var(--gp-muted);
+}
+
+.article-body .article-byline__link {
+  color: var(--gp-accent-ink);
+  text-decoration-color: currentColor;
+}
+
+.article-overview {
+  color: var(--gp-muted);
+}
+
+.article-prose,
+.article-prose p,
+.article-prose li,
+.article-prose td,
+.article-prose th {
+  color: var(--gp-ink);
+}
+
+.article-prose h2,
+.article-prose h3,
+.article-prose h4,
+.article-prose strong,
+.article-prose b {
+  color: var(--gp-ink);
+}
+
+.article-prose a {
+  color: var(--gp-accent-ink);
+  text-decoration-color: currentColor;
+}
+
+.article-prose blockquote {
+  border-left-color: var(--gp-accent-ink);
+  color: var(--gp-muted);
+}
+
+.article-prose hr {
+  border-color: var(--gp-line);
+}
+
+/* Pasted formatting is neutralised against the light ground too — the rule
+   further up forces inherit, which now inherits dark ink rather than white. */
+
+/* The related grid takes the same colour as the founder-quote band on the
+   homepage: the lighter step of the segment's dark ramp, green on Award and a
+   warm grey-black on Win. The section itself goes one step darker again, so the
+   cards read as panels raised off it rather than as the same surface.
+
+   White text from here down. All of it clears AA: white on the section is
+   10.4:1 (Award) and 14.4:1 (Win), on the cards 8.0:1 and 11.4:1, and the
+   accents 5.1:1 and 5.3:1. */
+.article-related {
+  --rel-bg: #15492a;
+  --rel-card: var(--gp-award-alt);
+  --rel-card-hover: var(--gp-lift-green);
+  --rel-accent: var(--gp-mint-300);
+
+  background: var(--rel-bg);
+  border-top: 0;
+  color: #fff;
+  padding-bottom: clamp(40px, 6vw, 64px);
+  transition: var(--gp-fade);
+}
+
+.article[data-audience='win'] .article-related {
+  --rel-bg: #2a2a28;
+  --rel-card: var(--gp-win-alt);
+  --rel-card-hover: var(--gp-lift-grey);
+  --rel-accent: var(--gp-win-accent);
+}
+
+.article-related__title,
+.article-related__card-title {
+  color: #fff;
+}
+
+/* The list item is layout only: no face, no border. Anything painted here sits
+   behind the rounded link and shows at the corners. */
+.article-related__card {
+  transition: var(--gp-fade), transform 240ms var(--gp-ease);
+}
+
+.article-related__card:hover {
+  transform: translateY(-3px);
+}
+
+.article-related__meta,
+.article-related__date {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.article-related__topic {
+  color: var(--rel-accent);
+}
+
+.article-related__cta {
+  margin-top: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---------- Reveal animation ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .article .article-body,
+  .article .article-related {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition: opacity var(--gp-reveal-dur) var(--gp-ease), transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .article.is-in .article-body,
+  .article.is-in .article-related {
+    opacity: 1;
+    transform: none;
+  }
+
+  .article.is-in .article-related {
+    transition-delay: var(--gp-reveal-step);
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  /* Image over title — side by side leaves neither enough room. */
+  .article-hero,
+  .article-hero--plain {
+    grid-template-columns: 1fr;
+  }
+
+  .article-hero__media {
+    grid-row: 1;
+    min-height: 220px;
+    height: 46vw;
+    max-height: 300px;
+  }
+
+  .article-hero__panel,
+  .article-hero--plain .article-hero__panel {
+    justify-content: flex-start;
+    padding: 36px 24px 40px;
+    min-height: 0;
+  }
+
+  .article-hero__panel-inner,
+  .article-hero--plain .article-hero__panel-inner {
+    max-width: none;
+  }
+
+  .article-hero__title {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: clamp(30px, 7vw, 42px);
+  }
+
+  .article-related__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .article-body {
+    padding: 28px 24px 8px;
+  }
+
+  /* Label above the buttons; four pills and a label won't sit on one line. */
+  .article-byline {
+    align-items: flex-start;
+  }
+
+  .article-share {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .article-share__actions {
+    flex-wrap: wrap;
+  }
+
+  .article-related {
+    padding: 20px 24px 24px;
+  }
+
+  .article-overview {
+    font-size: 19px;
+  }
+
+  .article-prose p {
+    font-size: 17px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   B1.6 — print, and by extension the PDF the browser saves from it.
+
+   The page carries a lot that is navigation rather than reading: the site
+   header and footer, the announcement banner, the reading bar, the related
+   grid. None of it belongs on paper, and none of it is useful in a PDF someone
+   has saved to read later. What is left is the title, the byline, the hero
+   image and the prose.
+   -------------------------------------------------------------------------- */
+@media print {
+  /* Chrome, in the literal sense. */
+  .page-layout__chrome,
+  .site-header,
+  .site-footer,
+  .announcement-banner,
+  .article-bar,
+  .article-related,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* The reveal animation leaves elements at opacity 0 until they scroll into
+     view. Printing does not scroll, so anything below the fold would come out
+     blank without this. */
+  .hm-reveal,
+  .article,
+  .article * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Black on white: the segment ramps are for screens, and printing a dark
+     band costs a page of toner to say nothing. */
+  .article,
+  .article-body,
+  .article-prose,
+  .article-hero,
+  .article-hero__panel {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .article-body {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .article-hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 12pt;
+  }
+
+  .article-hero__title {
+    font-size: 22pt;
+    line-height: 1.2;
+    color: #000 !important;
+  }
+
+  .article-hero__meta,
+  .article-byline {
+    font-size: 9pt;
+    color: #444 !important;
+  }
+
+  .article-hero__media img {
+    max-width: 100%;
+    max-height: 90mm;
+    object-fit: contain;
+  }
+
+  .article-prose {
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000 !important;
+  }
+
+  /* Keep a heading with the paragraph it introduces, and never leave one line
+     of a paragraph stranded on its own page. */
+  .article-prose h2,
+  .article-prose h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .article-prose p,
+  .article-prose li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .article-prose img,
+  .article-prose figure,
+  .article-prose table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    max-width: 100%;
+  }
+
+  /* A link is useless on paper unless you can see where it goes. Internal
+     anchors are skipped: "#section" tells a reader nothing. */
+  .article-prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 9pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  @page {
+    margin: 18mm 16mm;
   }
 }

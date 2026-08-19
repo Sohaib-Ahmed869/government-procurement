@@ -1,22 +1,29 @@
-import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { homeHeroApi, heroCopyCache } from '../../../api';
-import { useInView } from '../../../hooks/useInView.js';
-import mainImage from '../../../assets/images/MainPictureHomepage.png';
+import posterImage from '../../../assets/images/MainPictureHomepage.png';
+import placeholderVideo from '../../../assets/CourseVideo.mp4';
 import './HomeHero.css';
 
-// The hero carries no copy of its own — every line comes from the API, which
-// serves whatever the CMS holds (Pages → Homepage) and falls back to the
-// page's original wording for any field nobody has written. See DEFAULT_COPY in
-// homeHero.controller.js.
+// A1 — the video-led hero.
 //
-// It used to ship with a FALLBACK block and AUDIENCE_EYEBROW as defaults, which
-// React painted on every mount while the request was still out. An edited
-// heading therefore flashed the shipped wording for a beat before the saved one
-// arrived — most visibly on returning to the homepage, since remounting reset
-// the fetched copy. Resolving the fallback on the server means the browser only
-// ever sees one version, so there is nothing to flash.
+// The loop is a background, not content: muted, looping, no controls, and the
+// headline sits over it. Two rules follow from that. It carries no audio track
+// worth hearing, so autoplay is allowed everywhere; and it must never be the
+// only way the page reads, so `poster` carries the still the hero used to show
+// and the scrim under the copy is drawn whether or not the video ever plays.
+//
+// The source is CMS copy (Pages → Homepage), the same as the words are, so the
+// clip can be swapped without a deploy.
+//
+// PLACEHOLDER. Until the real footage arrives this borrows the course clip
+// already in the repo, so the hero shows a moving background rather than a
+// still. Two ways to replace it, neither needing a code change beyond the
+// second: set a videoUrl in the CMS, or drop the new file in over this import.
+const PLACEHOLDER_VIDEO = placeholderVideo;
+
 export default function HomeHero() {
   const { audience } = useAudience();
 
@@ -44,50 +51,96 @@ export default function HomeHero() {
   const forAudience = copy?.[audience] || {};
   const { eyebrow, heading, subheading } = forAudience;
 
-  // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  // `videoUrl` is shared across both segments — one clip behind the hero, since
+  // the toggle recolours the tint over it rather than swapping the footage.
+  const videoUrl = copy?.videoUrl || PLACEHOLDER_VIDEO;
+  const poster = copy?.posterUrl || posterImage;
 
-  // The advisory block sits lower down, so reveal it on scroll-in instead.
-  // Passing the audience replays the reveal when the toggle changes.
-  const advisory = useInView({ resetKey: audience });
+  // Reveal on mount, and again each time the audience toggle changes.
+  const mounted = useMountReveal();
+
+  // A source that 404s or a codec the browser won't take fires `error` on the
+  // <video>; dropping it from the tree then leaves the poster showing as a
+  // plain image rather than a black rectangle with a broken-media glyph.
+  const [videoFailed, setVideoFailed] = useState(false);
+  const videoRef = useRef(null);
+
+  // Some browsers refuse autoplay until the element is muted in the DOM rather
+  // than only in the attribute, and iOS additionally wants the play() call.
+  // Failing that, the poster is already correct, so the rejection is ignored.
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = true;
+    const attempt = el.play();
+    if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {});
+  }, [videoUrl]);
 
   return (
     <section
       className={`home-hero${mounted ? ' is-in' : ''}`}
       data-audience={audience}
+      id="home-hero"
     >
+      <div className="home-hero__media">
+        {!videoFailed && (
+          <video
+            ref={videoRef}
+            className="home-hero__video"
+            // The loader looks for this to decide when the hero is actually
+            // ready — see components/shared/SiteLoader.jsx.
+            data-hero-video=""
+            src={videoUrl}
+            poster={poster}
+            autoPlay
+            muted
+            loop
+            playsInline
+            // `metadata` fetched just enough to know the duration, so the
+            // poster sat there until the first frames arrived and the hero
+            // visibly switched from still to footage a second in. `auto` asks
+            // for the media itself up front; the loader then holds the page
+            // until it can play, so the visitor never sees the swap.
+            preload="auto"
+            aria-hidden="true"
+            tabIndex={-1}
+            onError={() => setVideoFailed(true)}
+          />
+        )}
+        {videoFailed && <img className="home-hero__video" src={poster} alt="" />}
 
-      <div className="home-hero__intro">
-        {/* Each line renders only once the CMS has one for it, so the first
-            paint of a cold load is blank rather than wrong. */}
-        {eyebrow && <p className="home-hero__eyebrow">{eyebrow}</p>}
-        {heading && <h1 className="home-hero__title">{heading}</h1>}
-        {subheading && <p className="home-hero__lede">{subheading}</p>}
-
-        <div className="home-hero__actions">
-          <a className="home-hero__btn" href="/book-a-consultation">
-            Request a Consultation
-          </a>
-        </div>
+        {/* Two washes: a brand-tinted one from the left so the footage belongs
+            to the active segment, and a vertical scrim so the headline holds
+            its contrast wherever the frame happens to be light. */}
+        <div className="home-hero__tint" />
       </div>
 
-      <div
-        ref={advisory.ref}
-        className={`home-hero__advisory${advisory.inView ? ' is-in' : ''}`}
-      >
-        <div className="home-hero__advisory-text">
-          <p className="home-hero__eyebrow">Advisory Services</p>
-          <h2 className="home-hero__subtitle">Your Trusted Partner</h2>
-          <p className="home-hero__advisory-copy">
-            We help private sector organisations and suppliers strengthen their bids and win
-            more contracts. Our end-to-end advisory services ensure your proposals are
-            competitive, compliant, and compelling, giving you the edge in a highly contested
-            marketplace.
-          </p>
-        </div>
+      <div className="home-hero__inner hm-shell">
+        {/* The lines carry `hm-reveal` one by one rather than the column
+            carrying it for all of them. As a single block the hero faded in
+            flat, with no stagger at all, which is why it read as a different
+            (and faster) animation from every other page's hero — those step
+            their title, lede and action apart by --gp-reveal-step. */}
+        <div className="home-hero__col">
+          {/* Each line renders only once the CMS has one for it, so the first
+              paint of a cold load is blank rather than wrong. */}
+          {eyebrow && <p className="home-hero__eyebrow hm-reveal">{eyebrow}</p>}
+          {heading && <h1 className="home-hero__title hm-reveal" data-delay="1">{heading}</h1>}
+          {subheading && (
+            <p className="home-hero__lede hm-reveal" data-delay="2">
+              {subheading}
+            </p>
+          )}
 
-        <div className="home-hero__advisory-media">
-          <img src={mainImage} alt="Advisory team meeting outdoors" />
+          {/* One action only. The hero used to carry a second, ghost button to
+              the Service Offering page; the ribbon already goes there, and two
+              calls to action at the top of the page split the one thing this
+              hero is asking for. */}
+          <div className="home-hero__actions hm-reveal" data-delay="3">
+            <Link className="hm-btn hm-btn--accent" to="/book-a-consultation">
+              Request a Consultation
+            </Link>
+          </div>
         </div>
       </div>
     </section>

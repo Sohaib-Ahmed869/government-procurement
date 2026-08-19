@@ -1,0 +1,94 @@
+/* Head office card — a paper panel on the paper-alt band.
+
+   Raised rather than ruled, the same way the service cards are: a tight contact
+   shadow to seat it, a wider soft one for the lift, and a hairline of light
+   along the top edge so it has a lit face. The 3px accent rule that used to
+   mark the top is gone — the lift is what separates it from the band now. */
+
+.office-card {
+  padding: clamp(28px, 3vw, 38px);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 12px 28px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition:
+    var(--gp-fade),
+    transform 260ms var(--gp-ease),
+    box-shadow 260ms var(--gp-ease);
+}
+
+.office-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 22px 44px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.office-card__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gp-muted);
+  transition: var(--gp-fade);
+}
+
+.office-card__city {
+  margin: 14px 0 0;
+  font-size: clamp(19px, 1.8vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
+}
+
+.office-card__address {
+  display: flex;
+  flex-direction: column;
+  margin: 16px 0 0;
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gp-muted);
+  transition: var(--gp-fade);
+}
+
+.office-card__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 22px 0 0;
+}
+
+.office-card__rows a {
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--gp-ink);
+  transition: color 200ms var(--gp-ease);
+}
+
+.office-card__rows a:hover {
+  color: var(--gp-accent-ink);
+}
+
+/* Same arrow link as the bands use (.hm-arrow), restated here because the
+   footer doesn't load the homepage stylesheet. */
+.office-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--gp-accent-ink);
+  transition: color var(--gp-swap) var(--gp-ease), gap 220ms var(--gp-ease);
+}
+
+.office-card__cta:hover { gap: 15px; }

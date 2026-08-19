@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { coursesApi } from '../../../api';
-import menuIcon from '../../../assets/icons/Menu.png';
-import levelIcon from '../../../assets/icons/LevelIcon.png';
 import './CoursesBrowser.css';
 
 // Availability badge copy keyed on the course's `availability` state.
@@ -60,7 +58,7 @@ export default function CoursesBrowser() {
   // under a short hero and is taller than the viewport, so it never satisfied
   // the observer's threshold on a shorter screen — the page looked like it
   // ended below the intro until you scrolled.
-  const inView = useMountReveal(audience);
+  const inView = useMountReveal();
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
 
@@ -124,7 +122,7 @@ export default function CoursesBrowser() {
   }, [courses, category, level]);
 
   return (
-    <section className={`courses-browse${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section className={`courses-browse hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="courses-browse__inner">
         {/* Sidebar on desktop; a slide-up panel on phones. */}
         <div
@@ -145,7 +143,11 @@ export default function CoursesBrowser() {
 
           <aside className="courses-filters">
           <FilterGroup
-            icon={<img className="courses-filter__img" src={menuIcon} alt="" />}
+            /* A masked span rather than an <img>: the artwork is white-on-
+               transparent, drawn for the dark ground this page used to have, so
+               as an image it cannot take a colour. Masked, it is a shape the
+               CSS fills — see CoursesBrowser.css. */
+            icon={<span className="courses-filter__img courses-filter__img--menu" />}
             heading="Categories"
             name="category"
             options={CATEGORY_OPTS}
@@ -153,7 +155,7 @@ export default function CoursesBrowser() {
             onChange={setCategory}
           />
           <FilterGroup
-            icon={<img className="courses-filter__img" src={levelIcon} alt="" />}
+            icon={<span className="courses-filter__img courses-filter__img--level" />}
             heading="Level"
             name="level"
             options={LEVEL_OPTS}

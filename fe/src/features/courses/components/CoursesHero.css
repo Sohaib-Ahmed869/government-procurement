@@ -1,20 +1,13 @@
 .courses-hero {
-  --courses-hero-bg: var(--gp-ink-900);
 
   position: relative;
   overflow: hidden;
-  background: var(--courses-hero-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.courses-hero[data-audience='award'] {
-  --courses-hero-bg: var(--gp-green-900);
-}
 
-.courses-hero[data-audience='win'] {
-  --courses-hero-bg: var(--gp-ink-900);
-}
 
 /* Corner wave — small screens only. */
 .courses-hero__wave {
@@ -32,28 +25,28 @@
   .courses-hero__title,
   .courses-hero__sub {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .courses-hero.is-in .courses-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .courses-hero.is-in .courses-hero__sub {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
 .courses-hero__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 56px 40px 32px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .courses-hero__title {
@@ -82,7 +75,7 @@
   /* The wave is cleared by the header's toggle overlay space above; this is
      just the gap from the toggle down to the title. */
   .courses-hero__inner {
-    padding: 32px 20px 24px;
+    padding: var(--gp-head-pad) 20px;
   }
 
   .courses-hero__title {

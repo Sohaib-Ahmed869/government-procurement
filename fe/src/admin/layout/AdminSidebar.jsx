@@ -60,7 +60,8 @@ const NAV = [
     group: 'Pages',
     items: [
       { to: '/admin/home-hero', label: 'Homepage', icon: 'page' },
-      { to: '/admin/capabilities', label: 'Capabilities', icon: 'page' },
+      { to: '/admin/service-offering', label: 'Service Offering', icon: 'page' },
+      { to: '/admin/advisory-rules', label: 'Advisory Rules', icon: 'rails' },
       { to: '/admin/team', label: 'Our Team', icon: 'users' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/articles', label: 'Insights', icon: 'doc' },
@@ -68,6 +69,10 @@ const NAV = [
       { to: '/admin/tenders', label: 'Tenders', icon: 'link' },
       { to: '/admin/careers', label: 'Careers', icon: 'hand' },
       { to: '/admin/rules', label: 'Jurisdictional Links', icon: 'rails' },
+      { to: '/admin/panels', label: 'Government Panels', icon: 'link' },
+      { to: '/admin/prompts', label: 'Prompt Library', icon: 'doc' },
+      { to: '/admin/templates', label: 'Templates', icon: 'media' },
+      { to: '/admin/bid-writers', label: 'Find a Bid Writer', icon: 'hand' },
     ],
   },
   {

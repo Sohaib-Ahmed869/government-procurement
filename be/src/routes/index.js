@@ -13,9 +13,14 @@ import pageRoutes from '../modules/pages/pages.routes.js';
 import teamRoutes from '../modules/team/team.routes.js';
 import careerRoutes from '../modules/careers/careers.routes.js';
 import ruleRoutes from '../modules/rules/rules.routes.js';
+import panelRoutes from '../modules/panels/panels.routes.js';
+import promptRoutes from '../modules/prompts/prompts.routes.js';
+import templateRoutes from '../modules/templates/templates.routes.js';
+import bidWriterRoutes from '../modules/bidWriters/bidWriters.routes.js';
 import homeHeroRoutes from '../modules/homeHero/homeHero.routes.js';
 import capabilitiesHeroRoutes from '../modules/capabilitiesHero/capabilitiesHero.routes.js';
 import capabilityRoutes from '../modules/capabilities/capabilities.routes.js';
+import rulePackRoutes from '../modules/rulePacks/rulePacks.routes.js';
 import announcementRoutes from '../modules/announcements/announcements.routes.js';
 import homepageRailRoutes from '../modules/homepageRails/homepageRails.routes.js';
 import subscriberRoutes from '../modules/subscribers/subscribers.routes.js';
@@ -46,9 +51,19 @@ router.use('/pages', pageRoutes);
 router.use('/team', teamRoutes);
 router.use('/careers', careerRoutes);
 router.use('/rules', ruleRoutes);
+// B2 — government panels and prequalification schemes, by jurisdiction.
+router.use('/panels', panelRoutes);
+// B4 — the AI Prompt Library: master prompts by topic, use case and tool.
+router.use('/prompts', promptRoutes);
+// B6 — the Templates library: sourced, licence-checked, downloadable documents.
+router.use('/templates', templateRoutes);
+// B7 — Find a Bid Writer. Public reads are held behind FEATURE_BID_WRITERS.
+router.use('/bid-writers', bidWriterRoutes);
 router.use('/home-hero', homeHeroRoutes);
 router.use('/capabilities-hero', capabilitiesHeroRoutes);
 router.use('/capabilities', capabilityRoutes);
+// A6 — versioned rule overlays for the Procurement Advisor.
+router.use('/rule-packs', rulePackRoutes);
 router.use('/announcements', announcementRoutes);
 router.use('/homepage-rails', homepageRailRoutes);
 router.use('/subscribers', subscriberRoutes);

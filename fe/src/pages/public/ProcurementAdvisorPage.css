@@ -1,0 +1,93 @@
+/* A6 — Procurement Advisor.
+
+   The jurisdiction boxes are not here: they are shared with the homepage's
+   advisory band and live in features/advisor/components/JurisdictionPicker.css,
+   so the two surfaces cannot drift apart. Colours are tokens, so the page
+   follows the segment toggle like everything else. */
+
+.pa-page {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
+}
+
+.pa-page__shell {
+  /* The site container, shared with the homepage's .hm-shell: same cap, same
+     fluid gutters, so the page does not visibly narrow when you leave home. */
+  width: min(var(--gp-shell), 100%);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+.pa-page__head {
+  padding: var(--gp-head-pad) 0;
+  /* One step lighter than the site header directly above it (--gp-brand is the
+     header's own ground), so the two read as a pair rather than the page
+     starting over. White on it measures 12.2:1 on Award, 15.5:1 on Win. */
+  background: var(--gp-brand-soft);
+  color: #fff;
+  transition: var(--gp-fade);
+}
+
+.pa-page__title {
+  margin: 0 0 14px;
+  /* The shared page-title size, weight and tracking (--gp-page-title in
+     styles/tokens.css). These two pages were the only ones still carrying their
+     own clamp, which made their headings a different size and tighter tracking
+     than every other page's. */
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: #fff;
+}
+
+.pa-page__lede {
+  max-width: 62ch;
+  margin: 0;
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.pa-page__body {
+  padding: clamp(36px, 6vw, 76px) 0 clamp(56px, 9vw, 110px);
+}
+
+.pa-note {
+  margin: 0 0 clamp(24px, 3vw, 36px);
+  font-size: 15px;
+  color: var(--gp-muted);
+}
+
+/* The disclaimer is meant to be read, so it gets a surface of its own rather
+   than small print at the bottom of the page. */
+.pa-disclaimer {
+  max-width: 72ch;
+  padding: 20px 24px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-left: 3px solid var(--gp-accent);
+  border-radius: 4px;
+  transition: var(--gp-fade);
+}
+
+.pa-disclaimer p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-ink);
+}
+
+.pa-disclaimer p + p {
+  margin-top: 10px;
+  color: var(--gp-muted);
+}
+
+/* Shared page-title breakpoint, matching every other page's hero. */
+@media (max-width: 860px) {
+  .pa-page__title {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: var(--gp-page-title-phone);
+  }
+}
