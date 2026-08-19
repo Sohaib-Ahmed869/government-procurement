@@ -45,7 +45,7 @@ Legend for the per-phase status column: `☐ not started` · `◐ in progress` �
 These are called out in the tracker's Dependencies column. Build the structure now, wire content in later — none of them should stall a phase.
 
 - [x] ~~**Procurement Advisor rule file**~~ — received. `docs/procurementadvisor (1).html` is in the repo and is the working NSW reference. A6 is unblocked.
-- [ ] **Home hero video** — placeholder in use until the real video arrives (A1.11).
+- [ ] **Home hero video** — stand-in footage in use until the real video arrives (A1.11). It is now on-brand boardroom footage rather than the unrelated sunset clip, so the hero reads correctly in the meantime.
 - [ ] **Prompt Library — review the starter set (B4)** — 18 drafted prompts are seeded as drafts and visible to signed-in staff on `/prompt-library`. They have been written but not run against their tools. Read, try, edit, publish.
 - [ ] **Tender portals — missing entries (B3)** — the Local Government links (Local Buy and equivalents), plus the absent federal AusTender and the VIC/WA/NT/ACT portals. Also a live test entry named `fsd` to delete. All CMS work; the code is in.
 - [ ] **Government Panels — the actual panel list (B2)** — which panels and prequalification schemes the firm holds an appointment on, with agency, panel name and reference number. Cannot be defaulted or guessed: each row is a credential. The page ships with its empty state until this arrives.
@@ -131,7 +131,7 @@ Benchmarks: mckinsey.com/au, fticonsulting.com/australia. Video treatment: deloi
 - [x] **A1.8** Smooth scroll plus scroll-spy (`hooks/useScrollSpy.js`) — verified: "Careers" was the lit nav item after scrolling to it.
 - [x] **A1.9** Ribbon reverts to routed links off the homepage — verified: on `/careers` the nav hrefs are all routes, no anchors.
 - [x] **A1.10** Deep links resolve on cold load (`hooks/useHashScroll.js`, which re-checks while the fetching bands grow) — verified: `/#insights` landed with the section top at exactly 116px.
-- [x] **A1.11** Video-led hero — **placeholder video in place** (`src/assets/CourseVideo.mp4`, borrowed until the real footage arrives). Verified playing, muted, looping, with poster fallback. Swap it via the CMS `videoUrl` or by replacing the import.
+- [x] **A1.11** Video-led hero — **stand-in video in place** (`src/assets/HeroVideo.mp4`, licensed boardroom footage: advisers with tender documents, city skyline behind, held until the real footage arrives). 1080p, silent, 13s, 4.0 MB. Poster is its own first frame (`src/assets/images/HeroPoster.jpg`), so the still and the footage are the same shot. Verified playing, muted, looping, with poster fallback. Swap it via the CMS `videoUrl` or by replacing the import.
 
 ### A2 — First-load animation *(depends on A1)*
 - [x] **A2.1** Loader is a logo-based spinner in `fe/src/components/shared/SiteLoader.jsx` — two counter-rotating accent rings around the mark, painted in the active segment's ramp.

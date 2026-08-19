@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { homeHeroApi, heroCopyCache } from '../../../api';
-import posterImage from '../../../assets/images/MainPictureHomepage.png';
-import placeholderVideo from '../../../assets/CourseVideo.mp4';
+import posterImage from '../../../assets/images/HeroPoster.jpg';
+import fallbackVideo from '../../../assets/HeroVideo.mp4';
 import './HomeHero.css';
 
 // A1 — the video-led hero.
@@ -12,17 +12,22 @@ import './HomeHero.css';
 // The loop is a background, not content: muted, looping, no controls, and the
 // headline sits over it. Two rules follow from that. It carries no audio track
 // worth hearing, so autoplay is allowed everywhere; and it must never be the
-// only way the page reads, so `poster` carries the still the hero used to show
-// and the scrim under the copy is drawn whether or not the video ever plays.
+// only way the page reads, so `poster` carries a still of the same footage and
+// the scrim under the copy is drawn whether or not the video ever plays.
 //
 // The source is CMS copy (Pages → Homepage), the same as the words are, so the
 // clip can be swapped without a deploy.
 //
-// PLACEHOLDER. Until the real footage arrives this borrows the course clip
-// already in the repo, so the hero shows a moving background rather than a
-// still. Two ways to replace it, neither needing a code change beyond the
-// second: set a videoUrl in the CMS, or drop the new file in over this import.
-const PLACEHOLDER_VIDEO = placeholderVideo;
+// The bundled fallback is boardroom footage — advisers around a table with
+// tender documents and a city skyline behind them — so the hero reads as the
+// work the firm does even before the CMS has anything to say. It replaces the
+// sunset clip that was standing in here, which said nothing about procurement.
+// The poster is its own first frame, so the still and the footage are the same
+// shot and the swap from one to the other is invisible.
+//
+// Two ways to change it, neither needing a code change beyond the second: set a
+// videoUrl in the CMS, or drop a new file in over this import.
+const FALLBACK_VIDEO = fallbackVideo;
 
 export default function HomeHero() {
   const { audience } = useAudience();
@@ -53,7 +58,7 @@ export default function HomeHero() {
 
   // `videoUrl` is shared across both segments — one clip behind the hero, since
   // the toggle recolours the tint over it rather than swapping the footage.
-  const videoUrl = copy?.videoUrl || PLACEHOLDER_VIDEO;
+  const videoUrl = copy?.videoUrl || FALLBACK_VIDEO;
   const poster = copy?.posterUrl || posterImage;
 
   // Reveal on mount, and again each time the audience toggle changes.
