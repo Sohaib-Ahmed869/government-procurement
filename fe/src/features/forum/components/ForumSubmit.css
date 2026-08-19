@@ -1,7 +1,7 @@
 .forum-submit {
   position: relative;
   z-index: 1;
-  color: #fff;
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
@@ -9,9 +9,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: 64px;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px 40px 48px;
+  padding: 40px clamp(20px, 4vw, 60px) 48px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -21,28 +21,44 @@
   .forum-submit__send,
   .forum-submit .forum-sidebar {
     opacity: 0;
-    transform: translateY(28px);
+    translate: 0 var(--gp-reveal-shift);
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      translate var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .forum-submit.is-in .forum-submit__heading {
     opacity: 1;
-    transform: none;
-    transition-delay: 0.05s;
+    translate: none;
+    transition-delay: var(--gp-reveal-step);
   }
-  /* Fields + button stagger via their --i index. */
-  .forum-submit.is-in .forum-submit__field,
+  /* Fields stagger via their --i index. */
+  .forum-submit.is-in .forum-submit__field {
+    opacity: 1;
+    translate: none;
+    transition-delay: calc(0.12s + var(--i) * 0.08s);
+  }
+
+  /* The reveal owns `translate` and `opacity`; the hover owns `transform` and
+     the colours. Keeping them on separate properties is what lets the stagger
+     sit at the full delay while everything the pointer drives stays at 0s in
+     both directions — a single delay here is what made both entering and
+     leaving the button wait out the stagger. */
   .forum-submit.is-in .forum-submit__send {
     opacity: 1;
-    transform: none;
-    transition-delay: calc(0.12s + var(--i) * 0.08s);
+    translate: none;
+    /* One value per property, in the base rule's order:
+       background-color, color, border-color, opacity, translate, transform. */
+    transition-delay:
+      0s, 0s, 0s,
+      calc(0.12s + var(--i, 0) * 0.08s),
+      calc(0.12s + var(--i, 0) * 0.08s),
+      0s;
   }
   .forum-submit.is-in .forum-sidebar {
     opacity: 1;
-    transform: none;
-    transition-delay: 0.15s;
+    translate: none;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
@@ -70,7 +86,7 @@
 
 .forum-submit__label {
   font-size: 18px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* Glass field boxes — same edge treatment as the Contact page fields. */
@@ -79,31 +95,23 @@
   padding: 16px 18px;
   font-family: inherit;
   font-size: 15px;
-  color: #fff;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
+  color: var(--band-ink);
+  background: var(--band-surface);
   border: none;
   border-radius: 10px;
   outline: none;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--band-line);
   transition: box-shadow 0.15s ease;
 }
 
 .forum-submit__input::placeholder {
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .forum-submit__input:focus {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.5),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--band-line);
 }
 
 /* Taller than the 130px it used to stand at — a question here is usually a
@@ -126,7 +134,7 @@
 }
 
 .forum-submit__select.is-placeholder {
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .forum-submit__chevron {
@@ -135,7 +143,7 @@
   right: 16px;
   transform: translateY(-50%);
   display: inline-flex;
-  color: #fff;
+  color: var(--band-ink);
   pointer-events: none;
   transition: transform 0.18s ease;
 }
@@ -155,17 +163,15 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: var(--gp-green-800);
+  /* One ground for both segments. The Win override used to force --gp-ink-800
+     here, which left dark options on a dark panel once the page moved to paper.
+     A menu sits above the page, so it takes the plain paper step rather than the
+     tinted one the field below it uses. */
+  background: var(--gp-paper);
+  border: 1px solid var(--band-line);
   border-radius: 14px;
-  box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.38),
-    inset 1px 1px 1px rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
   overflow: hidden;
-}
-
-/* Dropdown panel green becomes dark gray in the win theme. */
-.forum-submit[data-audience='win'] .forum-submit__menu {
-  background: var(--gp-ink-800);
 }
 
 .forum-submit__option {
@@ -174,7 +180,7 @@
   padding: 12px 14px;
   font: inherit;
   font-size: 15px;
-  color: #fff;
+  color: var(--band-ink);
   text-align: left;
   cursor: pointer;
   background: none;
@@ -185,10 +191,10 @@
 
 .forum-submit__option:hover,
 .forum-submit__option.is-active {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--band-surface-hover);
 }
 
-/* --- send button: glass pill with trailing arrow (matches Contact) --- */
+/* --- send button: the same filled pill as Receive updates in the footer --- */
 .forum-submit__send {
   display: inline-flex;
   align-items: center;
@@ -198,20 +204,33 @@
   padding: 8px 8px 8px 24px;
   font-family: inherit;
   font-size: 15.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--gp-brand);
   border: 0;
   border-radius: 100px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: background-color 0.15s ease;
+  /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
+     the segment cross-fade's pace and far too slow for a pointer: the button
+     looked like it was thinking about it. Background moves fast; colour and
+     border keep the slow swap so a segment change still dissolves. */
+  /* `opacity` is in this list because the reveal above needs it and this rule,
+     coming later at equal specificity, replaces the reveal's own `transition`
+     wholesale. Left out, the button's fade-in would jump rather than fade.
+     The order here is the order the reveal's `transition-delay` list matches
+     against, so the two have to stay in step. */
+  transition:
+    background-color 140ms var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease),
+    opacity 700ms ease,
+    translate 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 180ms var(--gp-ease);
 }
 
 .forum-submit__send:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--gp-brand-lift);
+  transform: translateY(-2px);
 }
 
 .forum-submit__send-arrow {
@@ -222,8 +241,8 @@
   height: 28px;
   flex: none;
   overflow: hidden;
-  background: #fff;
-  border-radius: 50%;
+  /* No disc behind the arrow: the button is a filled pill now, and a second
+     filled shape inside it read as a badge stuck on the end. */
 }
 
 .forum-submit__send-arrow img {
@@ -235,11 +254,11 @@
 .forum-submit__sent {
   margin: 4px 0 0;
   font-size: 14px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .forum-submit :is(a, button, input, textarea, select):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
 }
 

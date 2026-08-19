@@ -1,0 +1,310 @@
+/* A6 — the stepper.
+
+   The reference file (docs/procurementadvisor (1).html) styles itself as a
+   statutory instrument: serif type, brass accent, hairline rules. None of that
+   is carried across. Every colour here is a site role token, so the tool sits
+   in the segment's palette like any other page and follows the toggle. */
+
+.adv-step {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+/* --- progress rail -------------------------------------------------------- */
+
+.adv-step__rail {
+  position: sticky;
+  top: 132px;
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.adv-step__rail-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--gp-line);
+  color: var(--gp-muted);
+  transition: var(--gp-fade);
+}
+
+.adv-step__rail-item.is-done {
+  border-left-color: var(--gp-accent-ink);
+  color: var(--gp-ink);
+}
+
+.adv-step__rail-item.is-current {
+  border-left-color: var(--gp-accent-ink);
+  background: var(--gp-paper-alt);
+  color: var(--gp-ink);
+}
+
+.adv-step__rail-no {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.adv-step__rail-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* --- panel ---------------------------------------------------------------- */
+
+.adv-step__panel {
+  min-width: 0;
+  padding: clamp(24px, 3vw, 40px);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-radius: 8px;
+  /* Seated, like the service cards. */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 14px 32px rgba(0, 0, 0, 0.08);
+  transition: var(--gp-fade);
+}
+
+.adv-step__count {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gp-accent-ink);
+}
+
+.adv-step__title {
+  margin: 10px 0 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--gp-ink);
+}
+
+.adv-step__questions {
+  display: grid;
+  gap: clamp(26px, 3vw, 38px);
+  margin-top: clamp(26px, 3vw, 36px);
+}
+
+.adv-step__error {
+  margin: 22px 0 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #b3261e;
+  background: var(--gp-paper-alt);
+  border-left: 3px solid #b3261e;
+  border-radius: 4px;
+}
+
+.adv-step__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(28px, 3vw, 40px);
+  padding-top: clamp(20px, 2vw, 28px);
+  border-top: 1px solid var(--gp-line);
+}
+
+/* --- questions ------------------------------------------------------------ */
+
+.adv-q {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.adv-q__label {
+  padding: 0;
+  font-size: clamp(16px, 1.5vw, 19px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--gp-ink);
+}
+
+.adv-q__req { color: var(--gp-accent-ink); }
+
+.adv-q__help {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.adv-q__options {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.adv-q__options--inline {
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: 10px;
+}
+
+.adv-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    var(--gp-fade),
+    border-color 160ms var(--gp-ease);
+}
+
+.adv-opt:hover { border-color: var(--gp-accent-ink); }
+
+.adv-opt--inline { min-width: 120px; }
+
+.adv-opt input {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--gp-accent-ink);
+}
+
+/* The checked state is carried by the border and ground, not only by the
+   control, so the chosen option is legible at a glance down a long list. */
+.adv-opt:has(input:checked) {
+  background: var(--gp-paper);
+  border-color: var(--gp-accent-ink);
+  box-shadow: inset 0 0 0 1px var(--gp-accent-ink);
+}
+
+.adv-opt:has(input:focus-visible) {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+.adv-opt__body { display: grid; gap: 4px; }
+
+.adv-opt__label {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--gp-ink);
+}
+
+.adv-opt__help {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--gp-muted);
+}
+
+.adv-q__number {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.adv-q__number input {
+  flex: 0 1 260px;
+  min-width: 0;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--gp-ink);
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 6px;
+}
+
+.adv-q__number input:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 1px;
+}
+
+.adv-q__affix {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gp-muted);
+}
+
+.adv-q.is-invalid .adv-q__label { color: #b3261e; }
+.adv-q.is-invalid .adv-opt,
+.adv-q.is-invalid .adv-q__number input { border-color: #b3261e; }
+
+/* --- buttons -------------------------------------------------------------- */
+
+.adv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    var(--gp-fade),
+    transform 200ms var(--gp-ease);
+}
+
+.adv-btn--primary {
+  background: var(--gp-brand);
+  color: #fff;
+}
+
+.adv-btn--primary:hover {
+  transform: translateY(-2px);
+  background: var(--gp-brand-lift);
+}
+
+.adv-btn--ghost {
+  background: transparent;
+  border-color: var(--gp-line);
+  color: var(--gp-ink);
+}
+
+.adv-btn--ghost:hover { background: var(--gp-paper-alt); }
+
+.adv-btn:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .adv-step { grid-template-columns: 1fr; }
+
+  /* The rail becomes a scrollable strip above the panel rather than a column
+     beside it — a sticky sidebar on a phone is just lost height. */
+  .adv-step__rail {
+    position: static;
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .adv-step__rail-item {
+    border-left: 0;
+    border-bottom: 2px solid var(--gp-line);
+    white-space: nowrap;
+  }
+
+  .adv-step__rail-item.is-done,
+  .adv-step__rail-item.is-current { border-bottom-color: var(--gp-accent-ink); }
+}
+
+@media (max-width: 420px) {
+  .adv-step__actions .adv-btn { flex: 1 1 100%; }
+  .adv-q__options--inline { grid-auto-flow: row; }
+}

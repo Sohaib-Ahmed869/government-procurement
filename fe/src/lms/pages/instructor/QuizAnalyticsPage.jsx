@@ -23,7 +23,7 @@ function verdict(q) {
   if (q.correctRate === 0) {
     return {
       tone: 'bad',
-      text: 'Nobody has ever got this right. That is usually a wrong answer key rather than a hard question — check the ticked option.',
+      text: 'Nobody has ever got this right. That is usually a wrong answer key rather than a hard question. Check the ticked option.',
     };
   }
   if (q.correctRate < WEAK) {
@@ -217,7 +217,7 @@ export default function QuizAnalyticsPage() {
                         Accepted:{' '}
                         {q.answer.length
                           ? q.answer.join(', ')
-                          : 'nothing — this question cannot be marked correct'}
+                          : 'nothing, so this question cannot be marked correct'}
                       </p>
                     ) : (
                       <p className="lms-item__accepted">

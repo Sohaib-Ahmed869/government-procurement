@@ -5,7 +5,7 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 
 // Format an ISO date/timestamp into a readable label. Deliberately the same
-// locale and options the public site uses (InsightsGrid / LatestInsights /
+// locale and options the public site uses (InsightsGrid / InsightsBand /
 // ArticleDetail all call toLocaleDateString('en-US', …) with these fields), so a
 // date reads identically in the CMS and on the website.
 function formatDate(value) {
@@ -56,7 +56,7 @@ function ArticleCard({ article, onDelete }) {
           )}
           <span
             className="admin-libcard__date"
-            title={published ? 'Publish date — this is the date the website shows' : 'Created (not published yet)'}
+            title={published ? 'Publish date: this is the date the website shows' : 'Created (not published yet)'}
           >
             {date}
           </span>

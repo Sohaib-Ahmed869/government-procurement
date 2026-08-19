@@ -110,7 +110,7 @@ export default function SettingsPage() {
             <FormField
               label="Title template"
               name="titleTemplate"
-              hint="e.g. %s — Site name"
+              hint="e.g. %s | Site name"
               value={form.seo.titleTemplate}
               onChange={onSectionChange('seo')}
             />

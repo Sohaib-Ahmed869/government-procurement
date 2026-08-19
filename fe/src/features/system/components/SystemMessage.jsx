@@ -17,7 +17,7 @@ export default function SystemMessage({
   actions = [],
 }) {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   return (
     <section

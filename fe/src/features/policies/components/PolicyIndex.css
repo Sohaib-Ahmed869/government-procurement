@@ -1,0 +1,141 @@
+/* B5.2 the policy index. A plain list on paper, the same reading surface as the
+   documents it leads to. */
+
+.polx {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+.polx__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(32px, 4.5vw, 56px) clamp(20px, 4vw, 60px) clamp(56px, 8vw, 96px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .polx-group {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .polx.is-in .polx-group {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.polx__search { margin-bottom: clamp(24px, 3vw, 36px); }
+
+.polx__search-input {
+  width: min(420px, 100%);
+  padding: 12px 16px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--gp-ink);
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 10px;
+}
+
+.polx__search-input:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+.polx__empty {
+  margin: 0;
+  font-size: 15px;
+  color: var(--gp-muted);
+}
+
+.polx-group + .polx-group { margin-top: clamp(32px, 4vw, 48px); }
+
+.polx-group__title {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gp-muted);
+  border-bottom: 1px solid var(--gp-line);
+}
+
+.polx-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.polx-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 18px 4px;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--gp-line);
+  transition: background 160ms var(--gp-ease);
+}
+
+.polx-card:hover { background: var(--gp-paper-alt); }
+
+.polx-card:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: -2px;
+}
+
+.polx-card__title {
+  grid-column: 1;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.polx-card__summary {
+  grid-column: 1;
+  max-width: 68ch;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+/* Quiet, not alarming. It reports the state of the work; the document itself
+   carries the warning that matters. */
+.polx-card__flag {
+  grid-column: 1;
+  justify-self: start;
+  margin-top: 4px;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gp-accent-ink);
+  border: 1px solid var(--gp-accent-ink);
+  border-radius: 999px;
+}
+
+.polx-card__go {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--gp-accent-ink);
+}
+
+@media (max-width: 560px) {
+  .polx-card { grid-template-columns: minmax(0, 1fr); }
+
+  .polx-card__go {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 6px;
+  }
+}

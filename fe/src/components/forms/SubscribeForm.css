@@ -1,49 +1,58 @@
+/* "Stay across procurement" — styled to match the concept in
+   fe/homepage-v2/index.html (`.subscribe`).
+
+   That version sits on a light band rather than in the dark footer: a
+   section-title heading, a muted line under it, and a pill field beside a solid
+   brand-coloured button. So this is now a paper block at the top of the footer
+   — which is exactly where the concept puts it, immediately above the dark
+   footer proper — rather than the centred glass panel it used to be.
+
+   Everything resolves role tokens, so the block recolours with the segment
+   along with the rest of the page. */
 .subscribe-form {
-  /* Focus-glow accent, keyed to the segment: green for award, neutral grey for
-     win — so the input's focus ring matches the active theme. */
-  --mint: var(--gp-mint-300);
-
-  /* Sized to the blurb's own single-line width, so the field row below lines up
-     with it exactly — input's left edge under the "H", button's right edge under
-     the full stop. Capped at the footer's gutters, where the copy wraps again. */
-  width: max-content;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
+  /* No width of its own: it is one column of the contact band's grid (see
+     .site-footer__subscribe-inner in Footer.css), which carries the shell
+     geometry for both halves. */
+  min-width: 0;
+  text-align: left;
   font-family: 'Geist Variable', system-ui, sans-serif;
-  color: #fff;
-}
-
-.subscribe-form[data-audience='award'] {
-  --mint: var(--gp-mint-300);
-}
-
-.subscribe-form[data-audience='win'] {
-  --mint: #c9c9c9;
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
 }
 
 .subscribe-form__heading {
   margin: 0;
-  font-size: 20px;
+  max-width: 20ch;
+  font-size: var(--gp-section-title);
   font-weight: 600;
-  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
 }
 
 .subscribe-form__copy {
-  margin: 8px 0 18px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: #fff;
+  margin: 16px 0 0;
+  max-width: 58ch;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.6;
+  color: var(--gp-muted);
+  transition: var(--gp-fade);
 }
 
 .subscribe-form__form {
-  margin: 0;
+  margin: 26px 0 0;
 }
 
 .subscribe-form__field {
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: stretch;
+  /* The concept's field row is half the band's width. Capped rather than
+     full-bleed so the input doesn't stretch to a 1100px slot for an email
+     address. */
+  max-width: 620px;
 }
 
 .subscribe-form__label {
@@ -59,33 +68,33 @@
 }
 
 .subscribe-form__input {
-  flex: 1 1 auto;
+  flex: 1 1 260px;
   min-width: 0;
-  padding: 11px 18px;
+  padding: 14px 18px;
   font-family: inherit;
-  font-size: 14px;
-  /* Centred so the placeholder and typed address line up with the heading and
-     copy above, which the section centres. */
+  font-size: 15px;
+  /* Centred, so the placeholder and the address the visitor types both sit in
+     the middle of the pill rather than pinned to its left edge. */
   text-align: center;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--gp-ink);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
   border-radius: 999px;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: var(--gp-fade), box-shadow 150ms var(--gp-ease);
 }
 
 .subscribe-form__input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--gp-muted);
+  opacity: 0.75;
 }
 
 .subscribe-form__input:focus-visible {
-  outline: none;
-  border-color: var(--mint);
-  background: rgba(255, 255, 255, 0.1);
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 1px;
 }
 
 .subscribe-form__input[aria-invalid='true'] {
-  border-color: #ff8f8f;
+  border-color: #b3261e;
 }
 
 .subscribe-form__input:disabled {
@@ -93,49 +102,43 @@
   cursor: not-allowed;
 }
 
+/* The concept's `.btn--dark`: the segment's own ground colour, lifting to the
+   lift step on hover. */
 .subscribe-form__button {
   flex: 0 0 auto;
-  padding: 11px 22px;
+  padding: 14px 28px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  /* Glass pill — matches the Request a consultation button on the homepage. */
   color: #fff;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--gp-brand);
   border: 0;
   border-radius: 999px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: background-color 0.15s ease, opacity 0.15s ease;
+  /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
+     the segment cross-fade's pace and far too slow for a pointer: the button
+     looked like it was thinking about it. Background moves fast; colour and
+     border keep the slow swap so a segment change still dissolves. */
+  transition:
+    background-color 140ms var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease),
+    transform 180ms var(--gp-ease);
 }
 
 .subscribe-form__button:hover:not(:disabled),
 .subscribe-form__button:focus-visible:not(:disabled) {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--gp-brand-lift);
 }
 
-/* Hover polish — matches the homepage "Request a consultation" button: lift + shadow. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .subscribe-form__button {
-    transition:
-      background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out,
-      opacity 0.15s ease;
-  }
-
   .subscribe-form__button:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
   }
 }
 
 .subscribe-form__button:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--gp-accent-ink);
   outline-offset: 2px;
 }
 
@@ -145,26 +148,23 @@
 }
 
 .subscribe-form__error {
-  margin: 10px 2px 0;
-  font-size: 12.5px;
-  color: #ff8f8f;
+  margin: 12px 2px 0;
+  font-size: 13px;
+  color: #b3261e;
 }
 
 .subscribe-form__success {
-  margin: 0;
-  padding: 12px 16px;
-  font-size: 13.5px;
+  margin: 26px 0 0;
+  padding: 14px 20px;
+  max-width: 620px;
+  font-size: 15px;
   line-height: 1.5;
-  color: #fff;
-  /* Glass edge — matches the boxes below Expertise on the Our Expertise page. */
-  background: rgba(241, 238, 234, 0.05);
-  border: 0;
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  color: var(--gp-ink);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-left: 3px solid var(--gp-accent-ink);
+  border-radius: 4px;
+  transition: var(--gp-fade);
 }
 
 @media (max-width: 480px) {

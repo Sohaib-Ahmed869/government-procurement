@@ -1,6 +1,14 @@
 /* Brand colour tokens every stylesheet resolves against. Must stay first —
    @import has to precede all other rules. */
 @import './styles/tokens.css';
+/* The alternating band grounds and their --band-* roles. Global rather than
+   per-page: see the note at the top of the file. */
+@import './styles/bands.css';
+/* The shared browse shell (filter rail + results), used by the Prompt Library
+   and the Templates library. */
+@import './styles/browse.css';
+/* The shared fade-in used by every page's sections. */
+@import './styles/reveal.css';
 
 *,
 *::before,
@@ -12,6 +20,14 @@ body {
   margin: 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+
+  /* The page's own ground. Without this the browser default — pure white —
+     is what shows through anything translucent, and white belongs to neither
+     ramp. It resolves the segment's paper token, so it changes with the
+     toggle like every other surface. */
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
 }
 
 .page-layout {
@@ -110,4 +126,87 @@ html[data-reveal-reset] *::before,
 html[data-reveal-reset] *::after {
   transition: none !important;
   animation: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   A3 — the segment cross-fade.
+
+   AudienceContext stamps data-audience-swap="out" on <html>, waits for the fade
+   to finish, changes the segment and stamps "in". Only the page body fades: the
+   header stays put and legible throughout, so the toggle the visitor just
+   pressed doesn't disappear underneath their cursor, and the scroll position is
+   never touched — the page comes back exactly where they left it.
+
+   WHAT FADES, AND WHY IT ISN'T THE PAGE.
+   Fading `.page-layout__main` was the obvious thing and both attempts at it
+   were wrong. Fading it to 0 made whatever sat behind it the screen for a
+   moment — a white flash on a page that opens on a dark hero. Dimming it part
+   way and blurring instead avoided the flash but read as the page going out of
+   focus, which is not a transition anyone asked for.
+
+   So the fade is applied one level in: the *contents* of each band fade, while
+   the bands themselves stay painted and recolour underneath via --gp-fade. The
+   backgrounds never leave the screen, so there is nothing behind them to show
+   through — no white at any point, on a light band or a dark one. The copy
+   lifts a few pixels as it goes and settles as it returns, which is what makes
+   it read as a change rather than a flicker.
+
+   `section > *` and `header > *` are how the public pages are built (a band, a
+   shell inside it). Anything not matching simply recolours without fading —
+   the failure mode is "less animation", never a flash.
+   -------------------------------------------------------------------------- */
+.page-layout__main :is(section, header, article) > *,
+.page-layout > .site-footer > * {
+  transition:
+    opacity var(--gp-swap) var(--gp-ease),
+    transform var(--gp-swap) var(--gp-ease);
+}
+
+/* The hero's media layer is excluded: the footage is the same in both segments,
+   so fading it out and back is motion with nothing behind it — and the tint
+   above it already recolours on its own. */
+html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > *:not(.home-hero__media),
+html[data-audience-swap='out'] .page-layout > .site-footer > * {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition-duration: 380ms; /* SWAP_FADE_OUT_MS */
+}
+
+html[data-audience-swap='in'] .page-layout__main :is(section, header, article) > *,
+html[data-audience-swap='in'] .page-layout > .site-footer > * {
+  opacity: 1;
+  transform: none;
+  transition-duration: 640ms; /* SWAP_FADE_IN_MS */
+}
+
+/* Held for the length of the swap so the reveal animations underneath don't
+   fight the cross-fade: sections snap to their new state behind the curtain and
+   the fade is the only motion on screen.
+
+   Scoped *inside* the elements that fade, not over them. This used to read
+   `.page-layout__main *`, which was right when the fade lived on the main
+   itself — now that the faded elements are descendants, that selector would
+   have suppressed the very transition it exists to protect, and the swap would
+   snap instead of fade. */
+html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > * *,
+html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > * *::before,
+html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > * *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* The chrome is themed by the same ramps, so it re-colours on the toggle too —
+   just without the fade-out, since it never leaves the screen. */
+.site-header,
+.page-layout__chrome {
+  transition: var(--gp-fade);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-layout__main :is(section, header, article) > *,
+  .page-layout > .site-footer > * {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
 }

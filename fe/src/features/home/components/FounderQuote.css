@@ -1,0 +1,33 @@
+/* Founder quote — the only pulled quote on the page, so it gets the accent rule
+   down its edge rather than quotation marks, which sit badly at this size. */
+
+.fq__quote {
+  margin: 22px 0 0;
+  padding-left: 22px;
+  border-left: 2px solid var(--band-accent);
+  transition: var(--gp-fade);
+}
+
+.fq__quote p {
+  margin: 0;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.6;
+  color: var(--band-muted);
+}
+
+.fq__attribution {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 24px 0 0;
+}
+
+.fq__name {
+  font-weight: 600;
+  color: var(--band-ink);
+}
+
+.fq__role {
+  font-size: 14px;
+  color: var(--band-muted);
+}

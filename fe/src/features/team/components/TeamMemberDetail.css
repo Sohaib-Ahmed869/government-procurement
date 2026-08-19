@@ -1,36 +1,30 @@
 .tm {
-  --tm-bg: var(--gp-ink-900);
-  --tm-surface: var(--gp-ink-800);
   /* Fill behind the "Get in touch" CTA and the expertise chevrons. Follows the
      segment: mint on Award, grey on Win. */
   --tm-accent: var(--gp-mint-300);
   /* Light end of the hero band's wash — one step up from the page colour, well
      short of the segment's brightest lift. */
-  --tm-band-lift: #2e2e2e;
 
-  background: var(--tm-bg);
-  color: #fff;
+  /* Paper below the hero band, which keeps the shared dark heading colour. Same
+     shape as the Service Offering and Procurement Advisor pages: the page opens
+     dark and is read on paper. */
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
 .tm[data-audience='award'] {
-  --tm-bg: var(--gp-green-900);
-  --tm-surface: var(--gp-green-800);
   --tm-accent: var(--gp-mint-300);
-  --tm-band-lift: var(--gp-green-600);
 }
 
 .tm[data-audience='win'] {
-  --tm-bg: var(--gp-ink-900);
-  --tm-surface: var(--gp-ink-800);
   --tm-accent: #c9c9c9;
-  --tm-band-lift: #2e2e2e;
 }
 
 .tm__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 48px 40px 48px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- hero band --- */
@@ -51,17 +45,29 @@
    The oklab pass keeps the midpoint on the hue instead of sagging through a
    grey; browsers without it keep the sRGB blend above. */
 .tm__hero-band {
+  /* The page's heading band. It keeps the dark ground and carries the dark
+     --band-* roles with it, so everything inside stays white type while the
+     page below reads on paper. */
+  color: #fff;
+  --band-ink: #fff;
+  --band-muted: rgba(255, 255, 255, 0.72);
+  --band-line: rgba(255, 255, 255, 0.12);
+  --band-surface: var(--gp-brand);
+  --band-surface-hover: var(--gp-brand-mid);
+  --band-accent: var(--gp-accent);
+  --band-on-accent: var(--gp-brand-deep);
+
   background: linear-gradient(
     135deg,
-    var(--tm-bg) 0%,
-    var(--tm-bg) 20%,
-    var(--tm-band-lift) 100%
+    var(--gp-head-bg) 0%,
+    var(--gp-head-bg) 20%,
+    var(--gp-brand-alt) 100%
   );
   background: linear-gradient(
     135deg in oklab,
-    var(--tm-bg) 0%,
-    var(--tm-bg) 20%,
-    var(--tm-band-lift) 100%
+    var(--gp-head-bg) 0%,
+    var(--gp-head-bg) 20%,
+    var(--gp-brand-alt) 100%
   );
 }
 
@@ -80,10 +86,10 @@
   .tm__hero,
   .tm__block {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .tm.is-in .tm__hero,
@@ -93,7 +99,7 @@
   }
 
   .tm.is-in .tm__hero {
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
 }
 
@@ -163,14 +169,14 @@
   gap: 6px;
   margin-bottom: 18px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .tm__back:hover,
 .tm__back:focus-visible {
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .tm__name {
@@ -189,7 +195,7 @@
   font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.86);
+  color: var(--band-muted);
 }
 
 .tm__location {
@@ -201,7 +207,7 @@
   margin: 20px 0 0;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--band-muted);
 }
 
 /* --- contact / LinkedIn: the glass pills used across the site --- */
@@ -219,16 +225,15 @@
   padding: 12px 22px;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--band-surface-hover);
   border-radius: 100px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: background-color 0.15s ease;
 }
 
 .tm__action:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--band-surface-hover);
 }
 
 /* Bare glyph in the link colour, as in the footer — no disc behind it. */
@@ -256,7 +261,7 @@
    page in their own right. */
 .tm__block {
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  border-top: 1px solid var(--band-line);
 }
 
 .tm__block + .tm__block {
@@ -270,14 +275,14 @@
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .tm__para {
   margin: 0 0 22px;
   font-size: 17px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 .tm__para:last-child {
@@ -289,7 +294,7 @@
   margin: 0 0 12px;
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 .tm__citation:last-child {
@@ -297,7 +302,7 @@
 }
 
 .tm__citation-link {
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -311,14 +316,14 @@
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .tm__entry-detail {
   margin: 4px 0 0;
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 /* --- right column --- */
@@ -335,9 +340,9 @@
   padding: 18px 24px;
   font-size: 15.5px;
   font-weight: 600;
-  color: var(--tm-bg);
+  color: var(--band-on-accent);
   text-decoration: none;
-  background: var(--tm-accent);
+  background: var(--band-accent);
   border-radius: 10px;
   transition: filter 0.15s ease;
 }
@@ -369,7 +374,7 @@
   gap: 10px;
   font-size: 16px;
   line-height: 1.45;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .tm__expertise-chevron {
@@ -408,8 +413,10 @@
   overflow: hidden;
   color: inherit;
   text-decoration: none;
-  background: #2a2a2a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Same card as the Insights grid: the hardcoded #2a2a2a was the same bug,
+     and the Award override below it is redundant now. */
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
   border-radius: 14px;
 }
 
@@ -417,15 +424,6 @@
 .tm__work-card > :not(.tm__work-art) {
   padding-left: 16px;
   padding-right: 16px;
-}
-
-/* Award-contract audience: the translucent glass boxes used across the site. */
-.tm[data-audience='award'] .tm__work-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 0;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
 }
 
 /* Fixed ratio so the row of titles starts at the same height whether or not a
@@ -437,7 +435,7 @@
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: 0;
-  background: var(--tm-bg);
+  background: var(--gp-paper);
 }
 
 .tm__work-art img {
@@ -449,7 +447,7 @@
 .tm__work-type {
   margin-top: 16px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--band-muted);
 }
 
 .tm__work-title {
@@ -457,7 +455,7 @@
   font-size: 17px;
   font-weight: 600;
   line-height: 1.35;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .tm__work-chevron {
@@ -472,7 +470,7 @@
   margin-top: auto;
   padding-top: 14px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--band-muted);
 }
 
 /* Hover lifts the card clear of the grid, as on the Insights grid: it rises and
@@ -503,8 +501,8 @@
     position: relative;
     z-index: 1;
     transform: translateY(-10px) scale(1.04);
-    background-color: var(--tm-surface);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--band-surface);
+    border-color: var(--band-muted);
     box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
   }
 
@@ -525,23 +523,22 @@
   font: inherit;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: none;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--band-surface-hover);
   border: 0;
   border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease;
 }
 
 .tm__work-more:hover,
 .tm__work-more:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--band-surface-hover);
 }
 
 .tm :is(a, button):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
   border-radius: 4px;
 }

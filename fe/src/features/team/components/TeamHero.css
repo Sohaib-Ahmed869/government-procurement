@@ -1,45 +1,38 @@
 .team-hero {
-  --team-hero-bg: var(--gp-ink-900);
 
-  background: var(--team-hero-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.team-hero[data-audience='award'] {
-  --team-hero-bg: var(--gp-green-900);
-}
 
-.team-hero[data-audience='win'] {
-  --team-hero-bg: var(--gp-ink-900);
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .team-hero__eyebrow,
   .team-hero__title {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .team-hero.is-in .team-hero__eyebrow {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .team-hero.is-in .team-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.12s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
 .team-hero__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 56px 40px 32px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .team-hero__eyebrow {
@@ -69,6 +62,6 @@
 
 @media (max-width: 760px) {
   .team-hero__inner {
-    padding: 40px 24px 24px;
+    padding: var(--gp-head-pad) 24px;
   }
 }

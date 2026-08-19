@@ -1,7 +1,7 @@
 .forum-answers {
   position: relative;
   z-index: 1;
-  color: #fff;
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
@@ -9,9 +9,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: 64px;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px 40px 48px;
+  padding: 40px clamp(20px, 4vw, 60px) 48px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -20,10 +20,10 @@
   .forum-answers__list > li,
   .forum-answers .forum-sidebar {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .forum-answers.is-in .forum-answers__heading {
@@ -39,7 +39,7 @@
   .forum-answers.is-in .forum-sidebar {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: var(--gp-reveal-step);
   }
 }
 
@@ -57,11 +57,11 @@
   margin: 0;
   font-size: 15px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--band-muted);
 }
 
 .forum-answers__clear {
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -94,22 +94,49 @@
   display: block;
   width: 100%;
   padding: 24px;
-  color: inherit;
   text-decoration: none;
-  background: rgba(241, 238, 234, 0.05);
+  /* Raised the way the Procurement Advisor's jurisdiction boxes are: a tight
+     contact shadow to seat the card and a wider soft one for the lift, and it
+     rises on hover. The blur went with the glass it used to sit behind. */
+  /* Filled to match the team cards: --gp-brand-lift is #4a4a4a on Win and
+     #2f7d45 on Award, so one declaration covers both segments.
+
+     As on .team-card in features/team/components/TeamGrid.css, that makes this
+     a dark island on a paper page, so it carries the DARK band's text roles
+     instead of the section's — one redefinition here flips the title, date,
+     body, tag and focus ring together. --band-muted is 0.82 rather than the
+     dark band's 0.72 for the same reason it is there: these fills are lighter
+     than a dark band, so secondary text loses contrast against them faster. */
+  background: var(--gp-brand-lift);
+  color: #fff;
+
+  --band-ink: #fff;
+  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-line: rgba(255, 255, 255, 0.12);
+  --band-surface: rgba(255, 255, 255, 0.06);
+  --band-surface-hover: rgba(255, 255, 255, 0.16);
+  --band-accent: var(--gp-accent);
+  --band-on-accent: var(--gp-brand-deep);
+
+  border: 1px solid var(--band-line);
   border-radius: 24px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  transition: box-shadow 0.15s ease;
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 12px 28px rgba(0, 0, 0, 0.08);
+  /* One transition, listing every property the card animates. There were two
+     declarations here and the second won outright, so `transform` was never in
+     the list at all and the hover lift jumped instead of easing. */
+  transition:
+    transform 240ms var(--gp-ease),
+    box-shadow 240ms var(--gp-ease),
+    var(--gp-fade);
 }
 
 .forum-card:hover {
+  transform: translateY(-4px);
   box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.18);
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 22px 44px rgba(0, 0, 0, 0.12);
 }
 
 /* Reserves two lines whether or not the question needs them, so the tag and
@@ -131,7 +158,7 @@
 
 .forum-card__date {
   font-size: 13px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 /* Capped at three lines: in a grid the cards sit side by side, so an unclipped
@@ -140,7 +167,7 @@
   margin: 18px 0 0;
   font-size: 14px;
   line-height: 1.6;
-  color: #fff;
+  color: var(--band-ink);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -155,14 +182,14 @@
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 400;
-  color: #fff;
+  color: var(--band-ink);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.13);
+  background: var(--band-surface-hover);
   border-radius: 7px;
 }
 
 .forum-answers :is(a):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
 }
 

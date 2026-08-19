@@ -1,0 +1,197 @@
+/* B4 — the AI Prompt Library, results only.
+
+   The browse shell around this (the grid, the filter rail, the radios, the
+   phone panel) is shared with the Templates library and lives in
+   styles/browse.css. What is here is what a prompt looks like, which a template
+   has nothing in common with. */
+
+/* --- results -------------------------------------------------------------- */
+
+/* Level 1 — Main Topic. */
+.pl-topic + .pl-topic { margin-top: clamp(40px, 5vw, 64px); }
+
+.pl-topic__head {
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+.pl-topic__title {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+.pl-topic__blurb {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--gp-muted);
+}
+
+/* Level 2 — Use Case. Ruled rather than filled, so it reads as a divider inside
+   the topic rather than as a second topic. */
+.pl-case { margin-top: clamp(24px, 3vw, 36px); }
+
+.pl-case__title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--gp-ink);
+}
+
+.pl-cards {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- one prompt ----------------------------------------------------------- */
+
+.pl-card {
+  padding: 20px 22px 18px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 14px;
+  transition: var(--gp-fade), border-color 160ms var(--gp-ease);
+}
+
+.pl-card:hover { border-color: var(--gp-brand); }
+
+.pl-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* Level 3 is the tool, and it is a tag on the prompt rather than a heading:
+   grouping by it as well would split every use case into three near-identical
+   columns. */
+.pl-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.pl-tool {
+  flex: none;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--gp-paper);
+  background: var(--gp-brand);
+}
+
+/* The three are told apart by fill as well as by name, so a visitor scanning
+   for "the Claude ones" can do it without reading every tag. Drawn from the
+   segment ramp rather than each vendor's brand colour: three outside palettes
+   dropped into this page would fight both segments at once. */
+.pl-tool--chatgpt { background: var(--gp-brand); }
+.pl-tool--claude  { background: var(--gp-accent-ink); }
+.pl-tool--gemini  { background: var(--gp-brand-alt); }
+
+/* The prompt itself. Monospace and pre-wrap because a prompt's line breaks and
+   placeholder markers are part of it — a proportional paragraph hides both, and
+   what is copied would stop matching what is shown. */
+.pl-card__body {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  max-height: 320px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--gp-ink);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-radius: 10px;
+  transition: var(--gp-fade);
+}
+
+/* Guidance about the prompt, never part of it. Visually separated from the
+   block above for the same reason it is excluded from the clipboard: nobody
+   should paste our commentary into the tool. */
+.pl-card__notes {
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.pl-card__foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.pl-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--gp-paper);
+  background: var(--gp-brand);
+  border: 1px solid var(--gp-brand);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 160ms var(--gp-ease),
+    border-color 160ms var(--gp-ease),
+    var(--gp-fade);
+}
+
+.pl-copy:hover { background: var(--gp-brand-soft); border-color: var(--gp-brand-soft); }
+
+.pl-copy:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 3px;
+}
+
+/* Confirmed state. A colour change alone would be invisible to anyone who
+   cannot see it and to anyone who cannot tell the two greens apart, so the
+   label changes to "Copied" and the icon becomes a tick as well. */
+.pl-copy.is-copied {
+  color: var(--gp-brand-deep);
+  background: var(--gp-accent);
+  border-color: var(--gp-accent);
+}
+
+.pl-copy__icon {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.pl-copy__status {
+  font-size: 13px;
+  color: var(--gp-muted);
+}
+
+@media (max-width: 560px) {
+  .pl-card__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .pl-card__foot {
+    flex-wrap: wrap;
+  }
+}

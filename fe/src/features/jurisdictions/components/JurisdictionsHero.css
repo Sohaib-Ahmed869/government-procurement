@@ -1,45 +1,38 @@
 .jl-hero {
-  --jl-hero-bg: var(--gp-ink-900);
 
-  background: var(--jl-hero-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.jl-hero[data-audience='award'] {
-  --jl-hero-bg: var(--gp-green-900);
-}
 
-.jl-hero[data-audience='win'] {
-  --jl-hero-bg: var(--gp-ink-900);
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .jl-hero__title,
   .jl-hero__sub {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .jl-hero.is-in .jl-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .jl-hero.is-in .jl-hero__sub {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
 .jl-hero__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 56px 40px 32px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .jl-hero__title {
@@ -70,7 +63,7 @@
 
 @media (max-width: 760px) {
   .jl-hero__inner {
-    padding: 40px 24px 24px;
+    padding: var(--gp-head-pad) 24px;
   }
 
   .jl-hero__sub {

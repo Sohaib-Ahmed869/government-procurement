@@ -9,7 +9,7 @@ import './TeamGrid.css';
 
 export default function TeamGrid() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   // Roster comes from the CMS (Content → Team), ordered there.
   const [team, setTeam] = useState([]);
@@ -35,7 +35,7 @@ export default function TeamGrid() {
   return (
     <section
       ref={ref}
-      className={`team${inView ? ' is-in' : ''}`}
+      className={`team hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
       <div className="team__inner">

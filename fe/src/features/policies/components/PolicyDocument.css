@@ -1,0 +1,330 @@
+/* B5.3 — the long-form policy document.
+
+   A reading surface: paper ground, a measure that stops well short of the shell
+   width, and a contents rail beside it on desktop. Policies are read in
+   fragments by someone looking for one clause, which is what the contents list
+   and the per-heading anchors are for. */
+
+.pol {
+  display: block;
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+.pol__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(28px, 4vw, 52px) clamp(20px, 4vw, 60px) clamp(56px, 8vw, 96px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pol__head,
+  .pol__layout {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .pol.is-in .pol__head,
+  .pol.is-in .pol__layout {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pol.is-in .pol__layout { transition-delay: var(--gp-reveal-step); }
+}
+
+/* --- head ----------------------------------------------------------------- */
+
+.pol__head {
+  max-width: 70ch;
+  padding-bottom: clamp(20px, 3vw, 32px);
+  border-bottom: 1px solid var(--gp-line);
+}
+
+.pol__back {
+  display: inline-block;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+  text-decoration: none;
+}
+
+.pol__back:hover { text-decoration: underline; }
+
+.pol__title {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.pol__intro {
+  margin: 14px 0 0;
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.pol__updated {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--gp-muted);
+}
+
+.pol__loading {
+  margin: 32px 0 0;
+  font-size: 15px;
+  color: var(--gp-muted);
+}
+
+/* --- placeholder banner (B5.5) --------------------------------------------
+
+   Loud on purpose. This is the one thing on the page that must not be mistaken
+   for design detail, so it takes the warm accent rather than a quiet tint, and
+   it prints. */
+
+.pol-draft {
+  margin: clamp(24px, 3vw, 32px) 0 0;
+  max-width: 70ch;
+  padding: 18px 20px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-accent-ink);
+  border-left: 5px solid var(--gp-accent-ink);
+  border-radius: 6px;
+}
+
+.pol-draft__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--gp-accent-ink);
+}
+
+.pol-draft__body {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-ink);
+}
+
+/* --- layout --------------------------------------------------------------- */
+
+.pol__layout {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 56px);
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+/* The contents rail only exists on wide screens; below that it sits above the
+   document, where it reads as a summary rather than as navigation. */
+@media (min-width: 1000px) {
+  .pol__layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+
+  .pol-toc {
+    order: 2;
+    position: sticky;
+    /* Clears the site chrome. Capped and independently scrollable so a long
+       policy cannot push its own contents list out of reach, which is the trap
+       a plain sticky sidebar falls into. */
+    top: 96px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+
+  .pol__body { order: 1; }
+}
+
+.pol-toc {
+  padding: 18px 20px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 12px;
+  transition: var(--gp-fade);
+}
+
+.pol-toc__title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gp-muted);
+}
+
+.pol-toc__list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.pol-toc__list li + li { margin-top: 8px; }
+
+.pol-toc__list a {
+  color: var(--gp-ink);
+  text-decoration: none;
+}
+
+.pol-toc__list a:hover {
+  color: var(--gp-accent-ink);
+  text-decoration: underline;
+}
+
+/* --- the document --------------------------------------------------------- */
+
+.pol__body { min-width: 0; }
+
+.pol-section {
+  /* Anchor links land here, so the heading has to stop clear of the sticky
+     chrome rather than under it. */
+  scroll-margin-top: 96px;
+}
+
+.pol-section + .pol-section { margin-top: clamp(26px, 3vw, 38px); }
+
+.pol-section__heading {
+  margin: 0 0 10px;
+  font-size: clamp(17px, 1.7vw, 21px);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+/* Revealed on hover or focus rather than always drawn: a column of hashes down
+   the page is noise until somebody wants one. Focus makes it keyboard
+   reachable, which is why it is opacity rather than display. */
+.pol-section__anchor {
+  margin-left: 8px;
+  font-weight: 400;
+  color: var(--gp-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 140ms var(--gp-ease);
+}
+
+.pol-section__heading:hover .pol-section__anchor,
+.pol-section__anchor:focus-visible {
+  opacity: 1;
+}
+
+.pol-section__p,
+.pol-section__list {
+  max-width: 72ch;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--gp-ink);
+}
+
+.pol-section__p { margin: 0 0 12px; }
+.pol-section__p:last-child { margin-bottom: 0; }
+
+.pol-section__list {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.pol-section__list li + li { margin-top: 6px; }
+
+/* Rich text from the CMS, when a page is written as one body rather than as
+   sections. Same measure and rhythm as the structured path above. */
+.pol-prose {
+  max-width: 72ch;
+  font-size: 15.5px;
+  line-height: 1.7;
+}
+
+.pol-prose h2,
+.pol-prose h3 {
+  margin: 28px 0 10px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--gp-brand);
+}
+
+.pol-prose h2 { font-size: clamp(17px, 1.7vw, 21px); }
+.pol-prose h3 { font-size: 16px; }
+.pol-prose p { margin: 0 0 12px; }
+.pol-prose ul,
+.pol-prose ol { margin: 0 0 12px; padding-left: 22px; }
+.pol-prose li + li { margin-top: 6px; }
+.pol-prose a { color: var(--gp-accent-ink); }
+
+/* --- print (B5.3) ---------------------------------------------------------
+
+   Policies get printed and filed. The chrome, the contents rail and the back
+   link are all navigation and carry nothing onto paper; the document and its
+   placeholder warning do. */
+
+@media print {
+  .pol,
+  .pol__inner {
+    background: #fff;
+    color: #000;
+    padding: 0;
+    max-width: none;
+  }
+
+  .pol__back,
+  .pol-toc {
+    display: none;
+  }
+
+  /* The reveal animation leaves these at opacity 0 until it runs, and a print
+     from a background tab may never run it. Forced visible so a printed policy
+     can never come out blank. */
+  .pol__head,
+  .pol__layout {
+    opacity: 1;
+    transform: none;
+  }
+
+  .pol__layout {
+    display: block;
+  }
+
+  .pol-section__heading,
+  .pol-prose h2,
+  .pol-prose h3 {
+    color: #000;
+    break-after: avoid;
+  }
+
+  .pol-section {
+    break-inside: avoid;
+  }
+
+  .pol-section__p,
+  .pol-section__list,
+  .pol-prose {
+    color: #000;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .pol-section__anchor { display: none; }
+
+  /* The warning has to survive the trip to paper. */
+  .pol-draft {
+    border: 2px solid #000;
+    background: #fff;
+  }
+
+  .pol-draft__title,
+  .pol-draft__body {
+    color: #000;
+  }
+}

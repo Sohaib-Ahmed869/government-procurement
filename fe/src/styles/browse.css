@@ -1,0 +1,253 @@
+/* The shared browse shell: a filter rail beside a results column, becoming a
+   slide-up panel on phones.
+
+   Built for the Prompt Library (B4) and reused by the Templates library (B6),
+   which the plan calls for in as many words. Both pages slice the same way over
+   three levels, and a visitor who has learned one should not have to learn the
+   other. Keeping the shell here rather than copying it means they cannot drift.
+
+   The layout itself comes from the Courses page, which is what the client asked
+   the Prompt Library to be modelled on: a 220px rail, a 56px gap, the site
+   shell around both.
+
+   What belongs here: the grid, the rail, the radios, the mobile panel, the
+   empty-state note. What does NOT: anything about what a result looks like. A
+   prompt card and a template card have nothing in common beyond sitting in this
+   column, and each page styles its own.
+
+   Deliberately NOT sticky. The Use case group grows with the library, so the
+   rail is routinely taller than the viewport, and a sticky element taller than
+   its viewport pins its top and puts its own bottom out of reach. Pages using
+   this shell pair it with <BackToTop /> instead. */
+
+.browse {
+  /* BackToTop scrolls here, so it has to stop clear of the sticky site chrome
+     rather than landing underneath it. */
+  scroll-margin-top: 96px;
+
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+/* `align-items: start` matters: a grid item stretches to the row height by
+   default, so the rail's panel would be drawn as tall as the results column
+   next to it and sit mostly empty. */
+.browse__inner {
+  display: grid;
+  align-items: start;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 56px;
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(28px, 3.5vw, 44px) clamp(20px, 4vw, 60px) clamp(56px, 7vw, 88px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .browse-filters,
+  .browse-group {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .browse.is-in .browse-filters,
+  .browse.is-in .browse-group {
+    opacity: 1;
+    transform: none;
+  }
+
+  .browse.is-in .browse-group { transition-delay: var(--gp-reveal-step); }
+}
+
+/* --- the rail ------------------------------------------------------------- */
+
+.browse-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 22px 20px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 20px;
+  transition: var(--gp-fade);
+}
+
+.browse-filter__heading {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gp-muted);
+}
+
+.browse-filter__options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Radios rather than checkboxes: each level narrows to one choice, and "all" is
+   an option in the list rather than the absence of one. */
+.browse-radio {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: background 140ms var(--gp-ease);
+}
+
+.browse-radio:hover { background: var(--gp-paper); }
+
+.browse-radio input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.browse-radio__dot {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--gp-line);
+  border-radius: 50%;
+  transition:
+    border-color 140ms var(--gp-ease),
+    box-shadow 140ms var(--gp-ease);
+}
+
+.browse-radio input:checked ~ .browse-radio__dot {
+  border-color: var(--gp-brand);
+  box-shadow: inset 0 0 0 3px var(--gp-brand);
+}
+
+/* The input is visually hidden, so the ring has to be drawn on something the
+   eye can find. */
+.browse-radio input:focus-visible ~ .browse-radio__dot {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+.browse-radio__label {
+  flex: 1;
+  min-width: 0;
+}
+
+.browse-radio input:checked ~ .browse-radio__label { font-weight: 600; }
+
+.browse-radio__count {
+  flex: none;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--gp-muted);
+}
+
+.browse-filters__reset {
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+  background: none;
+  border: 1px solid var(--gp-line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 160ms var(--gp-ease);
+}
+
+.browse-filters__reset:hover { border-color: var(--gp-accent-ink); }
+
+/* --- results column ------------------------------------------------------- */
+
+.browse-main { min-width: 0; }
+
+.browse-main__note {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--gp-muted);
+}
+
+/* --- phone: the rail becomes a panel -------------------------------------- */
+
+.browse-filters__close,
+.browse-main__filter-button {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .browse__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .browse-main__filter-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 24px;
+    padding: 13px 18px;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--gp-ink);
+    background: var(--gp-paper-alt);
+    border: 1px solid var(--gp-line);
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  /* Off canvas until opened. `visibility` as well as the transform, so the
+     closed panel is not a screen-reader trap sitting under the page. */
+  .browse-filters-wrap {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 200;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 18px 18px 28px;
+    background: var(--gp-paper);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.22);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition:
+      transform 260ms var(--gp-ease),
+      visibility 260ms var(--gp-ease);
+  }
+
+  .browse-filters-wrap.is-open {
+    transform: none;
+    visibility: visible;
+  }
+
+  .browse-filters {
+    position: static;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .browse-filters__close {
+    display: inline-flex;
+    margin-left: auto;
+    padding: 6px;
+    color: var(--gp-ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+}

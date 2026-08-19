@@ -1,4 +1,12 @@
 .site-header {
+  /* The row's outer gutter, and the padding inside one nav cell. Held as
+     variables because three things have to agree: the logo row's gutter, the
+     nav list's inset (gutter minus cell padding, so labels line up rather than
+     boxes), and the cell padding itself. Stepped down together at the
+     breakpoints below. */
+  --nav-gutter: 40px;
+  --nav-cell-pad: 16px;
+
   /* Segment colours are the only thing that changes between the two variants. */
   --header-bg: var(--gp-ink-900);
 
@@ -66,10 +74,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  max-width: 1440px;
+  max-width: var(--gp-shell-bar);
   min-height: 60px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 var(--nav-gutter);
 }
 
 /* --- brand --- */
@@ -162,9 +170,21 @@
   display: flex;
   align-items: stretch;
   flex-wrap: wrap;
-  max-width: 1440px;
+  max-width: var(--gp-shell-bar);
   margin: 0 auto;
-  padding: 0 40px;
+  /* Inset by one cell's padding rather than by the full gutter.
+
+     The row has to line up with the wordmark above it, and the thing that has
+     to line up is the LABEL, not the cell around it. Pulling the list in by
+     `gutter - cell padding` puts the first label exactly on the gutter and the
+     last label exactly on the far one, while every cell keeps equal padding on
+     both sides.
+
+     The obvious alternative — zeroing the first cell's left padding and the
+     last cell's right — was tried and is wrong: a cell carries a background and
+     an underline when it is the current page, so removing padding from one side
+     only leaves the label jammed against the edge of its own highlight. */
+  padding: 0 calc(var(--nav-gutter) - var(--nav-cell-pad));
   list-style: none;
 }
 
@@ -172,11 +192,29 @@
   display: flex;
 }
 
+/* The last cell's trailing hairline goes: it was drawing a divider against
+   nothing. Its padding stays — see the note on the list's gutter below. */
+.site-header__nav-list > li:last-child .site-header__nav-link {
+  box-shadow: none;
+}
+
 .site-header__nav-link {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 11px 20px;
+  /* 16px, not 20px, and this is the base rather than a step-down.
+
+     The header sits inside `.page-scale`, so above 1441px it is laid out at a
+     fixed 1440px and zoomed (index.css). Media queries evaluate against the
+     REAL viewport, not that layout, so `@media (max-width: 1440px)` — which is
+     where this used to tighten — does not fire on a 1600px or 4K screen even
+     though the row it is sizing is exactly 1440px wide there. The result was
+     the roomiest padding in the narrowest effective space, and the ribbon
+     wrapping to a second line once Templates was added.
+
+     Every viewport at or above 1440px lays the row out identically, so the
+     metric that fits 1440px is simply the right one everywhere above it. */
+  padding: 11px var(--nav-cell-pad);
   font-size: 13.5px;
   font-weight: 400;
   /* Slightly dimmed at rest so hover reads as a gentle brighten. */
@@ -613,14 +651,8 @@
    step-down of the shared control metrics and the container padding, driven
    through the variables so the toggle and the CTA shrink together. --- */
 @media (max-width: 1440px) {
-  .site-header__inner,
-  .site-header__nav-list {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .site-header__nav-link {
-    padding: 11px 16px;
+  .site-header {
+    --nav-gutter: 24px;
   }
 }
 
@@ -631,16 +663,11 @@
     --control-hint-font: 12.5px;
     /* Steps down with the type, so three equal cells still fit the bar here. */
     --control-width: 172px;
-  }
-
-  .site-header__inner,
-  .site-header__nav-list {
-    padding-left: 18px;
-    padding-right: 18px;
+    --nav-gutter: 18px;
+    --nav-cell-pad: 13px;
   }
 
   .site-header__nav-link {
-    padding: 10px 13px;
     font-size: 12.5px;
   }
 

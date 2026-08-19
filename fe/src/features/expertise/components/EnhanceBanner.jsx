@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import bg from '../../../assets/images/OurexpertiseEnhance.png';
@@ -5,7 +6,7 @@ import './EnhanceBanner.css';
 
 export default function EnhanceBanner() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   return (
     <section ref={ref} className={`eb${inView ? ' is-in' : ''}`} data-audience={audience}>
@@ -21,9 +22,9 @@ export default function EnhanceBanner() {
             </p>
 
             <div className="eb__actions">
-              <a className="eb__btn" href="/book-a-consultation">
+              <Link className="eb__btn" to="/book-a-consultation">
                 Request a Consultation
-              </a>
+              </Link>
             </div>
           </div>
         </div>

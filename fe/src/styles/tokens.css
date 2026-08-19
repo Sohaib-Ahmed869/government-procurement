@@ -60,4 +60,247 @@
      had crept to 44–46px, above the 42px the headline settles at on a laptop,
      which inverted the hierarchy on the Q&A and home pages. */
   --gp-section-title: clamp(26px, 3vw, 34px);
+
+  /* ---- The site container -------------------------------------------------
+
+     Every page's content column is capped at --gp-shell, and the header bar at
+     --gp-shell-bar. They were 27 copies of `1400px` and two of `1440px` spread
+     across the feature stylesheets; held here instead, the width of the site is
+     one number rather than a sweep.
+
+     The 40px between them is deliberate and is preserved at every size below:
+     the header is a bar and runs slightly wider than the content it sits over.
+
+     Why these change on very wide screens: the page is laid out at a fixed
+     1440px viewport and `zoom`ed up to fill anything wider (see index.css), so
+     the container is 1400/1440 — 97% of the screen — at *every* width past
+     1441px. On a laptop that is right. On a 4K display it means a line of body
+     copy running the better part of a metre, and cards stretched to match. The
+     steps below pull the column in so the page keeps a margin at those sizes,
+     while the full-bleed bands and the header ground still span the screen. */
+  --gp-shell: 1400px;
+  --gp-shell-bar: 1440px;
+
+  /* ---- The page heading band ----------------------------------------------
+
+     Every page except the homepage opens with its title on a coloured band.
+     They were each rolling their own: a local --*-bg set to --gp-ink-900 with
+     an award override to --gp-green-900, which is --gp-brand by another name —
+     the site header's own ground. So the heading painted the same colour as the
+     header directly above it, and the two ran together as one slab with a
+     title floating in the middle of it.
+
+     --gp-brand-soft is one step lighter, which is what the Service Offering
+     page already used and what the rest now follow: header, then a lighter
+     heading band, then the page. White on it measures 12.2:1 on Award and
+     15.5:1 on Win, so nothing loses contrast by moving.
+
+     The padding is equal top and bottom, and it is one value rather than
+     sixteen: the bands had drifted to 56/32, 56/0, 48/48, 40/48 and
+     clamp(48,8vw,96)/clamp(28,4vw,44), so every page sat its title at a
+     different height. Clamped rather than fixed, so it still tightens on a
+     phone without each page needing its own breakpoint. */
+  --gp-head-bg: var(--gp-brand-soft);
+  --gp-head-pad: clamp(40px, 5vw, 68px);
+
+  /* ---- The two ramps (Sprint 2, A4) ---------------------------------------
+     Each segment now carries a full ramp rather than one ground colour: five
+     dark steps, three papers, a rule, two text greys and two accents. That is
+     what lets a section be built out of several distinguishable shades of the
+     same family — the brief's "min 2 distinguishable shades each" — and what
+     lets the win/award toggle recolour the light bands too, not only the dark
+     ones. The values are the reference sheet in fe/homepage-v2/palette.html;
+     the steps marked "shipped" above are reused verbatim rather than restated.
+
+     AWARD — the green family. Public sector. Mint leads, clay counterweights. */
+  --gp-award-950: #061c0c;              /* deepest — footer base + scrims */
+  --gp-award-900: var(--gp-green-900);  /* ground */
+  --gp-award-800: var(--gp-green-800);  /* raised surface */
+  --gp-award-700: var(--gp-green-600);  /* mid */
+  --gp-award-600: var(--gp-lift-green); /* lift / active pill */
+  --gp-award-500: #3f9a58;              /* hover lift on dark surfaces */
+  /* The second dark band (the founder quote). A lighter step of the same green
+     rather than the deep teal this used to be — the teal read as blue against
+     the rest of the ramp, which is not a colour either segment owns. Lighter
+     than --gp-award-900 by 1.8x, so the two dark bands are clearly different
+     without either stopping being green. White on it measures 8.0:1. */
+  --gp-award-alt: #1a5c33;
+  --gp-award-paper: #f4f7f1;
+  --gp-award-paper-alt: #e8efe4;
+  --gp-award-paper-deep: #dbe6d6;
+  --gp-award-line: #cfdcc9;
+  --gp-award-ink: #10281a;              /* green-black body text */
+  --gp-award-muted: #5b6f60;
+  --gp-award-accent: var(--gp-mint-300);
+  --gp-award-warm: #c1663a;             /* clay */
+  /* Same accent, dark enough to be read as text on the paper steps. The two
+     above are built for dark grounds — mint on paper measures 1.5:1 and clay
+     3.7:1, both well under AA — so an eyebrow or a link in the accent needs its
+     own value rather than the one the dark bands use. Worst case against
+     paper-deep: 5.5:1. See the note on --gp-accent-ink below. */
+  --gp-award-warm-ink: #8a4522;         /* deep clay */
+
+  /* WIN — the ink family. Suppliers. Amber leads; the greys are warmed a few
+     degrees so the paper steps read as paper rather than as grey card, and
+     amber replacing mint is what makes the segment legible from colour alone. */
+  --gp-win-950: #0e0e0d;
+  --gp-win-900: var(--gp-ink-900);
+  --gp-win-800: var(--gp-ink-800);
+  --gp-win-700: #333331;
+  --gp-win-600: var(--gp-lift-grey);
+  --gp-win-500: #6a675f;
+  /* Second dark band: a light grey-black, a clear step up from --gp-win-900
+     rather than the warm charcoal it was. White on it measures 11.4:1. */
+  --gp-win-alt: #3a3a37;
+  /* The Win paper steps are neutral greys, not the warm beige they were.
+     `paper-deep` is the one that shows most — it is the ground under the
+     subscribe band at the foot of every page — and at #ddd6c7 it read as tan
+     rather than as the grey counterpart to Award's green. The other two move
+     with it: leaving `paper` and `paper-alt` warm while the step below them
+     went grey would have put a colour shift inside one ramp. */
+  --gp-win-paper: #f7f7f6;
+  --gp-win-paper-alt: #eeeeec;
+  --gp-win-paper-deep: #e2e2df;
+  --gp-win-line: #d9d9d5;
+  --gp-win-ink: #191817;
+  --gp-win-muted: #6b665c;
+  --gp-win-accent: #e0a63f;             /* amber */
+  --gp-win-warm: var(--gp-mint-300);    /* mint keeps a role, as the second */
+  --gp-win-warm-ink: #1a5c3f;           /* deep mint — 5.5:1 on paper-deep */
+
+  /* Shared motion. --gp-fade is the property list every themed rule transitions
+     on, so flipping the toggle plays as a colour fade rather than a snap. */
+  --gp-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --gp-swap: 480ms;
+  --gp-fade:
+    background-color var(--gp-swap) var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease);
+
+  /* --- the mount reveal -------------------------------------------------
+
+     One contract for every page's on-enter animation, so a hero on Templates
+     moves exactly as a hero on Insights. Before this the pages agreed on the
+     easing and nothing else: heroes lifted 28px over 0.7s, body sections lifted
+     18px, 22px or 24px over 0.6s or 0.7s depending on which week they were
+     built, and the homepage ran its own 22px/700ms in reveal.css.
+
+     The numbers are taken from the two pages that were called out as right:
+     the shape from Government Panels (an 18px lift — the smallest travel on the
+     site, and the one that reads as the section settling rather than flying in)
+     and the pace from the homepage (700ms on --gp-ease, four stagger steps of
+     90ms).
+
+     --gp-reveal-step is capped at four uses per section on purpose. Panels'
+     own note puts it well: a per-item stagger down a page of six headings ends
+     on a delay long enough to read as the page still loading. */
+  --gp-reveal-shift: 18px;
+  --gp-reveal-dur: 700ms;
+  --gp-reveal-step: 90ms;
+
+  /* Role defaults. A page that never renders a [data-audience] wrapper — the
+     system pages, the 404 — still needs the roles resolved, so the win ramp
+     (the site default, see constants/audiences.js) stands in here. The two
+     [data-audience] blocks below carry the same specificity and come later, so
+     they win wherever the attribute is actually present. */
+  --gp-brand-deep: var(--gp-win-950);
+  --gp-brand: var(--gp-win-900);
+  --gp-brand-soft: var(--gp-win-800);
+  --gp-brand-mid: var(--gp-win-700);
+  --gp-brand-lift: var(--gp-win-600);
+  --gp-brand-hover: var(--gp-win-500);
+  --gp-brand-alt: var(--gp-win-alt);
+  --gp-paper: var(--gp-win-paper);
+  --gp-paper-alt: var(--gp-win-paper-alt);
+  --gp-paper-deep: var(--gp-win-paper-deep);
+  --gp-line: var(--gp-win-line);
+  --gp-ink: var(--gp-win-ink);
+  --gp-muted: var(--gp-win-muted);
+  --gp-accent: var(--gp-win-accent);
+  --gp-accent-warm: var(--gp-win-warm);
+  --gp-accent-ink: var(--gp-win-warm-ink);
+}
+
+/* ---- Role tokens ----------------------------------------------------------
+   The only place a ramp is chosen. Everything downstream resolves the role
+   names below, so no component stylesheet has to know which segment is active
+   — or name a hex. Both blocks are declared on [data-audience], which the
+   sections and the chrome already carry, and on <html> via the same attribute
+   so a page that sets it once at the root themes everything beneath it. */
+[data-audience='award'] {
+  --gp-brand-deep: var(--gp-award-950);
+  --gp-brand: var(--gp-award-900);
+  --gp-brand-soft: var(--gp-award-800);
+  --gp-brand-mid: var(--gp-award-700);
+  --gp-brand-lift: var(--gp-award-600);
+  --gp-brand-hover: var(--gp-award-500);
+  --gp-brand-alt: var(--gp-award-alt);
+  --gp-paper: var(--gp-award-paper);
+  --gp-paper-alt: var(--gp-award-paper-alt);
+  --gp-paper-deep: var(--gp-award-paper-deep);
+  --gp-line: var(--gp-award-line);
+  --gp-ink: var(--gp-award-ink);
+  --gp-muted: var(--gp-award-muted);
+  --gp-accent: var(--gp-award-accent);
+  --gp-accent-warm: var(--gp-award-warm);
+  /* Which accent to use depends on what it sits on. --gp-accent and
+     --gp-accent-warm are tuned for the dark bands; on the paper steps they fail
+     AA badly, so anything that is *text* on a light surface — an eyebrow, an
+     arrow link, a hover colour — takes --gp-accent-ink instead. Decorative
+     marks (rules, bullets, borders) keep the bright accent: they carry no
+     information on their own. */
+  --gp-accent-ink: var(--gp-award-warm-ink);
+}
+
+[data-audience='win'] {
+  --gp-brand-deep: var(--gp-win-950);
+  --gp-brand: var(--gp-win-900);
+  --gp-brand-soft: var(--gp-win-800);
+  --gp-brand-mid: var(--gp-win-700);
+  --gp-brand-lift: var(--gp-win-600);
+  --gp-brand-hover: var(--gp-win-500);
+  --gp-brand-alt: var(--gp-win-alt);
+  --gp-paper: var(--gp-win-paper);
+  --gp-paper-alt: var(--gp-win-paper-alt);
+  --gp-paper-deep: var(--gp-win-paper-deep);
+  --gp-line: var(--gp-win-line);
+  --gp-ink: var(--gp-win-ink);
+  --gp-muted: var(--gp-win-muted);
+  --gp-accent: var(--gp-win-accent);
+  --gp-accent-warm: var(--gp-win-warm);
+  --gp-accent-ink: var(--gp-win-warm-ink);
+}
+
+/* The alternating band on the Service Offering rows: a light green on Award, a
+   light grey on Win. Its own values rather than the paper steps, because the
+   Win ramp's papers are warm creams — right under a page of prose, wrong where
+   a neutral is wanted. */
+:root {
+  --gp-band-tint: #e9ebeb;
+}
+
+[data-audience='award'] {
+  --gp-band-tint: #e6f0e4;
+}
+
+[data-audience='win'] {
+  --gp-band-tint: #e9ebeb;
+}
+
+/* 4K at 150% scaling — the width Windows reports for a 3840px panel at its
+   default setting, and the most common way a 4K monitor is actually run. */
+@media (min-width: 2561px) {
+  :root {
+    --gp-shell: 1240px;
+    --gp-shell-bar: 1280px;
+  }
+}
+
+/* 4K and 5K at native density. Pulled in one step further: at 3840px the page
+   is zoomed ~2.67x, so 1240 of the 1440px layout is still a very long line. */
+@media (min-width: 3201px) {
+  :root {
+    --gp-shell: 1180px;
+    --gp-shell-bar: 1220px;
+  }
 }

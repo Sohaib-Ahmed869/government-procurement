@@ -57,7 +57,7 @@ const Icon = {
 
 export default function CourseDetail({ course, status = 'ready' }) {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   // Loading / error / not-found states, themed to match the detail page.
   if (status !== 'ready' || !course) {
@@ -68,7 +68,7 @@ export default function CourseDetail({ course, status = 'ready' }) {
       message = "We couldn't find that course.";
     }
     return (
-      <section ref={ref} className={`cd${inView ? ' is-in' : ''}`} data-audience={audience}>
+      <section ref={ref} className={`cd hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
         <div className="cd__inner">
           <div className="cd__main">
             <h1 className="cd__title">{status === 'notfound' ? 'Course not found' : 'Course'}</h1>
@@ -112,7 +112,7 @@ export default function CourseDetail({ course, status = 'ready' }) {
   );
 
   return (
-    <section ref={ref} className={`cd${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section ref={ref} className={`cd hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="cd__inner">
         {/* --- main column --- */}
         <div className="cd__main">

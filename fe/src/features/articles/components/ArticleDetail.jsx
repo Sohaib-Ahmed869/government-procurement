@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaLink, FaCheck } from 'react-icons/fa6';
 import { useInView } from '../../../hooks/useInView.js';
+import { useReadingProgress } from '../../../hooks/useReadingProgress.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi, teamApi } from '../../../api';
+import ArticleBar from './ArticleBar.jsx';
 import './ArticleDetail.css';
 
 function formatDate(iso) {
@@ -28,42 +29,6 @@ function profilePath(team, name) {
   return member?.hasProfile && member.slug ? `/our-team/${member.slug}` : null;
 }
 
-// Copy-link control, sitting above the article alongside the byline.
-function ShareRow() {
-  const [copied, setCopied] = useState(false);
-  const url = typeof window !== 'undefined' ? window.location.href : '';
-
-  const onCopy = () => {
-    if (!navigator?.clipboard?.writeText) return;
-    navigator.clipboard.writeText(url).then(
-      () => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      },
-      () => setCopied(false),
-    );
-  };
-
-  return (
-    <div className="article-share">
-      <span className="article-share__label">Share this article</span>
-      <div className="article-share__actions">
-        <button
-          type="button"
-          className="article-share__action"
-          onClick={onCopy}
-          aria-label={copied ? 'Link copied' : 'Copy link'}
-        >
-          <span className="article-share__icon" aria-hidden="true">
-            {copied ? <FaCheck /> : <FaLink />}
-          </span>
-          <span className="article-share__name">{copied ? 'Copied' : 'Copy link'}</span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function ArticleDetail({ slug }) {
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
@@ -73,7 +38,23 @@ export default function ArticleDetail({ slug }) {
 
   // resetKey includes status so the reveal observer re-attaches once the
   // content mounts (the ref isn't rendered during the loading state).
-  const { ref, inView } = useInView({ resetKey: `${audience}:${slug}:${status}` });
+  //
+  // `threshold: 0` rather than the default 0.15, because the element being
+  // watched is the whole article. A long article is several times the height of
+  // the viewport, so the fraction of it ever on screen at once is smaller than
+  // the default threshold and the observer never fires: the body stays at
+  // opacity 0 and the article is invisible. Measured on this article, a phone
+  // could see 10.6% of it at most against a 15% threshold. Any part of it
+  // arriving is the right trigger for "start reading".
+  const { ref, inView } = useInView({
+    threshold: 0,
+    resetKey: `${slug}:${status}`,
+  });
+
+  // B1.1 — progress is measured against the prose itself, not the page. The
+  // offset is the sticky chrome plus the reading bar, so "read" means "has
+  // passed above the last line the reader can actually see".
+  const [bodyRef, progress] = useReadingProgress();
 
   useEffect(() => {
     let alive = true;
@@ -145,6 +126,9 @@ export default function ArticleDetail({ slug }) {
 
   return (
     <article ref={ref} className={`article${inView ? ' is-in' : ''}`} data-audience={audience}>
+      {/* B1.3 / B1.8 — title, progress and the actions, at every scroll depth. */}
+      <ArticleBar title={article.title} progress={progress} article={article} />
+
       {/* Title panel on the left, hero image running to the right edge. */}
       <header className={`article-hero${heroUrl ? '' : ' article-hero--plain'}`}>
         <div className="article-hero__panel">
@@ -170,7 +154,9 @@ export default function ArticleDetail({ slug }) {
         )}
       </header>
 
-      <div className="article-body">
+      {/* The progress bar measures this element, not the page: the hero above
+          and the related grid below are not the article. */}
+      <div className="article-body" ref={bodyRef}>
         <div className="article-byline">
           {name && (
             <p className="article-byline__author">
@@ -184,7 +170,9 @@ export default function ArticleDetail({ slug }) {
               )}
             </p>
           )}
-          <ShareRow />
+          {/* The share row that used to sit here has moved into ArticleBar,
+              which stays with the reader. Keeping both would put the same
+              actions on the page twice. */}
         </div>
 
         {article.overview && <p className="article-overview">{article.overview}</p>}

@@ -1,0 +1,236 @@
+/* ===========================================================================
+   Homepage — shared section primitives (A1).
+
+   The homepage is one page now: a hero, then a run of alternating bands the
+   visitor scrolls rather than navigates. Every band is built from the same four
+   pieces below — a shell, a head, a reveal and a band background — so the
+   rhythm holds section to section and a new band only has to bring its own
+   content.
+
+   COLOUR (A4)
+   Nothing here names a hex. Bands resolve the role tokens from
+   styles/tokens.css (--gp-brand*, --gp-paper*, --gp-line, --gp-ink,
+   --gp-muted, --gp-accent*), and the ramp behind those roles is chosen by
+   [data-audience] on <html>. That is what lets the light bands change with the
+   toggle as well as the dark ones: they used to be fixed neutrals, so they sat
+   the switch out. Four distinguishable steps are in play on any screenful —
+   paper, paper-alt, brand and brand-alt — which is the brief's "min 2
+   distinguishable shades each", met twice over.
+   =========================================================================== */
+
+.hm {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
+}
+
+.hm-shell {
+  width: min(var(--gp-shell), 100%);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+/* --- bands ---------------------------------------------------------------- */
+
+.hm-band {
+  padding: clamp(72px, 9vw, 112px) 0;
+  transition: var(--gp-fade);
+
+  /* The ribbon scrolls to these, and the chrome above is sticky — without this
+     the heading lands underneath it. One value covers both the smooth scroll
+     from the nav and a /#section deep link, since both end in scrollIntoView.
+     Sized to the chrome: the header bar plus the nav row, plus a little air. */
+  scroll-margin-top: 116px;
+}
+
+/* The hero has no heading to clear and is the top of the page, so it goes to
+   the actual top rather than leaving a header's worth of gap above it. */
+.hm .home-hero { scroll-margin-top: 0; }
+
+/* The band shades and their --band-* roles moved to styles/bands.css when the
+   Tender Websites page needed them too (B3). Same rules, loaded globally from
+   index.css instead of only wherever home.css happens to be imported — a page
+   using .hm-band--light should not depend on the homepage having been visited
+   in the same bundle. */
+.hm-band--brand { background: var(--gp-brand); color: #fff; }
+.hm-band--alt { background: var(--gp-brand-alt); color: #fff; }
+
+/* The band directly under the hero opens a little lower, so the hero's bottom
+   edge and the first heading aren't the same distance apart as two ordinary
+   bands — the hero is taller and needs the extra air to settle. */
+.hm-band--hero-tail { padding-top: clamp(88px, 10vw, 124px); }
+
+/* The head is an .hm-shell too, so the measure is capped on the text rather than
+   on this box. Putting a max-width here instead would collide with the shell's
+   `margin-inline: auto` and centre the whole head in the band — which is not
+   what a left-aligned page wants, and is subtle enough to miss. */
+.hm-band__head {
+  margin-bottom: clamp(36px, 5vw, 58px);
+}
+
+.hm-band__title {
+  margin: 0;
+  max-width: 20ch;
+  font-size: var(--gp-section-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.hm-band__lede {
+  margin: 18px 0 0;
+  max-width: 60ch;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.55;
+  color: var(--band-muted, var(--gp-muted));
+  transition: var(--gp-fade);
+}
+
+/* --- reveal --------------------------------------------------------------- */
+/* One class, driven by `is-in` on the section (useInView / useMountReveal), so
+   a band's children stagger in together rather than each carrying its own
+   observer. */
+/* The reveal itself moved to styles/reveal.css when the other pages needed it
+   (see the note there). The class name is unchanged, so nothing that used it
+   here had to change. */
+
+/* --- links and buttons ---------------------------------------------------- */
+
+.hm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border: 0;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 220ms var(--gp-ease),
+    background-color var(--gp-swap) var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease);
+}
+
+.hm-btn--accent {
+  background: var(--gp-accent);
+  color: var(--gp-brand-deep);
+}
+.hm-btn--accent:hover { transform: translateY(-2px); }
+
+.hm-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.hm-btn--ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+.hm-btn--dark {
+  background: var(--gp-brand);
+  color: #fff;
+}
+.hm-btn--dark:hover {
+  transform: translateY(-2px);
+  background: var(--gp-brand-lift);
+}
+
+/* The arrow slides out from the label on hover, which is the whole affordance —
+   there is no underline to animate on a link this short. */
+.hm-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 28px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--band-accent, var(--gp-accent-ink));
+  transition: color var(--gp-swap) var(--gp-ease), gap 220ms var(--gp-ease);
+}
+.hm-arrow:hover { gap: 15px; }
+
+/* --- split (media beside body) -------------------------------------------- */
+
+.hm-split {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+
+.hm-split--reverse .hm-split__media { order: 2; }
+
+.hm-split__media { position: relative; }
+
+.hm-split__media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* An accent bracket at the lower-left corner, so the photograph picks up the
+   active segment rather than being the one element on the band that ignores it. */
+.hm-split__media::after {
+  content: "";
+  position: absolute;
+  left: -18px;
+  bottom: -18px;
+  width: 42%;
+  height: 46%;
+  border-left: 3px solid var(--band-accent, var(--gp-accent));
+  border-bottom: 3px solid var(--band-accent, var(--gp-accent));
+  transition: var(--gp-fade);
+  pointer-events: none;
+}
+
+.hm-split__body h2 {
+  margin: 0;
+  font-size: var(--gp-section-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.hm-split__body p {
+  margin: 20px 0 0;
+  color: var(--band-muted, var(--gp-muted));
+  line-height: 1.6;
+  transition: var(--gp-fade);
+}
+
+.hm-split__list {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.hm-split__list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 15px;
+}
+
+.hm-split__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--band-accent, var(--gp-accent));
+  transition: var(--gp-fade);
+}
+
+@media (max-width: 900px) {
+  .hm-split { grid-template-columns: 1fr; }
+  .hm-split--reverse .hm-split__media { order: 0; }
+  .hm-split__media::after { left: -10px; bottom: -10px; }
+}

@@ -1,0 +1,52 @@
+/* The site's fade-in, shared.
+
+   Lifted out of features/home/home.css so every page can use it. home.css is
+   imported by HomePage.jsx alone, so this lived where only the homepage could
+   reach it — which is why the pages built since have each rolled their own
+   fade, and why the tender page's looked different from the homepage's.
+
+   How it is meant to be used, and this is the part that had drifted:
+
+     A HERO reveals on MOUNT (useMountReveal). It is above the fold; there is
+     nothing to scroll it into.
+
+     A BODY SECTION reveals on SCROLL (useInView). Reveal a body section on
+     mount instead and everything below the fold has already played by the time
+     the visitor arrives at it, which is the whole animation wasted.
+
+   Either way the hook puts `is-in` on the section and the children carry
+   `hm-reveal`. The audience is NOT passed as `resetKey`: switching segment is
+   not an arrival, and replaying a reveal on top of the segment cross-fade is
+   what made the toggle look busy. `resetKey` is for a genuine content change —
+   a different article, a new filter result — and nothing else.
+
+   The numbers live on --gp-reveal-* in tokens.css so every page moves alike.
+
+   The class keeps its `hm-` name: it is used in a couple of dozen places and
+   renaming it would be churn for nothing. */
+
+.hm-reveal {
+  opacity: 0;
+  transform: translateY(var(--gp-reveal-shift));
+  transition:
+    opacity var(--gp-reveal-dur) var(--gp-ease),
+    transform var(--gp-reveal-dur) var(--gp-ease);
+}
+
+.is-in .hm-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.hm-reveal[data-delay='1'] { transition-delay: var(--gp-reveal-step); }
+.hm-reveal[data-delay='2'] { transition-delay: calc(var(--gp-reveal-step) * 2); }
+.hm-reveal[data-delay='3'] { transition-delay: calc(var(--gp-reveal-step) * 3); }
+.hm-reveal[data-delay='4'] { transition-delay: calc(var(--gp-reveal-step) * 4); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

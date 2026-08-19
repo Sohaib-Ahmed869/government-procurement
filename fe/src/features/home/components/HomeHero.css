@@ -1,407 +1,113 @@
+/* A1 — the video-led hero.
+
+   Full-bleed footage with the headline over it, in the manner of deloitte.com/au
+   and pwc.com.au: the loop carries no information, so everything that has to be
+   read is set on a scrim above it and the still poster is a complete fallback.
+
+   Colour comes from the role tokens (styles/tokens.css) rather than from hexes,
+   so the tint over the footage follows the win/award ramp along with the rest
+   of the page. */
+
 .home-hero {
-  --home-bg: var(--gp-ink-900);
-  /* Raised panel behind the advisory block — the same surface the "Enhance your
-     Experience" card sits on, so the two read as one family down the page. */
-  --home-surface: var(--gp-ink-800);
-
   position: relative;
+  background: var(--gp-brand);
+  color: #fff;
+  transition: var(--gp-fade);
+  isolation: isolate;
+}
+
+/* --- media --------------------------------------------------------------- */
+
+.home-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   overflow: hidden;
-  background: var(--home-bg);
-  color: #fff;
-  font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.home-hero[data-audience='award'] {
-  --home-bg: var(--gp-green-900);
-  --home-surface: var(--gp-green-800);
-}
-
-.home-hero[data-audience='win'] {
-  --home-bg: var(--gp-ink-900);
-  --home-surface: var(--gp-ink-800);
-}
-
-/* --- reveal animations --- */
-@media (prefers-reduced-motion: no-preference) {
-  .home-hero__eyebrow,
-  .home-hero__title,
-  .home-hero__lede,
-  .home-hero__actions,
-  .home-hero__advisory-text > *,
-  .home-hero__advisory-media {
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-
-  /* Hero intro reveals on mount, staggered top to bottom. */
-  .home-hero.is-in .home-hero__intro .home-hero__eyebrow {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.05s;
-  }
-  .home-hero.is-in .home-hero__title {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.15s;
-  }
-  .home-hero.is-in .home-hero__lede {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.25s;
-  }
-  .home-hero.is-in .home-hero__actions {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.35s;
-  }
-
-  /* Advisory block reveals when scrolled into view. */
-  .home-hero__advisory.is-in .home-hero__advisory-text > * {
-    opacity: 1;
-    transform: none;
-  }
-  .home-hero__advisory.is-in .home-hero__advisory-text > *:nth-child(2) {
-    transition-delay: 0.1s;
-  }
-  .home-hero__advisory.is-in .home-hero__advisory-text > *:nth-child(3) {
-    transition-delay: 0.2s;
-  }
-  .home-hero__advisory.is-in .home-hero__advisory-text > *:nth-child(4) {
-    transition-delay: 0.3s;
-  }
-  .home-hero__advisory.is-in .home-hero__advisory-media {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.15s;
-  }
-}
-
-/* --- shared eyebrow --- */
-.home-hero__eyebrow {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  color: #fff;
-}
-
-/* --- hero (centred) --- */
-.home-hero__intro {
-  position: relative;
-  z-index: 1;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 72px 40px 40px;
-  text-align: center;
-}
-
-.home-hero__title {
-  margin: 26px 0 0;
-  font-family: 'Geist Variable', system-ui, sans-serif;
-  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.01em;
-}
-
-.home-hero__lede {
-  max-width: 620px;
-  margin: 28px auto 0;
-  font-size: 15px;
-  line-height: 1.65;
-  color: #fff;
-}
-
-.home-hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 44px;
-}
-
-/* --- buttons (Figma: white 20% fill, radius 100, glass effect) --- */
-.home-hero__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 30px;
-  font-size: 18px;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.2);
-  border: 0;
-  border-radius: 100px;
-  /* "Glass" effect: blur what shows through, plus a soft top highlight. */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: background-color 0.15s ease;
-}
-
-.home-hero__btn:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-/* Hover polish (pointer devices only, so the mobile pinned-icon transforms
-   and full-width buttons are left untouched). */
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .home-hero__btn {
-    transition:
-      background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out;
-  }
-
-  .home-hero__btn:hover {
-    transform: translateY(-3px);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-
-  .home-hero__circle {
-    transition: transform 0.2s ease-out;
-  }
-
-  /* Leading-icon buttons: nudge the disc left; trailing-icon buttons: right. */
-  .home-hero__btn:hover .home-hero__circle {
-    transform: translateX(-2px);
-  }
-
-  .home-hero__btn--trailing:hover .home-hero__circle {
-    transform: translateX(2px);
-  }
-}
-
-/* Was the trailing-icon variant; with the icon gone it matches the base pill.
-   The class is kept so the advisory button can be styled apart again later. */
-.home-hero__btn--trailing {
-  padding: 14px 30px;
-}
-
-.home-hero__circle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex: none;
-  overflow: hidden;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.home-hero__circle img {
-  display: block;
-}
-
-/* --- advisory --- */
-/* Sits on the segment's raised surface, matching the "Enhance your Experience"
-   card below it. Sized the way that card is — the 1100px container less its
-   40px gutters — so the two panels share one left and right edge down the page,
-   with the gutters kept as the panel's own outer margin at narrow widths. */
-.home-hero__advisory {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* The photo fills its column edge to edge — same as the "Enhance your
-     Experience" card below — so the two sections read as the same shape. */
-  align-items: stretch;
-  gap: 0;
-  width: min(1020px, calc(100% - 80px));
-  margin: 24px auto 72px;
-  overflow: hidden;
-  background: var(--home-surface);
-  border-radius: 14px;
-}
-
-/* Padding moved off the panel so the media column can bleed to its edges. */
-.home-hero__advisory-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  /* Tighter block padding than the 48px gutters — the panel's height is set by
-     this column, so the vertical padding is what keeps it compact. */
-  padding: 32px 48px;
-}
-
-.home-hero__advisory .home-hero__eyebrow {
-  color: #fff;
-  font-weight: 600;
-}
-
-.home-hero__subtitle {
-  margin: 12px 0 0;
-  font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: var(--gp-section-title);
-  font-weight: 400;
-  line-height: 1.05;
-}
-
-.home-hero__advisory-copy {
-  margin: 16px 0 0;
-  max-width: 480px;
-  font-size: 15px;
-  line-height: 1.65;
-  color: #fff;
-}
-
-/* The copy column is a flex column now, so the pill has to opt out of the
-   default stretch and keep its shrink-to-fit width. */
-.home-hero__advisory .home-hero__btn {
-  align-self: flex-start;
-  margin-top: 24px;
-}
-
-.home-hero__advisory-media img {
-  display: block;
+.home-hero__video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
-  /* Outer corners are clipped by the panel; the inner (left) edge carries its
-     own curve so it meets the copy panel smoothly. */
-  border-radius: 20px 0 0 20px;
+  display: block;
 }
 
-/* WCAG 2.1 AA focus visibility */
-.home-hero :is(a):focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-  border-radius: 999px;
+/* The brand wash runs left to right and the black scrim top to bottom, so the
+   headline column sits over the darkest part of the frame while the right-hand
+   side keeps enough of the footage to be worth having. */
+.home-hero__tint {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0.55) 55%,
+      rgba(0, 0, 0, 0.86) 100%
+    ),
+    linear-gradient(90deg, var(--gp-brand) 0%, rgba(0, 0, 0, 0) 72%);
+  opacity: 0.94;
+  transition: background var(--gp-swap) var(--gp-ease);
 }
 
-@media (max-width: 900px) {
-  .home-hero__advisory {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
+/* --- copy ---------------------------------------------------------------- */
 
-  /* Image sits above the text on narrow screens. */
-  .home-hero__advisory-media {
-    order: -1;
-  }
-
-  /* Stacked, so the photo keeps its own proportions rather than filling a
-     column, and the curve moves to the edge it shares with the copy. */
-  .home-hero__advisory-media img {
-    height: auto;
-    aspect-ratio: 790 / 466;
-    border-radius: 0 0 20px 20px;
-  }
-
-  .home-hero__advisory .home-hero__btn {
-    align-self: center;
-  }
-
-  .home-hero__advisory-copy {
-    margin-left: auto;
-    margin-right: auto;
-  }
+.home-hero__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(560px, 78vh, 780px);
+  padding-top: clamp(96px, 12vw, 150px);
+  padding-bottom: clamp(40px, 5vw, 64px);
 }
+
+.home-hero__col { max-width: 800px; }
+
+.home-hero__eyebrow {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gp-accent);
+  transition: var(--gp-fade);
+}
+
+.home-hero__title {
+  margin: 0;
+  font-size: min(64px, calc((100vw - 96px) / 13));
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.home-hero__lede {
+  margin: 22px 0 0;
+  max-width: 620px;
+  font-size: clamp(16px, 1.5vw, 19px);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.home-hero__actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
 
 @media (max-width: 860px) {
-  /* The toggle already states the audience, so drop the redundant intro eyebrow
-     (the advisory section keeps its own "Advisory Services" eyebrow). */
-  .home-hero__intro .home-hero__eyebrow {
-    display: none;
+  .home-hero__inner {
+    min-height: 0;
+    /* Clears the mobile audience toggle, which is painted over the top of the
+       page rather than taking up flow space (see index.css). */
+    padding-top: clamp(120px, 22vw, 170px);
   }
+}
 
-  /* No wave on small screens, so the intro only needs room for its own
-     content. */
-  .home-hero__intro {
-    padding: 38px 24px 56px;
-  }
-
-  .home-hero__title {
-    font-size: var(--gp-page-title-phone);
-  }
-
-  /* Advisory-block headings drop the display face on small screens. */
-  .home-hero__advisory .home-hero__eyebrow,
-  .home-hero__subtitle {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-  }
-
-  /* Body copy under the headings matches the footer blurb. */
-  .home-hero__lede,
-  .home-hero__advisory-copy {
-    font-size: 18px;
-    line-height: 1.5;
-  }
-
-  /* Stack the hero buttons full-width: icon pinned left, text centred. */
-  .home-hero__actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    margin-top: 32px;
-  }
-
-  .home-hero__actions .home-hero__btn {
-    position: relative;
-    flex: none;
-    /* Pinned width rather than shrink-to-fit, so the stacked button keeps a
-       consistent size and its label clears the icon pinned on the left. */
-    width: 274px;
-    min-width: 274px;
-    max-width: 274px;
-    height: 54px;
-    justify-content: center;
-    /* Extra left padding leaves room for the pinned icon; the label then centres
-       in the remaining space and fills the button on one line. */
-    padding: 12px 18px;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-
-  /* Icon sits at the left edge, out of flow, so the label stays centred. */
-  .home-hero__actions .home-hero__circle {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  /* Full-bleed from here down, matching the "Enhance your Experience" card,
-     which drops its gutters and corners at the same width. */
-  .home-hero__advisory {
-    width: 100%;
-    margin: 16px 0 48px;
-    border-radius: 0;
-  }
-
-  .home-hero__advisory-text {
-    padding: 40px 24px 48px;
-  }
-
-  /* Advisory "Request a consultation" button: identical to the intro button —
-     fixed size, label centred, icon pinned left (even though it's the trailing
-     variant, so its icon is positioned to the left too). */
-  .home-hero__advisory .home-hero__btn {
-    position: relative;
-    flex: none;
-    width: 237px;
-    min-width: 237px;
-    max-width: 237px;
-    height: 54px;
-    justify-content: center;
-    padding: 12px 18px;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-
-  .home-hero__advisory .home-hero__circle {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
+@media (max-width: 560px) {
+  .home-hero__title { font-size: var(--gp-page-title-phone); }
+  .home-hero__actions .hm-btn { flex: 1 1 100%; }
 }

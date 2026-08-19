@@ -1,40 +1,34 @@
 .careers {
-  --careers-bg: var(--gp-ink-900);
   /* Raised surface the reason and role cards sit on. */
-  --careers-surface: var(--gp-ink-800);
 
-  background: var(--careers-bg);
-  color: #fff;
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
 .careers[data-audience='award'] {
-  --careers-bg: var(--gp-green-900);
-  --careers-surface: var(--gp-green-800);
 }
 
 .careers[data-audience='win'] {
-  --careers-bg: var(--gp-ink-900);
-  --careers-surface: var(--gp-ink-800);
 }
 
 .careers__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
   /* 28px on both ends, the same clearance every rule on the page carries: below
      the hero's rule down to "Roles we are hiring for", and below "Propose a
      role" up to the footer's own top rule. */
-  padding: 28px 40px;
+  padding: 28px clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
 @media (prefers-reduced-motion: no-preference) {
   .careers__block {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .careers.is-in .careers__block {
@@ -42,16 +36,30 @@
     transform: none;
   }
 
-  .careers.is-in .careers__block:nth-of-type(2) { transition-delay: 0.08s; }
-  .careers.is-in .careers__block:nth-of-type(3) { transition-delay: 0.16s; }
+  .careers.is-in .careers__block:nth-of-type(2) { transition-delay: var(--gp-reveal-step); }
+  .careers.is-in .careers__block:nth-of-type(3) { transition-delay: calc(var(--gp-reveal-step) * 2); }
 }
 
-/* Every rule on the page sits in the same 28px of clear space above and below,
-   so the sections read as one rhythm rather than each carrying its own. */
-.careers__block + .careers__block {
-  margin-top: 28px;
-  padding-top: 28px;
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+/* Blocks are told apart by ground rather than by a rule.
+
+   They used to be separated by a hairline, which is the weakest separator the
+   page had and read as a stray line once the section moved onto paper. Each
+   block now takes its own step of the paper ramp and full-bleeds to the edges
+   of the section, so the change of colour does the work — the same way the
+   homepage and the Service Offering page separate their bands.
+
+   Full-bleed needs the block to escape the shell it sits in: the negative
+   inline margin and matching padding push each block out to the section edges
+   and put the gutter back inside it. */
+.careers__block {
+  margin-inline: calc(clamp(20px, 4vw, 60px) * -1);
+  padding: 28px clamp(20px, 4vw, 60px);
+}
+
+/* Alternating steps, starting on the section's own paper so the first block
+   does not announce itself as a band. */
+.careers__block:nth-of-type(even) {
+  background: var(--gp-paper-alt);
 }
 
 /* A block's last element carries no trailing margin of its own — .careers__copy
@@ -75,7 +83,7 @@
   margin: 0 0 18px;
   font-size: 16px;
   line-height: 1.7;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 /* --- roles --- */
@@ -94,11 +102,30 @@
   margin-top: 28px;
 }
 
+/* Filled to match the team cards and the Q&A answer cards: --gp-brand-lift is
+   #4a4a4a on Win and #2f7d45 on Award, so one declaration covers both segments.
+
+   As on .team-card in features/team/components/TeamGrid.css, that makes this a
+   dark island on a paper page, so it carries the DARK band's text roles instead
+   of the section's — one redefinition flips the title and body together.
+   --band-muted is 0.82 rather than the dark band's 0.72 for the same reason it
+   is there: these fills are lighter than a dark band, so secondary text loses
+   contrast against them faster. */
 .careers-role {
   display: flex;
   flex-direction: column;
   padding: 28px;
-  background: var(--careers-surface);
+  background: var(--gp-brand-lift);
+  color: #fff;
+
+  --band-ink: #fff;
+  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-line: rgba(255, 255, 255, 0.12);
+  --band-surface: rgba(255, 255, 255, 0.06);
+  --band-surface-hover: rgba(255, 255, 255, 0.16);
+  --band-accent: var(--gp-accent);
+  --band-on-accent: var(--gp-brand-deep);
+
   border-radius: 14px;
 }
 
@@ -106,14 +133,14 @@
   margin: 0 0 12px;
   font-size: 20px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .careers-role__body {
   margin: 0 0 24px;
   font-size: 15px;
   line-height: 1.65;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--band-muted);
 }
 
 /* Glass pill — matches the subscribe button. Pinned to the bottom so the
@@ -126,18 +153,32 @@
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--gp-brand);
   border-radius: 999px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: background-color 0.15s ease;
+  /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
+     the segment cross-fade's pace and far too slow for a pointer: the button
+     looked like it was thinking about it. Background moves fast; colour and
+     border keep the slow swap so a segment change still dissolves. */
+  transition:
+    background-color 140ms var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease),
+    transform 180ms var(--gp-ease);
 }
 
+/* --gp-brand-mid, NOT --gp-brand-lift. The pill rests on --gp-brand and used to
+   hover to --gp-brand-lift, which is the colour the card around it now carries —
+   so hovering Apply made the button dissolve into its own card. The mid step
+   (#333331 / #14572a) is the same direction of travel and stays clearly a pill
+   against the fill behind it. Every other button on the page keeps the lift:
+   they sit on the section ground, where there is nothing to collide with. */
 .careers-role__apply:hover,
 .careers-role__apply:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--gp-brand-mid);
+  transform: translateY(-2px);
 }
 
-/* Glass pill — the same treatment as the subscribe button. */
+/* The same filled pill as Receive updates in the footer. */
 .careers__cta-btn {
   display: inline-flex;
   align-items: center;
@@ -146,18 +187,24 @@
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--gp-brand);
   border: 0;
   border-radius: 999px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  transition: background-color 0.15s ease;
+  /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
+     the segment cross-fade's pace and far too slow for a pointer: the button
+     looked like it was thinking about it. Background moves fast; colour and
+     border keep the slow swap so a segment change still dissolves. */
+  transition:
+    background-color 140ms var(--gp-ease),
+    color var(--gp-swap) var(--gp-ease),
+    border-color var(--gp-swap) var(--gp-ease),
+    transform 180ms var(--gp-ease);
 }
 
 .careers__cta-btn:hover,
 .careers__cta-btn:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--gp-brand-lift);
+  transform: translateY(-2px);
 }
 
 /* Hover polish — matches the subscribe button: lift + shadow. */
@@ -171,14 +218,12 @@
 
   .careers__cta-btn:hover {
     transform: translateY(-3px);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
   }
 }
 
 .careers :is(a):focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 3px;
   border-radius: 4px;
 }

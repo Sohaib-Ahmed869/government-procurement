@@ -85,7 +85,7 @@ export default function LinksManagerPage() {
           <h2 className="admin-page__title">Links</h2>
           <p className="admin-page__subtitle">
             Where the footer&rsquo;s social and messaging icons point. Each one keeps its own
-            icon, so the list is fixed — change the address, or untick to hide it.
+            icon, so the list is fixed. Change the address, or untick to hide it.
           </p>
         </div>
       </div>

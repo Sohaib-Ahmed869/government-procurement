@@ -1,0 +1,69 @@
+/* B6 — Templates library hero. The shared page-heading band, same as every other
+   page: --gp-head-bg for the ground and --gp-head-pad for the spacing. */
+
+.tl-hero {
+  background: var(--gp-head-bg);
+  color: #fff;
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tl-hero__title,
+  .tl-hero__sub,
+  .tl-hero__note {
+    opacity: 0;
+    transform: translateY(var(--gp-reveal-shift));
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .tl-hero.is-in .tl-hero__title { opacity: 1; transform: none; transition-delay: var(--gp-reveal-step); }
+  .tl-hero.is-in .tl-hero__sub   { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 2); }
+  .tl-hero.is-in .tl-hero__note  { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 3); }
+}
+
+.tl-hero__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
+}
+
+.tl-hero__title {
+  margin: 0;
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+.tl-hero__sub {
+  max-width: 68ch;
+  margin: 20px 0 0;
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* The caveat. Quieter than the lede but not hidden — it is the line that keeps
+   the page honest about what a prompt can and cannot do. */
+.tl-hero__note {
+  max-width: 62ch;
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 860px) {
+  .tl-hero__title {
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    font-size: var(--gp-page-title-phone);
+  }
+}
+
+@media (max-width: 760px) {
+  .tl-hero__inner { padding: var(--gp-head-pad) 24px; }
+  .tl-hero__sub { max-width: none; font-size: 16px; }
+}

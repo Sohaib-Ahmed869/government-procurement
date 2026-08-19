@@ -15,9 +15,9 @@
 }
 
 .eb__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 0 40px 96px;
+  padding: 0 clamp(20px, 4vw, 60px) 96px;
 }
 
 .eb__card {
@@ -60,26 +60,26 @@
   .eb__copy,
   .eb__actions {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .eb.is-in .eb__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .eb.is-in .eb__copy {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
   .eb.is-in .eb__actions {
     opacity: 1;
     transform: none;
-    transition-delay: 0.25s;
+    transition-delay: calc(var(--gp-reveal-step) * 3);
   }
 }
 

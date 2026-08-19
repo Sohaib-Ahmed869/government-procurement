@@ -1,26 +1,19 @@
 .careers-hero {
-  --careers-hero-bg: var(--gp-ink-900);
 
-  background: var(--careers-hero-bg);
+  background: var(--gp-head-bg);
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.careers-hero[data-audience='award'] {
-  --careers-hero-bg: var(--gp-green-900);
-}
 
-.careers-hero[data-audience='win'] {
-  --careers-hero-bg: var(--gp-ink-900);
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .careers-hero__title {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   /* The title leads the reveal now that the eyebrow above it has gone, so it
@@ -28,16 +21,16 @@
   .careers-hero.is-in .careers-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
 }
 
 .careers-hero__inner {
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
   /* The rule under the title closes the hero off, so the space down to "Roles
      we are hiring for" is paid entirely by .careers__inner below. */
-  padding: 56px 40px 0;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .careers-hero__title {
@@ -47,11 +40,8 @@
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.015em;
-  /* Closes the hero off from the sections below, which are separated the same
-     way. Carried on the title rather than .careers-hero__inner so it spans the
-     container's content box and lines up with the rule between the blocks. */
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  /* No rule under the heading. The sections below are separated by their ground
+     now rather than by hairlines, and a rule here was the last one left. */
 }
 
 /* Shared page-title breakpoint, matching the homepage and advisory heroes. */
@@ -64,6 +54,6 @@
 
 @media (max-width: 760px) {
   .careers-hero__inner {
-    padding: 40px 24px 0;
+    padding: var(--gp-head-pad) 24px;
   }
 }

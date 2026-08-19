@@ -35,7 +35,7 @@ function applyTargetProps(href) {
 
 export default function CareersContent() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView({ resetKey: audience });
+  const { ref, inView } = useInView();
 
   // Openings come from the CMS (Content → Careers). With none published the
   // whole section is left out rather than showing an empty heading.
@@ -58,14 +58,21 @@ export default function CareersContent() {
   return (
     <section
       ref={ref}
-      className={`careers${inView ? ' is-in' : ''}`}
+      className={`careers hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
-      <div className="careers__inner">
-        {/* --- roles --- */}
-        {/* The heading stands whether or not anything is open: an empty careers
-            page reads as broken, and "nothing right now" is useful in itself. */}
-        <section className="careers__block">
+      {/* Each block is a full-width band carrying the shell inside it, rather
+          than blocks sitting inside one shared shell. The shell-inside-band
+          order is what lets a block's ground reach the screen edges: the old
+          arrangement tried to escape the shell with a negative `50vw` margin,
+          which cannot work on this site — the page sits inside `.page-scale`,
+          so `vw` resolves against the real viewport and is then magnified by
+          the zoom, leaving the tint short of the edges on every side. */}
+
+      {/* The heading stands whether or not anything is open: an empty careers
+          page reads as broken, and "nothing right now" is useful in itself. */}
+      <section className="careers__block">
+        <div className="careers__inner">
           <h2 className="careers__heading">Roles we are hiring for</h2>
 
           {roles.length > 0 ? (
@@ -94,11 +101,12 @@ export default function CareersContent() {
               in the meantime.
             </p>
           )}
+        </div>
+      </section>
 
-        </section>
-
-        {/* --- reverse brief: propose a role rather than answer an advert --- */}
-        <section className="careers__block">
+      {/* --- reverse brief: propose a role rather than answer an advert --- */}
+      <section className="careers__block">
+        <div className="careers__inner">
           <h2 className="careers__heading">Create your own role</h2>
           <p className="careers__copy">
             Tell us the role you think we should be hiring for and why you are
@@ -109,8 +117,8 @@ export default function CareersContent() {
           <a className="careers__cta-btn" href={OWN_ROLE_HREF}>
             Propose a role
           </a>
-        </section>
-      </div>
+        </div>
+      </section>
     </section>
   );
 }

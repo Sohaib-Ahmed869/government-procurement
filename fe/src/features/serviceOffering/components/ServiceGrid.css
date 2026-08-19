@@ -1,0 +1,153 @@
+/* A5 — the six services.
+
+   Two jobs at once: list all six so they are easy to scan, and make Win and
+   Award read as genuinely different pages rather than the same grid with two
+   labels. The differences are structural as well as visual —
+
+     AWARD  a numbered ladder. The six are the stages of a procurement in the
+            order it is run, so the index is shown and each card carries a rule
+            down its left edge that reads as a spine when they are stacked.
+     WIN    an unnumbered set of entry points, ordered by when a bidder meets
+            them. No index, no spine; the mark sits on a filled chip instead,
+            and the cards are separated by their own hairline grid.
+
+   — and on top of that the two ramps recolour every surface here, so the paper,
+   the rule, the mark and the accent all change with the toggle. */
+
+.sg {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 26px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: sg;
+}
+
+.sg__item { display: flex; }
+
+/* Raised, not ruled. The cards used to be marked with a 3px rule down one edge;
+   they now sit off the band on a stacked shadow instead — a tight contact
+   shadow to seat the card, a wider soft one for the lift, and a hairline of
+   light along the top edge so the card has a lit face rather than just a
+   drop shadow under it. */
+.sg__card {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 28px 34px;
+  background: var(--band-surface, var(--gp-paper));
+  border: 1px solid var(--band-line, var(--gp-line));
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition:
+    var(--gp-fade),
+    transform 260ms var(--gp-ease),
+    box-shadow 260ms var(--gp-ease);
+}
+
+.sg__card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 22px 46px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.sg__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sg__mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  color: var(--band-ink, var(--gp-brand));
+  transition: var(--gp-fade);
+}
+
+.sg__no {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--band-accent, var(--gp-accent-ink));
+  transition: var(--gp-fade);
+}
+
+.sg__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.sg__stage {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--band-muted, var(--gp-muted));
+  transition: var(--gp-fade);
+}
+
+.sg__body {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--band-muted, var(--gp-muted));
+  transition: var(--gp-fade);
+}
+
+/* --- AWARD: the numbered ladder ------------------------------------------ */
+
+/* The edge rules are gone — the lift is what marks the card now. What still
+   separates the two segments is the mark and the index: Award numbers the six
+   and draws the mark on a recessed chip, Win drops the number and fills the
+   chip instead. */
+.sg[data-audience='award'] .sg__mark {
+  background: var(--band-surface-hover, var(--gp-paper-deep));
+  color: var(--band-ink, var(--gp-brand));
+}
+
+/* --- WIN: the unnumbered set --------------------------------------------- */
+
+/* No index — the six aren't a sequence for a bidder, they're places to come in.
+   Dropped with `visibility` rather than `display` so the header keeps the same
+   height in both segments and the titles line up across a toggle. */
+.sg[data-audience='win'] .sg__no { visibility: hidden; }
+
+/* Filled chip, so the mark is the loudest thing in the card — on Award it is
+   the number that leads instead. */
+.sg[data-audience='win'] .sg__mark {
+  background: var(--band-accent, var(--gp-brand));
+  color: var(--band-on-accent, var(--gp-accent));
+}
+
+/* --- compact (homepage band) --------------------------------------------- */
+/* The homepage shows the same six, just tighter: it is a summary of the page,
+   not the page. */
+.sg--compact .sg__card { padding: 24px 22px 28px; }
+.sg--compact .sg__title { font-size: 18px; }
+.sg--compact .sg__mark { width: 38px; height: 38px; }
+
+/* --- responsive ----------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .sg { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .sg { grid-template-columns: 1fr; }
+}

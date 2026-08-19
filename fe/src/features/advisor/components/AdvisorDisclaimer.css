@@ -1,0 +1,35 @@
+/* A6.9 / A6.10 — the disclaimer, in both the places it has to appear.
+
+   Given a surface and an accent edge rather than set as small print, because
+   the requirement is that it cannot be missed. */
+
+.adv-disclaimer {
+  padding: 18px 22px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-left: 3px solid var(--gp-accent-ink);
+  border-radius: 6px;
+  transition: var(--gp-fade);
+}
+
+.adv-disclaimer p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.adv-disclaimer p + p { margin-top: 8px; }
+
+.adv-disclaimer__lead { color: var(--gp-ink) !important; }
+
+/* In front of the questions it sits above the whole grid, so it spans both
+   columns of the stepper. */
+.adv-disclaimer--intro {
+  grid-column: 1 / -1;
+  margin-bottom: clamp(20px, 2.5vw, 30px);
+}
+
+.adv-disclaimer--result {
+  margin-top: clamp(28px, 3vw, 40px);
+}

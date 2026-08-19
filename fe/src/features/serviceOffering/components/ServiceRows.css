@@ -1,0 +1,105 @@
+/* A5 — the six services as full-width alternating rows.
+
+   Odd rows sit on paper with the photograph on the left; even rows sit on the
+   raised paper step with the photograph on the right. The two together give the
+   page a rhythm you can feel scrolling it, and mean no row has to carry a
+   border to separate it from the one above. */
+
+.sr__row {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  padding: clamp(44px, 6vw, 80px) 0;
+  transition: var(--gp-fade);
+}
+
+/* The alternating band, in the same light green / light grey as the page's
+   heading bar so the page reads as one set of shades rather than two.
+
+   The run starts pale, because the heading bar above it is the tint. Whichever
+   shade the last row lands on, the "Stay across procurement" band below carries
+   its own top rule (see Footer.css), so the boundary is legible even when the
+   two shades are close. */
+.sr__row--flip {
+  background: var(--gp-band-tint);
+}
+
+.sr__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+
+  /* .hm-shell's geometry, so the rows line up with the page header above. */
+  width: min(var(--gp-shell), 100%);
+  margin-inline: auto;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+/* The photograph swaps sides on alternate rows. Ordering the grid items rather
+   than reversing the whole row keeps the source order — image then copy — which
+   is the order it should be read aloud in. */
+.sr__row--flip .sr__media { order: 2; }
+
+/* --- media ---------------------------------------------------------------- */
+
+.sr__media {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  /* Seated, the same way the service cards are on the homepage. */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.14),
+    0 16px 36px rgba(0, 0, 0, 0.14);
+}
+
+.sr__media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  transition: transform 700ms var(--gp-ease);
+}
+
+.sr__row:hover .sr__media img { transform: scale(1.02); }
+
+/* --- copy ----------------------------------------------------------------- */
+
+.sr__stage {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gp-accent-ink);
+  transition: var(--gp-fade);
+}
+
+.sr__title {
+  margin: 12px 0 0;
+  font-size: var(--gp-section-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--gp-ink);
+  transition: var(--gp-fade);
+}
+
+.sr__copy {
+  margin: 18px 0 0;
+  max-width: 54ch;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.65;
+  color: var(--gp-muted);
+  transition: var(--gp-fade);
+}
+
+@media (max-width: 900px) {
+  .sr__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  /* Image above the copy on every row once stacked — alternating the order
+     vertically would just look like a mistake. */
+  .sr__row--flip .sr__media { order: 0; }
+}

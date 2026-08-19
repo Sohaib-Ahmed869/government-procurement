@@ -11,17 +11,18 @@ const BLANK = {
   seoTitle: '', seoDescription: '',
 };
 
-// The homepage "Latest Insights" rail has three slots (LatestInsights.jsx asks
-// for 3, featured first). Only a *published* insight occupies one — a featured
-// draft isn't on the homepage yet, so it doesn't hold a slot open. Publishing is
-// where that's reconciled: see the publish handler below.
-const MAX_FEATURED = 3;
+// The homepage insights band has five slots (InsightsBand.jsx asks for 5,
+// featured first: one lead article and four beside it). Only a *published*
+// insight occupies one — a featured draft isn't on the homepage yet, so it
+// doesn't hold a slot open. Publishing is where that's reconciled: see the
+// publish handler below.
+const MAX_FEATURED = 5;
 
 // Message shown when a featured draft can't take a slot because the live ones
 // filled up while it sat unpublished. The flag is dropped for the author, so the
 // next Publish click goes through.
 const NO_SLOT_NOTICE =
-  `No space in featured insights — all ${MAX_FEATURED} homepage slots are taken by ` +
+  `No space in featured insights. All ${MAX_FEATURED} homepage slots are taken by ` +
   'published insights, so this one has been changed to not featured on homepage. ' +
   'Click Publish again to publish it.';
 
@@ -241,7 +242,7 @@ export default function ArticleEditorPage() {
             <h3 className="editor-panel__title">Status</h3>
             <div className="editor-publish">
               <span className={`editor-publish__dot${isPublished ? ' is-live' : ''}`} />
-              <span>{isPublished ? 'Published — live on the site' : 'Draft — not visible yet'}</span>
+              <span>{isPublished ? 'Published, live on the site' : 'Draft, not visible yet'}</span>
             </div>
             <FormField
               label="Featured" name="featured" as="select" value={form.featured} onChange={onChange}
@@ -274,7 +275,7 @@ export default function ArticleEditorPage() {
                 in the article hero, and it's what the Insights filter offers. */}
             <FormField
               label="Category" name="category" as="select" value={form.category} onChange={onChange}
-              options={[{ value: '', label: '— None —' }, ...categories.map((c) => ({ value: c._id || c.id, label: c.name }))]}
+              options={[{ value: '', label: 'None' }, ...categories.map((c) => ({ value: c._id || c.id, label: c.name }))]}
               hint="(shown as the topic on the site)"
             />
             <FormField
@@ -284,7 +285,7 @@ export default function ArticleEditorPage() {
               value={form.author}
               onChange={onChange}
               options={[
-                { value: '', label: '— None —' },
+                { value: '', label: 'None' },
                 // An author saved before this became a dropdown — or a member
                 // since removed — would otherwise vanish from the field on open.
                 ...(form.author && !team.some((m) => m.name === form.author)

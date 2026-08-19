@@ -6,7 +6,7 @@ export default function JurisdictionsHero() {
   const { audience } = useAudience();
 
   // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  const mounted = useMountReveal();
 
   return (
     <section className={`jl-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>

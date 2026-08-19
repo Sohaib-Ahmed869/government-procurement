@@ -1,0 +1,87 @@
+/* Courses — three cards on paper. */
+
+.cob__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 2vw, 28px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cob__item { display: flex; }
+
+.cob__card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 22px;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--band-line);
+  transition: var(--gp-fade);
+}
+
+.cob__media {
+  display: block;
+  margin-bottom: 18px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--band-surface-hover);
+}
+
+.cob__media img,
+.cob__media-empty {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  transition: transform 600ms var(--gp-ease);
+}
+
+.cob__media-empty {
+  background: linear-gradient(135deg, var(--band-surface-hover), var(--band-surface));
+}
+
+.cob__card:hover .cob__media img { transform: scale(1.04); }
+
+.cob__title {
+  margin: 0;
+  font-size: clamp(17px, 1.6vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  transition: color 220ms var(--gp-ease);
+}
+
+.cob__card:hover .cob__title { color: var(--band-accent); }
+
+.cob__summary {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--band-muted);
+  transition: var(--gp-fade);
+
+  /* Two lines, so three cards of very different summary lengths still line up
+     along their bottom edge. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cob__by {
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--band-accent);
+  transition: var(--gp-fade);
+}
+
+@media (max-width: 900px) {
+  .cob__grid { grid-template-columns: 1fr; }
+}

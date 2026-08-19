@@ -65,7 +65,7 @@ const FEATURED_SLOTS = { courses: 4, artefacts: 2 };
 // full by the time it's published — this is what the author sees then. The flag
 // is dropped for them, so the next Publish click goes through.
 const noSlotNotice = (resourceType, max) =>
-  `No space in featured ${resourceType} — all ${max} homepage slots are taken by ` +
+  `No space in featured ${resourceType}. All ${max} homepage slots are taken by ` +
   `published ${resourceType}, so this one has been changed to not featured on ` +
   'homepage. Click Publish again to publish it.';
 
@@ -356,7 +356,7 @@ export default function CourseEditorPage() {
             <h3 className="editor-panel__title">Status</h3>
             <div className="editor-publish">
               <span className={`editor-publish__dot${isPublished ? ' is-live' : ''}`} />
-              <span>{isPublished ? 'Published — live on the site' : 'Draft — not visible yet'}</span>
+              <span>{isPublished ? 'Published, live on the site' : 'Draft, not visible yet'}</span>
             </div>
             {/* No Featured control for a type with no homepage rail — there'd be
                 nowhere for the flag to take effect. */}

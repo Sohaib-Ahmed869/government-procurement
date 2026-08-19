@@ -25,7 +25,7 @@ export default function ForumAnswerDetail() {
 
   // resetKey includes status so the IntersectionObserver re-attaches once the
   // content section actually mounts (the ref isn't rendered during loading).
-  const { ref, inView } = useInView({ resetKey: `${audience}:${id}:${status}` });
+  const { ref, inView } = useInView({ resetKey: `${id}:${status}` });
 
   useEffect(() => {
     let alive = true;
@@ -70,7 +70,7 @@ export default function ForumAnswerDetail() {
 
   if (status === 'loading') {
     return (
-      <section className="forum-article">
+      <section className="forum-article hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
             <p className="forum-article__q">Loading question…</p>
@@ -82,7 +82,7 @@ export default function ForumAnswerDetail() {
 
   if (status === 'notfound') {
     return (
-      <section className="forum-article forum-answer-missing">
+      <section className="forum-article forum-answer-missing hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
             <h1 className="forum-article__title">Answer not found</h1>
@@ -105,7 +105,7 @@ export default function ForumAnswerDetail() {
   return (
     <section
       ref={ref}
-      className={`forum-article${inView ? ' is-in' : ''}`}
+      className={`forum-article hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
       <div className="forum-article__inner">

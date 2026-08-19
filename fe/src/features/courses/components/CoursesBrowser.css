@@ -1,30 +1,16 @@
 .courses-browse {
-  --courses-browse-bg: var(--gp-ink-900);
-  /* Dropdown panel follows the segment: green for Award, grey for Win. */
-  --courses-menu-bg: var(--gp-ink-800);
-
-  background: var(--courses-browse-bg);
-  color: #fff;
+  background: var(--gp-paper);
+  color: var(--band-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
-}
-
-.courses-browse[data-audience='award'] {
-  --courses-browse-bg: var(--gp-green-900);
-  --courses-menu-bg: var(--gp-green-750);
-}
-
-.courses-browse[data-audience='win'] {
-  --courses-browse-bg: var(--gp-ink-900);
-  --courses-menu-bg: var(--gp-ink-800);
 }
 
 .courses-browse__inner {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 56px;
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 24px 40px 48px;
+  padding: 24px clamp(20px, 4vw, 60px) 48px;
 }
 
 /* --- reveal on scroll-in --- */
@@ -33,26 +19,33 @@
   .courses-main__head,
   .courses-card {
     opacity: 0;
-    transform: translateY(24px);
+    translate: 0 var(--gp-reveal-shift);
     transition:
-      opacity 0.6s ease,
-      transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      translate var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .courses-browse.is-in .courses-filters {
     opacity: 1;
-    transform: none;
-    transition-delay: 0.05s;
+    translate: none;
+    transition-delay: var(--gp-reveal-step);
   }
   .courses-browse.is-in .courses-main__head {
     opacity: 1;
-    transform: none;
-    transition-delay: 0.1s;
+    translate: none;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
+  /* The stagger lands on the two properties the reveal owns and nowhere else.
+     `transform` and the colours — everything the pointer drives — sit at 0s, in
+     BOTH directions: a single delay value here is what made leaving a card take
+     as long as the stagger before it settled back. */
   .courses-browse.is-in .courses-card {
     opacity: 1;
-    transform: none;
-    transition-delay: calc(0.12s + var(--i) * 0.06s);
+    translate: none;
+    transition-delay:
+      0s, 0s, 0s,
+      calc(0.12s + var(--i, 0) * 0.06s),
+      calc(0.12s + var(--i, 0) * 0.06s);
   }
 }
 
@@ -63,11 +56,9 @@
   flex-direction: column;
   gap: 34px;
   padding: 24px 20px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   border-radius: 24px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--band-line);
 }
 
 .courses-filter__heading {
@@ -80,19 +71,36 @@
   font-weight: 600;
   /* The card's glass edge rather than solid white, so the rule sits in the same
      register as the panel around it. */
-  border-bottom: 2px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 2px solid var(--band-line);
 }
 
 .courses-filter__icon {
   display: inline-flex;
-  color: #fff;
+  color: var(--band-ink);
 }
 
+/* The Categories and Level marks.
+   The source artwork is white on transparent, drawn for the dark ground this
+   page used to sit on, so as an <img> it was invisible against paper and could
+   not be recoloured. Masked instead: the PNG supplies the shape and the fill
+   comes from --gp-brand, which is the segment's own darkest step — deep green
+   on Award, near-black on Win. */
 .courses-filter__img {
   display: block;
   width: 18px;
   height: 18px;
-  object-fit: contain;
+  background-color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+.courses-filter__img--menu {
+  -webkit-mask: url('../../../assets/icons/Menu.png') center / contain no-repeat;
+  mask: url('../../../assets/icons/Menu.png') center / contain no-repeat;
+}
+
+.courses-filter__img--level {
+  -webkit-mask: url('../../../assets/icons/LevelIcon.png') center / contain no-repeat;
+  mask: url('../../../assets/icons/LevelIcon.png') center / contain no-repeat;
 }
 
 .courses-filter__options {
@@ -108,7 +116,7 @@
   gap: 10px;
   cursor: pointer;
   font-size: 14px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .courses-radio input {
@@ -126,13 +134,13 @@
   width: 16px;
   height: 16px;
   flex: none;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid var(--band-line);
   border-radius: 50%;
   transition: border-color 0.15s ease;
 }
 
 .courses-radio input:checked + .courses-radio__dot {
-  border-color: #fff;
+  border-color: var(--band-ink);
 }
 
 .courses-radio input:checked + .courses-radio__dot::after {
@@ -140,15 +148,17 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #fff;
+  /* The dot inside a checked radio. White read as "filled" on the dark ground;
+     on paper it would read as empty, so it takes the brand instead. */
+  background: var(--gp-brand);
 }
 
 .courses-radio input:checked ~ .courses-radio__label {
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .courses-radio input:focus-visible + .courses-radio__dot {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 2px;
 }
 
@@ -170,12 +180,10 @@
   gap: 20px;
   margin-bottom: 22px;
   padding: 16px 22px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   /* Shallower than the cards' 24px — on a short bar that radius reads as a pill. */
   border-radius: 14px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--band-line);
 }
 
 .courses-main__title {
@@ -192,7 +200,7 @@
 }
 
 .courses-sort__label {
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .courses-sort__control {
@@ -209,7 +217,7 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -217,7 +225,7 @@
 
 .courses-sort__chevron {
   display: inline-flex;
-  color: #fff;
+  color: var(--band-ink);
   transition: transform 0.18s ease;
 }
 
@@ -235,10 +243,13 @@
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: var(--courses-menu-bg);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  /* Paper, not the dark --courses-menu-bg it used to force. Its options are ink
+     now, so a dark panel left dark text on a dark menu — the same bug the Q&A
+     submit dropdown had. */
+  background: var(--gp-paper);
+  border: 1px solid var(--band-line);
   border-radius: 12px;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.16);
   animation: courses-sort-in 0.15s ease;
 }
 
@@ -261,7 +272,7 @@
   font-size: 13px;
   text-align: left;
   white-space: nowrap;
-  color: #fff;
+  color: var(--band-ink);
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -272,19 +283,19 @@
 }
 
 .courses-sort__option:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--band-ink);
+  background: var(--band-surface);
 }
 
 .courses-sort__option.is-active {
-  color: #fff;
+  color: var(--band-ink);
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--band-surface-hover);
 }
 
 .courses-sort__button:focus-visible,
 .courses-sort__option:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -303,14 +314,26 @@
   display: flex;
   flex-direction: column;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--band-surface);
   border-radius: 24px;
+  border: 1px solid var(--band-line);
+  /* Seated on a contact shadow plus a wider soft one, the pair the Procurement
+     Advisor's boxes use. The card already moved on hover, but with nothing cast
+     underneath it the movement did not read as a lift. */
   box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 10px 24px rgba(0, 0, 0, 0.07);
+  /* Every property this card animates, in one list, because this rule comes
+     after the reveal block at equal specificity and replaces its `transition`
+     outright — anything missing here simply would not animate.
+     The order is what the reveal's per-property `transition-delay` below
+     matches against, so the two have to stay in step. */
   transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
+    transform 140ms var(--gp-ease),
+    box-shadow 140ms var(--gp-ease),
+    background-color 140ms var(--gp-ease),
+    opacity 600ms ease,
+    translate 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 /* Whole card is a link to the course detail page. */
@@ -325,12 +348,15 @@
 @media (prefers-reduced-motion: no-preference) {
   .courses-card:hover {
     transform: translateY(-4px);
-    background-color: rgba(255, 255, 255, 0.07);
+    background-color: var(--band-surface-hover);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.09),
+      0 20px 40px rgba(0, 0, 0, 0.11);
   }
 }
 
 .courses-card__link:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--band-accent);
   outline-offset: 4px;
   border-radius: 16px;
 }
@@ -339,7 +365,7 @@
 .courses-card__art {
   height: 150px;
   border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--band-surface-hover);
   background-size: cover;
   background-position: center;
 }
@@ -358,8 +384,8 @@
   padding: 5px 12px;
   font-size: 11.5px;
   font-weight: 400;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.13);
+  color: var(--band-ink);
+  background: var(--band-surface-hover);
   border-radius: 6px;
 }
 
@@ -368,7 +394,7 @@
   display: inline-flex;
   align-items: center;
   font-size: 11.5px;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .courses-card__title {
@@ -382,7 +408,7 @@
   margin: 12px 0 0;
   font-size: 12.5px;
   line-height: 1.6;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .courses-card__price {
@@ -425,7 +451,7 @@
     z-index: 300;
     overflow-y: auto;
     padding: 16px 24px 48px;
-    background: var(--courses-browse-bg);
+    background: var(--gp-paper);
     opacity: 0;
     visibility: hidden;
     transform: translateY(100%);
@@ -449,7 +475,7 @@
     width: 40px;
     height: 40px;
     margin: 0 0 8px auto;
-    color: #fff;
+    color: var(--band-ink);
     cursor: pointer;
     background: transparent;
     border: 0;
@@ -467,21 +493,15 @@
     font: inherit;
     font-size: 15px;
     font-weight: 600;
-    color: #fff;
+    color: var(--band-ink);
     text-align: left;
     cursor: pointer;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0.02)
-    );
+    background: var(--band-surface);
     border: 0;
     border-radius: 10px;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow:
-      inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-      inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--band-line);
   }
 
   .courses-resource__chevron {

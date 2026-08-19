@@ -1,4 +1,15 @@
 .forum-hero {
+  /* The page's heading band. It used to be transparent, sitting on the page's
+     own dark ground; now the page is paper, so the band carries its colour and
+     the dark --band-* roles itself. */
+  background: var(--gp-head-bg);
+  --band-ink: #fff;
+  --band-muted: rgba(255, 255, 255, 0.72);
+  --band-line: rgba(255, 255, 255, 0.12);
+  --band-surface: var(--gp-brand);
+  --band-accent: var(--gp-accent);
+  --band-on-accent: var(--gp-brand-deep);
+
   /* Root is transparent (it sits on .forum-page); this var only drives the
      mobile slide-up panel background so it tracks the audience theme. */
   --forum-hero-panel-bg: var(--gp-ink-900);
@@ -31,26 +42,26 @@
   .forum-hero__sub,
   .forum-hero__tools {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(var(--gp-reveal-shift));
     transition:
-      opacity 0.7s ease,
-      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .forum-hero.is-in .forum-hero__title {
     opacity: 1;
     transform: none;
-    transition-delay: 0.05s;
+    transition-delay: var(--gp-reveal-step);
   }
   .forum-hero.is-in .forum-hero__sub {
     opacity: 1;
     transform: none;
-    transition-delay: 0.15s;
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
   .forum-hero.is-in .forum-hero__tools {
     opacity: 1;
     transform: none;
-    transition-delay: 0.25s;
+    transition-delay: calc(var(--gp-reveal-step) * 3);
   }
 }
 
@@ -60,9 +71,9 @@
   /* 1100px and 56px/40px/32px, the same column and the same drop from the
      header as every other page hero — this was the one that opened wider,
      lower and centred. */
-  max-width: 1100px;
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 56px 40px 32px;
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .forum-hero__title {

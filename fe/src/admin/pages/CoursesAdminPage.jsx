@@ -413,7 +413,7 @@ export default function CoursesAdminPage() {
               <p className="admin-curric__empty">Loading curriculum…</p>
             ) : !detail.modules?.length ? (
               <p className="admin-curric__empty">
-                This course has no modules yet — there’s nothing to review.
+                This course has no modules yet, so there’s nothing to review.
               </p>
             ) : (
               <>

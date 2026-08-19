@@ -129,18 +129,18 @@ async function run() {
       '<p>For over two decades we have helped organisations across the public and private sectors win and manage government contracts.</p><p>Our team combines procurement advisory, training, and digital tools to make tendering fairer, faster, and more transparent.</p>',
       'September 2025',
     ),
-    upsertPage(
-      'privacy',
-      'Privacy Policy',
-      '<p>We are committed to protecting your privacy in line with the Privacy Act 1988 (Cth) and the Australian Privacy Principles.</p>',
-      'September 2025',
-    ),
-    upsertPage(
-      'terms',
-      'Terms of Use',
-      '<p>By using this website you agree to these Terms of Use.</p>',
-      'September 2025',
-    ),
+    // B5: 'privacy', 'terms' and 'conflicts-of-interest' are NOT seeded here any
+    // more, and that is deliberate rather than an omission.
+    //
+    // The policies feature owns those slugs now and ships its own placeholder
+    // copy, which renders under a banner saying in as many words that it is not
+    // the policy (see PLACEHOLDER_SECTIONS in fe/src/features/policies).
+    // A one-sentence stub seeded into the CMS defeats that entirely: the page
+    // finds CMS content, treats it as real, drops the banner, and publishes a
+    // single sentence as though it were the Privacy Policy.
+    //
+    // No CMS page means the marked placeholder shows, which is the correct
+    // state until the real wording is written.
   ]);
 
   // 5. Articles -------------------------------------------------------------

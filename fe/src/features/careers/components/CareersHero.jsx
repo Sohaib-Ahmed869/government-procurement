@@ -6,7 +6,7 @@ export default function CareersHero() {
   const { audience } = useAudience();
 
   // Reveal on mount, and again each time the audience toggle changes.
-  const mounted = useMountReveal(audience);
+  const mounted = useMountReveal();
 
   return (
     <section className={`careers-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>

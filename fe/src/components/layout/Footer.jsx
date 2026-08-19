@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import logo from '../../assets/icons/gp-02.svg';
 import { linksApi } from '../../api';
@@ -10,7 +11,9 @@ import {
 import { resolveFooterLinks } from '../../constants/footerLinks.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
+import OfficeCard from './OfficeCard.jsx';
 import WeChatQrDialog from './WeChatQrDialog.jsx';
+import { bidWritersPublic } from '../../config/features.js';
 import './Footer.css';
 
 // The two segment columns carry the header nav, with Home ahead of it and the
@@ -21,7 +24,10 @@ import './Footer.css';
 // rather than tagged with an audience it would ignore.
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
-  { label: 'Capabilities', href: '/capabilities' },
+  { label: 'Service Offering', href: '/service-offering' },
+  // The Procurement Advisor is one tool per jurisdiction, not a win/award
+  // variant of a page, so it is linked plainly.
+  { label: 'Advisory', href: '/advisory', shared: true },
   { label: 'Our Team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
   { label: 'Insights', href: '/insights' },
@@ -29,6 +35,16 @@ const AUDIENCE_LINKS = [
   { label: 'Tender Websites', href: '/aus-list' },
   { label: 'Careers', href: '/careers', shared: true },
   { label: 'Jurisdictional Links', href: '/jurisdictional-links', shared: true },
+  // B2. The list itself is the same under both segments — what differs is the
+  // reason to read it, which the page's own lede handles — so it is linked
+  // plainly rather than tagged with an audience it would ignore.
+  { label: 'Government Panels', href: '/government-panels', shared: true },
+  // B4. The library is filtered by topic on the page itself, so the audience
+  // toggle has nothing to add to the link.
+  { label: 'Prompt Library', href: '/prompt-library', shared: true },
+  { label: 'Templates', href: '/templates', shared: true },
+  // B7.8 — footer entry appears with the nav entry, at `live` only.
+  ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer', shared: true }] : []),
   { label: 'Request a Consultation', href: '/book-a-consultation' },
 ];
 
@@ -52,9 +68,10 @@ const LINK_COLUMNS = [
   {
     heading: 'Policies',
     links: [
-      { label: 'Privacy', href: '/privacy' },
-      { label: 'Terms', href: '/terms' },
-      { label: 'Conflicts of Interest', href: '/conflicts-of-interest' },
+      { label: 'Privacy', href: '/policies/privacy' },
+      { label: 'Terms', href: '/policies/terms' },
+      { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
+      { label: 'All policies', href: '/policies' },
     ],
   },
 ];
@@ -74,25 +91,54 @@ const FLAT_ROWS = [
   ],
   [
     { label: 'Insights', href: '/insights' },
-    { label: 'Capabilities', href: '/capabilities' },
+    { label: 'Service Offering', href: '/service-offering' },
     { label: 'Our Team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
   ],
   [
     { label: 'Q&A', href: '/q-and-a' },
+    { label: 'Advisory', href: '/advisory' },
     { label: 'Tender Websites', href: '/aus-list' },
     { label: 'Careers', href: '/careers' },
   ],
   [
     { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
+    { label: 'Government Panels', href: '/government-panels' },
+    { label: 'Prompt Library', href: '/prompt-library' },
+    { label: 'Templates', href: '/templates' },
+    ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
     { label: 'Request a Consultation', href: '/book-a-consultation' },
   ],
   [
-    { label: 'Privacy', href: '/privacy' },
-    { label: 'Terms', href: '/terms' },
-    { label: 'Conflicts of Interest', href: '/conflicts-of-interest' },
+    { label: 'Privacy', href: '/policies/privacy' },
+    { label: 'Terms', href: '/policies/terms' },
+    { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
   ],
 ];
+
+// Internal links go through the router; anything else stays a plain anchor.
+//
+// Every link in these lists used to be a bare <a href>, which made each one a
+// full page load: the SPA was torn down and rebuilt, and the first-load overlay
+// (SiteLoader) played on the way in. Clicking "Privacy" in the footer showed the
+// loading animation before the page it had already been on finished unmounting.
+//
+// A footer link is a same-app navigation and should behave like one. External,
+// mailto: and tel: hrefs are not, so they keep the anchor.
+function FooterLink({ href, className, children }) {
+  if (!href.startsWith('/')) {
+    return (
+      <a className={className} href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link className={className} to={href}>
+      {children}
+    </Link>
+  );
+}
 
 export default function Footer({ audience: audienceProp }) {
   const { audience: ctxAudience } = useAudience();
@@ -145,19 +191,24 @@ export default function Footer({ audience: audienceProp }) {
 
   return (
     <footer className="site-footer" data-audience={audience}>
+      {/* The concept's contact band: head office on the left, subscribe on the
+          right, on a paper band above the dark footer proper. */}
       <div className="site-footer__subscribe">
-        <SubscribeForm />
+        <div className="site-footer__subscribe-inner">
+          <OfficeCard />
+          <SubscribeForm />
+        </div>
       </div>
       <div className="site-footer__inner">
         <div className="site-footer__brand-col">
-          <a className="site-footer__brand" href="/">
+          <Link className="site-footer__brand" to="/">
             {/* Vector, so it stays crisp at any screen density. Height drives
                 the size and width follows; the attributes are only here to
                 declare the ratio before it loads, and carry the viewBox's
                 176.68 × 153.19 as whole numbers. */}
             <img className="site-footer__logo" src={logo} alt="" width="1153" height="1000" />
             <span className="site-footer__wordmark">Government Procurement</span>
-          </a>
+          </Link>
           <h2 className="site-footer__social-heading" id="footer-social-heading">
             Follow Us
           </h2>
@@ -225,9 +276,9 @@ export default function Footer({ audience: audienceProp }) {
               <ul className="site-footer__list">
                 {links.map(({ label, href }) => (
                   <li key={label}>
-                    <a className="site-footer__link" href={href}>
+                    <FooterLink className="site-footer__link" href={href}>
                       {label}
-                    </a>
+                    </FooterLink>
                   </li>
                 ))}
               </ul>
@@ -240,9 +291,9 @@ export default function Footer({ audience: audienceProp }) {
             <ul className="site-footer__flat-row" key={row[0].label}>
               {row.map(({ label, href }) => (
                 <li key={label}>
-                  <a className="site-footer__link" href={href}>
+                  <FooterLink className="site-footer__link" href={href}>
                     {label}
-                  </a>
+                  </FooterLink>
                 </li>
               ))}
             </ul>

@@ -11,7 +11,7 @@
   margin: 0 0 16px;
   font-size: 18px;
   font-weight: 600;
-  color: #fff;
+  color: var(--band-ink);
 }
 
 .forum-related__list {
@@ -30,9 +30,12 @@
   gap: 16px;
   padding: 16px 18px;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--band-surface);
+  border: 1px solid var(--band-line);
   border-radius: 10px;
+  /* The link had no colour of its own, so its title fell through to the
+     browser default: blue, and purple once visited. */
+  color: var(--band-ink);
   transition:
     background 0.25s ease,
     border-color 0.25s ease,
@@ -40,32 +43,36 @@
 }
 
 .forum-related__link:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(126, 226, 168, 0.5);
+  background: var(--band-surface);
+  border-color: var(--band-accent);
   transform: translateY(-2px);
 }
 
 .forum-related__title {
   font-size: 15px;
   font-weight: 500;
-  color: #fff;
+  color: var(--band-ink);
 }
 
-/* The category, sitting at the right-hand end of the row. */
+/* The category, sitting at the right-hand end of the row.
+
+   --gp-brand, which is the deep green on Award and near-black on Win, so the
+   label follows the segment without either side being named here. It used to be
+   --gp-mint-300 with a #c9c9c9 override for Win: both were picked when this row
+   sat on a dark ground, and once the page moved to paper they were a pale green
+   and a pale grey on near-white — legible in neither segment. */
 .forum-related__tag {
   flex-shrink: 0;
   font-size: 12px;
-  color: var(--gp-mint-300);
+  font-weight: 600;
+  color: var(--gp-brand);
 }
 
-/* The Win segment carries no green: the hover edge and the category label both
-   drop to the grey that side uses for accents. */
+/* The Win segment carries no green, so the hover edge drops to the grey that
+   side uses for accents. The category label needs no override any more — it
+   reads --gp-brand, which is already black on this side. */
 .forum-article[data-audience='win'] .forum-related__link:hover {
-  border-color: rgba(255, 255, 255, 0.45);
-}
-
-.forum-article[data-audience='win'] .forum-related__tag {
-  color: #c9c9c9;
+  border-color: var(--band-muted);
 }
 
 /* --- not found --- */
@@ -74,7 +81,7 @@
   max-width: 46ch;
   font-size: 15px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--band-muted);
 }
 
 .forum-answer-missing__link {
