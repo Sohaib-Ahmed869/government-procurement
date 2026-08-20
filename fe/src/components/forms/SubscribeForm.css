@@ -168,6 +168,16 @@
 }
 
 @media (max-width: 480px) {
+  /* In a column, flex-basis is a HEIGHT. `flex: 1 1 260px` on the input turned
+     it into a 260px-tall oval, which with the 999px radius read as a giant egg
+     rather than a field. Both children size to their content and take the full
+     width instead. */
+  .subscribe-form__input,
+  .subscribe-form__button {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
   .subscribe-form__field {
     flex-direction: column;
   }

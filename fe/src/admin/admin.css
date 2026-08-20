@@ -2092,3 +2092,18 @@
   background: #000;
   display: block;
 }
+
+/* Learning path steps in the review queue (LMS 8.0). The sequence is the only
+   thing here an admin has not already seen when they approved each course. */
+.admin-pathsteps {
+  margin: 12px 0;
+  padding: 12px 14px 12px 30px;
+  border: 1px solid var(--admin-line);
+  border-radius: 10px;
+  background: var(--admin-surface-2, #f7f9f8);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.admin-pathsteps li > span { display: block; }

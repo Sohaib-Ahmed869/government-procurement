@@ -110,18 +110,28 @@
   line-height: 1.55;
 }
 
+/* Reads exactly as .gp-row__text does. A panel with a URL and a panel without
+   one are the same credential; colouring the linked ones in the accent turned
+   "we happen to have found the source page" into what looked like a category of
+   entry, and the list stopped scanning as one list.
+
+   The underline is text-decoration, not a border. .gp-row is a grid and this is
+   one of its items, so a bottom border stretched the full width of the column —
+   a rule running from the text to the far edge of the page — rather than
+   sitting under the words. text-decoration follows the text itself, and wraps
+   with it. Held at `transparent` rather than toggled between none and underline
+   so the colour is what animates, and the row never reflows on hover. */
 .gp-row__link {
-  color: var(--gp-accent-ink);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition:
-    color 160ms var(--gp-ease),
-    border-color 160ms var(--gp-ease);
+  color: var(--gp-ink);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms var(--gp-ease);
 }
 
 .gp-row__link:hover {
-  color: var(--gp-brand);
-  border-bottom-color: currentColor;
+  text-decoration-color: currentColor;
 }
 
 .gp-row__link:focus-visible {

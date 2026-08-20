@@ -21,6 +21,18 @@
 // There is no contact section: the head office card and the subscribe form
 // both live in the footer band, so a section repeating them on the homepage
 // was saying the same thing twice, a screenful apart.
+/* TEMPORARY — the homepage is currently the hero and the footer, nothing else.
+   The bands are commented out in HomePage.jsx rather than deleted.
+
+   While that is true the ribbon must NAVIGATE, not scroll: there is no section
+   under a nav item to scroll to, so an anchor would sit there doing nothing.
+   Header.jsx reads this flag for exactly that, which keeps the two ends of the
+   change in step.
+
+   To put the homepage back: set this to true and uncomment the bands. Nothing
+   else has to move. */
+export const HOME_SECTIONS_ENABLED = false;
+
 export const HOME_SECTIONS = [
   { id: 'home-hero', nav: null },
   { id: 'trusted-partner', nav: null },

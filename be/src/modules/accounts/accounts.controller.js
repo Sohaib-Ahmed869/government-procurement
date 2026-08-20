@@ -90,6 +90,7 @@ export const meWithProfile = asyncHandler(async (req, res) => {
         headline: profile.headline,
         bio: profile.bio,
         organisation: profile.organisation,
+        avatarUrl: profile.avatarUrl,
         status: profile.status,
       };
     }
@@ -104,20 +105,34 @@ export const meWithProfile = asyncHandler(async (req, res) => {
 export const updateInstructorProfile = asyncHandler(async (req, res) => {
   const { headline, bio, organisation, avatarUrl } = req.body;
 
-  const profile = await InstructorProfile.findOne({ user: req.user._id });
-  if (!profile) throw ApiError.notFound('Instructor profile not found');
+  // Only the fields the request actually sent, and validated against those
+  // paths alone.
+  //
+  // This used to load the document, assign, and save(). A full save re-runs
+  // validation over the WHOLE record, including fields the request never
+  // touched, so every profile still holding the retired `status: 'pending'`
+  // (the enum is now active|suspended; see InstructorProfile) failed with
+  // "`pending` is not a valid enum value" and no instructor could edit their
+  // byline at all. An update should stand or fall on what it changes.
+  const $set = {};
+  if (headline !== undefined) $set.headline = headline;
+  if (bio !== undefined) $set.bio = bio;
+  if (organisation !== undefined) $set.organisation = organisation;
+  if (avatarUrl !== undefined) $set.avatarUrl = avatarUrl;
 
-  if (headline !== undefined) profile.headline = headline;
-  if (bio !== undefined) profile.bio = bio;
-  if (organisation !== undefined) profile.organisation = organisation;
-  if (avatarUrl !== undefined) profile.avatarUrl = avatarUrl;
-  await profile.save();
+  const profile = await InstructorProfile.findOneAndUpdate(
+    { user: req.user._id },
+    { $set },
+    { new: true, runValidators: true },
+  );
+  if (!profile) throw ApiError.notFound('Instructor profile not found');
 
   return ok(res, {
     id: profile._id,
     headline: profile.headline,
     bio: profile.bio,
     organisation: profile.organisation,
+    avatarUrl: profile.avatarUrl,
     status: profile.status,
   });
 });

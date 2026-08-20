@@ -140,7 +140,13 @@ function FooterLink({ href, className, children }) {
   );
 }
 
-export default function Footer({ audience: audienceProp }) {
+// `showContactBand` drops the paper band above the dark footer — the head
+// office card and the "Remain Connected" form together. Off on the homepage,
+// which is currently the hero and the footer and nothing else: the dark footer
+// below already carries the same address, phone and email, so the band was
+// saying it twice on a page with nothing between them. Every other page keeps
+// it, where there is a page's worth of content in between.
+export default function Footer({ audience: audienceProp, showContactBand = true }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
 
@@ -193,12 +199,14 @@ export default function Footer({ audience: audienceProp }) {
     <footer className="site-footer" data-audience={audience}>
       {/* The concept's contact band: head office on the left, subscribe on the
           right, on a paper band above the dark footer proper. */}
-      <div className="site-footer__subscribe">
-        <div className="site-footer__subscribe-inner">
-          <OfficeCard />
-          <SubscribeForm />
+      {showContactBand ? (
+        <div className="site-footer__subscribe">
+          <div className="site-footer__subscribe-inner">
+            <OfficeCard />
+            <SubscribeForm />
+          </div>
         </div>
-      </div>
+      ) : null}
       <div className="site-footer__inner">
         <div className="site-footer__brand-col">
           <Link className="site-footer__brand" to="/">

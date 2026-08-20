@@ -45,8 +45,18 @@
       rgba(0, 0, 0, 0.55) 55%,
       rgba(0, 0, 0, 0.86) 100%
     ),
-    linear-gradient(90deg, var(--gp-brand) 0%, rgba(0, 0, 0, 0) 72%);
-  opacity: 0.94;
+    /* The brand wash. Softer than it was, and it lets go of the frame sooner:
+       it used to run at full strength from the left edge and only reach
+       transparent at 72%, which put a heavy green over more than two thirds of
+       the footage. Now it starts partly transparent and is gone by 52%, so the
+       headline column still reads while the picture survives. */
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--gp-brand) 74%, transparent) 0%,
+      color-mix(in srgb, var(--gp-brand) 30%, transparent) 26%,
+      rgba(0, 0, 0, 0) 52%
+    );
+  opacity: 0.88;
   transition: background var(--gp-swap) var(--gp-ease);
 }
 
@@ -57,8 +67,21 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: clamp(560px, 78vh, 780px);
-  padding-top: clamp(96px, 12vw, 150px);
+  /* Fills the screen: whatever the viewport has left once the header stack is
+     accounted for. It used to be clamp(560px, 78vh, 780px), which on a short
+     laptop window put the lede below the fold — 78vh of an 700px window is
+     546px, under the 560px floor, so the block stopped shrinking while the
+     screen kept getting shorter and the copy fell off the bottom.
+     
+     svh, not vh: on mobile vh is the TALLEST the viewport gets (toolbars
+     retracted), so a vh-sized hero is always a little too tall to fit.
+     
+     --gp-hero-offset is the header stack above this section. The floor keeps
+     the block usable on a very short window rather than crushing the copy. */
+  min-height: max(420px, calc(100svh - var(--gp-hero-offset, 140px)));
+  /* Capped harder than before. The block is bottom-aligned, so a big top pad
+     only ever pushes the copy down when the content is taller than the space. */
+  padding-top: clamp(80px, 8vw, 120px);
   padding-bottom: clamp(40px, 5vw, 64px);
 }
 
@@ -98,9 +121,14 @@
 }
 
 
-@media (max-width: 860px) {
+/* Below the header's hamburger breakpoint the stack above the hero is taller:
+   the slim bar plus the audience toggle row painted under it. */
+@media (max-width: 1300px) {
+  .home-hero {
+    --gp-hero-offset: 208px;
+  }
+
   .home-hero__inner {
-    min-height: 0;
     /* Clears the mobile audience toggle, which is painted over the top of the
        page rather than taking up flow space (see index.css). */
     padding-top: clamp(120px, 22vw, 170px);
@@ -110,4 +138,28 @@
 @media (max-width: 560px) {
   .home-hero__title { font-size: var(--gp-page-title-phone); }
   .home-hero__actions .hm-btn { flex: 1 1 100%; }
+}
+
+/* Short windows — a laptop with the browser part-height, or a small phone in
+   landscape. Below about 700px the copy no longer fits the screen however the
+   box is sized, so the rhythm tightens rather than the hero overflowing and
+   putting the lede back under the fold. */
+@media (max-height: 700px) {
+  .home-hero__inner {
+    padding-top: clamp(40px, 7vh, 84px);
+    padding-bottom: clamp(24px, 4vh, 40px);
+  }
+
+  .home-hero__title {
+    font-size: min(44px, calc((100vw - 96px) / 13));
+  }
+
+  .home-hero__lede {
+    margin-top: 14px;
+    font-size: clamp(14px, 1.4vw, 16px);
+  }
+
+  .home-hero__actions {
+    margin-top: 20px;
+  }
 }

@@ -15,7 +15,8 @@ import { STAFF_ROLES } from '../../constants/roles.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
 import { parseYouTubeId } from '../../utils/youtube.js';
-import { Course } from '../../models/Course.js';
+import { Course, UNSUBMITTED_INSTRUCTOR_DRAFT } from '../../models/Course.js';
+import { sanitizeRichTextFields } from '../../utils/richText.js';
 
 // Homepage slots, per resource type. The "Unlock your potential" section renders
 // 4 course cards and 2 artefact cards (UnlockPotential.jsx), so those are the
@@ -76,7 +77,10 @@ function mediaKindFromMime(mime) {
 // the admin filters.
 export const list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = parsePaging(req.query);
-  const filter = {};
+  // A course its instructor has never submitted stays out of every listing,
+  // including this one. Staff asking for ?status=draft is the same door into
+  // the same unfinished work as the review screen, so it gets the same answer.
+  const filter = { $nor: [UNSUBMITTED_INSTRUCTOR_DRAFT] };
   // Role, not merely "is signed in". These are now the same user collection as
   // the LMS, so a student holding a valid token would otherwise count as staff
   // and could ask for ?status=draft. Staff behaviour is unchanged.
@@ -147,7 +151,7 @@ export const create = asyncHandler(async (req, res) => {
   assertTaxonomy(req.body);
 
   const slug = await uniqueSlug(Course, title);
-  const data = { ...req.body, slug };
+  const data = sanitizeRichTextFields({ ...req.body, slug });
   // Stamp publishedAt the moment a course goes live.
   if (data.status === CONTENT_STATUS.PUBLISHED && !data.publishedAt) {
     data.publishedAt = new Date();
@@ -172,6 +176,7 @@ export const update = asyncHandler(async (req, res) => {
   if (!course) throw ApiError.notFound('Course not found');
 
   assertTaxonomy(req.body);
+  sanitizeRichTextFields(req.body);
 
   // Captured before the field loop below overwrites them — the slot check needs
   // to know what changed, not just where things ended up.

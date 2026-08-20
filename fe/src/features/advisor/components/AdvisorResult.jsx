@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import AdvisorDisclaimer from './AdvisorDisclaimer.jsx';
 import './AdvisorResult.css';
 
@@ -15,7 +16,30 @@ const CONFIDENCE_LABEL = {
   judgement: "The tool's own recommendation, not a rule",
 };
 
-export default function AdvisorResult({ result, rules, onRestart, onExit }) {
+// One answer, rendered the way the question asked it. Mirrors the field types
+// in features/advisor/fields.js: anything else is printed as given.
+function displayValue(question, value) {
+  if (question.type === 'bool') return value ? 'Yes' : 'No';
+  if (question.type === 'number') {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return String(value);
+    const shown = n.toLocaleString('en-AU');
+    if (question.prefix === '$') return `$${shown}`;
+    return question.suffix ? `${shown} ${question.suffix}` : shown;
+  }
+  const label = (v) => question.options?.find((o) => o.value === v)?.label ?? v;
+  if (question.type === 'multi') return (value || []).map(label).join(', ');
+  if (question.type === 'select') return label(value);
+  return String(value);
+}
+
+function isAnswered(value) {
+  if (value === undefined || value === null || value === '') return false;
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
+}
+
+export default function AdvisorResult({ result, rules, answers = {}, onRestart, onExit }) {
   const { headline, pathways = [], obligations = [], setAsides = [], flags = [] } = result;
 
   // Obligations arrive grouped by the engine; keep that grouping in the order
@@ -28,8 +52,50 @@ export default function AdvisorResult({ result, rules, onRestart, onExit }) {
     g.items.push(o);
   }
 
+  // Stamped once per result rather than on every render, so the time on the
+  // page doesn't drift while it is being read.
+  const generated = useMemo(() => {
+    const now = new Date();
+    return `${now.toLocaleDateString('en-AU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })} at ${now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}`;
+  }, [result]);
+
+  // The questions that were actually asked and actually answered, in the order
+  // the rule pack asks them. `showIf` is re-run against the final answers, so a
+  // question that was answered and then hidden by a later change is left out.
+  const asked = (rules.questions || []).filter(
+    (q) =>
+      (typeof q.showIf === 'function' ? Boolean(q.showIf(answers)) : true) &&
+      isAnswered(answers[q.id]),
+  );
+
   return (
     <div className="adv-result">
+      {/* Screen only. The printed copy is the document; a Print button on it
+          would be a button that cannot be pressed. */}
+      <div className="adv-result__toolbar" data-print-hide>
+        <button
+          type="button"
+          className="adv-btn adv-btn--ghost adv-btn--print"
+          onClick={() => window.print()}
+        >
+          Print / Save as PDF
+        </button>
+      </div>
+
+      {/* Print only: a copy that goes on a procurement file has to say what it
+          is, when it was produced and which rule set it was produced against.
+          On screen all three are already in the page around it. */}
+      <div className="adv-print-head">
+        <p className="adv-print-head__brand">Procurement Advisor</p>
+        <p className="adv-print-head__stamp">
+          Generated {generated} &middot; {rules.label} &middot; rules as at {rules.asAt}
+        </p>
+      </div>
+
       <header className="adv-result__head">
         <p className="adv-result__eyebrow">{rules.label} · rules as at {rules.asAt}</p>
         {headline ? (
@@ -117,9 +183,26 @@ export default function AdvisorResult({ result, rules, onRestart, onExit }) {
         </section>
       ))}
 
+      {/* Print only, and last: the answers the findings above were derived
+          from. Without it a printed copy states conclusions with nothing to
+          check them against, which is exactly what a file note must not do. */}
+      {asked.length > 0 && (
+        <section className="adv-print-inputs">
+          <h3 className="adv-result__h3">What you told it</h3>
+          <dl className="adv-print-inputs__list">
+            {asked.map((q) => (
+              <div className="adv-print-inputs__row" key={q.id}>
+                <dt>{q.label}</dt>
+                <dd>{displayValue(q, answers[q.id])}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
       <AdvisorDisclaimer variant="result" />
 
-      <div className="adv-result__actions">
+      <div className="adv-result__actions" data-print-hide>
         <button type="button" className="adv-btn adv-btn--primary" onClick={onRestart}>
           Start again
         </button>

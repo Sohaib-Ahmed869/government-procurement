@@ -72,9 +72,12 @@ export function AudienceProvider({ children }) {
   // — plays the same transition. `data-audience-swap` on <html> is the only
   // thing the CSS reads (see index.css).
   const timers = useRef([]);
+  const frames = useRef([]);
   const clearTimers = useCallback(() => {
     timers.current.forEach(window.clearTimeout);
     timers.current = [];
+    frames.current.forEach(window.cancelAnimationFrame);
+    frames.current = [];
   }, []);
   useEffect(() => clearTimers, [clearTimers]);
 
@@ -97,9 +100,36 @@ export function AudienceProvider({ children }) {
       root.dataset.audienceSwap = 'out';
       timers.current.push(
         window.setTimeout(() => {
+          // The palette moves FIRST, synchronously, and only then does the swap
+          // go to 'in'. Both used to happen in this one tick, and the order was
+          // the wrong way round: the suppression rule in the A3 block of
+          // index.css keys off data-audience-swap='out', so lifting it in the
+          // same tick as the palette change left every colour inside a faded
+          // element free to transition. What you saw was the old segment's
+          // colour fading to the new one over --gp-swap *while the content was
+          // fading back in* — the wrong colour, briefly, before it settled. It
+          // was worst on anything saturated: the Government Panels hero button
+          // is amber on Win and mint on Award, so it announced itself.
+          //
+          // Set here rather than left to the effect below, which is passive and
+          // runs after the next paint — too late to be covered by 'out'.
+          root.dataset.audience = next;
           setAudienceState(next);
           track.audienceSelected(next);
-          root.dataset.audienceSwap = 'in';
+
+          // Two frames, so the palette change is actually painted while
+          // transitions are still suppressed. Lifting the suppression in the
+          // same frame it was applied gives the browser one style recalculation
+          // with transitions live, and the snap becomes a cross-fade again.
+          frames.current.push(
+            window.requestAnimationFrame(() => {
+              frames.current.push(
+                window.requestAnimationFrame(() => {
+                  root.dataset.audienceSwap = 'in';
+                }),
+              );
+            }),
+          );
         }, SWAP_FADE_OUT_MS),
       );
       timers.current.push(

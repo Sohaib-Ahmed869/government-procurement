@@ -1,6 +1,7 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { Course } from '../models/Course.js';
+import { Program } from '../models/Program.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { ROLES } from '../constants/roles.js';
 
@@ -53,3 +54,25 @@ export const isEnrolled = asyncHandler(async (req, _res, next) => {
   req.enrolment = enrolment;
   return next();
 });
+
+// Loads req.params.programId onto req.program, or 404s. A learning path's
+// twin of loadCourse.
+export const loadProgram = asyncHandler(async (req, _res, next) => {
+  const program = await Program.findById(req.params.programId);
+  if (!program) throw ApiError.notFound('Learning path not found');
+  req.program = program;
+  return next();
+});
+
+// The instructor who wrote the path, or a super admin. Use AFTER loadProgram.
+// Same 404-not-403 rule as ownsCourse: confirming a path exists is more than a
+// stranger needs to know.
+export const ownsProgram = (req, _res, next) => {
+  if (!req.user) return next(ApiError.unauthorized());
+  if (req.user.role === ROLES.SUPERADMIN) return next();
+
+  if (String(req.program?.author ?? '') !== String(req.user._id)) {
+    return next(ApiError.notFound('Learning path not found'));
+  }
+  return next();
+};

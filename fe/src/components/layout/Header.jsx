@@ -3,7 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/icons/gp-02.svg';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import { useScrollSpy } from '../../hooks/useScrollSpy.js';
-import { HOME_SECTION_IDS, SECTION_BY_NAV_LABEL } from '../../features/home/sections.js';
+import {
+  HOME_SECTION_IDS,
+  HOME_SECTIONS_ENABLED,
+  SECTION_BY_NAV_LABEL,
+} from '../../features/home/sections.js';
 import { bidWritersPublic } from '../../config/features.js';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
@@ -99,7 +103,11 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
 
   // The ribbon behaves as anchors on the homepage and as routed links
   // everywhere else, so the spy only runs where there is something to spy on.
-  const onHome = pathname === '/';
+  //
+  // HOME_SECTIONS_ENABLED is false while the homepage is just the hero and the
+  // footer: with no bands to scroll to, every item routes to its own page
+  // instead. Flipping that one flag back restores the scrolling ribbon.
+  const onHome = HOME_SECTIONS_ENABLED && pathname === '/';
   const activeSection = useScrollSpy(HOME_SECTION_IDS, { enabled: onHome });
 
   const closeMenu = () => setMenuOpen(false);

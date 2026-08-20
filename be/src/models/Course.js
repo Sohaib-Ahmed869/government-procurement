@@ -192,6 +192,31 @@ export const CERTIFICATE_DEFAULTS = {
   showCredentialId: true,
 };
 
+// A course an instructor is still writing and has never submitted. Their own
+// workspace, not the admin's queue, so it is excluded from every staff-facing
+// listing until they press "Submit for review".
+//
+// All three conditions are needed, and each one protects a course that MUST
+// stay visible to staff:
+//   author       a CMS-authored course has none, and its drafts are the admin's
+//                own work in progress.
+//   reviewStatus 'none' is also where a course lands after being unpublished,
+//                or after its author edits one that was sent back.
+//   submittedAt  which is what separates those from a course that has never
+//                been shown to anybody. withdrawSubmission() clears it back to
+//                null on purpose: withdrawing means "treat this as unsent".
+//   status       a live course is never hidden from anyone, whatever its review
+//                state. Nothing on the site should be invisible to the people
+//                answerable for it.
+//
+// Spread into a query as `$nor: [UNSUBMITTED_INSTRUCTOR_DRAFT]`.
+export const UNSUBMITTED_INSTRUCTOR_DRAFT = {
+  author: { $ne: null },
+  reviewStatus: 'none',
+  submittedAt: null,
+  status: { $ne: CONTENT_STATUS.PUBLISHED },
+};
+
 courseSchema.index({ title: 'text', summary: 'text', body: 'text' });
 
 export const Course = mongoose.model('Course', courseSchema);

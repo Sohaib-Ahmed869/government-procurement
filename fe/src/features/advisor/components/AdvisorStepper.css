@@ -229,6 +229,64 @@
   outline-offset: 1px;
 }
 
+/* Drawn steppers. The native spinner is hidden on phones and, on desktop, only
+   appears on hover — so the control existed but nothing said so. These are
+   always visible and are a real touch target. */
+.adv-q__spin {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border: 1px solid var(--gp-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.adv-q__step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: var(--gp-paper-alt);
+  color: var(--gp-muted);
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms var(--gp-ease), color 120ms var(--gp-ease);
+}
+
+.adv-q__step + .adv-q__step {
+  border-top: 1px solid var(--gp-line);
+}
+
+.adv-q__step:hover {
+  background: var(--gp-line);
+  color: var(--gp-ink);
+}
+
+/* The native spinner would sit beside ours and step by a different amount.
+   Removed so there is one control, and it is the visible one. */
+.adv-q__number input::-webkit-outer-spin-button,
+.adv-q__number input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.adv-q__number input[type='number'] {
+  appearance: textfield;
+}
+
+/* Comfortable thumb targets once there is no pointer to be precise with. */
+@media (pointer: coarse) {
+  .adv-q__step {
+    width: 46px;
+    height: 30px;
+    font-size: 11px;
+  }
+}
+
 .adv-q__affix {
   font-size: 15px;
   font-weight: 600;

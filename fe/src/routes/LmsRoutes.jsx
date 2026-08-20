@@ -1,5 +1,5 @@
 import { Navigate, Routes, Route, useParams } from 'react-router-dom';
-import { StudentAuthProvider } from '../lms/context/StudentAuthContext.jsx';
+import { StudentAuthProvider, useStudentAuth } from '../lms/context/StudentAuthContext.jsx';
 import { CartProvider } from '../lms/context/CartContext.jsx';
 import InstructorRoute from './InstructorRoute.jsx';
 import StudentRoute from './StudentRoute.jsx';
@@ -10,6 +10,8 @@ import ForgotPasswordPage from '../lms/pages/auth/ForgotPasswordPage.jsx';
 import ResetPasswordPage from '../lms/pages/auth/ResetPasswordPage.jsx';
 import InstructorDashboardPage from '../lms/pages/instructor/InstructorDashboardPage.jsx';
 import InstructorCoursesPage from '../lms/pages/instructor/InstructorCoursesPage.jsx';
+import InstructorPathsPage from '../lms/pages/instructor/InstructorPathsPage.jsx';
+import PathBuilderPage from '../lms/pages/instructor/PathBuilderPage.jsx';
 import NewCoursePage from '../lms/pages/instructor/NewCoursePage.jsx';
 import CourseBuilderPage from '../lms/pages/instructor/CourseBuilderPage.jsx';
 import QuizzesPage from '../lms/pages/instructor/QuizzesPage.jsx';
@@ -43,6 +45,7 @@ import InvoicePage from '../lms/pages/commerce/InvoicePage.jsx';
 import CheckoutPage from '../lms/pages/commerce/CheckoutPage.jsx';
 import OrderConfirmationPage from '../lms/pages/commerce/OrderConfirmationPage.jsx';
 import ProfilePage from '../lms/pages/dashboard/ProfilePage.jsx';
+import InstructorProfilePage from '../lms/pages/dashboard/InstructorProfilePage.jsx';
 import AccountSettingsPage from '../lms/pages/dashboard/AccountSettingsPage.jsx';
 import ProgressPage from '../lms/pages/progress/ProgressPage.jsx';
 import NotesPage from '../lms/pages/progress/NotesPage.jsx';
@@ -57,6 +60,19 @@ import BookmarksPage from '../lms/pages/progress/BookmarksPage.jsx';
 function CourseStudentsRedirect() {
   const { courseId } = useParams();
   return <Navigate to={`/learn/instructor/students/${courseId}`} replace />;
+}
+
+// /learn/profile serves both roles, because "your profile" is one idea and one
+// sidebar link. What it MEANS differs enough to be two components: a learner's
+// is their progress and their public name; an instructor's is their published
+// work and the byline the site prints beside it.
+//
+// Split here rather than branched inside ProfilePage, so each mounts its own
+// hooks. A component that calls useProgress() only when the viewer is a learner
+// would be calling hooks conditionally.
+function ProfileForRole() {
+  const { isInstructor } = useStudentAuth();
+  return isInstructor ? <InstructorProfilePage /> : <ProfilePage />;
 }
 
 function Soon({ title, note }) {
@@ -135,6 +151,11 @@ export default function LmsRoutes() {
               path was linked to before the page existed. */}
           <Route path="instructor/courses/:courseId/students" element={<InstructorRoute><CourseStudentsRedirect /></InstructorRoute>} />
           <Route path="instructor/quizzes" element={<InstructorRoute><QuizzesPage /></InstructorRoute>} />
+
+          {/* Learning paths (LMS 8.0). A path curates published courses, so it
+              is authored beside them rather than inside one of them. */}
+          <Route path="instructor/paths" element={<InstructorRoute><InstructorPathsPage /></InstructorRoute>} />
+          <Route path="instructor/paths/:programId" element={<InstructorRoute><PathBuilderPage /></InstructorRoute>} />
           <Route path="instructor/students" element={<InstructorRoute><EnrolmentsPage /></InstructorRoute>} />
           <Route path="instructor/students/:courseId" element={<InstructorRoute><StudentRosterPage /></InstructorRoute>} />
           <Route path="instructor/progress" element={<InstructorRoute><CohortProgressPage /></InstructorRoute>} />
@@ -168,7 +189,7 @@ export default function LmsRoutes() {
           <Route path="checkout/confirmation/:orderId" element={me(<OrderConfirmationPage />)} />
           <Route path="orders" element={me(<OrdersPage />)} />
           <Route path="orders/:orderId/invoice" element={me(<InvoicePage />)} />
-          <Route path="profile" element={me(<ProfilePage />)} />
+          <Route path="profile" element={me(<ProfileForRole />)} />
           <Route path="settings" element={me(<AccountSettingsPage />)} />
 
           <Route path="*" element={<Soon title="Not found" note="That page doesn't exist in the LMS." />} />

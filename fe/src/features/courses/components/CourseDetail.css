@@ -299,7 +299,11 @@
 .cd-prose {
   font-size: 14.5px;
   line-height: 1.6;
-  color: var(--band-muted);
+  /* Same ink as Requirements (.cd-bullets) and Who should take this course
+     (.cd-rich-list). The description is body copy of the same standing as
+     those two, and setting it in --band-muted read as a caption sitting
+     between them. */
+  color: var(--band-ink);
 }
 
 .cd-prose p {
@@ -317,10 +321,6 @@
 
 .cd-prose li {
   line-height: 1.5;
-}
-
-.cd-prose li::marker {
-  color: var(--cd-accent);
 }
 
 .cd-prose strong {

@@ -27,6 +27,19 @@ export const authoringApi = {
   // picked — a course with 800 learners shouldn't be loaded to count them.
   enrolments: () => api.get('/lms/authoring/enrollments'),
   courseEnrolments: (courseId) => api.get(`/lms/authoring/courses/${courseId}/enrollments`),
+  // The rollup behind the instructor's own profile: courses, reach and rating.
+  // One request rather than reducing the three pages' payloads client-side.
+  profileSummary: () => api.get('/lms/authoring/profile'),
+
+  // Learning paths (LMS 8.0). A path curates existing courses, so these only
+  // ever move references around; nothing here creates lesson content.
+  programs: () => api.get('/lms/authoring/programs'),
+  createProgram: (body) => api.post('/lms/authoring/programs', body),
+  getProgram: (programId) => api.get(`/lms/authoring/programs/${programId}`),
+  updateProgram: (programId, body) => api.patch(`/lms/authoring/programs/${programId}`, body),
+  removeProgram: (programId) => api.del(`/lms/authoring/programs/${programId}`),
+  submitProgram: (programId) => api.post(`/lms/authoring/programs/${programId}/submit`),
+  withdrawProgram: (programId) => api.post(`/lms/authoring/programs/${programId}/withdraw`),
 
   // Cohort analytics: how the assessments are performing, and who has stopped.
   // The per-quiz call takes a LESSON id — a quiz is a lesson of kind 'quiz'.
@@ -85,6 +98,27 @@ export const reviewApi = {
   unpublish: (courseId) => api.post(`/lms/review/${courseId}/unpublish`),
   setFeatured: (courseId, featured) =>
     api.patch(`/lms/review/${courseId}/featured`, { featured }),
+
+  // Learning paths go through the same queue, so the admin screen speaks to
+  // one API shaped the same way for both kinds of submission.
+  programs: (params) => api.get('/lms/review/programs', params),
+  programDetail: (programId) => api.get(`/lms/review/programs/${programId}`),
+  approveProgram: (programId, note) =>
+    api.post(`/lms/review/programs/${programId}/approve`, { note }),
+  rejectProgram: (programId, note) =>
+    api.post(`/lms/review/programs/${programId}/reject`, { note }),
+  declineProgram: (programId, note) =>
+    api.post(`/lms/review/programs/${programId}/decline`, { note }),
+  unpublishProgram: (programId) => api.post(`/lms/review/programs/${programId}/unpublish`),
+};
+
+// ---- L4 · Learning paths, learner-facing -------------------------------------
+// Public like the course catalogue: anyone may browse them, and a signed-in
+// learner additionally gets every step resolved against what they have already
+// finished. That resolution is the SERVER's, not the client's.
+export const pathsApi = {
+  list: () => api.get('/lms/programs'),
+  get: (slug) => api.get(`/lms/programs/${slug}`),
 };
 
 // ---- L1 · Catalogue and outline ---------------------------------------------

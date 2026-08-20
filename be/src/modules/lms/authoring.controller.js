@@ -2,16 +2,18 @@ import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ok, created } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
-import { Course } from '../../models/Course.js';
+import { Course, UNSUBMITTED_INSTRUCTOR_DRAFT } from '../../models/Course.js';
 import { Module } from '../../models/Module.js';
 import { Lesson } from '../../models/Lesson.js';
 import { Enrollment } from '../../models/Enrollment.js';
 import { Progress } from '../../models/Progress.js';
 import { Certificate } from '../../models/Certificate.js';
+import { Review } from '../../models/Review.js';
 import { presignPut, uploadBuffer, deleteObject } from '../../config/s3.js';
 import { parseYouTubeId } from '../../utils/youtube.js';
 import { toSlug, uniqueSlug } from '../../utils/slugify.js';
 import { CONTENT_STATUS } from '../../constants/statuses.js';
+import { sanitizeRichTextFields } from '../../utils/richText.js';
 
 // Slugs that would collide with a route segment the app already owns,
 // /courses/new is the create page, so a course titled "New" became unreachable.
@@ -58,6 +60,12 @@ function pickAuthorFields(body, course) {
   AUTHOR_FIELDS.forEach((f) => {
     if (body[f] !== undefined) out[f] = body[f];
   });
+
+  // `body` is rich text and reaches the public course page as raw HTML. An
+  // instructor account is open self-registration, so this is the boundary
+  // between "somebody who signed up" and "script running in every visitor's
+  // session". Cleaned here, on the only path an author can write it.
+  sanitizeRichTextFields(out);
 
   if (body.instructor && typeof body.instructor === 'object') {
     const current = course?.instructor?.toObject?.() ?? course?.instructor ?? {};
@@ -310,6 +318,67 @@ export const enrolmentSummary = asyncHandler(async (req, res) => {
   );
 
   return ok(res, rows);
+});
+
+// GET /lms/authoring/profile. The rollup behind an instructor's own profile
+// page: what they have published, how many people it reached, and what those
+// people thought of it.
+//
+// A purpose-built endpoint rather than three page-sized ones. The profile needs
+// four numbers; asking for the course list, the enrolment summary and every
+// review in order to reduce them client-side would ship far more than it uses,
+// and would make the profile disagree with those pages the moment one of the
+// three reductions drifted.
+//
+// `learners` counts PEOPLE, not enrolments. Someone taking two of this
+// instructor's courses is one learner, which is what "learners taught" means to
+// the person reading it. The enrolments page deliberately counts the other way
+// and labels itself accordingly; both numbers are here so neither has to
+// pretend to be the other.
+export const instructorProfileSummary = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ author: req.user._id })
+    .select('_id status reviewStatus')
+    .lean();
+  const ids = courses.map((c) => c._id);
+
+  if (!ids.length) {
+    return ok(res, {
+      courses: { total: 0, published: 0, inReview: 0, draft: 0 },
+      learners: 0,
+      enrolments: 0,
+      completions: 0,
+      rating: { average: null, count: 0 },
+    });
+  }
+
+  const [learnerIds, enrolments, completions, reviews] = await Promise.all([
+    Enrollment.distinct('user', { course: { $in: ids }, revokedAt: null }),
+    Enrollment.countDocuments({ course: { $in: ids }, revokedAt: null }),
+    Enrollment.countDocuments({ course: { $in: ids }, revokedAt: null, completedAt: { $ne: null } }),
+    Review.find({ course: { $in: ids } }).select('rating').lean(),
+  ]);
+
+  const count = reviews.length;
+
+  return ok(res, {
+    courses: {
+      total: courses.length,
+      published: courses.filter((c) => c.status === CONTENT_STATUS.PUBLISHED).length,
+      inReview: courses.filter((c) => c.reviewStatus === 'pending').length,
+      draft: courses.filter((c) => c.status !== CONTENT_STATUS.PUBLISHED && c.reviewStatus !== 'pending').length,
+    },
+    learners: learnerIds.length,
+    enrolments,
+    completions,
+    rating: {
+      // One decimal, matching how the reviews page rounds. `null` rather than 0
+      // when nobody has rated: no rating and a rating of nothing are different
+      // things, and a profile reading "0.0" would libel a course nobody has
+      // got round to reviewing yet.
+      average: count ? Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / count) * 10) / 10 : null,
+      count,
+    },
+  });
 });
 
 // GET /lms/authoring/courses/:courseId/enrollments. The roster for one course.
@@ -650,13 +719,18 @@ export const reorderLessons = asyncHandler(async (req, res) => {
 
 /* ---- Admin review (CMS) ---------------------------------------------------- */
 
-// GET /lms/review/courses. EVERY course, from every instructor, for the CMS
-// list. Unlike /courses (the public, published-only endpoint) this shows
+// GET /lms/review/courses. Every course the CMS has business seeing, for the
+// admin list. Unlike /courses (the public, published-only endpoint) this shows
 // drafts and submissions too, because the whole point of the screen is to see
 // what is waiting and what is live.
+//
+// The one thing it does NOT show is a course an instructor is still writing and
+// has never submitted. Until they press "Submit for review" it is theirs, and
+// an admin reading an unfinished draft over their shoulder is not the workflow
+// the review states describe.
 export const allCourses = asyncHandler(async (req, res) => {
   const { review, status, q } = req.query;
-  const filter = {};
+  const filter = { $nor: [UNSUBMITTED_INSTRUCTOR_DRAFT] };
   if (review) filter.reviewStatus = review;
   if (status) filter.status = status;
   if (q) filter.title = { $regex: String(q).trim(), $options: 'i' };

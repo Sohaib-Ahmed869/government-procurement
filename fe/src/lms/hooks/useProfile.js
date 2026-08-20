@@ -37,13 +37,10 @@ settingsStore.seedOnce([
     emailMarketing: false,
     inAppReminders: true,
     inAppDiscussion: true,
+    inAppReviews: true,
     // Learning preferences
     autoplayVideo: false,
     transcriptOpen: true,
-    reduceMotion: false,
-    // Privacy
-    publicProfile: true,
-    showInStandings: true,
   },
 ]);
 

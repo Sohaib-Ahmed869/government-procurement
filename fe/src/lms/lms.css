@@ -506,6 +506,196 @@
   text-align: center;
 }
 
+/* Learning path builder (LMS 8.0) ---------------------------------------- */
+.lms-pathsteps__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+
+.lms-pathstep {
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface);
+  padding: 12px 14px;
+}
+.lms-pathstep__head { display: flex; align-items: flex-start; gap: 10px; }
+.lms-pathstep__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--lms-mint-soft);
+  color: var(--lms-green-600);
+  font-size: 12px;
+  font-weight: 700;
+}
+.lms-pathstep__id { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lms-pathstep__meta { font-size: 12px; color: var(--lms-muted); }
+.lms-pathstep__tools { display: flex; gap: 4px; flex-shrink: 0; }
+.lms-pathstep__body { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--lms-border); }
+.lms-pathstep__reqs { margin-top: 10px; }
+
+/* Prerequisites are picked from the other steps, so they are chips rather than
+   a select: an author is toggling a small known set, not searching one. */
+.lms-chipset { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.lms-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--lms-border);
+  border-radius: 999px;
+  background: var(--lms-surface);
+  color: var(--lms-text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.lms-chip:hover { border-color: var(--lms-border-strong); }
+.lms-chip.is-on { background: var(--lms-mint-soft); border-color: var(--lms-mint); color: var(--lms-green-600); font-weight: 600; }
+.lms-chip svg { width: 13px; height: 13px; }
+
+.lms-pathpick { list-style: none; margin: 10px 0 0; padding: 0; max-height: 320px; overflow-y: auto; }
+.lms-pathpick li + li { border-top: 1px solid var(--lms-border); }
+.lms-pathpick__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lms-pathpick__row:hover { background: var(--lms-surface-2); }
+.lms-pathpick__row > span { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.lms-pathpick__row svg { width: 16px; height: 16px; color: var(--lms-green); flex-shrink: 0; }
+
+.lms-checklist { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; }
+.lms-checklist li { display: flex; align-items: center; gap: 8px; }
+.lms-checklist svg { width: 15px; height: 15px; flex-shrink: 0; }
+.lms-checklist li.is-ok { color: var(--lms-text); }
+.lms-checklist li.is-ok svg { color: var(--lms-green); }
+.lms-checklist li.is-todo { color: var(--lms-muted); }
+
+/* Notifications bell + panel (R2) --------------------------------------- */
+.lms-notif { position: relative; }
+
+.lms-notif__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: min(360px, calc(100vw - 32px));
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius);
+  background: var(--lms-surface);
+  box-shadow: var(--lms-shadow-md);
+  overflow: hidden;
+}
+
+.lms-notif__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--lms-border);
+  font-size: 14px;
+}
+.lms-notif__mark {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--lms-green);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.lms-notif__mark:hover { text-decoration: underline; }
+
+.lms-notif__empty {
+  margin: 0;
+  padding: 18px 14px;
+  color: var(--lms-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Capped so a busy week scrolls inside the panel rather than off the page. */
+.lms-notif__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+}
+.lms-notif__list li + li { border-top: 1px solid var(--lms-border); }
+
+.lms-notif__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lms-notif__item:hover { background: var(--lms-surface-2); }
+.lms-notif__item:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-notif__item.is-unread { background: var(--lms-mint-soft); }
+.lms-notif__item.is-unread:hover { background: var(--lms-mint-soft); filter: brightness(0.98); }
+
+.lms-notif__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--lms-surface-2);
+  color: var(--lms-green);
+}
+.lms-notif__icon svg { width: 15px; height: 15px; }
+/* A review decision is about the instructor's own work rather than someone
+   else's activity, so it is tinted apart from the rest of the list. */
+.lms-notif__icon.is-review { background: var(--lms-mint-soft); color: var(--lms-green-600); }
+
+.lms-notif__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.lms-notif__title { font-size: 13.5px; font-weight: 600; }
+.lms-notif__detail {
+  font-size: 12.5px;
+  color: var(--lms-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lms-notif__meta { font-size: 11.5px; color: var(--lms-muted); }
+
+.lms-notif__unread {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--lms-green);
+}
+
+.lms-notif__foot {
+  padding: 10px 14px;
+  border-top: 1px solid var(--lms-border);
+  background: var(--lms-surface-2);
+  font-size: 12.5px;
+}
+.lms-notif__foot a { color: var(--lms-muted); }
+.lms-notif__foot a:hover { color: var(--lms-green); }
+
 /* Signed-in user chip */
 .lms-header__chip {
   display: inline-flex;
@@ -2801,6 +2991,22 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-profile__fact svg { width: 17px; height: 17px; color: var(--lms-green-600); }
 .lms-profile__fact-value { display: block; margin-top: 4px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
 .lms-profile__fact-label { display: block; font-size: 11.5px; color: var(--lms-muted); }
+/* Context under a stat, e.g. "3 not yet live" beneath courses published. Sized
+   below the label so the number stays the thing the eye lands on. */
+.lms-profile__fact-note { display: block; margin-top: 3px; font-size: 11px; color: var(--lms-muted); opacity: 0.85; }
+.lms-profile__unset { color: var(--lms-muted); font-style: italic; }
+
+/* A button that reads as a link, for actions inside a sentence (retry, undo). */
+.lms-linkbtn {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--lms-green);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.lms-linkbtn:focus-visible { outline: none; box-shadow: var(--lms-ring); }
 .lms-profile__bio { margin: 0; max-width: 70ch; font-size: 14.5px; line-height: 1.65; color: var(--lms-text-2); white-space: pre-wrap; }
 .lms-profile__details { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin: 20px 0 0; }
 .lms-profile__details dt {

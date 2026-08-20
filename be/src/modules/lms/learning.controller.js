@@ -9,6 +9,8 @@ import { Enrollment, ENROLMENT_SOURCE } from '../../models/Enrollment.js';
 import { Progress } from '../../models/Progress.js';
 import { QuizAttempt } from '../../models/QuizAttempt.js';
 import { Certificate } from '../../models/Certificate.js';
+import { Program, PROGRAM_CERTIFICATE_DEFAULTS } from '../../models/Program.js';
+import { resolveForLearner } from './programs.controller.js';
 import { markAttempt, reviewFor } from '../../utils/grading.js';
 import { presignGet } from '../../config/s3.js';
 import { CONTENT_STATUS } from '../../constants/statuses.js';
@@ -477,10 +479,17 @@ export const completeLesson = asyncHandler(async (req, res) => {
   const finished = progress.completedLessons.length >= total && total > 0;
 
   let certificate = null;
+  let programCertificates = [];
   if (finished && !enrolment.completedAt) {
     enrolment.completedAt = new Date();
     await enrolment.save();
     certificate = await issueCertificate({ user: req.user, courseId: lesson.course });
+    // A course completion can be the last step of a learning path. Issued in
+    // the same request so the learner is told once, not on a later page load.
+    programCertificates = await issueProgramCertificates({
+      user: req.user,
+      courseId: lesson.course,
+    });
   }
 
   return ok(res, {
@@ -490,6 +499,7 @@ export const completeLesson = asyncHandler(async (req, res) => {
     percent: total ? Math.round((progress.completedLessons.length / total) * 100) : 0,
     courseComplete: finished,
     certificate,
+    programCertificates,
   });
 });
 
@@ -753,6 +763,75 @@ async function issueCertificate({ user, courseId }) {
       showCredentialId: c.showCredentialId,
     },
   });
+}
+
+/* Finishing a course can also finish a LEARNING PATH that contains it, so the
+   two are issued together rather than leaving the path certificate to be
+   noticed on some later page load.
+
+   Only published paths, and only the ones this course actually belongs to: a
+   completion cannot certify a program the learner was never working toward.
+
+   Completion is recomputed by resolveForLearner(), the same function the path
+   page renders from, so the certificate can never disagree with the progress
+   the learner is looking at. */
+async function issueProgramCertificates({ user, courseId }) {
+  const programs = await Program.find({
+    status: CONTENT_STATUS.PUBLISHED,
+    'steps.course': courseId,
+  }).lean();
+  if (!programs.length) return [];
+
+  const issued = [];
+  for (const program of programs) {
+    // Sequential rather than parallel: each iteration hits the same handful of
+    // collections, and a learner is in a small number of paths.
+    // eslint-disable-next-line no-await-in-loop
+    const { complete } = await resolveForLearner(program, user._id);
+    if (!complete) continue;
+
+    // eslint-disable-next-line no-await-in-loop
+    const existing = await Certificate.findOne({ user: user._id, program: program._id });
+    if (existing) continue;
+
+    const c = { ...PROGRAM_CERTIFICATE_DEFAULTS, ...(program.certificate ?? {}) };
+    if (c.enabled === false) continue;
+
+    // Hours across every course in the path, so the document says what the
+    // whole program was worth rather than what its last course was.
+    // eslint-disable-next-line no-await-in-loop
+    const lessons = await Lesson.find({ course: { $in: program.steps.map((s) => s.course) } })
+      .select('minutes')
+      .lean();
+    const hours = Math.round(lessons.reduce((sum, l) => sum + (l.minutes || 0), 0) / 60);
+
+    // eslint-disable-next-line no-await-in-loop
+    const cert = await Certificate.create({
+      user: user._id,
+      program: program._id,
+      kind: 'path',
+      credentialId: `GP-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`,
+      recipientName: user.name,
+      title: program.title,
+      hours,
+      issuerName: c.issuerName || 'Government Procurement',
+      signatoryName: c.signatoryName || '',
+      signatoryRole: c.signatoryRole || '',
+      design: {
+        heading: c.heading,
+        preamble: c.preamble,
+        statement: c.statement,
+        footnote: c.footnote,
+        accent: c.accent,
+        background: c.background,
+        textColor: c.textColor,
+        showHours: c.showHours,
+        showCredentialId: c.showCredentialId,
+      },
+    });
+    issued.push(cert);
+  }
+  return issued;
 }
 
 export const myCertificates = asyncHandler(async (req, res) => {

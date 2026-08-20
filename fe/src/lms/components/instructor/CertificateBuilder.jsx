@@ -8,7 +8,7 @@ const HEX = /^#[0-9a-fA-F]{6}$/;
 const COLOURS = [
   { key: 'accent', label: 'Accent', hint: 'Border, heading and issuer line', fallback: '#0a3114' },
   { key: 'background', label: 'Background', hint: 'The paper', fallback: '#ffffff' },
-  { key: 'textColor', label: 'Text', hint: 'Names, course title and body', fallback: '#1a1a1a' },
+  { key: 'textColor', label: 'Text', hint: 'Names, title and body', fallback: '#1a1a1a' },
 ];
 
 function luminance(hex) {
@@ -33,14 +33,33 @@ function contrast(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-// The certificate tab of the course builder (L4).
+// The certificate tab of the course builder, and of the learning path builder
+// (L4, LMS 8.0).
 //
-// Every field starts from CERTIFICATE_DEFAULTS, so a course nobody customises
-// still issues something sensible. The preview beside the form is the SAME
-// component that renders the issued certificate, so what is designed here is
-// what a learner receives.
-export default function CertificateBuilder({ course, previewName, onChange }) {
-  const c = { ...CERTIFICATE_DEFAULTS, ...(course.certificate ?? {}) };
+// Every field starts from the defaults, so something nobody customises still
+// issues sensibly. The preview beside the form is the SAME component that
+// renders the issued certificate, so what is designed here is what a learner
+// receives.
+//
+// Shared between the two builders rather than copied. A path's certificate says
+// different words and counts hours across several courses, but the form, the
+// contrast checks and the preview are the same work — and a second copy is a
+// second place for the colour validation to be fixed in only one of them.
+//
+// `subject` is whatever is being certified. `noun` is what to call it in the
+// copy, and `defaults` lets a path start from its own wording.
+export default function CertificateBuilder({
+  course,
+  subject,
+  noun = 'course',
+  defaults = CERTIFICATE_DEFAULTS,
+  minutes,
+  previewName,
+  onChange,
+}) {
+  const item = subject ?? course ?? {};
+  const c = { ...defaults, ...(item.certificate ?? {}) };
+  const totalMinutes = minutes ?? item.minutes ?? 0;
   const set = (patch) => onChange({ certificate: { ...c, ...patch } });
 
   const field = (key, label, hint, props = {}) => (
@@ -63,7 +82,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
           <span className="lms-pref__text">
             <span className="lms-pref__name">Award a certificate</span>
             <span className="lms-pref__hint">
-              Issued automatically when a learner finishes every lesson.
+              Issued automatically when a learner finishes {noun === 'path' ? 'every required course' : 'every lesson'}.
             </span>
           </span>
           <input
@@ -86,7 +105,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
 
               {field('heading', 'Heading', 'The line at the top. "Certificate of Attendance" and "Statement of Completion" mean different things.')}
               {field('preamble', 'Above the name')}
-              {field('statement', 'Between the name and the course')}
+              {field('statement', `Between the name and the ${noun}`)}
 
               <label className="lms-field">
                 <span className="lms-field__label">
@@ -97,7 +116,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
                   className="lms-textarea"
                   rows={2}
                   value={c.footnote}
-                  placeholder="An accreditation reference or CPD note, if this course carries one."
+                  placeholder={`An accreditation reference or CPD note, if this ${noun} carries one.`}
                   onChange={(e) => set({ footnote: e.target.value })}
                 />
               </label>
@@ -107,7 +126,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
               <div className="lms-card__head">
                 <h2 className="lms-card__title"><LmsIcon name="user" /> Signature</h2>
               </div>
-              {field('signatoryName', 'Signed by', 'Left blank, the course byline is used.')}
+              {field('signatoryName', 'Signed by', `Left blank, the ${noun} byline is used.`)}
               {field('signatoryRole', 'Their role')}
               {field('issuerName', 'Issued by')}
             </section>
@@ -203,7 +222,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
           </>
         ) : (
           <p className="lms-detail__note">
-            No certificate is issued for this course. Learners still get their
+            No certificate is issued for this {noun}. Learners still get their
             completion recorded, and existing certificates are unaffected.
           </p>
         )}
@@ -216,17 +235,17 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
             <CertificateDesign
               design={c}
               recipientName={previewName || 'Sam Taylor'}
-              courseTitle={course.title || 'Untitled course'}
-              hours={Math.max(1, Math.round((course.minutes ?? 0) / 60))}
+              courseTitle={item.title || `Untitled ${noun}`}
+              hours={Math.max(1, Math.round(totalMinutes / 60))}
               credentialId="GP-2026-XXXXXXXX"
               issuedAt={new Date().toISOString()}
               issuerName={c.issuerName}
-              signatoryName={c.signatoryName || course.instructor?.name}
-              signatoryRole={c.signatoryRole || course.instructor?.role}
+              signatoryName={c.signatoryName || item.instructor?.name}
+              signatoryRole={c.signatoryRole || item.instructor?.role}
             />
             <p className="lms-detail__note">
               Sample values. A real certificate carries the learner’s name, the
-              hours from your lesson times, and its own credential ID.
+              hours from your {noun === 'path' ? 'course' : 'lesson'} times, and its own credential ID.
             </p>
             <p className="lms-detail__note">
               Changing this affects certificates issued from now on. Ones already
@@ -234,7 +253,7 @@ export default function CertificateBuilder({ course, previewName, onChange }) {
             </p>
           </>
         ) : (
-          <p className="lms-empty">Certificates are turned off for this course.</p>
+          <p className="lms-empty">Certificates are turned off for this {noun}.</p>
         )}
       </div>
     </div>

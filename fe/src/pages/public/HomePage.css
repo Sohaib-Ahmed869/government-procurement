@@ -24,4 +24,13 @@
   .home-scale .page-layout {
     min-height: calc(100vh / (100vw / 1440px));
   }
+
+  /* Same correction, same reason, for the hero — which sizes itself to the
+     screen so the headline and lede are readable without scrolling. Left
+     unadjusted, its 100svh came out a zoom-factor too tall (833px of hero for
+     750px of layout at 1600px wide) and pushed the lede back below the fold,
+     which is the exact thing the full-height hero exists to prevent. */
+  .home-scale .home-hero__inner {
+    min-height: max(420px, calc(100svh / (100vw / 1440px) - var(--gp-hero-offset, 140px)));
+  }
 }

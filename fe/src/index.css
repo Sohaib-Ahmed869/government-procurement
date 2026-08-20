@@ -71,9 +71,11 @@ body {
   --mobile-toggle-space: 0px;
 }
 
-@media (max-width: 860px) {
+/* Matches the header's hamburger breakpoint (Header.css). The toggle row only
+   exists below it, so the clearance has to start at exactly the same width. */
+@media (max-width: 1300px) {
   .page-layout {
-    --mobile-toggle-space: 118px;
+    --mobile-toggle-space: 90px;
   }
 
   .page-layout__main > :first-child {

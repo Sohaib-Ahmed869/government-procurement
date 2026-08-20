@@ -2,6 +2,35 @@ import LmsIcon from '../LmsIcon.jsx';
 import ImageUploader from './ImageUploader.jsx';
 import { LEVELS, RESOURCE_TYPES, SEGMENTS } from '../../constants/courseTaxonomy.js';
 import { courseDurationLabel } from '../../hooks/useAuthoring.js';
+import RichTextEditor from '../../../admin/components/RichTextEditor.jsx';
+
+// Descriptions written before the builder had a rich text editor are stored as
+// plain text, and the course page renders the field as HTML - so their line
+// breaks collapse and the whole thing arrives as one paragraph, which is what
+// this replaced.
+//
+// Converting on the way INTO the editor, rather than migrating the database,
+// means nothing is rewritten until an author opens the description and saves
+// it. They see the paragraphs, and their next save is what persists them.
+const HAS_MARKUP = /<[a-z][\s\S]*>/i;
+const SPLIT_PARAGRAPHS = /\n\s*\n/;
+const NEWLINE = /\n/g;
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function toEditorHtml(body) {
+  const text = String(body ?? '');
+  if (!text.trim() || HAS_MARKUP.test(text)) return text;
+  return text
+    .split(SPLIT_PARAGRAPHS)
+    .map((para) => `<p>${escapeHtml(para.trim()).replace(NEWLINE, '<br />')}</p>`)
+    .join('');
+}
 
 const AVAILABILITY = [
   { value: 'open', label: 'Open for enrolment' },
@@ -257,15 +286,17 @@ export default function CourseBuilder({
         </div>
         <label className="lms-field">
           <span className="lms-sr-only">Course description</span>
-          <textarea
-            className="lms-textarea"
-            rows={8}
-            value={course.body ?? ''}
-            placeholder="The long description on the course page. Blank lines separate paragraphs."
-            onChange={(e) => set({ body: e.target.value })}
+          {/* Inline images are off: uploads go through the staff-only media
+              API, so the button would offer every instructor a 403. */}
+          <RichTextEditor
+            value={toEditorHtml(course.body)}
+            onChange={(html) => set({ body: html })}
+            allowImages={false}
+            placeholder="The long description on the course page. Headings, bullets and bold all work."
           />
           <span className="lms-field__hint">
-            Plain text for now. Rich formatting arrives with the content API.
+            Formatting is kept when the course is published. Links and lists are cleaned on
+            save, so anything pasted from elsewhere arrives as plain formatting.
           </span>
         </label>
       </section>
