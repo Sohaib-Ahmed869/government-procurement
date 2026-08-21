@@ -14,6 +14,7 @@ const INSTRUCTOR_NAV = [
       { to: '/learn/instructor', label: 'Dashboard', end: true, icon: 'dashboard' },
       { to: '/learn/instructor/courses', label: 'My Courses', icon: 'book' },
       { to: '/learn/instructor/quizzes', label: 'Quizzes', icon: 'quiz' },
+      { to: '/learn/instructor/paths', label: 'Learning Paths', icon: 'path' },
     ],
   },
   {

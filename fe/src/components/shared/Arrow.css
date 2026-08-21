@@ -1,0 +1,17 @@
+/* The shared arrow. See Arrow.jsx for why it is drawn rather than typed. */
+
+.gp-arrow {
+  /* Sized in `em`, so it tracks whatever font-size the label beside it has and
+     one rule serves a 13px back-link and an 18px band link alike. */
+  width: 1em;
+  height: 1em;
+  flex: none;
+  /* For the links that are a plain text run rather than a flex row: nudges the
+     glyph onto the text's baseline instead of leaving it sitting on it. Has no
+     effect inside a flex container, where align-items does the work. */
+  vertical-align: -0.13em;
+}
+
+/* Slightly lighter than the text it follows. At the same weight the arrowhead
+   reads as a piece of punctuation somebody typed by mistake. */
+.gp-arrow { opacity: 0.9; }

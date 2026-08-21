@@ -1,0 +1,150 @@
+/* Public certificate verification (LMS 12.0b).
+
+   Sits inside SystemMessage, which is a dark, centred shell whose accent
+   follows the Award/Win toggle. Everything here is written against that
+   component's own --sysmsg-* roles rather than the ramp, so this page changes
+   colour with the rest of the site instead of pinning itself to one palette. */
+
+.verify__form {
+  margin: 24px auto 0;
+  max-width: 420px;
+  text-align: left;
+}
+
+.verify__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--sysmsg-accent);
+}
+
+.verify__row {
+  display: flex;
+  gap: 10px;
+}
+
+.verify__input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  /* Credential IDs are read off a printed page and retyped, so they are set in
+     a face where 0/O and 1/l cannot be confused. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.verify__input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.verify__input:hover { border-color: rgba(255, 255, 255, 0.36); }
+.verify__input:focus {
+  outline: none;
+  border-color: var(--sysmsg-accent);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.verify__submit {
+  flex-shrink: 0;
+  padding: 13px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--sysmsg-accent);
+  color: var(--sysmsg-on-accent);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.verify__submit:hover:not(:disabled) { background: var(--sysmsg-accent-hover); }
+.verify__submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.verify__submit:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* What was actually checked, echoed back on a miss so somebody comparing it to
+   the printed document can see where the typo is. */
+.verify__echo {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.72);
+}
+.verify__echo code {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.06em;
+}
+
+/* The result. A definition list rather than a table: it is a set of labelled
+   facts about one thing, which is what <dl> is for, and it reflows to one
+   column on a phone without any of a table's fighting. */
+.verify__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 28px;
+  margin: 28px 0 0;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+/* A withdrawn certificate is real but must not read as an endorsement, so the
+   panel loses its accent and says so with a warm edge instead. */
+.verify__facts.is-revoked {
+  border-color: rgba(255, 190, 160, 0.4);
+  background: rgba(255, 170, 130, 0.08);
+}
+
+.verify__facts > div { min-width: 0; }
+
+.verify__facts dt {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.verify__facts dd {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: #fff;
+  /* A course title or a long name must wrap rather than widen the panel. */
+  overflow-wrap: anywhere;
+}
+
+.verify__facts dd code {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.verify__more {
+  margin-top: 22px;
+  text-align: left;
+}
+
+.verify__more summary {
+  cursor: pointer;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.72);
+}
+.verify__more summary:hover { color: #fff; }
+.verify__more .verify__form { margin-top: 14px; }
+
+@media (max-width: 560px) {
+  .verify__facts { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  /* Stacked, so the button keeps a full-width tap target instead of being
+     squeezed beside a shrinking field. */
+  .verify__row { flex-direction: column; }
+  .verify__submit { width: 100%; }
+}

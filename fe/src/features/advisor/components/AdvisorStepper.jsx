@@ -1,5 +1,4 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import AdvisorDisclaimer from './AdvisorDisclaimer.jsx';
 import AdvisorResult from './AdvisorResult.jsx';
 import { useChromeHeight } from '../../../hooks/useChromeHeight.js';
 import { evaluate } from '../engine.js';
@@ -131,7 +130,13 @@ export default function AdvisorStepper({ rules, onExit }) {
   if (result) {
     return (
       <div ref={topRef}>
-        <AdvisorResult result={result} rules={rules} onRestart={restart} onExit={onExit} />
+        <AdvisorResult
+          result={result}
+          rules={rules}
+          answers={answers}
+          onRestart={restart}
+          onExit={onExit}
+        />
       </div>
     );
   }
@@ -140,10 +145,6 @@ export default function AdvisorStepper({ rules, onExit }) {
 
   return (
     <div className="adv-step" ref={topRef}>
-      {/* A6.9/A6.10 — shown before a single question is answered, not only on
-          the result. */}
-      <AdvisorDisclaimer />
-
       <ol className="adv-step__rail" aria-label="Progress">
         {steps.map((s, i) => (
           <li
@@ -200,7 +201,15 @@ export default function AdvisorStepper({ rules, onExit }) {
 // sets: every choice carries its own help text, and a native dropdown has
 // nowhere to put it.
 function Question({ question, value, onChange, invalid }) {
-  const { id, type, label, help, options = [], prefix, suffix, min } = question;
+  const { id, type, label, help, options = [], prefix, suffix, min, max, step = 1 } = question;
+
+  // Stepping stays inside the question's own bounds, so the arrows can never
+  // put the field into a state the form would then reject.
+  const nudge = (delta) => {
+    const next = (Number(value) || 0) + delta;
+    const floored = min == null ? next : Math.max(min, next);
+    onChange(max == null ? floored : Math.min(max, floored));
+  };
   const describedBy = help ? `${id}-help` : undefined;
 
   return (
@@ -289,12 +298,28 @@ function Question({ question, value, onChange, invalid }) {
             type="number"
             inputMode="decimal"
             min={min}
+            max={max}
+            step={step}
             value={value ?? ''}
             aria-describedby={describedBy}
             onChange={(e) =>
               onChange(e.target.value === '' ? '' : Number(e.target.value))
             }
           />
+          {/* Explicit steppers, because the native ones are invisible on a
+              phone: mobile browsers do not paint the spinner at all, so the
+              value could be stepped (a scroll over the field still works) with
+              nothing on screen saying so. These are the same control, drawn.
+              `tabIndex={-1}` keeps them out of the keyboard path, where the
+              arrow keys already step the input. */}
+          <span className="adv-q__spin" aria-hidden="true">
+            <button type="button" className="adv-q__step" tabIndex={-1} onClick={() => nudge(step)}>
+              ▲
+            </button>
+            <button type="button" className="adv-q__step" tabIndex={-1} onClick={() => nudge(-step)}>
+              ▼
+            </button>
+          </span>
           {suffix && <span className="adv-q__affix">{suffix}</span>}
         </div>
       )}

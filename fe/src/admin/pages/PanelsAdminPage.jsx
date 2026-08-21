@@ -209,12 +209,20 @@ export default function PanelsAdminPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Government Panels</h2>
+          <h2 className="admin-page__title">How to Engage Us — Award</h2>
           <p className="admin-page__subtitle">
-            The panels and prequalification schemes we can be engaged through, as listed on
-            the Government Panels page. Each entry says a client can appoint us under that
-            arrangement, so only add one we actually hold. Published entries are live
+            The panels and prequalification schemes we can be engaged through, listed on the
+            <strong> How to Engage Us</strong> page when the visitor is on{' '}
+            <strong>Award Contracts</strong>. Each entry says a client can appoint us under
+            that arrangement, so only add one we actually hold. Published entries are live
             immediately; drafts are visible on the page to you and to nobody else.
+          </p>
+          <p className="admin-page__subtitle">
+            The <strong>Win Contracts</strong> side of the same page shows services and how
+            to start one, not panels — a supplier cannot engage us through a panel, because
+            a panel is how government buys. That half is edited under{' '}
+            <strong>Content → Service Offering</strong>: any card tagged “Win contracts
+            only” or “Both segments” appears there.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -359,7 +367,7 @@ export default function PanelsAdminPage() {
       <ConfirmDialog
         open={Boolean(confirmId)}
         title="Delete panel"
-        message="Delete this panel? It disappears from the Government Panels page. This cannot be undone."
+        message="Delete this panel? It disappears from the How to Engage Us page (Award). This cannot be undone."
         confirmLabel="Delete"
         onConfirm={onDelete}
         onCancel={() => setConfirmId(null)}

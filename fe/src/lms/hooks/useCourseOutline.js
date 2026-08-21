@@ -67,13 +67,13 @@ export function useCourseOutline(slug) {
           whoShouldTake: course.whoShouldTake ?? [],
           includes: course.includes ?? [],
         },
-        // Course media doubles as the downloadable resources (L1).
-        resources: (course.media ?? []).map((m) => ({
-          id: m._id ?? m.url,
-          title: m.title || m.name || 'Resource',
-          kind: m.kind ?? 'pdf',
-          url: m.url,
-        })),
+        // Course-wide downloads are gone: a course's materials are the
+        // LESSONS' materials now, each gated by the lesson it hangs off. The
+        // course record's `media` was a public marketing gallery — an
+        // unexpiring /files link — and listing it here put it in the same card
+        // as gated lesson downloads, where it was the one row that always
+        // opened. Nothing to merge, so the card renders its empty state.
+        resources: [],
       });
       setStatus('ready');
     } catch (err) {

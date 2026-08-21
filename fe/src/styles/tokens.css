@@ -101,7 +101,7 @@
      different height. Clamped rather than fixed, so it still tightens on a
      phone without each page needing its own breakpoint. */
   --gp-head-bg: var(--gp-brand-soft);
-  --gp-head-pad: clamp(40px, 5vw, 68px);
+  --gp-head-pad: clamp(24px, 2.8vw, 38px);
 
   /* ---- The two ramps (Sprint 2, A4) ---------------------------------------
      Each segment now carries a full ramp rather than one ground colour: five
@@ -158,7 +158,12 @@
      rather than as the grey counterpart to Award's green. The other two move
      with it: leaving `paper` and `paper-alt` warm while the step below them
      went grey would have put a colour shift inside one ramp. */
-  --gp-win-paper: #f7f7f6;
+  /* Pure white. The paper step was an off-white, which on a page whose content
+     bands all sit on it read as slightly grey rather than as paper; the cards
+     inside those bands are --gp-win-paper-alt, and at #f7f7f6 against #eeeeec
+     the two were almost the same tone. White gives the cards an edge to sit
+     against and the reading bands their brightness back. */
+  --gp-win-paper: #ffffff;
   --gp-win-paper-alt: #eeeeec;
   --gp-win-paper-deep: #e2e2df;
   --gp-win-line: #d9d9d5;
@@ -287,20 +292,34 @@
   --gp-band-tint: #e9ebeb;
 }
 
-/* 4K at 150% scaling — the width Windows reports for a 3840px panel at its
-   default setting, and the most common way a 4K monitor is actually run. */
-@media (min-width: 2561px) {
-  :root {
-    --gp-shell: 1240px;
-    --gp-shell-bar: 1280px;
-  }
-}
+/* No wide-screen overrides.
 
-/* 4K and 5K at native density. Pulled in one step further: at 3840px the page
-   is zoomed ~2.67x, so 1240 of the 1440px layout is still a very long line. */
-@media (min-width: 3201px) {
-  :root {
-    --gp-shell: 1180px;
-    --gp-shell-bar: 1220px;
-  }
+   The page is laid out at 1440px and scaled up (see index.css), so --gp-shell
+   is a width inside that fixed 1440 — the same 1400px at every screen size, and
+   the scaling is what makes it fill a 4K panel. The two steps that used to sit
+   here pulled the column in to 1240px and then 1180px on very wide screens; with
+   the scale applied on top they made a large monitor show a narrower column than
+   a laptop, which is backwards. */
+
+/* The Our Team page runs wider than --gp-shell.
+
+   The reference holds its directory in about 81% of the screen, with 9.5% of
+   margin down each side and correspondingly wide cards — the columns read as a
+   set because there is ground around them. 1246 is that 81% of the 1440px the
+   page lays out at before it is scaled up.
+
+   A variable rather than two literals because the hero above the grid has to
+   sit on the same left edge — the moment those two disagree the heading floats
+   off the column it introduces. */
+:root {
+  /* 81vw is the reference's own proportion — its directory sits in about 81% of
+     the screen with 9.5% of margin down each side. This was a flat 1246px,
+     which WAS that 81%, back when everything laid out at 1440 and was zoomed
+     up. With the zoom gone, 1246 of a real 1920px screen is 65% and the grid
+     stranded itself in the middle of the page.
+
+     Capped, unlike --gp-shell above: 81% of a 4K panel is a 3100px row, and a
+     third of that is one person's card the width of a door. */
+  --gp-team-shell: min(1246px, 100%);
+  --gp-team-gutter: clamp(20px, 2.8vw, 40px);
 }

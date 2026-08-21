@@ -10,19 +10,37 @@
    Everything resolves role tokens, so the block recolours with the segment
    along with the rest of the page. */
 .subscribe-form {
-  /* No width of its own: it is one column of the contact band's grid (see
-     .site-footer__subscribe-inner in Footer.css), which carries the shell
-     geometry for both halves. */
+  /* Centred in the band, which is now its only occupant. Capped rather than
+     full-width: a single line of input stretched across a 1400px shell is a
+     field nobody can judge the length of.
+
+     `--subscribe-align` lets a caller opt back into the left-aligned column
+     layout without this file needing to know who is asking. */
   min-width: 0;
-  text-align: left;
+  width: 100%;
+  /* Narrow enough to read as a block rather than a full-width strip, and no
+     narrower than the standfirst needs to stay on one line.
+
+     Those two pull against each other, and the sentence is what sets the floor:
+     91 characters at the 16px it now reaches measures about 757px, so 780px is
+     the tightest this can be without it wrapping. Dropping the copy (see below)
+     is what buys the width back each time this narrows. At 15px the sentence
+     measures about 710px, which is what puts the floor at 730. Below this it
+     has to wrap — there is no size left to give. */
+  max-width: 730px;
+  margin-inline: auto;
+  text-align: var(--subscribe-align, center);
   font-family: 'Geist Variable', system-ui, sans-serif;
   color: var(--gp-ink);
   transition: var(--gp-fade);
 }
 
 .subscribe-form__heading {
-  margin: 0;
-  max-width: 20ch;
+  /* The measure caps were sized for a half-width column; centred, they have to
+     centre themselves too or the block reads as left-aligned inside a centred
+     box. */
+  margin: 0 auto;
+  max-width: 24ch;
   font-size: var(--gp-section-title);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -32,9 +50,14 @@
 }
 
 .subscribe-form__copy {
-  margin: 16px 0 0;
-  max-width: 58ch;
-  font-size: clamp(15px, 1.3vw, 17px);
+  margin: 16px auto 0;
+  /* A readable measure while it is wrapping. Lifted on a laptop below, where
+     the point is that it does not wrap at all. */
+  max-width: 54ch;
+  /* Flat 15px rather than a clamp that grows: this is the smallest the
+     standfirst can be and still read comfortably, and holding it there is what
+     keeps the sentence on one line inside a 730px band. */
+  font-size: 15px;
   line-height: 1.6;
   color: var(--gp-muted);
   transition: var(--gp-fade);
@@ -49,10 +72,14 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: stretch;
-  /* The concept's field row is half the band's width. Capped rather than
-     full-bleed so the input doesn't stretch to a 1100px slot for an email
-     address. */
+  /* Capped rather than full-bleed so the input doesn't stretch to a 1100px slot
+     for an email address. */
   max-width: 620px;
+  /* text-align doesn't reach flex children, so the row centres itself: `margin`
+     for the row inside its parent, `justify-content` for the field and button
+     inside the row once they wrap onto separate lines. */
+  margin-inline: auto;
+  justify-content: center;
 }
 
 .subscribe-form__label {
@@ -154,7 +181,7 @@
 }
 
 .subscribe-form__success {
-  margin: 26px 0 0;
+  margin: 26px auto 0;
   padding: 14px 20px;
   max-width: 620px;
   font-size: 15px;
@@ -168,6 +195,16 @@
 }
 
 @media (max-width: 480px) {
+  /* In a column, flex-basis is a HEIGHT. `flex: 1 1 260px` on the input turned
+     it into a 260px-tall oval, which with the 999px radius read as a giant egg
+     rather than a field. Both children size to their content and take the full
+     width instead. */
+  .subscribe-form__input,
+  .subscribe-form__button {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
   .subscribe-form__field {
     flex-direction: column;
   }
@@ -175,4 +212,15 @@
   .subscribe-form__button {
     width: 100%;
   }
+}
+
+/* Laptop and larger: the standfirst reads as one line.
+
+   The measure cap is lifted rather than `white-space: nowrap` being set. Nowrap
+   would guarantee the single line and then overflow the band the day somebody
+   lengthens the sentence; giving it the room instead means it fits today and
+   wraps gracefully if it ever grows. */
+@media (min-width: 1024px) {
+  .subscribe-form__heading { max-width: none; }
+  .subscribe-form__copy { max-width: none; }
 }

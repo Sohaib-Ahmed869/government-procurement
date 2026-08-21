@@ -15,10 +15,9 @@
 
 .adv-result__eyebrow {
   margin: 0;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--gp-accent-ink);
 }
 
@@ -43,10 +42,9 @@
 
 .adv-result__h3 {
   margin: 0 0 16px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--gp-ink);
 }
 
@@ -94,10 +92,9 @@
 .adv-path__status {
   flex: 0 0 auto;
   padding: 3px 10px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   border-radius: 999px;
   background: var(--gp-paper-deep);
   color: var(--gp-muted);
@@ -204,4 +201,195 @@
 
 @media (max-width: 420px) {
   .adv-result__actions .adv-btn { flex: 1 1 100%; }
+}
+
+/* --- print / save as PDF --------------------------------------------------
+
+   The advisor had no print styles at all, so "save as PDF" produced whatever
+   the screen happened to be: the site header and footer, the dark page banner,
+   the stepper's buttons, and any section the reveal animation had not run on
+   yet coming out blank. That is the "basic template" — not a template at all,
+   just the page.
+
+   What a printed result has to be is a file note: it identifies itself, states
+   the findings, cites their sources with the addresses spelled out, and ends
+   with the answers it was derived from. Everything else goes.
+   ------------------------------------------------------------------------- */
+
+.adv-result__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+/* Both of these are print-only. Held out of the screen layout here rather than
+   only being revealed in the print block, so neither can appear on screen if a
+   later rule changes their display. */
+.adv-print-head,
+.adv-print-inputs {
+  display: none;
+}
+
+@media print {
+  /* A4 with a real margin. Browsers default to something narrower and the
+     result's cards then run to the paper edge. */
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  /* Chrome, in the literal sense — the same list the article page prints
+     against, plus the advisor's own controls. */
+  .page-layout__chrome,
+  .site-header,
+  .site-footer,
+  .announcement-banner,
+  .back-to-top,
+  .adv-stepper,
+  .adv-steps,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* The page banner is a dark full-bleed band. Printed it is a solid block of
+     ink across the top of page one, so it is flattened rather than hidden —
+     the jurisdiction and the page name still belong on the document. */
+  .pa-page__head {
+    padding: 0 0 10px !important;
+    background: none !important;
+    color: #000 !important;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .pa-page__title {
+    font-size: 18pt !important;
+    color: #000 !important;
+  }
+
+  .pa-page__body,
+  .pa-page__shell {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  /* The reveal animations leave elements at opacity 0 until they scroll into
+     view. Printing does not scroll, so anything below the fold would come out
+     blank without this. */
+  .hm-reveal,
+  .adv-result,
+  .adv-result * {
+    opacity: 1 !important;
+    transform: none !important;
+    translate: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .adv-result {
+    max-width: none;
+    color: #000;
+    font-size: 10.5pt;
+  }
+
+  .adv-print-head,
+  .adv-print-inputs {
+    display: block;
+  }
+
+  .adv-print-head {
+    margin: 0 0 14px;
+  }
+
+  .adv-print-head__brand {
+    margin: 0;
+    font-size: 13pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .adv-print-head__stamp {
+    margin: 4px 0 0;
+    font-size: 8.5pt;
+    color: #444;
+  }
+
+  /* Every tint the screen uses is a wash of toner that makes the type harder to
+     read, so the cards keep their structure and lose their fill. The status
+     edge stays: it is the one piece of colour doing work, marking which pathway
+     is the recommended one. */
+  .adv-path,
+  .adv-list > li,
+  .adv-flag {
+    background: none !important;
+    border: 1px solid #ccc !important;
+    border-left-width: 3px !important;
+    /* A pathway split across a page break loses its status label. */
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .adv-path.is-recommended,
+  .adv-path.is-required {
+    border-left-color: #000 !important;
+  }
+
+  .adv-result__head,
+  .adv-result__section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .adv-result__h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* A cited source with no address cannot be checked, and a printed page has no
+     link to follow. */
+  .adv-basis__list a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .adv-basis__list a::after {
+    content: ' (' attr(href) ')';
+    font-size: 8pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  /* Starts its own page. It is the appendix, and it reads as one. */
+  .adv-print-inputs {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #ccc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .adv-print-inputs__list {
+    margin: 0;
+  }
+
+  .adv-print-inputs__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .adv-print-inputs__row dt {
+    margin: 0;
+    font-size: 9pt;
+    color: #444;
+  }
+
+  .adv-print-inputs__row dd {
+    margin: 0;
+    font-size: 9pt;
+    font-weight: 600;
+    color: #000;
+  }
 }

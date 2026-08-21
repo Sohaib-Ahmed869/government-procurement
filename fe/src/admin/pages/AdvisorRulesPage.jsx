@@ -251,7 +251,7 @@ export default function AdvisorRulesPage() {
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Advisory rules</h2>
           <p className="admin-page__subtitle">
-            The figures and sources the Procurement Advisor works from. Change one, publish
+            The figures and sources the Sourcing Advisor works from. Change one, publish
             it, and the live tool uses it straight away. Every field shows the value in use
             today; fill in only what has changed.
           </p>

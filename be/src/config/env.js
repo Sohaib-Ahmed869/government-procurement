@@ -55,6 +55,29 @@ export const env = {
     maxUploadMb: Number(process.env.MAX_UPLOAD_MB) || 512,
   },
 
+  /* Encrypted HLS video (LMS 3.0).
+
+     `keySecret` is the root of every content key: rotating it invalidates all
+     of them at once, which is the break-glass lever. There is deliberately no
+     default — a shared default secret is the same as no encryption, and it is
+     the kind of thing nobody notices until a pen-test quotes it back. Serving
+     encrypted video without it fails loudly instead.
+
+     `ffmpegPath` is what turns transcoding ON. Absent, uploads keep their
+     existing signed-MP4 path and nothing changes. */
+  hls: {
+    keySecret: process.env.HLS_KEY_SECRET || '',
+    // Segments sharing one key. ~6s segments x 10 is about a minute of video
+    // per key, so a leaked key is worth about that much.
+    rotateEvery: Number(process.env.HLS_KEY_ROTATE_SEGMENTS) || 10,
+    // How long the key-URI token in a served playlist stays valid. The gate is
+    // re-checked on every key request regardless, so this is a second bound and
+    // not the access control.
+    tokenTtlSeconds: Number(process.env.HLS_TOKEN_TTL_SECONDS) || 300,
+    segmentSeconds: Number(process.env.HLS_SEGMENT_SECONDS) || 6,
+    ffmpegPath: process.env.FFMPEG_PATH || '',
+  },
+
   mail: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT) || 587,

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { reviewApi } from '../../api/lms.js';
+import AdminPathsPanel from '../components/AdminPathsPanel.jsx';
+import AdminBundlesPanel from '../components/AdminBundlesPanel.jsx';
 import CurriculumLesson from '../components/CurriculumLesson.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -80,6 +82,11 @@ export default function CoursesAdminPage() {
   const [rows, setRows] = useState([]);
   const [state, setState] = useState('loading');
   const [tab, setTab] = useState('pending');
+  // Courses and learning paths share this screen because they share a queue: an
+  // instructor submits both, and the same admin decides on both. Split into two
+  // lists rather than one mixed one, because the thing being judged differs —
+  // a course is a curriculum, a path is a sequence of courses already approved.
+  const [kind, setKind] = useState('courses');
   const [q, setQ] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [error, setError] = useState('');
@@ -203,6 +210,52 @@ export default function CoursesAdminPage() {
 
       <div className="admin-toolbar">
         <div className="admin-seg">
+          <button
+            type="button"
+            className={`admin-seg__btn${kind === 'courses' ? ' is-active' : ''}`}
+            onClick={() => setKind('courses')}
+          >
+            Courses
+          </button>
+          <button
+            type="button"
+            className={`admin-seg__btn${kind === 'paths' ? ' is-active' : ''}`}
+            onClick={() => setKind('paths')}
+          >
+            Learning paths
+          </button>
+          {/* Bundles sit beside courses rather than in a page of their own:
+              what goes in one is a course, and the admin picking them has just
+              been looking at the list on the tab next door. */}
+          <button
+            type="button"
+            className={`admin-seg__btn${kind === 'bundles' ? ' is-active' : ''}`}
+            onClick={() => setKind('bundles')}
+          >
+            Bundles
+          </button>
+        </div>
+        <input
+          className="admin-input"
+          placeholder={
+            kind === 'paths'
+              ? 'Search path or instructor…'
+              : kind === 'bundles'
+                ? 'Search bundles…'
+                : 'Search title or instructor…'
+          }
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          style={{ maxWidth: 280, marginLeft: 'auto' }}
+        />
+      </div>
+
+      {kind === 'paths' ? <AdminPathsPanel isAdmin={isAdmin} query={q} /> : null}
+      {kind === 'bundles' ? <AdminBundlesPanel isAdmin={isAdmin} query={q} /> : null}
+
+      {kind === 'courses' ? (
+      <div className="admin-toolbar">
+        <div className="admin-seg">
           {TABS.map((t) => (
             <button
               key={t.value}
@@ -215,25 +268,21 @@ export default function CoursesAdminPage() {
             </button>
           ))}
         </div>
-        <input
-          className="admin-input"
-          placeholder="Search title or instructor…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          style={{ maxWidth: 280, marginLeft: 'auto' }}
-        />
       </div>
+      ) : null}
 
-      {error ? <div className="admin-alert admin-alert--error">{error}</div> : null}
+      {kind === 'courses' && error ? (
+        <div className="admin-alert admin-alert--error">{error}</div>
+      ) : null}
 
-      {!isAdmin ? (
+      {kind === 'courses' && !isAdmin ? (
         <div className="admin-alert">
           You can review submissions here. Approving, rejecting and featuring are
           super-admin actions.
         </div>
       ) : null}
 
-      {state === 'loading' ? (
+      {kind !== 'courses' ? null : state === 'loading' ? (
         <div className="admin-card">Loading courses…</div>
       ) : visible.length === 0 ? (
         <div className="admin-card">

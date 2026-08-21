@@ -42,18 +42,6 @@
   color: #fff;
 }
 
-.so-page__lede {
-  max-width: 62ch;
-  margin: 0;
-  font-size: clamp(15px, 1.3vw, 18px);
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.74);
-}
-
-.so-page__body {
-  padding: clamp(36px, 6vw, 76px) 0 clamp(56px, 9vw, 110px);
-}
-
 /* Shared page-title breakpoint, matching every other page's hero. */
 @media (max-width: 860px) {
   .so-page__title {

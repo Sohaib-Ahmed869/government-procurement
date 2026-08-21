@@ -117,14 +117,22 @@ export default function TeamMemberDetail({ slug }) {
   const education = member.education || [];
 
   return (
-    <section
+    <div
       ref={ref}
       className={`tm hm-band--light${inView ? ' is-in' : ''}`}
       data-audience={audience}
     >
+      {/* The band is the <section>, and the shell inside it is what fades.
+          These were the other way round: the page ground sat on the outer
+          element and each band was one of its children, so the A3 cross-fade —
+          which targets `:is(section, header, article) > *` — faded the BANDS
+          themselves. Fading a dark band to nothing shows whatever is behind it,
+          and behind it was this page's own paper: the white flash on every
+          toggle. Same correction the tender page needed, and the same shape
+          Service Offering already had. */}
       {/* The hero sits in its own full-bleed band so its gradient runs edge to
           edge, rather than stopping at the 1100px column. */}
-      <div className="tm__hero-band">
+      <section className="tm__hero-band">
         <div className="tm__inner tm__inner--hero">
           <div className="tm__hero">
             <TeamAvatar member={member} className="tm__avatar" />
@@ -163,9 +171,9 @@ export default function TeamMemberDetail({ slug }) {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="tm__inner">
+      <section className="tm__inner">
         {/* Body: the written profile on the left, contact CTA + expertise in a
             narrower column on the right. Every block after About renders only
             when there's content for it. */}
@@ -310,7 +318,7 @@ export default function TeamMemberDetail({ slug }) {
             )}
           </section>
         )}
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
+import NotificationsMenu from '../components/NotificationsMenu.jsx';
 
 // Up-to-two-letter initials for the avatar chip.
 function initials(name) {
@@ -11,7 +12,7 @@ function initials(name) {
 // Top bar: mobile drawer toggle, breadcrumb trail, course search, notifications
 // and the signed-in student. The desktop collapse control lives in the sidebar,
 // so it is not repeated here.
-export default function LmsHeader({ crumbs = [], onOpenMobile, notifications = 0 }) {
+export default function LmsHeader({ crumbs = [], onOpenMobile }) {
   const { user, isAuthenticated } = useStudentAuth();
   const current = crumbs[crumbs.length - 1];
   const trail = crumbs.slice(0, -1);
@@ -65,17 +66,9 @@ export default function LmsHeader({ crumbs = [], onOpenMobile, notifications = 0
           <input type="search" placeholder="Search courses, lessons…" aria-label="Search courses" />
         </div>
 
-        <button type="button" className="lms-header__iconbtn" title="Notifications"
-          aria-label={`Notifications${notifications ? ` (${notifications} unread)` : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-            strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8" />
-            <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-          </svg>
-          {notifications > 0 ? (
-            <span className="lms-header__dot">{notifications > 99 ? '99+' : notifications}</span>
-          ) : null}
-        </button>
+        {/* Signed out, there is nothing to notify anyone about: every source
+            behind the bell is scoped to an account. */}
+        {isAuthenticated ? <NotificationsMenu /> : null}
 
         {/* Signed out only happens on the public screens now. The catalogue and
             a course's page. "Guest / Signed out" states a fact and offers

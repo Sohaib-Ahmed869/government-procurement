@@ -106,6 +106,16 @@ export function StudentAuthProvider({ children }) {
     return u;
   }, []);
 
+  // An instructor editing their own details. The session holds a copy (it
+  // arrives with /accounts/me so the shell can render in one request), so the
+  // save has to update it here rather than leaving the header and the byline
+  // quoting the old headline until the next reload.
+  const saveInstructorProfile = useCallback(async (body) => {
+    const next = await accountsApi.updateInstructorProfile(body);
+    setInstructor(next);
+    return next;
+  }, []);
+
   // Signing out from a gated screen would be bounced to the login page by
   // StudentRoute anyway, but from a public one (the catalogue, say) nothing
   // would move and the click would look like it failed. Navigating here makes
@@ -132,10 +142,11 @@ export function StudentAuthProvider({ children }) {
       login,
       signup,
       logout,
+      saveInstructorProfile,
       // TODO (L6): back this with the enrolment record once it exists.
       isEnrolled: () => Boolean(user),
     }),
-    [user, instructor, loading, login, signup, logout],
+    [user, instructor, loading, login, signup, logout, saveInstructorProfile],
   );
 
   return <StudentAuthContext.Provider value={value}>{children}</StudentAuthContext.Provider>;

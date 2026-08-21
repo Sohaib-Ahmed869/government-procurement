@@ -13,9 +13,11 @@
 }
 
 .team__inner {
-  max-width: var(--gp-shell);
+  /* Same width and same gutter as the hero above, so the first card's left edge
+     and the page title's start on one line. */
+  max-width: var(--gp-team-shell);
   margin: 0 auto;
-  padding: 24px clamp(20px, 4vw, 60px) 48px;
+  padding: 24px var(--gp-team-gutter) 48px;
 }
 
 /* Status / empty message shown while the roster loads or when none exist. */
@@ -55,7 +57,14 @@
   flex-direction: column;
   align-items: center;
   height: 100%;
-  padding: 40px 28px 32px;
+  /* Taller than it was. The reference's cards are close to 640px against our
+     ~400px, and most of that difference is air above the portrait and below the
+     summary — which is what stops a directory of twenty faces reading as a
+     table. A minimum height keeps a member with a one-line summary the same
+     size as one with three, so the grid stays even. 480 against a ~385px card
+     is the reference's own 1.25 height-to-width. */
+  min-height: 480px;
+  padding: 48px 28px 40px;
   text-align: center;
   background: var(--gp-brand-lift);
   color: #fff;

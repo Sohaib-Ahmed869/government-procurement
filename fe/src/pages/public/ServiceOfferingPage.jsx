@@ -14,16 +14,8 @@ import './ServiceOfferingPage.css';
 //
 // No eyebrow, and no "Capabilities" anywhere — both are explicit in A5.
 const HEADINGS = {
-  award: {
-    title: 'Service Offering: Award Contracts',
-    lede:
-      'Six services that run the length of a procurement, from deciding how to go to market through to managing the contract you sign. They are listed here in the order a procurement is actually run.',
-  },
-  win: {
-    title: 'Service Offering: Win Contracts',
-    lede:
-      'Six services covering the points where a bid is won or lost, from the decision to respond through to mobilising the contract you have taken. They are listed here in the order a bidder meets them.',
-  },
+  award: { title: 'Service Offering: Award Contracts' },
+  win: { title: 'Service Offering: Win Contracts' },
 };
 
 export default function ServiceOfferingPage() {
@@ -40,8 +32,9 @@ export default function ServiceOfferingPage() {
         <div className="so-page" data-audience={audience}>
           <header className={`so-page__head${mounted ? ' is-in' : ''}`}>
             <div className="so-page__shell">
+              {/* The title alone. The lede described the six rows that begin
+                  immediately below it, so it delayed the thing it described. */}
               <h1 className="so-page__title hm-reveal">{copy.title}</h1>
-              <p className="so-page__lede hm-reveal" data-delay="1">{copy.lede}</p>
             </div>
           </header>
 

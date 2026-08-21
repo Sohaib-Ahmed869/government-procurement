@@ -7,6 +7,7 @@ import {
   CONTACT_PHONE_HREF,
 } from '../../constants/contact.js';
 import './OfficeCard.css';
+import Arrow from '../../components/shared/Arrow.jsx';
 
 // The head office card that sits beside "Stay across procurement", as in the
 // concept (fe/homepage-v2/index.html, `.office`).
@@ -31,7 +32,7 @@ export default function OfficeCard() {
       </p>
 
       <Link className="office-card__cta" to="/book-a-consultation">
-        Request a Consultation <span aria-hidden="true">→</span>
+        Request a Consultation <Arrow />
       </Link>
     </div>
   );

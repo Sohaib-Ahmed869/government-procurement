@@ -579,7 +579,7 @@
    Matched to the 860px breakpoint the reserved space itself uses, not the
    760px one below — between the two the toggle is on screen and still needs
    the band behind it. */
-@media (max-width: 860px) {
+@media (max-width: 1300px) {
   .tm-page .page-layout__main > .tm {
     padding-top: 0;
   }

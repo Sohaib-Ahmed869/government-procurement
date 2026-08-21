@@ -76,12 +76,19 @@ const courseSchema = new mongoose.Schema(
       key: { type: String, default: '' },
       url: { type: String, default: '' },
     },
-    // Course materials attached directly to the course. Each item is one of:
-    //  - 'video'    an uploaded video file (key/url/mimeType/sizeBytes)
-    //  - 'youtube'  a pasted YouTube link (youtubeUrl/youtubeId)
-    //  - 'pdf'      an uploaded PDF document (key/url)
-    //  - 'image'    an uploaded image (key/url)
-    // (Videos used to be a standalone collection; they now live here.)
+    // DEPRECATED — nothing writes this and nothing renders it.
+    //
+    // These were course-level materials shown on the public course page: an
+    // uploaded video, a YouTube link, a PDF, an image. They were public by
+    // construction — `url` is an unexpiring /files link, and /files is
+    // unauthenticated — which made them the wrong home for anything a learner
+    // pays for. A course's detail page now carries its cover image only, and
+    // video, documents and downloads are LESSON content, gated per lesson by
+    // gateFor(): open on a free preview, closed otherwise.
+    //
+    // The field is kept so existing rows survive a save and `remove` can still
+    // clean up their S3 objects. The write routes are gone. Safe to drop once
+    // the data has been migrated into lessons or discarded.
     media: [
       {
         kind: { type: String, enum: ['video', 'youtube', 'pdf', 'image'], required: true },
@@ -190,6 +197,31 @@ export const CERTIFICATE_DEFAULTS = {
   textColor: '#1a1a1a',
   showHours: true,
   showCredentialId: true,
+};
+
+// A course an instructor is still writing and has never submitted. Their own
+// workspace, not the admin's queue, so it is excluded from every staff-facing
+// listing until they press "Submit for review".
+//
+// All three conditions are needed, and each one protects a course that MUST
+// stay visible to staff:
+//   author       a CMS-authored course has none, and its drafts are the admin's
+//                own work in progress.
+//   reviewStatus 'none' is also where a course lands after being unpublished,
+//                or after its author edits one that was sent back.
+//   submittedAt  which is what separates those from a course that has never
+//                been shown to anybody. withdrawSubmission() clears it back to
+//                null on purpose: withdrawing means "treat this as unsent".
+//   status       a live course is never hidden from anyone, whatever its review
+//                state. Nothing on the site should be invisible to the people
+//                answerable for it.
+//
+// Spread into a query as `$nor: [UNSUBMITTED_INSTRUCTOR_DRAFT]`.
+export const UNSUBMITTED_INSTRUCTOR_DRAFT = {
+  author: { $ne: null },
+  reviewStatus: 'none',
+  submittedAt: null,
+  status: { $ne: CONTENT_STATUS.PUBLISHED },
 };
 
 courseSchema.index({ title: 'text', summary: 'text', body: 'text' });

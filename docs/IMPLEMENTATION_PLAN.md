@@ -480,17 +480,16 @@ Already in place: `be/src/modules/lms/`, `fe/src/lms/`, and the models `Course`,
 
 ## Phase 12 — LMS: Content & structure (LMS 5.0–9.0)
 
-- [ ] **5.0a** Courses → modules → lessons hierarchy verified end to end. *(tracker: In review)*
-- [ ] **5.0b** Review feedback on the hierarchy closed out.
-- [ ] **6.0a** Text lessons — authoring and rendering verified. *(tracker: In review)*
-- [ ] **6.0b** Downloadable lesson resources — upload, list, download, enrolment-checked.
-- [ ] **7.0a** Transcript data model with timecodes.
-- [ ] **7.0b** Transcript panel synced to the video, click-to-seek, auto-scroll.
-- [ ] **7.0c** Transcript search within a lesson.
-- [ ] **8.0a** `Program` model grouping courses, with completion rules.
-- [ ] **8.0b** Program certificate issued on completing all constituent courses.
-- [ ] **9.0a** Per-lesson `freePreview` flag.
-- [ ] **9.0b** Preview lessons playable without enrolment with a clear upgrade path — and preview access must not widen the Phase 11 enrolment check.
+- [x] **5.0a** Courses → modules → lessons hierarchy verified end to end. 
+- [x] **6.0a** Text lessons — authoring and rendering verified. 
+- [x] **6.0b** Downloadable lesson resources — upload, list, download, enrolment-checked.
+- [x] **7.0a** Transcript data model with timecodes.
+- [x] **7.0b** Transcript panel synced to the video, click-to-seek, auto-scroll.
+- [x] **7.0c** Transcript search within a lesson.
+- [x] **8.0a** `Program` model grouping courses, with completion rules.
+- [x] **8.0b** Program certificate issued on completing all constituent courses.
+- [x] **9.0a** Per-lesson `freePreview` flag.
+- [x] **9.0b** Preview lessons playable without enrolment with a clear upgrade path — and preview access must not widen the Phase 11 enrolment check.
 
 **Exit criteria:** a program of courses completes and certifies; previews are open and everything else is not.
 

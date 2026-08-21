@@ -1,27 +1,2 @@
-/* Big-screen scaling.
-   The homepage is designed at a 1440px content width. On wider screens it would
-   otherwise sit in a fixed column with large empty margins. Instead we lay the
-   page out at exactly 1440px and use `zoom` to scale the whole thing up to fill
-   the viewport, so every text size, button, image and padding grows in the same
-   proportion — the laptop layout, just bigger. `zoom` (unlike transform) also
-   reflows, so nothing overlaps. */
-@media (min-width: 1441px) {
-  body {
-    /* The scaled page spans exactly 100vw; hide the sub-pixel/scrollbar spill. */
-    overflow-x: hidden;
-  }
-
-  .home-scale {
-    width: 1440px;
-    zoom: calc(100vw / 1440px);
-  }
-
-  /* `.page-layout` sets `min-height: 100vh`, but `vh` inside a zoomed subtree
-     resolves to the real viewport and is then magnified by the zoom factor — so
-     the layout is forced to ~1.8 viewports tall, stretching the flex <main> and
-     leaving a large empty gap between the last section and the footer. Divide the
-     height back down by the zoom factor so it targets exactly one real viewport. */
-  .home-scale .page-layout {
-    min-height: calc(100vh / (100vw / 1440px));
-  }
-}
+/* Big-screen scaling lives in index.css now, for every -scale class at once.
+   It used to be copied into six page stylesheets, which is how they drifted. */

@@ -6,11 +6,17 @@ import { Course, CERTIFICATE_DEFAULTS } from '../../models/Course.js';
 import { Module } from '../../models/Module.js';
 import { Lesson } from '../../models/Lesson.js';
 import { Enrollment, ENROLMENT_SOURCE } from '../../models/Enrollment.js';
+import { User } from '../../models/User.js';
 import { Progress } from '../../models/Progress.js';
 import { QuizAttempt } from '../../models/QuizAttempt.js';
 import { Certificate } from '../../models/Certificate.js';
+import { Program, PROGRAM_CERTIFICATE_DEFAULTS } from '../../models/Program.js';
+import { resolveForLearner } from './programs.controller.js';
 import { markAttempt, reviewFor } from '../../utils/grading.js';
-import { presignGet } from '../../config/s3.js';
+import { getObject, presignGet } from '../../config/s3.js';
+import { env } from '../../config/env.js';
+import { deriveKey, issuePlaybackToken, readPlaybackToken } from './hlsKeys.js';
+import { resolvePlaylist } from './hlsPackage.js';
 import { CONTENT_STATUS } from '../../constants/statuses.js';
 import { STAFF_ROLES } from '../../constants/roles.js';
 
@@ -20,9 +26,23 @@ const VIDEO_URL_TTL_SECONDS = 300;
    One function decides whether a lesson is open, so no endpoint can disagree
    with another about it. The client has a mirror of this for display, but this
    is the one that is enforced.                                              */
+/* Is this enrolment one that still grants access?
+
+   An enrolment is revoked, never deleted, so that a refund leaves an auditable
+   trail (see models/Enrollment.js). That makes a bare truthiness check the
+   wrong question: a revoked row is still an object, so `if (!enrolment)` waves
+   a refunded learner straight through to the lesson body and to the signed URLs
+   for its video, documents and attachments.
+
+   The rule is Enrollment.isActive()'s, but not the method: `myEnrollments`
+   reads its rows with .lean(), and a plain object has no methods on it. Calling
+   the method there would throw rather than deny, so the field is read directly
+   and both shapes are handled. */
+const grantsAccess = (enrolment) => Boolean(enrolment) && !enrolment.revokedAt;
+
 function gateFor({ lesson, module: mod, enrolment, now = new Date() }) {
   if (lesson.preview) return { reason: 'preview' };
-  if (!enrolment) return { reason: 'locked-enrolment' };
+  if (!grantsAccess(enrolment)) return { reason: 'locked-enrolment' };
 
   // Drip (L4): an absolute date, or days after this learner enrolled.
   if (mod?.releaseAt && now < mod.releaseAt) {
@@ -38,6 +58,21 @@ function gateFor({ lesson, module: mod, enrolment, now = new Date() }) {
 }
 
 const isLocked = (gate) => gate.reason !== 'open' && gate.reason !== 'preview';
+
+/* The caller's enrolment in a course, or null when nobody is signed in.
+
+   The media endpoints below are optional-auth so a FREE PREVIEW lesson can be
+   played by somebody who has not signed up — that is the point of a preview,
+   and requiring an account to watch the sample defeats it. Which means
+   `req.user` can be absent, and reading `req.user._id` straight out would throw
+   on exactly the request a preview exists to serve.
+
+   Anonymous therefore means "no enrolment", not "error", and gateFor() decides
+   the rest. It answers `preview` before it looks at enrolment at all, and
+   `locked-enrolment` for everything else — so opening these routes widens
+   access to preview lessons and to nothing besides. */
+const enrolmentFor = (user, courseId) =>
+  (user ? Enrollment.findOne({ user: user._id, course: courseId }) : null);
 
 /* ---- Catalogue + outline --------------------------------------------------- */
 
@@ -216,7 +251,7 @@ export const videoUrl = asyncHandler(async (req, res) => {
     Course.findById(lesson.course),
     Module.findById(lesson.module),
   ]);
-  const enrolment = await Enrollment.findOne({ user: req.user._id, course: lesson.course });
+  const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
     const gate = gateFor({ lesson, module: mod, enrolment });
@@ -246,7 +281,7 @@ export const documentUrl = asyncHandler(async (req, res) => {
     Course.findById(lesson.course),
     Module.findById(lesson.module),
   ]);
-  const enrolment = await Enrollment.findOne({ user: req.user._id, course: lesson.course });
+  const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
     const gate = gateFor({ lesson, module: mod, enrolment });
@@ -278,7 +313,7 @@ export const resourceUrl = asyncHandler(async (req, res) => {
     Course.findById(lesson.course),
     Module.findById(lesson.module),
   ]);
-  const enrolment = await Enrollment.findOne({ user: req.user._id, course: lesson.course });
+  const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
     const gate = gateFor({ lesson, module: mod, enrolment });
@@ -293,10 +328,215 @@ export const resourceUrl = asyncHandler(async (req, res) => {
   });
 });
 
-// GET /lms/lessons/:lessonId/transcript. Synced captions (L2).
-export const transcript = asyncHandler(async (req, res) => {
-  const lesson = await Lesson.findById(req.params.lessonId).select('transcript course');
+/* ---- Encrypted HLS (LMS 3.0) -----------------------------------------------
+
+   Two endpoints. The PLAYLIST is fetched once and rewritten per request; the
+   KEYS are fetched as playback crosses each rotation boundary.
+
+   Where the expiry actually lives is the part worth understanding. Segment URLs
+   are presigned for hours, not minutes, because a two-hour lesson cannot have
+   its later segments lapse mid-watch — and it is safe precisely because those
+   segments are ENCRYPTED. A leaked segment URL yields ciphertext. The short
+   life is on the keys, and the enrolment is re-checked on every key request, so
+   revoking access stops playback within a rotation group rather than at the
+   next page load.
+
+   Neither endpoint can be reached for a lesson the gate refuses, so a preview
+   plays for a signed-out visitor and nothing else does.
+   -------------------------------------------------------------------------- */
+
+// Long enough to watch a long lesson without a stall; the ciphertext behind
+// these is useless without a key.
+const SEGMENT_URL_TTL_SECONDS = 6 * 60 * 60;
+
+const readS3Text = async (key) => {
+  const chunks = [];
+  for await (const chunk of (await getObject(key)).Body) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8');
+};
+
+/* Who is watching.
+
+   Normally `req.user`, set by optionalAuth from the Authorization header. But a
+   video player fetches playlists and keys ITSELF, and native HLS — which is how
+   Safari and every iOS browser play this — offers no hook to add a header. So
+   the URLs we hand those players carry a short-lived signed token instead, and
+   this resolves the person it names.
+
+   The token is an identity assertion we signed minutes ago, NOT an
+   authorisation: the caller still goes through the gate below on every request.
+   That is what makes a revoked enrolment stop playback part-way through instead
+   of at the next page load, and it is why a leaked token opens nothing on its
+   own. A token with no user is a signed-out viewer on a free preview, which is
+   a real case and gates correctly as "no enrolment". */
+async function viewerFor(req) {
+  if (req.user) return req.user;
+
+  const claim = readPlaybackToken(req.query?.t);
+  if (!claim || claim.lessonId !== String(req.params.lessonId)) return null;
+  if (!claim.userId) return null;
+  return User.findById(claim.userId);
+}
+
+// The gate for a lesson's media, resolved once. Returns the lesson, or throws
+// exactly what the other media endpoints throw.
+async function openLessonOr403(req, { message }) {
+  const lesson = await Lesson.findById(req.params.lessonId);
   if (!lesson) throw ApiError.notFound('Lesson not found');
+
+  const [course, mod, user] = await Promise.all([
+    Course.findById(lesson.course),
+    Module.findById(lesson.module),
+    viewerFor(req),
+  ]);
+
+  if (!mayBypassGate({ user, course })) {
+    const enrolment = await enrolmentFor(user, lesson.course);
+    const gate = gateFor({ lesson, module: mod, enrolment });
+    if (isLocked(gate)) throw ApiError.forbidden(message);
+  }
+  return { lesson, user };
+}
+
+/* GET /lms/lessons/:lessonId/hls — the ticket.
+
+   Mirrors the signed-URL endpoint for MP4: an authenticated call that hands
+   back a URL and when it lapses. The URL is the playlist with a playback token
+   on it, which is what lets a native player fetch it without a header. */
+export const hlsTicket = asyncHandler(async (req, res) => {
+  const { lesson, user } = await openLessonOr403(req, {
+    message: 'You need to be enrolled to watch this',
+  });
+
+  if (lesson.video?.hls?.status !== 'ready') {
+    throw ApiError.notFound('This lesson has no encrypted stream');
+  }
+
+  const token = issuePlaybackToken({
+    lessonId: String(lesson._id),
+    userId: user?._id ? String(user._id) : null,
+  });
+
+  return ok(res, {
+    url: `${env.apiPublicUrl}/api/lms/lessons/${lesson._id}/hls/index.m3u8?t=${encodeURIComponent(token)}`,
+    expiresAt: new Date(Date.now() + env.hls.tokenTtlSeconds * 1000),
+  });
+});
+
+// GET /lms/lessons/:lessonId/hls/index.m3u8
+export const hlsPlaylist = asyncHandler(async (req, res) => {
+  const { lesson, user } = await openLessonOr403(req, {
+    message: 'You need to be enrolled to watch this',
+  });
+
+  const hls = lesson.video?.hls;
+  if (hls?.status !== 'ready' || !hls.playlistKey) {
+    throw ApiError.notFound('This lesson has no encrypted stream');
+  }
+
+  const stored = await readS3Text(hls.playlistKey);
+
+  // Bound to this viewer and this lesson, and short-lived. It is not the
+  // authorisation — the key endpoint re-checks the gate — it just stops the key
+  // URL being a bare, permanently open address.
+  // Re-issued rather than echoed: the ticket that got us here may have minutes
+  // left, and the keys this playlist points at are fetched over the whole
+  // watch. A fresh token gives the player a full window from now.
+  const token = issuePlaybackToken({
+    lessonId: String(lesson._id),
+    userId: user?._id ? String(user._id) : null,
+  });
+
+  // Every segment is presigned up front, in parallel, so the rewrite itself
+  // stays the synchronous function that hlsPackage tests. A long lesson is a
+  // few hundred signatures, which is local HMAC work and no network at all.
+  const names = [
+    ...new Set(
+      stored
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#')),
+    ),
+  ];
+  const signed = new Map(
+    await Promise.all(
+      names.map(async (name) => [
+        name,
+        await presignGet(`${hls.segmentPrefix}/${name}`, SEGMENT_URL_TTL_SECONDS),
+      ]),
+    ),
+  );
+
+  const body = resolvePlaylist(stored, {
+    keyUrl: (group) =>
+      `${env.apiPublicUrl}/api/lms/lessons/${lesson._id}/hls/key/${group}?t=${encodeURIComponent(token)}`,
+    segmentUrl: (name) => signed.get(name) ?? name,
+  });
+
+  res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+  // Every copy is viewer-specific and time-limited, so no shared cache may keep
+  // one. Without this a CDN would happily serve one learner's playlist to the
+  // next person who asked.
+  res.setHeader('Cache-Control', 'no-store, private');
+  return res.send(body);
+});
+
+// GET /lms/lessons/:lessonId/hls/key/:group
+//
+// Returns 16 raw bytes. The gate runs again here, on every request, which is
+// what makes revocation bite mid-playback.
+export const hlsKey = asyncHandler(async (req, res) => {
+  const claim = readPlaybackToken(req.query.t);
+  if (!claim || claim.lessonId !== String(req.params.lessonId)) {
+    throw ApiError.forbidden('That playback token is not valid for this lesson');
+  }
+
+  const { lesson } = await openLessonOr403(req, {
+    message: 'You need to be enrolled to watch this',
+  });
+  if (lesson.video?.hls?.status !== 'ready') {
+    throw ApiError.notFound('This lesson has no encrypted stream');
+  }
+
+  const group = Number(req.params.group);
+  const groups = Math.ceil(
+    (lesson.video.hls.segmentCount || 0) / (lesson.video.hls.rotateEvery || 1),
+  );
+  // Bounded so the endpoint cannot be walked as a key-derivation oracle for
+  // groups this lesson never had.
+  if (!Number.isInteger(group) || group < 0 || group >= groups) {
+    throw ApiError.notFound('No such key');
+  }
+
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('Cache-Control', 'no-store, private');
+  return res.end(deriveKey(String(lesson._id), group));
+});
+
+// GET /lms/lessons/:lessonId/transcript. Synced captions (L2).
+//
+// Gated like the video it belongs to. It used to return any lesson's transcript
+// to anyone signed in, and a transcript is the paid lesson in full text: the
+// words ARE the content, so handing them over unenrolled gives away the thing
+// the video was selling. It now reads the same gate as everything else, which
+// is what lets it be opened to anonymous callers for a free preview without
+// opening anything else.
+export const transcript = asyncHandler(async (req, res) => {
+  const lesson = await Lesson.findById(req.params.lessonId)
+    .select('transcript course module preview');
+  if (!lesson) throw ApiError.notFound('Lesson not found');
+
+  const [course, mod] = await Promise.all([
+    Course.findById(lesson.course),
+    Module.findById(lesson.module),
+  ]);
+
+  if (!mayBypassGate({ user: req.user, course })) {
+    const enrolment = await enrolmentFor(req.user, lesson.course);
+    const gate = gateFor({ lesson, module: mod, enrolment });
+    if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to read this');
+  }
+
   return ok(res, lesson.transcript ?? []);
 });
 
@@ -477,10 +717,17 @@ export const completeLesson = asyncHandler(async (req, res) => {
   const finished = progress.completedLessons.length >= total && total > 0;
 
   let certificate = null;
+  let programCertificates = [];
   if (finished && !enrolment.completedAt) {
     enrolment.completedAt = new Date();
     await enrolment.save();
     certificate = await issueCertificate({ user: req.user, courseId: lesson.course });
+    // A course completion can be the last step of a learning path. Issued in
+    // the same request so the learner is told once, not on a later page load.
+    programCertificates = await issueProgramCertificates({
+      user: req.user,
+      courseId: lesson.course,
+    });
   }
 
   return ok(res, {
@@ -490,6 +737,7 @@ export const completeLesson = asyncHandler(async (req, res) => {
     percent: total ? Math.round((progress.completedLessons.length / total) * 100) : 0,
     courseComplete: finished,
     certificate,
+    programCertificates,
   });
 });
 
@@ -753,6 +1001,75 @@ async function issueCertificate({ user, courseId }) {
       showCredentialId: c.showCredentialId,
     },
   });
+}
+
+/* Finishing a course can also finish a LEARNING PATH that contains it, so the
+   two are issued together rather than leaving the path certificate to be
+   noticed on some later page load.
+
+   Only published paths, and only the ones this course actually belongs to: a
+   completion cannot certify a program the learner was never working toward.
+
+   Completion is recomputed by resolveForLearner(), the same function the path
+   page renders from, so the certificate can never disagree with the progress
+   the learner is looking at. */
+async function issueProgramCertificates({ user, courseId }) {
+  const programs = await Program.find({
+    status: CONTENT_STATUS.PUBLISHED,
+    'steps.course': courseId,
+  }).lean();
+  if (!programs.length) return [];
+
+  const issued = [];
+  for (const program of programs) {
+    // Sequential rather than parallel: each iteration hits the same handful of
+    // collections, and a learner is in a small number of paths.
+    // eslint-disable-next-line no-await-in-loop
+    const { complete } = await resolveForLearner(program, user._id);
+    if (!complete) continue;
+
+    // eslint-disable-next-line no-await-in-loop
+    const existing = await Certificate.findOne({ user: user._id, program: program._id });
+    if (existing) continue;
+
+    const c = { ...PROGRAM_CERTIFICATE_DEFAULTS, ...(program.certificate ?? {}) };
+    if (c.enabled === false) continue;
+
+    // Hours across every course in the path, so the document says what the
+    // whole program was worth rather than what its last course was.
+    // eslint-disable-next-line no-await-in-loop
+    const lessons = await Lesson.find({ course: { $in: program.steps.map((s) => s.course) } })
+      .select('minutes')
+      .lean();
+    const hours = Math.round(lessons.reduce((sum, l) => sum + (l.minutes || 0), 0) / 60);
+
+    // eslint-disable-next-line no-await-in-loop
+    const cert = await Certificate.create({
+      user: user._id,
+      program: program._id,
+      kind: 'path',
+      credentialId: `GP-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`,
+      recipientName: user.name,
+      title: program.title,
+      hours,
+      issuerName: c.issuerName || 'Government Procurement',
+      signatoryName: c.signatoryName || '',
+      signatoryRole: c.signatoryRole || '',
+      design: {
+        heading: c.heading,
+        preamble: c.preamble,
+        statement: c.statement,
+        footnote: c.footnote,
+        accent: c.accent,
+        background: c.background,
+        textColor: c.textColor,
+        showHours: c.showHours,
+        showCredentialId: c.showCredentialId,
+      },
+    });
+    issued.push(cert);
+  }
+  return issued;
 }
 
 export const myCertificates = asyncHandler(async (req, res) => {

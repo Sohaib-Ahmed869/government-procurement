@@ -4,10 +4,6 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.insights[data-audience='win'] .insights-pill__menu {
-  background: var(--band-surface);
-}
-
 .insights__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
@@ -21,17 +17,30 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  /* Clears the page-heading block above it. With no top margin the pill sat
+     hard against the dark band's bottom edge, so the two read as one control
+     attached to the heading rather than the start of the listing. */
+  margin-top: clamp(20px, 3vw, 32px);
   margin-bottom: 24px;
 }
 
 .insights-pill {
   position: relative;
+  /* The trigger and the menu are one control and should read as one width. The
+     menu carries a 190px floor and the button sized itself to its label, so the
+     open state was a narrow pill sitting on a wider panel. Setting the floor
+     here makes both inherit it. */
+  min-width: 190px;
 }
 
 .insights-pill__button {
   display: inline-flex;
   align-items: center;
+  /* Label left, chevron hard right — the same edges the options below line up
+     to, rather than the chevron floating beside a short label. */
+  justify-content: space-between;
   gap: 10px;
+  width: 100%;
   padding: 8px 16px;
   font: inherit;
   font-size: 13px;
@@ -68,15 +77,27 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
+  right: 0;
   z-index: 20;
-  min-width: 190px;
+  /* Matches the trigger exactly now that .insights-pill carries the floor. */
+  min-width: 100%;
   margin: 0;
   padding: 6px;
   list-style: none;
-  background: var(--gp-green-800);
+  /* --band-surface on both segments, which is the paper step above the section
+     ground: light green (#e8efe4) on Award, light grey (#eeeeec) on Win.
+
+     It used to be a hardcoded --gp-green-800 with a Win-only override back to
+     --band-surface. That was written when this section was dark; once it moved
+     to paper the override kept Win right and left Award as a slab of dark green
+     holding --band-muted text, which on a light band is dark — a dark menu with
+     dark options on it. One token, no override, no segment named here. */
+  background: var(--band-surface);
   border: 1px solid var(--band-line);
   border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  /* 0.12, not 0.35. The heavier shadow was carrying a dark menu off a dark
+     band; under a light menu on paper it reads as a smudge. */
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
 .insights-pill__option {

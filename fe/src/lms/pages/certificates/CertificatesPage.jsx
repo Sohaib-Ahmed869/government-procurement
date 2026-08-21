@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import CertificateCard from '../../components/certificates/CertificateCard.jsx';
 import { useCertificates } from '../../hooks/useCertificates.js';
-import { usePaths } from '../../hooks/usePaths.js';
+import { usePaths } from '../../hooks/usePrograms.js';
 
 // Earned certificates, plus the ones in reach (L4). Showing what is still
 // outstanding is the point. A page that only lists what you already have gives
@@ -36,7 +36,7 @@ export default function CertificatesPage() {
       ) : (
         <div className="lms-cert-grid">
           {certificates.map((c) => (
-            <CertificateCard key={c.id} certificate={c} />
+            <CertificateCard key={c._id ?? c.id} certificate={c} />
           ))}
         </div>
       )}
@@ -51,15 +51,20 @@ export default function CertificatesPage() {
           </div>
           <div className="lms-list">
             {inProgress.map((p) => (
-              <Link key={p.id} to={`/learn/paths/${p.slug}`} className="lms-list__item">
+              <Link key={p._id ?? p.slug} to={`/learn/paths/${p.slug}`} className="lms-list__item">
                 <span className="lms-list__icon"><LmsIcon name="award" /></span>
                 <span className="lms-list__body">
-                  <span className="lms-list__title">{p.certificateTitle}</span>
+                  {/* The award's name comes from the path's stored design;
+                      `certificateTitle` was the placeholder's field and is not
+                      on the API record. */}
+                  <span className="lms-list__title">
+                    {p.certificate?.heading || p.title}
+                  </span>
                   <span className="lms-list__meta">
-                    {p.doneCount} of {p.steps.length} courses complete
+                    {p.doneCount ?? 0} of {p.steps?.length ?? 0} courses complete
                   </span>
                 </span>
-                <span className="lms-list__trail">{p.percent}%</span>
+                <span className="lms-list__trail">{p.percent ?? 0}%</span>
               </Link>
             ))}
           </div>

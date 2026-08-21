@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import ServiceGrid from '../../serviceOffering/components/ServiceGrid.jsx';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // The homepage's summary of the Service Offering page — the same six services,
 // under the heading the brief fixes for each segment, with the page itself one
@@ -43,7 +44,7 @@ export default function HomeServiceOffering() {
         <ServiceGrid audience={audience} compact />
 
         <Link className="hm-arrow" to="/service-offering">
-          See the full service offering <span aria-hidden="true">→</span>
+          See the full service offering <Arrow />
         </Link>
       </div>
     </section>

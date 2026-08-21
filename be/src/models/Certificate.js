@@ -10,6 +10,9 @@ const certificateSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', index: true },
+    // A learning path certificate names a Program instead. Exactly one of
+    // `course` / `program` is set, which is what `kind` below says in words.
+    program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program', index: true },
 
     // Public identifier printed on the certificate and used by /verify.
     // Unique and indexed because verification looks up by it.
@@ -52,7 +55,21 @@ const certificateSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-certificateSchema.index({ user: 1, course: 1 }, { unique: true, sparse: true });
+// One certificate per learner per thing certified.
+//
+// PARTIAL, not sparse. A compound sparse index still indexes a document when
+// ANY of its keys is present, and `user` always is: two path certificates for
+// the same learner would both index as {user, course: null} and the second
+// would fail on a duplicate key. `$type` rather than `$exists` because an
+// explicit null exists.
+certificateSchema.index(
+  { user: 1, course: 1 },
+  { unique: true, name: 'user_course_unique', partialFilterExpression: { course: { $type: 'objectId' } } },
+);
+certificateSchema.index(
+  { user: 1, program: 1 },
+  { unique: true, name: 'user_program_unique', partialFilterExpression: { program: { $type: 'objectId' } } },
+);
 
 // What /verify returns to an unauthenticated caller. Deliberately minimal,
 // enough to confirm the claim, nothing more about the person.

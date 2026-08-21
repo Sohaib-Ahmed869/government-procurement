@@ -36,6 +36,30 @@ const TENDER_SITES = [
     createAccountUrl: 'https://www.tenders.tas.gov.au/Account/register',
     order: 30,
   },
+
+  // B3 — one entry in the Local Government group, so the section renders.
+  //
+  // The page hides that whole band while it holds nothing (`local.length > 0`
+  // in TenderPortals.jsx), so until there is an entry here there is nothing to
+  // look at and nothing to judge the layout by.
+  //
+  // THIS IS AN EXAMPLE, NOT A CHECKED LISTING. It carries a note that prints on
+  // the page saying so, on the same reasoning as the Templates preview set: a
+  // sample that looks identical to real content is one that ships by accident.
+  // Replace it, or delete it, from Tenders in the CMS.
+  //
+  // `upcomingTendersUrl` and `createAccountUrl` are left out rather than
+  // guessed. The page simply doesn't draw a button it has no address for, so
+  // the entry also shows what a portal with fewer than three destinations looks
+  // like. `loginRequired` stays off — that indicator is South Australia only.
+  {
+    name: 'VendorPanel Marketplace',
+    subtitle: 'Local Government: councils, national',
+    group: 'local',
+    openTendersUrl: 'https://marketplace.vendorpanel.com.au/',
+    note: 'EXAMPLE ENTRY. Confirm the link, add the councils you want listed, then clear this note (Tenders, edit, Note).',
+    order: 100,
+  },
 ];
 
 async function run() {

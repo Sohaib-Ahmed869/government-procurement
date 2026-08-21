@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useLocation, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import LessonBody from '../../components/lesson/LessonBody.jsx';
 import LessonNav from '../../components/lesson/LessonNav.jsx';
@@ -7,6 +7,7 @@ import ResourceList from '../../components/lesson/ResourceList.jsx';
 import NoteEditor from '../../components/progress/NoteEditor.jsx';
 import BookmarkButton from '../../components/progress/BookmarkButton.jsx';
 import LessonStates from '../../components/lesson/LessonStates.jsx';
+import PreviewGate from '../../components/lesson/PreviewGate.jsx';
 import { useLesson } from '../../hooks/useLesson.js';
 import { lessonHref } from '../../utils/lessonHref.js';
 
@@ -15,7 +16,6 @@ import { lessonHref } from '../../utils/lessonHref.js';
 // rail and the exit route are already on screen.
 export default function LessonPage() {
   const { slug, lessonId } = useParams();
-  const { pathname } = useLocation();
   const { data, status, gate, error, complete, markComplete, reload } = useLesson(slug, lessonId);
 
   const [tab, setTab] = useState('resources'); // resources | notes
@@ -31,7 +31,7 @@ export default function LessonPage() {
     );
   }
 
-  const { lesson, module: mod, index, total, prev, next, body, resources, enrolled } = data;
+  const { course, lesson, module: mod, index, total, prev, next, body, resources, enrolled } = data;
 
   // This route renders TEXT lessons. A video, an embed, a document or a quiz
   // has its own screen, and landing here would tell the learner their video
@@ -42,10 +42,12 @@ export default function LessonPage() {
   // kind was changed, a link someone pasted, a stale tab. Cheaper than leaving
   // any of those on a page that quietly shows the wrong thing.
   //
-  // The preview route is exempt: it renders here on purpose, because it is the
-  // one in-course screen that works signed out.
-  const isPreviewRoute = pathname.includes(`/preview/${lessonId}`);
-  if (!isPreviewRoute && lesson.kind && lesson.kind !== 'text') {
+  // The preview route used to be exempt, back when this was the only in-course
+  // screen that worked signed out — so a preview video rendered here and was
+  // told it had no written content. The preview family now has a screen per
+  // kind, so the redirect applies there too and lessonHref() sends it to the
+  // preview URL rather than the enrolled one.
+  if (lesson.kind && lesson.kind !== 'text') {
     return <Navigate to={lessonHref(slug, lesson)} replace />;
   }
 
@@ -64,7 +66,9 @@ export default function LessonPage() {
               Free preview
             </span>
           ) : null}
-          <BookmarkButton slug={slug} lessonId={lesson.id} />
+          {/* A bookmark is a place in a course you are working through. There
+              is nothing to come back to before you have the course. */}
+          {enrolled ? <BookmarkButton slug={slug} lessonId={lesson.id} /> : null}
         </div>
       </div>
 
@@ -78,12 +82,17 @@ export default function LessonPage() {
         )}
       </article>
 
+      {/* Directly under the body, where somebody who has just finished reading
+          the sample actually is. */}
+      <PreviewGate course={course} lesson={lesson} enrolled={enrolled} />
+
       <LessonNav
         slug={slug}
         prev={prev}
         next={next}
         complete={complete}
         onToggleComplete={markComplete}
+        enrolled={enrolled}
       />
 
       {/* Resources and notes sit under the lesson rather than in a sidebar, so
@@ -100,20 +109,22 @@ export default function LessonPage() {
             <LmsIcon name="download" />
             Resources
           </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === 'notes'}
-            className={`lms-tab${tab === 'notes' ? ' is-active' : ''}`}
-            onClick={() => setTab('notes')}
-          >
-            <LmsIcon name="note" />
-            My notes
-          </button>
+          {enrolled ? (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === 'notes'}
+              className={`lms-tab${tab === 'notes' ? ' is-active' : ''}`}
+              onClick={() => setTab('notes')}
+            >
+              <LmsIcon name="note" />
+              My notes
+            </button>
+          ) : null}
         </div>
 
         <div className="lms-tabs__panel">
-          {tab === 'resources' ? (
+          {tab === 'resources' || !enrolled ? (
             <ResourceList resources={resources} enrolled={enrolled} />
           ) : (
             <NoteEditor slug={slug} lessonId={lesson.id} />

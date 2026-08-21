@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { protect, optionalAuth } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
-import { loadCourse, ownsCourse } from '../../middleware/ownership.js';
+import { loadCourse, ownsCourse, loadProgram, ownsProgram } from '../../middleware/ownership.js';
 import { uploadImage } from '../../middleware/upload.js';
 import { ADMIN_ONLY, CONTENT_ROLES, TEACHING_ROLES } from '../../constants/roles.js';
 import * as authoring from './authoring.controller.js';
@@ -9,6 +9,7 @@ import * as learning from './learning.controller.js';
 import * as analytics from './analytics.controller.js';
 import * as discussions from './discussions.controller.js';
 import * as reviews from './reviews.controller.js';
+import * as programs from './programs.controller.js';
 
 const router = Router();
 
@@ -30,10 +31,23 @@ router.get('/progress', protect, learning.myProgress);
 router.post('/progress/lessons/:lessonId/complete', protect, learning.completeLesson);
 router.patch('/progress/lessons/:lessonId/position', protect, learning.setPosition);
 
-router.get('/lessons/:lessonId/video-url', protect, learning.videoUrl);
-router.get('/lessons/:lessonId/document-url', protect, learning.documentUrl);
-router.get('/lessons/:lessonId/resources/:resourceId/url', protect, learning.resourceUrl);
-router.get('/lessons/:lessonId/transcript', protect, learning.transcript);
+// Lesson media is optional-auth, not protected (LMS 9.0b). A free preview has
+// to play for somebody who has not signed up, or it is not a preview. The
+// enrolment check has NOT moved: every one of these still runs gateFor(), which
+// returns `preview` only for a lesson the instructor flagged as one and
+// `locked-enrolment` for the rest, signed in or not.
+router.get('/lessons/:lessonId/video-url', optionalAuth, learning.videoUrl);
+router.get('/lessons/:lessonId/document-url', optionalAuth, learning.documentUrl);
+router.get('/lessons/:lessonId/resources/:resourceId/url', optionalAuth, learning.resourceUrl);
+router.get('/lessons/:lessonId/transcript', optionalAuth, learning.transcript);
+
+// Encrypted HLS (LMS 3.0). Optional-auth for the same reason the rest of the
+// lesson media is: a free preview has to play without an account. Both run the
+// enrolment gate, and the key endpoint runs it again on every request, so
+// revoking access stops playback rather than waiting for a page load.
+router.get('/lessons/:lessonId/hls', optionalAuth, learning.hlsTicket);
+router.get('/lessons/:lessonId/hls/index.m3u8', optionalAuth, learning.hlsPlaylist);
+router.get('/lessons/:lessonId/hls/key/:group', optionalAuth, learning.hlsKey);
 
 // Declared before /:lessonId so "attempts" isn't read as a lesson id.
 router.get('/quizzes/attempts', protect, learning.allMyAttempts);
@@ -59,6 +73,13 @@ router.get('/reviews/mine', protect, reviews.myReviews);
 router.post('/reviews', protect, reviews.saveReview);
 router.delete('/reviews/:id', protect, reviews.removeReview);
 
+/* ---- Learning paths (LMS 8.0) ---------------------------------------------
+   optionalAuth for the same reason the course outline uses it: the paths are a
+   shop window, and a signed-in learner additionally gets every step resolved
+   against courses they have already finished. */
+router.get('/programs', optionalAuth, programs.listPrograms);
+router.get('/programs/:slug', optionalAuth, programs.getProgramBySlug);
+
 router.get('/certificates', protect, learning.myCertificates);
 router.get('/certificates/:id', protect, learning.getCertificate);
 
@@ -68,6 +89,16 @@ router.get('/certificates/:id', protect, learning.getCertificate);
    second, any instructor could edit anyone's course by changing the id. */
 const teach = [protect, authorize(TEACHING_ROLES)];
 const owns = [...teach, loadCourse, ownsCourse];
+// The same pair for a learning path: an instructor may only touch their own.
+const ownsPath = [...teach, loadProgram, ownsProgram];
+
+router.get('/authoring/programs', ...teach, programs.myPrograms);
+router.post('/authoring/programs', ...teach, programs.createProgram);
+router.get('/authoring/programs/:programId', ...ownsPath, programs.getProgram);
+router.patch('/authoring/programs/:programId', ...ownsPath, programs.updateProgram);
+router.delete('/authoring/programs/:programId', ...ownsPath, programs.deleteProgram);
+router.post('/authoring/programs/:programId/submit', ...ownsPath, programs.submitProgramForReview);
+router.post('/authoring/programs/:programId/withdraw', ...ownsPath, programs.withdrawProgram);
 
 router.get('/authoring/courses', ...teach, authoring.myCourses);
 router.post('/authoring/courses', ...teach, authoring.createCourse);
@@ -76,6 +107,9 @@ router.post('/authoring/courses', ...teach, authoring.createCourse);
 // instructor's own courses; the roster additionally goes through `owns`, so a
 // course id from somebody else's course reads as not found.
 router.get('/authoring/enrollments', ...teach, authoring.enrolmentSummary);
+
+// The instructor's own profile rollup: courses, reach and rating.
+router.get('/authoring/profile', ...teach, authoring.instructorProfileSummary);
 
 // Cohort analytics. Scoped to the instructor's own courses by what each query
 // loads; the per-quiz route takes a LESSON id, so it checks ownership itself
@@ -132,6 +166,16 @@ const admin = [protect, authorize(ADMIN_ONLY)];
 
 router.get('/review/queue', ...staffRead, authoring.reviewQueue);
 router.get('/review/courses', ...staffRead, authoring.allCourses);
+
+// Learning paths go through the same queue as courses, and these MUST be
+// declared before /review/:courseId or "programs" is read as a course id.
+router.get('/review/programs', ...staffRead, programs.allPrograms);
+router.get('/review/programs/:programId', ...staffRead, programs.programReviewDetail);
+router.post('/review/programs/:programId/approve', ...admin, programs.approveProgram);
+router.post('/review/programs/:programId/reject', ...admin, programs.rejectProgram);
+router.post('/review/programs/:programId/decline', ...admin, programs.declineProgram);
+router.post('/review/programs/:programId/unpublish', ...admin, programs.unpublishProgram);
+
 // Declared before /:courseId so the static segments aren't swallowed by it.
 router.get('/review/:courseId', ...staffRead, authoring.reviewDetail);
 

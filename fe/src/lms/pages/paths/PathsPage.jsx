@@ -1,10 +1,14 @@
 import PathCard from '../../components/paths/PathCard.jsx';
-import { usePaths } from '../../hooks/usePaths.js';
+import { usePaths } from '../../hooks/usePrograms.js';
 
 // Learning paths (L4): programs of courses in a required order, each ending in
 // its own certificate.
+//
+// Reads /lms/programs, which is every path an admin has approved. It used to
+// read hooks/usePaths.js — a placeholder over three hardcoded paths — so a real
+// path an instructor built and an admin published never appeared here at all.
 export default function PathsPage() {
-  const { paths, status } = usePaths();
+  const { paths, status, reload } = usePaths();
 
   return (
     <div>
@@ -30,12 +34,19 @@ export default function PathsPage() {
               </div>
             </div>
           ))
+        ) : status === 'error' ? (
+          <div className="lms-card lms-course-grid__empty">
+            <p className="lms-empty">
+              Couldn’t load the learning paths.{' '}
+              <button type="button" className="lms-linkbtn" onClick={reload}>Try again</button>
+            </p>
+          </div>
         ) : paths.length === 0 ? (
           <div className="lms-card lms-course-grid__empty">
             <p className="lms-empty">No learning paths are published yet.</p>
           </div>
         ) : (
-          paths.map((path) => <PathCard key={path.id} path={path} />)
+          paths.map((path) => <PathCard key={path._id ?? path.slug} path={path} />)
         )}
       </div>
     </div>

@@ -54,14 +54,34 @@
 /* --- one prompt ----------------------------------------------------------- */
 
 .pl-card {
-  padding: 20px 22px 18px;
+  display: flex;
+  flex-direction: column;
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-line);
   border-radius: 14px;
+  overflow: hidden;
   transition: var(--gp-fade), border-color 160ms var(--gp-ease);
 }
 
 .pl-card:hover { border-color: var(--gp-brand); }
+/* The card's own outline when the button inside it is focused, so a keyboard
+   visitor sees the CARD highlighted rather than a rectangle inside it. */
+.pl-card:focus-within { border-color: var(--gp-brand); }
+
+/* The clickable body. A button, so it is reset to look like the card it fills
+   rather than like a control. */
+.pl-card__open {
+  display: block;
+  width: 100%;
+  padding: 18px 20px 14px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pl-card__open:focus-visible { outline: none; }
 
 .pl-card__head {
   display: flex;
@@ -79,15 +99,15 @@
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: -0.01em;
+  min-width: 0;
 }
 
 .pl-tool {
   flex: none;
   padding: 4px 10px;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   border-radius: 999px;
   white-space: nowrap;
   color: var(--gp-paper);
@@ -102,29 +122,21 @@
 .pl-tool--claude  { background: var(--gp-accent-ink); }
 .pl-tool--gemini  { background: var(--gp-brand-alt); }
 
-/* The prompt itself. Monospace and pre-wrap because a prompt's line breaks and
-   placeholder markers are part of it — a proportional paragraph hides both, and
-   what is copied would stop matching what is shown. */
-.pl-card__body {
-  margin: 14px 0 0;
-  padding: 14px 16px;
-  max-height: 320px;
-  overflow: auto;
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  color: var(--gp-ink);
-  background: var(--gp-paper);
-  border: 1px solid var(--gp-line);
-  border-radius: 10px;
-  transition: var(--gp-fade);
+/* Two lines of the prompt's opening, clamped. Enough to tell two prompts apart
+   without turning the list back into pages of monospace. Proportional, not
+   monospace: this is a description of the prompt, and the prompt's own
+   formatting only matters where the whole thing is shown. */
+.pl-card__teaser {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--gp-muted);
 }
 
-/* Guidance about the prompt, never part of it. Visually separated from the
-   block above for the same reason it is excluded from the clipboard: nobody
-   should paste our commentary into the tool. */
 .pl-card__notes {
   margin: 12px 0 0;
   font-size: 13.5px;
@@ -136,6 +148,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 0 20px 16px;
   margin-top: 14px;
 }
 
@@ -195,3 +208,13 @@
     flex-wrap: wrap;
   }
 }
+
+/* Says what the card does. Not a button — the card itself is the control, and a
+   second focus stop for the same action is one tab too many. */
+.pl-card__view {
+  margin-right: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+}
+.pl-card:hover .pl-card__view { text-decoration: underline; }

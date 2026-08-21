@@ -13,12 +13,18 @@ export const categoriesApi = createResource('categories');
 
 export const coursesApi = {
   ...createResource('courses'),
+  // The cover image is all a course record carries now. Videos, PDFs and
+  // YouTube links are lesson content, authored in the LMS builder and gated per
+  // lesson — see be/src/modules/courses/courses.routes.js.
   uploadImage: (id, file) => api.upload(`/courses/${id}/image`, file),
-  // Course materials attached directly to a course: uploaded video/pdf/image,
-  // or a pasted YouTube link.
-  addMedia: (id, file, fields) => api.upload(`/courses/${id}/media`, file, { fields }),
-  addMediaLink: (id, body) => api.post(`/courses/${id}/media/link`, body),
-  removeMedia: (id, mediaId) => api.del(`/courses/${id}/media/${mediaId}`),
+};
+
+// Course bundles: several published courses sold together for less than their
+// total. `listPrice`, `saving` and `savingPercent` come back computed from the
+// courses' current prices — they are never stored, so they cannot go stale.
+export const bundlesApi = {
+  ...createResource('bundles'),
+  uploadImage: (id, file) => api.upload(`/bundles/${id}/image`, file),
 };
 
 export const careersApi = {

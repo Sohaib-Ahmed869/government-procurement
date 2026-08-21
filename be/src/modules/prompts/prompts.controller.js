@@ -62,6 +62,18 @@ export const list = asyncHandler(async (req, res) => {
   return ok(res, items);
 });
 
+// GET /prompts/:id. Public for a published prompt, so the library's own detail
+// page can be opened, linked and shared. Staff additionally see drafts, which is
+// the same rule `list` above follows.
+export const getById = asyncHandler(async (req, res) => {
+  const prompt = await Prompt.findById(req.params.id);
+  if (!prompt) throw ApiError.notFound('Prompt not found');
+  if (!req.user && prompt.status !== CONTENT_STATUS.PUBLISHED) {
+    throw ApiError.notFound('Prompt not found');
+  }
+  return ok(res, prompt);
+});
+
 export const create = asyncHandler(async (req, res) => {
   validate(req.body);
 

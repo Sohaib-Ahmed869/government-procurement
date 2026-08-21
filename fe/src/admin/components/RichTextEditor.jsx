@@ -10,8 +10,17 @@ import './RichTextEditor.css';
 //
 // Props:
 //   value, onChange, placeholder
-//   onStats({ words, minutes }) — optional, fired as the content changes.
-export default function RichTextEditor({ value = '', onChange, placeholder = 'Start writing…', onStats }) {
+//   onStats({ words, minutes }) - optional, fired as the content changes.
+//   allowImages - inline upload goes through the media API, which is staff-only.
+//     Off for the instructor's course builder, where the button would offer
+//     everyone a 403.
+export default function RichTextEditor({
+  value = '',
+  onChange,
+  placeholder = 'Start writing…',
+  onStats,
+  allowImages = true,
+}) {
   const ref = useRef(null);
   const fileRef = useRef(null);
   const savedRange = useRef(null);
@@ -167,11 +176,15 @@ export default function RichTextEditor({ value = '', onChange, placeholder = 'St
         <Btn title="Numbered list" isActive={active.ol} onClick={() => exec('insertOrderedList')}>1.</Btn>
         <span className="rte__sep" aria-hidden="true" />
         <Btn title="Insert link" onClick={insertLink}>🔗</Btn>
-        <Btn title="Insert image" onClick={pickImage}>
-          {uploading ? '…' : '🖼'}
-        </Btn>
+        {allowImages ? (
+          <Btn title="Insert image" onClick={pickImage}>
+            {uploading ? '…' : '🖼'}
+          </Btn>
+        ) : null}
         <Btn title="Clear formatting" onClick={() => exec('removeFormat')} wide>Clear</Btn>
-        <input ref={fileRef} type="file" accept="image/*" hidden onChange={onImagePicked} />
+        {allowImages ? (
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onImagePicked} />
+        ) : null}
       </div>
 
       <div

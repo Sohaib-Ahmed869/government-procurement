@@ -4,6 +4,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import './QandABand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // Answered questions from the Q&A, most recent first.
 //
@@ -67,7 +68,7 @@ export default function QandABand() {
         </ul>
 
         <Link className="hm-arrow" to="/q-and-a/submit">
-          Ask a question <span aria-hidden="true">→</span>
+          Ask a question <Arrow />
         </Link>
       </div>
     </section>

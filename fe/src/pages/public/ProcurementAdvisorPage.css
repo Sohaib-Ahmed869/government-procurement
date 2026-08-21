@@ -42,16 +42,12 @@
   color: #fff;
 }
 
-.pa-page__lede {
-  max-width: 62ch;
-  margin: 0;
-  font-size: clamp(15px, 1.3vw, 18px);
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.74);
-}
-
 .pa-page__body {
-  padding: clamp(36px, 6vw, 76px) 0 clamp(56px, 9vw, 110px);
+  /* Tight. With the lede and the launch-jurisdiction note both gone there is
+     nothing between the page title and the picker, so 76px above it and 110px
+     below left the page mostly empty. */
+  /* Equal top and bottom. One value, so they cannot drift apart again. */
+  padding: clamp(20px, 2.5vw, 32px) 0;
 }
 
 .pa-note {
@@ -90,4 +86,34 @@
     font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: var(--gp-page-title-phone);
   }
+}
+
+/* The disclaimer above the picker. Quiet — it is a statement of fact about how
+   the tool works, not a warning, so it is set as a note rather than as an
+   alert. */
+.pa-disclaimer {
+  max-width: 78ch;
+  margin: 0 0 clamp(20px, 2.5vw, 30px);
+  padding: 14px 18px;
+  border: 1px solid var(--gp-line);
+  border-radius: 12px;
+  background: var(--gp-paper-alt);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+/* Black on Win, green on Award — set explicitly rather than through
+   --gp-accent-ink, which is a deep clay on Award and a deep mint on Win. That
+   token is tuned for contrast on paper, not for carrying the segment's own
+   colour, so it gave the link the wrong hue in both. */
+.pa-disclaimer a {
+  color: var(--gp-ink);
+  font-weight: 600;
+  text-underline-offset: 2px;
+  transition: var(--gp-fade);
+}
+
+.pa-page[data-audience='award'] .pa-disclaimer a {
+  color: var(--gp-green-600);
 }

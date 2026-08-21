@@ -4,7 +4,14 @@
      nav list's inset (gutter minus cell padding, so labels line up rather than
      boxes), and the cell padding itself. Stepped down together at the
      breakpoints below. */
-  --nav-gutter: 40px;
+  /* 24px at every width, not 40px stepping down to 24px below 1440.
+     Above 1441px the page is laid out at exactly 1440px and `zoom`-scaled to
+     fill the screen (see index.css), but MEDIA QUERIES still evaluate against
+     the real viewport — so on a 4K screen the `max-width: 1440px` step-down
+     stopped applying while the layout stayed 1440px wide, the 40px gutter came
+     back, and the ribbon no longer fitted: "Templates" dropped to a second row.
+     One value removes the mismatch. */
+  --nav-gutter: 24px;
   --nav-cell-pad: 16px;
 
   /* Segment colours are the only thing that changes between the two variants. */
@@ -77,7 +84,10 @@
   max-width: var(--gp-shell-bar);
   min-height: 60px;
   margin: 0 auto;
-  padding: 0 var(--nav-gutter);
+  /* A little air above the brand row. The logo sat hard against the top edge of
+     the viewport, which read as the page having been cropped rather than as a
+     bar. Top only: the nav row below supplies the space underneath. */
+  padding: 10px var(--nav-gutter) 6px;
 }
 
 /* --- brand --- */
@@ -462,9 +472,20 @@
 .site-header__toggle-row {
   display: none;
   justify-content: center;
-  /* Sits well clear of the bar above; the gap below it comes from the page
-     section's own top padding, which is deliberately much tighter. */
-  padding: 80px 24px 0;
+  align-items: center;
+  /* --gp-head-bg, not --gp-brand: this row floats over the top of the page's
+     FIRST section, which on almost every page is the dark page-heading block
+     painted in exactly this token. Matching it means the two read as one block
+     instead of showing a tonal seam where the row ends. Transparent is not an
+     option either — that is what let a light page's paper show through as a
+     white band above the pills. */
+  background: var(--gp-head-bg);
+  /* Height, not padding, and the SAME variable the page uses to clear it. The
+     two were 87px and 90px, and the 3px of difference showed as a hairline of
+     the section behind. Tied together they cannot drift. */
+  height: var(--mobile-toggle-space, 90px);
+  box-sizing: border-box;
+  padding: 0 24px;
 }
 
 /* Belongs to the bar, not the menu — so it goes away while the menu is open,
@@ -598,7 +619,18 @@
   height: clamp(24px, 4.2vh, 36px);
 }
 
-/* Staggered reveal of the menu items when the panel opens. */
+/* Staggered reveal of the menu items when the panel opens.
+
+   Driven by --i, set on each <li> from its index in Header.jsx. It used to be
+   thirteen items against ten hand-written :nth-child rules, so the last three
+   fell through to a 0s delay: they finished before the staggered ones had
+   started and read as already being there when the panel opened. Indexing the
+   items means the stagger cannot fall behind the length of the menu again.
+
+   Capped at the twelfth step. Past roughly 0.7s a menu stops looking like it is
+   arriving and starts looking like it is loading, and a nav long enough to hit
+   the cap is one where the last item should not be waiting on the other
+   fourteen. */
 @media (prefers-reduced-motion: no-preference) {
   .site-header__mobile-list li {
     opacity: 0;
@@ -606,42 +638,16 @@
     transition:
       opacity 0.4s ease,
       transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Closing runs in one movement rather than unwinding item by item: the
+       panel is on its way out, and a reversed stagger only delays it. The
+       .is-open rule below is more specific, so it still wins on the way in. */
+    transition-delay: 0s;
   }
 
   .site-header__mobile.is-open .site-header__mobile-list li {
     opacity: 1;
     transform: none;
-  }
-
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(1) {
-    transition-delay: 0.1s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(2) {
-    transition-delay: 0.15s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(3) {
-    transition-delay: 0.2s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(4) {
-    transition-delay: 0.25s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(5) {
-    transition-delay: 0.3s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(6) {
-    transition-delay: 0.35s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(7) {
-    transition-delay: 0.4s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(8) {
-    transition-delay: 0.45s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(9) {
-    transition-delay: 0.5s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(10) {
-    transition-delay: 0.55s;
+    transition-delay: calc(0.1s + min(var(--i, 0), 12) * 0.05s);
   }
 }
 
@@ -650,12 +656,6 @@
    stages to keep brand + nav + actions on one line. What's left is a gentle
    step-down of the shared control metrics and the container padding, driven
    through the variables so the toggle and the CTA shrink together. --- */
-@media (max-width: 1440px) {
-  .site-header {
-    --nav-gutter: 24px;
-  }
-}
-
 @media (max-width: 1105px) {
   .site-header {
     --control-pad-x: 14px;
@@ -678,8 +678,31 @@
   }
 }
 
-/* --- mobile: swap the horizontal nav for the hamburger menu --- */
-@media (max-width: 860px) {
+/* --- very wide screens ---
+   tokens.css narrows --gp-shell-bar to 1280px above 2561px and 1220px above
+   3201px. That narrowing is for PROSE: once the page is zoomed 2.5x, a full
+   1440px measure is an uncomfortably long line to read.
+
+   The header is chrome, not prose. The ribbon needs about 1266px of cells, so
+   at 1220px it wrapped and "Templates" dropped to a second row on a 4K screen —
+   while every width from 1441px up lays the row out identically at 1440px.
+   Redefined on the header itself, so the top bar and the nav row stay aligned
+   with each other while the page's text columns keep their narrower measure. */
+@media (min-width: 2561px) {
+  .site-header {
+    --gp-shell-bar: 1440px;
+  }
+}
+
+/* --- mobile: swap the horizontal nav for the hamburger menu ---
+   1300px, not 860px. The ribbon carries thirteen items and stops fitting on one
+   line at 1280px (measured); below that it silently wrapped to a second row and
+   the hamburger was still 400px away. The rule is now "one line or the burger",
+   so the swap happens at the width where the line actually breaks.
+
+   --mobile-toggle-space in index.css keys off the same width, so page content
+   keeps clearing the toggle row that appears here. */
+@media (max-width: 1300px) {
   /* Mobile only: the audience toggle sits in its own row below the bar, painted
      as an overlay. Once scrolled it drops away, so the pinned bar stays a single
      slim row rather than leaving pills floating over the page. */

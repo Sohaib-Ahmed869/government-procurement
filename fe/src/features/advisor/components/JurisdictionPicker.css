@@ -15,7 +15,11 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(16px, 2vw, 26px);
-  margin: 0 0 clamp(28px, 4vw, 44px);
+  /* No trailing margin. This used to hold the picker off the launch-jurisdiction
+     note beneath it; that note has gone, so the margin was stacking on the
+     section's own bottom padding and leaving twice as much space below the
+     cards as above them. */
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -71,6 +75,11 @@
 }
 
 .pa-card__go {
+  /* inline-flex with a gap, so the word and the arrow share a baseline instead
+     of the arrow hanging off the end of a text run. */
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin-top: 16px;
   font-size: 14px;
   font-weight: 600;
@@ -78,11 +87,25 @@
   transition: var(--gp-fade);
 }
 
+.pa-card__arrow {
+  /* The shared arrow sizes itself in `em`; the label here is 14px and this one
+     was drawn at 16, so it is pinned rather than left to track the text. */
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transition: transform 0.16s var(--gp-ease);
+}
+
+.pa-card.is-live:hover .pa-card__arrow { transform: translateX(3px); }
+
+/* A jurisdiction with no pack yet. Named, but plainly not a link: no accent on
+   the tier, and the status reads as the fact it is. */
+.pa-card--soon .pa-card__code { color: var(--gp-muted); }
+
 .pa-card__code {
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--gp-accent-ink);
 }
 

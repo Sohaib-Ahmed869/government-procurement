@@ -3,6 +3,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import photo from '../../../assets/images/MainPictureHomepage.png';
 import './FounderQuote.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // The team band, carried on the founder's own words.
 //
@@ -43,7 +44,7 @@ export default function FounderQuote() {
             </p>
 
             <Link className="hm-arrow" to="/our-team">
-              Meet the team <span aria-hidden="true">→</span>
+              Meet the team <Arrow />
             </Link>
           </div>
 

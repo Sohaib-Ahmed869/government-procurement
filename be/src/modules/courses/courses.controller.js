@@ -14,8 +14,8 @@ import {
 import { STAFF_ROLES } from '../../constants/roles.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
-import { parseYouTubeId } from '../../utils/youtube.js';
-import { Course } from '../../models/Course.js';
+import { Course, UNSUBMITTED_INSTRUCTOR_DRAFT } from '../../models/Course.js';
+import { sanitizeRichTextFields } from '../../utils/richText.js';
 
 // Homepage slots, per resource type. The "Unlock your potential" section renders
 // 4 course cards and 2 artefact cards (UnlockPotential.jsx), so those are the
@@ -62,21 +62,16 @@ async function assertFeaturedSlotFree(resourceType, exceptId) {
   }
 }
 
-// Derives a course-media `kind` from an uploaded file's mimetype. uploadMedia's
-// fileFilter already restricts to image/video/pdf, so the throw is defensive.
-function mediaKindFromMime(mime) {
-  if (mime.startsWith('image/')) return 'image';
-  if (mime.startsWith('video/')) return 'video';
-  if (mime === 'application/pdf') return 'pdf';
-  throw ApiError.badRequest(`Unsupported file type: ${mime}`);
-}
 
 // Public content module: anonymous users see only published courses, while
 // signed-in staff (optionalAuth attaches req.user) can list everything and use
 // the admin filters.
 export const list = asyncHandler(async (req, res) => {
   const { page, limit, skip } = parsePaging(req.query);
-  const filter = {};
+  // A course its instructor has never submitted stays out of every listing,
+  // including this one. Staff asking for ?status=draft is the same door into
+  // the same unfinished work as the review screen, so it gets the same answer.
+  const filter = { $nor: [UNSUBMITTED_INSTRUCTOR_DRAFT] };
   // Role, not merely "is signed in". These are now the same user collection as
   // the LMS, so a student holding a valid token would otherwise count as staff
   // and could ask for ?status=draft. Staff behaviour is unchanged.
@@ -147,7 +142,7 @@ export const create = asyncHandler(async (req, res) => {
   assertTaxonomy(req.body);
 
   const slug = await uniqueSlug(Course, title);
-  const data = { ...req.body, slug };
+  const data = sanitizeRichTextFields({ ...req.body, slug });
   // Stamp publishedAt the moment a course goes live.
   if (data.status === CONTENT_STATUS.PUBLISHED && !data.publishedAt) {
     data.publishedAt = new Date();
@@ -172,6 +167,7 @@ export const update = asyncHandler(async (req, res) => {
   if (!course) throw ApiError.notFound('Course not found');
 
   assertTaxonomy(req.body);
+  sanitizeRichTextFields(req.body);
 
   // Captured before the field loop below overwrites them — the slot check needs
   // to know what changed, not just where things ended up.
@@ -299,94 +295,3 @@ export const uploadCourseImage = asyncHandler(async (req, res) => {
   return ok(res, course);
 });
 
-// POST /:id/media — attach an uploaded file (video / pdf / image) to a course.
-export const addCourseMedia = asyncHandler(async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) throw ApiError.notFound('Course not found');
-  if (!req.file) throw ApiError.badRequest('File is required');
-
-  const kind = mediaKindFromMime(req.file.mimetype);
-  const { key, url } = await uploadBuffer({
-    buffer: req.file.buffer,
-    mimeType: req.file.mimetype,
-    folder: 'courses/media',
-    originalName: req.file.originalname,
-  });
-
-  course.media.push({
-    kind,
-    title: req.body.title?.trim() || req.file.originalname || '',
-    key,
-    url,
-    mimeType: req.file.mimetype,
-    sizeBytes: req.file.size || 0,
-    order: course.media.length,
-  });
-  await course.save();
-
-  recordAudit({
-    req,
-    action: 'course.media.add',
-    entity: 'Course',
-    entityId: course._id,
-    summary: `Added ${kind} to course "${course.title}"`,
-  });
-  return created(res, course);
-});
-
-// POST /:id/media/link — attach a YouTube link to a course.
-export const addCourseMediaLink = asyncHandler(async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) throw ApiError.notFound('Course not found');
-
-  const youtubeId = parseYouTubeId(req.body.url);
-  if (!youtubeId) throw ApiError.badRequest('A valid YouTube URL is required');
-
-  course.media.push({
-    kind: 'youtube',
-    title: req.body.title?.trim() || '',
-    youtubeUrl: String(req.body.url).trim(),
-    youtubeId,
-    order: course.media.length,
-  });
-  await course.save();
-
-  recordAudit({
-    req,
-    action: 'course.media.add',
-    entity: 'Course',
-    entityId: course._id,
-    summary: `Added YouTube link to course "${course.title}"`,
-  });
-  return created(res, course);
-});
-
-// DELETE /:id/media/:mediaId — remove one attached media item (and its S3 file).
-export const removeCourseMedia = asyncHandler(async (req, res) => {
-  const course = await Course.findById(req.params.id);
-  if (!course) throw ApiError.notFound('Course not found');
-
-  const item = course.media.id(req.params.mediaId);
-  if (!item) throw ApiError.notFound('Media item not found');
-
-  const { key } = item;
-  item.deleteOne();
-  await course.save();
-
-  if (key) {
-    try {
-      await deleteObject(key);
-    } catch {
-      /* ignore — orphaned object is acceptable */
-    }
-  }
-
-  recordAudit({
-    req,
-    action: 'course.media.remove',
-    entity: 'Course',
-    entityId: course._id,
-    summary: `Removed media from course "${course.title}"`,
-  });
-  return ok(res, course);
-});

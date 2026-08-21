@@ -842,7 +842,7 @@ let PACK;
       id: 'value', type: 'number', required: true, prefix: '$',
       label: 'Estimated whole-of-contract value (AUD, ex GST)',
       help: 'Include every extension option, all likely variations, and the full term. Do not value only the initial period, under-valuing to duck a threshold is contract splitting.',
-      min: 0
+      min: 0, step: 10000
     },
     {
       id: 'valueIncludesOptions', type: 'bool', required: true,
@@ -944,7 +944,7 @@ let PACK;
       id: 'evalPriceWeight', type: 'number', suffix: '% price', required: true,
       label: 'What weighting will price carry in the evaluation?',
       help: 'Enter price as a percentage of the total score. Non-price is the remainder. The mandated SME and government-objectives allocations are shares of the NON-PRICE component, so this figure changes what they are worth overall.',
-      min: 0, max: 100
+      min: 0, max: 100, step: 5
     },
     {
       id: 'approachOverride', type: 'select',

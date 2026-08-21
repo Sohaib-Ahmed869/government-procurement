@@ -11,7 +11,10 @@ import './AdvisorDisclaimer.css';
 // Rendered by the stepper before the first question and again on the result, so
 // it is on screen at both ends of every use rather than filed once in a footer.
 // `variant` only changes the spacing around it, not the words.
-export default function AdvisorDisclaimer({ variant = 'intro' }) {
+// Defaults to `result`, which is the only variant still rendered and the only
+// one with spacing rules left. A caller that wants it somewhere else should say
+// so explicitly rather than inherit a variant that styles nothing.
+export default function AdvisorDisclaimer({ variant = 'result' }) {
   return (
     <aside className={`adv-disclaimer adv-disclaimer--${variant}`} aria-label="Important information">
       <p className="adv-disclaimer__lead">

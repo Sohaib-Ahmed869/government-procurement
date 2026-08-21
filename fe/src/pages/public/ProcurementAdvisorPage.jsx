@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import PageLayout from '../../components/layout/PageLayout.jsx';
 import { useMountReveal } from '../../hooks/useMountReveal.js';
 import AdvisorStepper from '../../features/advisor/components/AdvisorStepper.jsx';
@@ -30,9 +30,12 @@ export default function ProcurementAdvisorPage() {
   // .hm-reveal, same --gp-reveal-* timings as the rest.
   const mounted = useMountReveal();
 
-  // Every entry in JURISDICTIONS is live — the ones that aren't simply aren't
-  // listed — so finding one is the whole check.
-  const live = JURISDICTIONS.find((j) => j.slug === jurisdiction) || null;
+  // JURISDICTIONS now lists every jurisdiction, live or not, so being IN the
+  // list is no longer proof there is a rule pack behind it. The `live` flag is,
+  // and it has to be checked here: without it /advisory/vic would match, ask
+  // for a pack that does not exist, and sit on "Loading the Victoria rules…"
+  // forever. Not-live falls through to the redirect below.
+  const live = JURISDICTIONS.find((j) => j.slug === jurisdiction && j.live) || null;
 
   useEffect(() => {
     let alive = true;
@@ -62,12 +65,10 @@ export default function ProcurementAdvisorPage() {
         <div className="pa-page" data-audience={audience}>
           <header className={`pa-page__head${mounted ? ' is-in' : ''}`}>
             <div className="pa-page__shell">
-              <h1 className="pa-page__title hm-reveal">Procurement Advisor</h1>
-              <p className="pa-page__lede hm-reveal" data-delay="1">
-                {live
-                  ? 'Answer the questions below and the advisor sets out the procurement approach the rules require, the pathways open to you, and the obligations that attach to each.'
-                  : 'Answer a short series of questions about what you are buying and how much you expect to spend, and the advisor points you to the procurement approach the rules require in your jurisdiction.'}
-              </p>
+              {/* The title alone. The lede under it described the questions
+                  that begin immediately below, so it delayed the thing it was
+                  describing. */}
+              <h1 className="pa-page__title hm-reveal">Sourcing Advisor</h1>
             </div>
           </header>
 
@@ -79,10 +80,18 @@ export default function ProcurementAdvisorPage() {
                 <p className="pa-note">Loading the {live.name} rules…</p>
               ) : (
                 <>
-                  <JurisdictionPicker />
-                  <p className="pa-note">
-                    More jurisdictions follow. New South Wales is the launch jurisdiction.
+                  {/* PLACEHOLDER COPY — the client is supplying the real
+                      wording. Keep the shape: what the tool is not (no AI, no
+                      data collected), what it is (published rules, applied as
+                      written), and the link to the privacy policy. */}
+                  <p className="pa-disclaimer">
+                    This tool is not AI-powered and collects no data about you or
+                    what you enter. It applies the published procurement rules
+                    for the jurisdiction you choose, as they are written, and is
+                    general information rather than legal advice.{' '}
+                    <Link to="/policies/privacy">Read our privacy policy</Link>.
                   </p>
+                  <JurisdictionPicker />
                 </>
               )}
             </div>

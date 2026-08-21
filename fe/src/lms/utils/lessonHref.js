@@ -23,8 +23,24 @@ export function lessonHref(slug, lesson) {
   const id = lesson.id ?? lesson._id;
   if (!id) return `/learn/courses/${slug}`;
 
-  if (lesson.preview && lesson.gate) return `/learn/courses/${slug}/preview/${id}`;
+  // A quiz is an attempt recorded against a person, so it goes to the quiz
+  // route even when the lesson is flagged as a preview. There is no signed-out
+  // way to sit one.
   if (lesson.kind === 'quiz') return `/learn/courses/${slug}/quiz/${id}`;
+
+  // A free preview has its own route family: the same screens, without the
+  // sign-in requirement. Picking by KIND here rather than defaulting to the
+  // text screen is the whole point — this branch used to return one URL for
+  // every preview, so a preview VIDEO landed on the text page and was told it
+  // "doesn't have any written content yet", which is the exact drift the note
+  // above says this function exists to stop.
+  if (lesson.preview && lesson.gate) {
+    const base = `/learn/courses/${slug}/preview/${id}`;
+    if (lesson.kind === 'video' || lesson.kind === 'youtube') return `${base}/watch`;
+    if (lesson.kind === 'doc') return `${base}/doc`;
+    return base;
+  }
+
   // Uploaded video and a YouTube embed are different screens: one plays a
   // signed, expiring source with a watermark, the other an iframe. They share
   // the /watch route because to a learner they are both "watch this".

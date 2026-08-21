@@ -71,8 +71,8 @@ const CATALOGUE = [
 // hold it.
 function useGamificationStats() {
   const { quizzes, totals } = useProgress();
-  const threads = useDiscussions();
-  const reviews = useReviews();
+  const { threads } = useDiscussions();
+  const { reviews } = useReviews();
   const { paths } = usePaths();
 
   return useMemo(

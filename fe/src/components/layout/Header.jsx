@@ -3,7 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/icons/gp-02.svg';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import { useScrollSpy } from '../../hooks/useScrollSpy.js';
-import { HOME_SECTION_IDS, SECTION_BY_NAV_LABEL } from '../../features/home/sections.js';
+import {
+  HOME_SECTION_IDS,
+  HOME_SECTIONS_ENABLED,
+  SECTION_BY_NAV_LABEL,
+} from '../../features/home/sections.js';
 import { bidWritersPublic } from '../../config/features.js';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
@@ -22,8 +26,6 @@ const NAV_LINKS = [
     href: '/service-offering',
     match: ['/service-offering', '/capabilities'],
   },
-  // A6: the Procurement Advisor.
-  { label: 'Advisory', href: '/advisory' },
   // Our Expertise is off the nav while Our Team is trialled in its place. The
   // page, route and components all still exist — restore this line to bring the
   // link back.
@@ -39,14 +41,21 @@ const NAV_LINKS = [
     href: '/aus-list',
     match: ['/aus-list', '/featured-list', '/tender-portals'],
   },
-  { label: 'Careers', href: '/careers' },
+  // A6: the Sourcing Advisor, sitting with the reference pages below rather
+  // than up beside Service Offering — it is a tool a visitor comes back to, not
+  // an introduction to the firm.
+  { label: 'Sourcing Advisor', href: '/advisory' },
   { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
   // B2. Sits next to Jurisdictional Links because the two are the site's
   // reference pages and a visitor looking for one often wants the other.
   // There is no homepage band for it, so on the homepage this one navigates
   // rather than scrolling — scrollToSection falls through when the section
   // isn't on the page.
-  { label: 'Government Panels', href: '/government-panels' },
+  //
+  // The route stays /government-panels: the label is what the page is FOR, the
+  // path is what it holds, and changing the URL would break every link already
+  // published to it.
+  { label: 'How to Engage Us', href: '/government-panels' },
   // B4 — the AI Prompt Library.
   { label: 'Prompt Library', href: '/prompt-library' },
   // B6 — the Templates library, on the top ribbon as the brief asks.
@@ -54,6 +63,10 @@ const NAV_LINKS = [
   // B7.8 — only on the ribbon once the directory is live. On `preview` the page
   // works but must not be advertised; on `off` it does not exist.
   ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
+  // Last, and after the conditional above so it stays last whether or not the
+  // bid-writer directory is switched on. It is the one item aimed at somebody
+  // who wants to work here rather than to buy or bid.
+  { label: 'Careers', href: '/careers' },
 ];
 
 // Whether `pathname` is this nav item's page — an exact match, or anything
@@ -99,7 +112,11 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
 
   // The ribbon behaves as anchors on the homepage and as routed links
   // everywhere else, so the spy only runs where there is something to spy on.
-  const onHome = pathname === '/';
+  //
+  // HOME_SECTIONS_ENABLED is false while the homepage is just the hero and the
+  // footer: with no bands to scroll to, every item routes to its own page
+  // instead. Flipping that one flag back restores the scrolling ribbon.
+  const onHome = HOME_SECTIONS_ENABLED && pathname === '/';
   const activeSection = useScrollSpy(HOME_SECTION_IDS, { enabled: onHome });
 
   const closeMenu = () => setMenuOpen(false);
@@ -246,13 +263,19 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
       >
         <nav className="site-header__mobile-nav" aria-label="Mobile">
           <ul className="site-header__mobile-list">
-            {navLinks.map((item) => {
+            {navLinks.map((item, i) => {
               const section = onHome ? SECTION_BY_NAV_LABEL[item.label] : undefined;
               const current = section ? activeSection === section : isCurrent(pathname, item);
               const className = `site-header__mobile-link${current ? ' is-current' : ''}`;
 
               return (
-                <li key={item.href}>
+                // `--i` drives the open stagger. The delays used to be written
+                // out by hand as :nth-child(1) … (10), and the menu has more
+                // items than that — so everything past the tenth got no delay
+                // at all and snapped in fully formed while the rest were still
+                // arriving. Indexed here instead, so adding a nav item cannot
+                // reintroduce it.
+                <li key={item.href} style={{ '--i': i }}>
                   {section ? (
                     <a
                       className={className}
@@ -278,7 +301,8 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
                 </li>
               );
             })}
-            <li>
+            {/* Last in the list, so it carries the last index. */}
+            <li style={{ '--i': navLinks.length }}>
               <Link
                 className="site-header__mobile-link site-header__mobile-cta"
                 to="/book-a-consultation"

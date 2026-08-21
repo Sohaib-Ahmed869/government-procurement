@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import StudentAvatar from '../../components/account/StudentAvatar.jsx';
 import ProfileForm from '../../components/account/ProfileForm.jsx';
-import { saveProfile, useProfile, useSettings } from '../../hooks/useProfile.js';
+import { saveProfile, useProfile } from '../../hooks/useProfile.js';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { useProgress } from '../../hooks/useProgress.js';
 import { useBadges } from '../../hooks/useBadges.js';
@@ -12,7 +11,6 @@ import { useBadges } from '../../hooks/useBadges.js';
 // the learner has done, which is what makes a profile worth visiting.
 export default function ProfilePage() {
   const profile = useProfile();
-  const settings = useSettings();
   const { user } = useStudentAuth();
   const { totals } = useProgress();
   const { earned, level, points } = useBadges();
@@ -133,31 +131,6 @@ export default function ProfilePage() {
             </dl>
           </section>
 
-          <section className="lms-card" style={{ marginTop: 18 }}>
-            <div className="lms-card__head">
-              <h2 className="lms-card__title">
-                <LmsIcon name="lock" />
-                Visibility
-              </h2>
-              <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/settings">
-                Change
-              </Link>
-            </div>
-            <ul className="lms-visibility">
-              <li>
-                <LmsIcon name={settings.publicProfile ? 'eye' : 'lock'} />
-                {settings.publicProfile
-                  ? 'Your profile is visible to other learners on your courses.'
-                  : 'Your profile is hidden. Only your name shows on posts.'}
-              </li>
-              <li>
-                <LmsIcon name={settings.showInStandings ? 'eye' : 'lock'} />
-                {settings.showInStandings
-                  ? 'You appear in the badge standings.'
-                  : 'You are hidden from the badge standings.'}
-              </li>
-            </ul>
-          </section>
         </>
       )}
     </div>

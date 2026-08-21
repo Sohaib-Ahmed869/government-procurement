@@ -125,7 +125,15 @@ export default function ArticleDetail({ slug }) {
   const kind = article.category?.name || 'Article';
 
   return (
-    <article ref={ref} className={`article${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <div ref={ref} className={`article${inView ? ' is-in' : ''}`} data-audience={audience}>
+      {/* The band is the <section>, and the shell inside it is what fades.
+          These were the other way round: the page ground sat on the outer
+          element and each band was one of its children, so the A3 cross-fade —
+          which targets `:is(section, header, article) > *` — faded the BANDS
+          themselves. Fading a dark band to nothing shows whatever is behind it,
+          and behind it was this page's own paper: the white flash on every
+          toggle. Same correction the tender page needed, and the same shape
+          Service Offering already had. */}
       {/* B1.3 / B1.8 — title, progress and the actions, at every scroll depth. */}
       <ArticleBar title={article.title} progress={progress} article={article} />
 
@@ -156,7 +164,7 @@ export default function ArticleDetail({ slug }) {
 
       {/* The progress bar measures this element, not the page: the hero above
           and the related grid below are not the article. */}
-      <div className="article-body" ref={bodyRef}>
+      <section className="article-body" ref={bodyRef}>
         <div className="article-byline">
           {name && (
             <p className="article-byline__author">
@@ -183,7 +191,7 @@ export default function ArticleDetail({ slug }) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: article.body || '' }}
         />
-      </div>
+      </section>
 
       {related.length > 0 && (
         <section className="article-related">
@@ -208,6 +216,6 @@ export default function ArticleDetail({ slug }) {
           </div>
         </section>
       )}
-    </article>
+    </div>
   );
 }

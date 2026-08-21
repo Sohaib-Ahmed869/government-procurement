@@ -32,6 +32,7 @@ export default function CourseBuilderPage() {
   const [selected, setSelected] = useState(null); // { moduleId, lessonId }
   const [confirming, setConfirming] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [actError, setActError] = useState('');
 
   // Local overlay so typing stays instant while the PATCH is debounced behind
   // it. Without this every keystroke would wait for a round trip.
@@ -87,13 +88,21 @@ export default function CourseBuilderPage() {
 
   // Structural changes (add/remove/reorder) reload, because the server assigns
   // ids and ordering and the client shouldn't guess at them.
+  // Structural edits — add, rename, reorder, delete, schedule — go through
+  // here. They are not autosaved fields, so until now a refusal from the server
+  // went nowhere: the promise rejected into the console and the rail simply
+  // didn't change. A drip date the server won't take has to say so.
   const act = useCallback(
     async (fn) => {
       setBusy(true);
+      setActError('');
       try {
         const result = await fn();
         await reload();
         return result;
+      } catch (err) {
+        setActError(err?.message ?? 'The server refused that change.');
+        return undefined;
       } finally {
         setBusy(false);
       }
@@ -237,6 +246,19 @@ export default function CourseBuilderPage() {
         </div>
       ) : null}
 
+      {actError ? (
+        <div className="lms-card lms-notice lms-notice--danger lms-builder__savefail">
+          <span className="lms-notice__icon"><LmsIcon name="lock" /></span>
+          <div className="lms-notice__body">
+            <p className="lms-notice__title">That change didn’t stick</p>
+            <p className="lms-notice__text">{actError}</p>
+          </div>
+          <button type="button" className="lms-btn lms-btn--sm" onClick={() => setActError('')}>
+            Dismiss
+          </button>
+        </div>
+      ) : null}
+
       <div className="lms-tabs lms-builder__tabs" role="tablist">
         {TABS.map((t) => (
           <button
@@ -266,6 +288,12 @@ export default function CourseBuilderPage() {
               onAddModule={() => act(() => authoringApi.addModule(courseId, {}))}
               onRenameModule={(id, title) =>
                 act(() => authoringApi.updateModule(courseId, id, { title }))
+              }
+              // Drip schedule (L4). Same PATCH as the rename, so a schedule is
+              // saved the moment it is set rather than waiting on a Save the
+              // rest of this screen doesn't have.
+              onScheduleModule={(id, patch) =>
+                act(() => authoringApi.updateModule(courseId, id, patch))
               }
               onRemoveModule={(id) => {
                 const mod = modules.find((m) => String(m._id) === String(id));

@@ -30,20 +30,28 @@ profileStore.seedOnce([
 
 settingsStore.seedOnce([
   {
-    // Notifications (R2)
+    // Notifications (R2) — learner side
     emailCourseUpdates: true,
     emailDiscussionReplies: true,
     emailNewCourses: false,
     emailMarketing: false,
     inAppReminders: true,
     inAppDiscussion: true,
+    // Notifications — instructor side. Separate keys rather than shared ones,
+    // because "a reply to your question" and "a question on your course" are
+    // different events and someone who is both should be able to want one
+    // without the other.
+    emailReviewDecisions: true,
+    emailCourseQuestions: true,
+    emailNewEnrolments: false,
+    emailCourseReviews: true,
+    inAppReviews: true,
+    inAppEnrolments: true,
     // Learning preferences
     autoplayVideo: false,
     transcriptOpen: true,
-    reduceMotion: false,
-    // Privacy
-    publicProfile: true,
-    showInStandings: true,
+    // Authoring preferences
+    authorPreviewOnSave: true,
   },
 ]);
 

@@ -14,7 +14,7 @@ import '../lms.css';
 // it's placeholder data, and one request once it's an API call with a cache).
 export default function PlayerLayout() {
   const { slug, lessonId, quizId } = useParams();
-  const { data, status } = useCourseOutline(slug);
+  const { data, status, reload } = useCourseOutline(slug);
   const [railOpen, setRailOpen] = useState(false);
 
   const closeRail = useCallback(() => setRailOpen(false), []);
@@ -82,7 +82,20 @@ export default function PlayerLayout() {
 
         <div className="lms-player__body">
           <main className="lms-player__main">
-            <Outlet context={{ course, enrolment, modules, activeId: lessonId ?? quizId }} />
+            {/* `reloadOutline` is what keeps the header percentage and the
+                rail's ticks honest. This layout fetches the outline once on
+                mount; a lesson marked complete inside a child screen changed
+                nothing out here, so a two-lesson course sat at 50% after both
+                were finished. The child calls this when progress moves. */}
+            <Outlet
+              context={{
+                course,
+                enrolment,
+                modules,
+                activeId: lessonId ?? quizId,
+                reloadOutline: reload,
+              }}
+            />
           </main>
           <PlayerSidebar
             course={course}
