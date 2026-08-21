@@ -3,6 +3,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import JurisdictionPicker from '../../advisor/components/JurisdictionPicker.jsx';
 import './AdvisoryBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // A6's homepage entry — the Procurement Advisor, summarised.
 //
@@ -48,7 +49,7 @@ export default function AdvisoryBand() {
         </p>
 
         <Link className="hm-arrow" to="/advisory">
-          Open the Procurement Advisor <span aria-hidden="true">→</span>
+          Open the Sourcing Advisor <Arrow />
         </Link>
       </div>
     </section>

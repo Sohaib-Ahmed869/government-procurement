@@ -448,13 +448,56 @@ export const createModule = asyncHandler(async (req, res) => {
   return created(res, mod);
 });
 
+/* A module's drip schedule (L4): an absolute date, or a number of days after
+   THAT learner enrolled — never both.
+
+   gateFor() in learning.controller.js applies every schedule it finds on a
+   module, so one carrying the pair stays shut until BOTH have passed. That is
+   not a rule anybody writes on purpose, and it is invisible from either field
+   on its own, so setting one here clears the other rather than trusting the
+   client to have done it.
+
+   The fields also have to be CLEARABLE. `releaseAt: ''` is what an emptied date
+   input sends, and assigning that straight onto the document throws a cast
+   error rather than removing the schedule. A blank on either field means "no
+   drip", which clears both. */
+function applyDripSchedule(mod, body) {
+  const sent = (f) => Object.prototype.hasOwnProperty.call(body, f);
+  const blank = (v) => v === null || v === undefined || v === '';
+
+  if (!sent('releaseAt') && !sent('releaseAfterDays')) return;
+
+  if (sent('releaseAt') && !blank(body.releaseAt)) {
+    const at = new Date(body.releaseAt);
+    if (Number.isNaN(at.getTime())) throw ApiError.badRequest('That release date is not a date');
+    mod.releaseAt = at;
+    mod.releaseAfterDays = null;
+    return;
+  }
+
+  if (sent('releaseAfterDays') && !blank(body.releaseAfterDays)) {
+    const days = Number(body.releaseAfterDays);
+    if (!Number.isInteger(days) || days < 0) {
+      throw ApiError.badRequest('Days after enrolment must be a whole number of days');
+    }
+    mod.releaseAfterDays = days;
+    mod.releaseAt = null;
+    return;
+  }
+
+  mod.releaseAt = null;
+  mod.releaseAfterDays = null;
+}
+
 export const updateModule = asyncHandler(async (req, res) => {
   const mod = await Module.findOne({ _id: req.params.moduleId, course: req.course._id });
   if (!mod) throw ApiError.notFound('Module not found');
 
-  ['title', 'summary', 'order', 'releaseAt', 'releaseAfterDays'].forEach((f) => {
+  ['title', 'summary', 'order'].forEach((f) => {
     if (req.body[f] !== undefined) mod[f] = req.body[f];
   });
+  applyDripSchedule(mod, req.body);
+
   await mod.save();
   return ok(res, mod);
 });

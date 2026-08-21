@@ -8,6 +8,7 @@ import userRoutes from '../modules/users/users.routes.js';
 import articleRoutes from '../modules/articles/articles.routes.js';
 import categoryRoutes from '../modules/categories/categories.routes.js';
 import courseRoutes from '../modules/courses/courses.routes.js';
+import bundleRoutes from '../modules/bundles/bundles.routes.js';
 import questionRoutes from '../modules/questions/questions.routes.js';
 import pageRoutes from '../modules/pages/pages.routes.js';
 import teamRoutes from '../modules/team/team.routes.js';
@@ -46,6 +47,8 @@ router.use('/users', userRoutes);
 router.use('/articles', articleRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/courses', courseRoutes);
+// Course bundles: several published courses sold together for less.
+router.use('/bundles', bundleRoutes);
 router.use('/questions', questionRoutes);
 router.use('/pages', pageRoutes);
 router.use('/team', teamRoutes);

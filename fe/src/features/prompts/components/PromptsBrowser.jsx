@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { promptsApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
@@ -301,32 +301,31 @@ export default function PromptsBrowser() {
           ))}
         </div>
       </div>
+
     </section>
   );
 }
 
-// B4.6 / B4.7 — one card, one prompt, one copy button.
-//
-// The prompt itself is on the card in full, as plain text you can read before
-// you take it. Deliberately NOT a chat mock-up: no assistant avatar, no
-// simulated reply, nothing dressed up as a conversation that already happened.
-// What the library ships is the prompt; what the tool says back is the
-// visitor's business, and showing an invented answer would set an expectation
-// no prompt can guarantee.
-function PromptCard({ prompt }) {
+/* Copying a prompt, wherever the button is.
+
+   Lifted out of the card so the card and the dialog cannot drift into two
+   behaviours — and because the clipboard fallback below is exactly the sort of
+   thing that gets fixed in one copy of it and not the other. */
+function useCopyPrompt(prompt) {
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
-  const copy = async () => {
+  const copy = useCallback(async () => {
+    const text = prompt?.body || '';
     try {
-      await navigator.clipboard.writeText(prompt.body || '');
+      await navigator.clipboard.writeText(text);
     } catch {
       // Older browsers and any non-secure origin: fall back to a hidden
       // textarea and the legacy command, so the button is never a dead end.
       const el = document.createElement('textarea');
-      el.value = prompt.body || '';
+      el.value = text;
       el.setAttribute('readonly', '');
       el.style.position = 'fixed';
       el.style.opacity = '0';
@@ -342,48 +341,76 @@ function PromptCard({ prompt }) {
     setCopied(true);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setCopied(false), 2000);
-  };
+  }, [prompt]);
 
+  return { copied, copy };
+}
+
+function CopyIcon({ copied }) {
+  return copied ? (
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+      strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+    </svg>
+  );
+}
+
+// The opening line of the prompt, for the card's teaser: enough to tell two
+// prompts apart at a glance without reprinting either of them.
+function teaserFor(prompt) {
+  if (prompt.summary) return prompt.summary;
+  const firstLine = String(prompt.body || '')
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .find(Boolean);
+  if (!firstLine) return '';
+  return firstLine.length > 150 ? firstLine.slice(0, 150).trimEnd() + '…' : firstLine;
+}
+
+/* B4.6 / B4.7 — one card, one prompt.
+
+   A SUMMARY, not the prompt. Every card used to print its prompt in full, so a
+   use case holding a dozen of them was several screens of monospace to scroll
+   past before the next heading — you could not see what the library held
+   without reading all of it. The card now carries what tells one prompt from
+   another (its name, the tool it is written for, its opening line) and the
+   prompt itself is one click away.
+
+   Deliberately still NOT a chat mock-up: no assistant avatar, no simulated
+   reply. What the library ships is the prompt; what the tool says back is the
+   visitor's business. */
+function PromptCard({ prompt }) {
+  const { copied, copy } = useCopyPrompt(prompt);
   const tool = TOOL_BY_VALUE[prompt.tool];
+  const teaser = teaserFor(prompt);
 
   return (
     <li className="pl-card">
-      <div className="pl-card__head">
-        <h4 className="pl-card__title">{prompt.title}</h4>
-        <span className={`pl-tool pl-tool--${prompt.tool}`}>{tool?.label || prompt.tool}</span>
-      </div>
-
-      {/* Monospace and pre-wrap: a prompt's line breaks and placeholder markers
-          are part of it, and a proportional paragraph hides both. */}
-      <pre className="pl-card__body">{prompt.body}</pre>
-
-      {prompt.notes && <p className="pl-card__notes">{prompt.notes}</p>}
+      {/* The whole card is the link. A real <a>, so it can be opened in a new
+          tab, bookmarked and read by anything collecting the page's
+          destinations — which a button opening a dialog could not be. Copy sits
+          OUTSIDE it: a control inside a link is invalid markup, and taking the
+          prompt should not also navigate. */}
+      <Link className="pl-card__open" to={`/prompt-library/${prompt._id || prompt.id}`}>
+        <span className="pl-card__head">
+          <span className="pl-card__title">{prompt.title}</span>
+          <span className={`pl-tool pl-tool--${prompt.tool}`}>{tool?.label || prompt.tool}</span>
+        </span>
+        {teaser ? <span className="pl-card__teaser">{teaser}</span> : null}
+      </Link>
 
       <div className="pl-card__foot">
-        <button
-          type="button"
-          className={`pl-copy${copied ? ' is-copied' : ''}`}
-          onClick={copy}
-        >
-          <span className="pl-copy__icon" aria-hidden="true">
-            {copied ? (
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
-                strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="12" height="12" rx="2" />
-                <path d="M5 15V5a2 2 0 0 1 2-2h10" />
-              </svg>
-            )}
-          </span>
-          {copied ? 'Copied' : 'Copy prompt'}
+        <span className="pl-card__view" aria-hidden="true">View prompt</span>
+        <button type="button" className={`pl-copy${copied ? ' is-copied' : ''}`} onClick={copy}>
+          <span className="pl-copy__icon" aria-hidden="true"><CopyIcon copied={copied} /></span>
+          {copied ? 'Copied' : 'Copy'}
         </button>
-
-        {/* The button's label changes, which a sighted visitor sees. A live
-            region says the same thing for anyone who cannot. */}
         <span className="pl-copy__status" role="status" aria-live="polite">
           {copied ? `${prompt.title} copied to clipboard` : ''}
         </span>
@@ -391,3 +418,4 @@ function PromptCard({ prompt }) {
     </li>
   );
 }
+

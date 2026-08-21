@@ -136,6 +136,11 @@ export const catalogApi = {
 export const videoApi = {
   // { url, expiresAt }. Short-lived and reissued before it lapses.
   signedUrl: (lessonId) => api.get(`/lms/lessons/${lessonId}/video-url`),
+  // Encrypted HLS (LMS 3.0). Returns { url, expiresAt } like signedUrl above,
+  // except the url is a PLAYLIST carrying a short-lived playback token — the
+  // player fetches its own keys from it, and each key request re-checks the
+  // enrolment server-side.
+  hlsUrl: (lessonId) => api.get(`/lms/lessons/${lessonId}/hls`),
   transcript: (lessonId) => api.get(`/lms/lessons/${lessonId}/transcript`),
   // An uploaded document, on the same short-lived terms as video. A document
   // lesson holding an external link never calls this.

@@ -508,9 +508,14 @@ export const getProgramBySlug = asyncHandler(async (req, res) => {
   }
 
   const resolved = await resolveForLearner(program, req.user?._id);
-  const certificate = req.user
+  // `issuedCertificate`, not `certificate`: the program document already has a
+  // `certificate` field holding the DESIGN of the document this path awards.
+  // Spreading the issued record over that key replaced the wording and colours
+  // with either a certificate row or null, so the detail page had nothing to
+  // name the award with.
+  const issuedCertificate = req.user
     ? await Certificate.findOne({ user: req.user._id, program: program._id }).lean()
     : null;
 
-  return ok(res, { ...program, ...resolved, certificate });
+  return ok(res, { ...program, ...resolved, issuedCertificate });
 });

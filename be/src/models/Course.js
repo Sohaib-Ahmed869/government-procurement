@@ -76,12 +76,19 @@ const courseSchema = new mongoose.Schema(
       key: { type: String, default: '' },
       url: { type: String, default: '' },
     },
-    // Course materials attached directly to the course. Each item is one of:
-    //  - 'video'    an uploaded video file (key/url/mimeType/sizeBytes)
-    //  - 'youtube'  a pasted YouTube link (youtubeUrl/youtubeId)
-    //  - 'pdf'      an uploaded PDF document (key/url)
-    //  - 'image'    an uploaded image (key/url)
-    // (Videos used to be a standalone collection; they now live here.)
+    // DEPRECATED — nothing writes this and nothing renders it.
+    //
+    // These were course-level materials shown on the public course page: an
+    // uploaded video, a YouTube link, a PDF, an image. They were public by
+    // construction — `url` is an unexpiring /files link, and /files is
+    // unauthenticated — which made them the wrong home for anything a learner
+    // pays for. A course's detail page now carries its cover image only, and
+    // video, documents and downloads are LESSON content, gated per lesson by
+    // gateFor(): open on a free preview, closed otherwise.
+    //
+    // The field is kept so existing rows survive a save and `remove` can still
+    // clean up their S3 objects. The write routes are gone. Safe to drop once
+    // the data has been migrated into lessons or discarded.
     media: [
       {
         kind: { type: String, enum: ['video', 'youtube', 'pdf', 'image'], required: true },

@@ -247,9 +247,8 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 13.5px;
+  letter-spacing: 0.01em;
   color: var(--band-muted);
 }
 

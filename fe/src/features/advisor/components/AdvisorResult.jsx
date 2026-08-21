@@ -90,7 +90,7 @@ export default function AdvisorResult({ result, rules, answers = {}, onRestart, 
           is, when it was produced and which rule set it was produced against.
           On screen all three are already in the page around it. */}
       <div className="adv-print-head">
-        <p className="adv-print-head__brand">Procurement Advisor</p>
+        <p className="adv-print-head__brand">Sourcing Advisor</p>
         <p className="adv-print-head__stamp">
           Generated {generated} &middot; {rules.label} &middot; rules as at {rules.asAt}
         </p>

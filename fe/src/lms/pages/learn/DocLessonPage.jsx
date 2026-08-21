@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import LessonNav from '../../components/lesson/LessonNav.jsx';
+import PreviewGate from '../../components/lesson/PreviewGate.jsx';
 import NoteEditor from '../../components/progress/NoteEditor.jsx';
 import ResourceList from '../../components/lesson/ResourceList.jsx';
 import BookmarkButton from '../../components/progress/BookmarkButton.jsx';
@@ -64,7 +65,7 @@ export default function DocLessonPage() {
     return <LessonStates slug={slug} status={status} gate={gate} error={error} onRetry={reload} />;
   }
 
-  const { lesson, module: mod, index, total, prev, next } = data;
+  const { course, lesson, module: mod, index, total, prev, next, enrolled } = data;
   const hasFile = Boolean(doc?.hasFile);
   const hasLink = Boolean(doc?.url);
 
@@ -134,12 +135,15 @@ export default function DocLessonPage() {
         )}
       </div>
 
+      <PreviewGate course={course} lesson={lesson} enrolled={enrolled} />
+
       <LessonNav
         slug={slug}
         prev={prev}
         next={next}
         complete={complete}
         onToggleComplete={markComplete}
+        enrolled={enrolled}
       />
 
       <div className="lms-card lms-lesson-page__aside">

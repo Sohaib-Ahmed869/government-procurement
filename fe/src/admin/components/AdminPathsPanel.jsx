@@ -184,16 +184,12 @@ export default function AdminPathsPanel({ isAdmin, query }) {
                     {open ? 'Hide the sequence' : 'Review the sequence'}
                   </button>
 
+                  {/* Approve sits last, at the right-hand end of the row, the
+                      same place the course queue puts it: the confirming action
+                      is the one a reader's eye lands on last, and the two
+                      refusals should not be what the cursor reaches first. */}
                   {p.reviewStatus === 'pending' ? (
                     <>
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn--primary"
-                        disabled={!isAdmin || busy}
-                        onClick={() => act(p._id, () => reviewApi.approveProgram(p._id))}
-                      >
-                        Approve and publish
-                      </button>
                       <button
                         type="button"
                         className="admin-btn"
@@ -215,6 +211,14 @@ export default function AdminPathsPanel({ isAdmin, query }) {
                         }}
                       >
                         Reject
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--primary"
+                        disabled={!isAdmin || busy}
+                        onClick={() => act(p._id, () => reviewApi.approveProgram(p._id))}
+                      >
+                        {busy ? 'Working…' : 'Approve and publish'}
                       </button>
                     </>
                   ) : p.status === 'published' ? (

@@ -5,6 +5,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { POLICY_BY_SLUG, PLACEHOLDER_SECTIONS, PLACEHOLDER_INTRO } from '../policies.js';
 import './PolicyDocument.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // B5.3 — the long-form policy template.
 //
@@ -115,7 +116,7 @@ export default function PolicyDocument() {
       <div className="pol__inner">
         <header className="pol__head">
           <Link className="pol__back" to="/policies">
-            <span aria-hidden="true">←</span> All policies
+            <Arrow direction="left" /> All policies
           </Link>
 
           <h1 className="pol__title">{title}</h1>

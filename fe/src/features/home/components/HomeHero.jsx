@@ -29,6 +29,32 @@ import './HomeHero.css';
 // videoUrl in the CMS, or drop a new file in over this import.
 const FALLBACK_VIDEO = fallbackVideo;
 
+/* And the words, for the same reason the video has a fallback.
+
+   The copy is fetched from the CMS, and until that call returns `heading` is
+   undefined and the hero renders an empty scrim over the footage — the page
+   opens with no headline on it. On a second visit the module cache fills it on
+   the first paint, so this only bites a first-time visitor, which is exactly
+   who it should not bite. It is worse the larger the screen, because there is
+   more empty hero to look at while the request is in flight.
+
+   These are the words the CMS is seeded with. An editor's version replaces them
+   the moment it arrives; nothing here overwrites what the CMS holds. */
+const FALLBACK_COPY = {
+  award: {
+    eyebrow: 'Award government contracts',
+    heading: 'Procure with Confidence',
+    subheading:
+      'Supporting government agencies and public sector organisations with end-to-end procurement advisory, ensuring that contracts are awarded fairly, efficiently and in line with best practice.',
+  },
+  win: {
+    eyebrow: 'Win government contracts',
+    heading: 'Bid with Confidence',
+    subheading:
+      'Supporting suppliers and bidders through every stage of a government procurement, from the decision to respond through to mobilising the contract you have won.',
+  },
+};
+
 export default function HomeHero() {
   const { audience } = useAudience();
 
@@ -53,8 +79,14 @@ export default function HomeHero() {
     };
   }, []);
 
-  const forAudience = copy?.[audience] || {};
-  const { eyebrow, heading, subheading } = forAudience;
+  // Field by field rather than object by object: the CMS may hold a heading and
+  // no eyebrow, and falling back wholesale would then drop the editor's heading
+  // as well as filling the gap.
+  const saved = copy?.[audience] || {};
+  const preset = FALLBACK_COPY[audience] || FALLBACK_COPY.award;
+  const eyebrow = saved.eyebrow || preset.eyebrow;
+  const heading = saved.heading || preset.heading;
+  const subheading = saved.subheading || preset.subheading;
 
   // `videoUrl` is shared across both segments — one clip behind the hero, since
   // the toggle recolours the tint over it rather than swapping the footage.

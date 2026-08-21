@@ -128,9 +128,18 @@ export default function LmsRoutes() {
             the app chrome, so they sit outside the LmsLayout branch. */}
         <Route element={<PlayerLayout />}>
           <Route path="courses/:slug/lessons/:lessonId" element={me(<LessonPage />)} />
-          {/* The one in-course screen that is deliberately open: a free preview
-              is the sample, so requiring an account to see it defeats it. */}
+          {/* Free previews: the same three screens, without the sign-in
+              requirement, because a sample that needs an account is not a
+              sample. One route per KIND — a single shared one sent every
+              preview to the text screen, so a preview video rendered as "no
+              written content yet".
+
+              Open here, gated on the server: gateFor() answers `preview` only
+              for a lesson the instructor flagged, and `locked-enrolment` for
+              everything else, whichever route asks. */}
           <Route path="courses/:slug/preview/:lessonId" element={<LessonPage />} />
+          <Route path="courses/:slug/preview/:lessonId/watch" element={<VideoLessonPage />} />
+          <Route path="courses/:slug/preview/:lessonId/doc" element={<DocLessonPage />} />
           <Route path="courses/:slug/watch/:lessonId" element={me(<VideoLessonPage />)} />
           <Route path="courses/:slug/doc/:lessonId" element={me(<DocLessonPage />)} />
           <Route path="courses/:slug/quiz/:quizId" element={me(<QuizPage />)} />

@@ -1,5 +1,4 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import AdvisorDisclaimer from './AdvisorDisclaimer.jsx';
 import AdvisorResult from './AdvisorResult.jsx';
 import { useChromeHeight } from '../../../hooks/useChromeHeight.js';
 import { evaluate } from '../engine.js';
@@ -146,10 +145,6 @@ export default function AdvisorStepper({ rules, onExit }) {
 
   return (
     <div className="adv-step" ref={topRef}>
-      {/* A6.9/A6.10 — shown before a single question is answered, not only on
-          the result. */}
-      <AdvisorDisclaimer />
-
       <ol className="adv-step__rail" aria-label="Progress">
         {steps.map((s, i) => (
           <li

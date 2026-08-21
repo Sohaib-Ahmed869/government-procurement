@@ -8,7 +8,10 @@
 .sr__row {
   background: var(--gp-paper);
   color: var(--gp-ink);
-  padding: clamp(44px, 6vw, 80px) 0;
+  /* Tight. Six of these run down the page, and the alternating band is what
+     separates one from the next — the padding only has to keep the content off
+     the seam, not draw the gap itself. */
+  padding: clamp(18px, 2vw, 28px) 0;
   transition: var(--gp-fade);
 }
 
@@ -25,9 +28,14 @@
 
 .sr__inner {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(32px, 5vw, 80px);
-  align-items: center;
+  /* The photograph takes the smaller share; the copy is what the row is for. */
+  grid-template-columns: minmax(0, 0.58fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  /* The COPY sets the height of the row and the photograph matches it, top edge
+     to top edge and bottom to bottom. Centred, the image kept its own 3:2 height
+     and ran taller than the paragraph beside it, so every row carried a band of
+     empty space above and below the text. */
+  align-items: stretch;
 
   /* .hm-shell's geometry, so the rows line up with the page header above. */
   width: min(var(--gp-shell), 100%);
@@ -39,23 +47,35 @@
    than reversing the whole row keeps the source order — image then copy — which
    is the order it should be read aloud in. */
 .sr__row--flip .sr__media { order: 2; }
+/* Mirrored with it, so the photograph keeps the same width whichever side of
+   the row it is on. */
+.sr__row--flip .sr__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 0.58fr); }
 
 /* --- media ---------------------------------------------------------------- */
 
 .sr__media {
   position: relative;
-  border-radius: 8px;
+  /* Generously rounded and unshadowed, as the reference has it: the photograph
+     is a shape on the band rather than a card lifted off it. */
+  border-radius: 18px;
   overflow: hidden;
-  /* Seated, the same way the service cards are on the homepage. */
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.14),
-    0 16px 36px rgba(0, 0, 0, 0.14);
+  /* Still a FLOOR rather than a fixed height: align-items: stretch above means a
+     service whose description runs longer simply takes its column with it, and
+     the row stays square. */
+  min-height: 250px;
 }
 
+/* Absolutely positioned so the photograph contributes NO height of its own: the
+   cell is stretched to the row by the copy beside it, and the image fills
+   whatever that turns out to be. Sized by aspect-ratio instead, it would set the
+   row height itself, which is the thing being fixed. */
 .sr__media img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 100%;
+  object-position: center;
   object-fit: cover;
   transition: transform 700ms var(--gp-ease);
 }
@@ -64,18 +84,16 @@
 
 /* --- copy ----------------------------------------------------------------- */
 
-.sr__stage {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gp-accent-ink);
-  transition: var(--gp-fade);
+/* Centred against the photograph. The column is stretched to the row height, so
+   without this the copy sits hard at the top while the image runs past it. */
+.sr__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .sr__title {
-  margin: 12px 0 0;
+  margin: 0;
   font-size: var(--gp-section-title);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -94,12 +112,21 @@
 }
 
 @media (max-width: 900px) {
-  .sr__inner {
-    grid-template-columns: 1fr;
+  .sr__inner,
+  .sr__row--flip .sr__inner {
+    grid-template-columns: minmax(0, 1fr);
     gap: 28px;
   }
 
   /* Image above the copy on every row once stacked — alternating the order
      vertically would just look like a mistake. */
   .sr__row--flip .sr__media { order: 0; }
+
+  /* Stacked, there is no column of copy beside the photograph to give it a
+     height, so it goes back to setting its own. Without this it would collapse
+     to the 200px floor and read as a letterbox strip on a phone. */
+  .sr__media {
+    min-height: 0;
+    aspect-ratio: 3 / 2;
+  }
 }

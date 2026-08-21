@@ -100,7 +100,10 @@ function ServiceRow({ service, index, audience }) {
         </div>
 
         <div className="sr__body">
-          <p className="sr__stage">{service.stage}</p>
+          {/* The stage line ("Before the tender drops") is gone: it sat above
+              every one of the six headings as tracked-out capitals and read as
+              chrome rather than as information. `stage` is still on the service
+              record and still orders the rows — it is just no longer printed. */}
           <h2 className="sr__title" id={`service-${service.key}`}>
             {service.title}
           </h2>

@@ -1,0 +1,176 @@
+/* B4 — one prompt, full page.
+
+   Same two-part shape every detail page on the site uses: the title on the dark
+   heading strip, the content on paper below it. The prompt itself reuses
+   `.pl-tool` from the library so a tool chip looks the same in both places. */
+
+.pd {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+.pd__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding-inline: clamp(20px, 4vw, 60px);
+}
+
+/* --- the strip ------------------------------------------------------------ */
+
+.pd__head {
+  background: var(--gp-head-bg);
+  color: #fff;
+  transition: var(--gp-fade);
+}
+
+.pd__head .pd__inner {
+  padding-block: var(--gp-head-pad);
+}
+
+/* Two grounds, two colours. The back link sits on the dark strip on a prompt
+   that loaded, and on paper on the not-found and error states — where the white
+   version was invisible against the page. Scoped to the strip rather than left
+   as a single rule, so neither case has to remember to override the other. */
+.pd__back {
+  display: inline-block;
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+  text-decoration: none;
+}
+.pd__back:hover { text-decoration: underline; }
+
+.pd__head .pd__back {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+}
+.pd__head .pd__back:hover { color: #fff; text-decoration: none; }
+
+.pd > .pd__inner .pd__title { max-width: 30ch; }
+
+.pd__title {
+  margin: 0;
+  max-width: 24ch;
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.pd__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* --- the body ------------------------------------------------------------- */
+
+.pd__body .pd__inner {
+  padding-block: clamp(24px, 3vw, 40px);
+}
+
+/* The loading / not-found / error states are the page's only content, so they
+   carry the padding the head-and-body pair would otherwise have given them. */
+.pd > .pd__inner {
+  padding-block: clamp(28px, 4vw, 56px);
+}
+
+.pd__state {
+  margin: 12px 0 20px;
+  font-size: 15px;
+  color: var(--gp-muted);
+}
+
+/* The label, the copy button and the live region on one line, so the action is
+   beside the thing it acts on rather than hunted for at the foot of the page. */
+.pd__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.pd__label {
+  margin: 0;
+  margin-right: auto;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pd__label--notes { margin-top: 28px; margin-bottom: 10px; }
+
+.pd__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--gp-brand);
+  border-radius: 999px;
+  background: var(--gp-brand);
+  color: var(--gp-paper);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s var(--gp-ease), border-color 0.16s var(--gp-ease);
+}
+
+.pd__copy:hover { background: var(--gp-brand-lift); border-color: var(--gp-brand-lift); }
+.pd__copy.is-copied { background: var(--gp-accent-ink); border-color: var(--gp-accent-ink); }
+.pd__copy:focus-visible { outline: 2px solid var(--gp-brand); outline-offset: 2px; }
+
+/* Announced, not shown: the button's own label already changes for anyone who
+   can see it. */
+.pd__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pd__prompt {
+  margin: 0;
+  padding: clamp(16px, 2vw, 24px);
+  max-width: 100ch;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-radius: 14px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--gp-ink);
+}
+
+.pd__notes {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gp-muted);
+}
+
+.pd__more {
+  display: inline-block;
+  margin-top: clamp(24px, 3vw, 36px);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
+  text-decoration: none;
+}
+.pd__more:hover { text-decoration: underline; }

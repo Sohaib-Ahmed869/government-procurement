@@ -1,25 +1,33 @@
 import PageLayout from '../../components/layout/PageLayout.jsx';
 import PanelsHero from '../../features/panels/components/PanelsHero.jsx';
 import PanelsList from '../../features/panels/components/PanelsList.jsx';
-import PanelsCta from '../../features/panels/components/PanelsCta.jsx';
+import EngageServices from '../../features/panels/components/EngageServices.jsx';
+import { useAudience } from '../../context/AudienceContext.jsx';
 
-// B2 — the panels and prequalification schemes we can be engaged through.
-//
-// A credentials page, not a directory: every row is an arrangement we hold an
-// appointment on, so a client who already buys under one can appoint us
-// directly. That distinction is the whole page — it decides the copy, why there
-// are no "open to new suppliers" labels, and why the list is not filterable.
-//
-// Every entry is CMS content (Content → Government Panels), including the
-// headings, which are free text so a local council that runs its own panel can
-// have one of its own.
+/* B2 — how a client can engage us. The page answers a different question on
+   each side of the toggle, because the two are not in the same position.
+
+   AWARD, a government buyer: the panels and schemes we hold an appointment on.
+   If they already purchase under one, they can appoint us directly under it
+   with no separate approach to market. That is a credentials list, and it is
+   what PanelsList renders.
+
+   WIN, a supplier or bidder: panels are how government BUYS, not a route a
+   bidder can use, so the same list would answer a question they never asked.
+   What they need is which services we run for them and how to start one —
+   EngageServices, a row per service with call, email and consultation on it.
+
+   Every panel entry is CMS content (Content → Government Panels), including the
+   headings, which are free text so a local council that runs its own panel can
+   have one of its own. */
 export default function GovernmentPanelsPage() {
+  const { audience } = useAudience();
+
   return (
     <div className="page-scale">
       <PageLayout>
         <PanelsHero />
-        <PanelsList />
-        <PanelsCta />
+        {audience === 'win' ? <EngageServices audience={audience} /> : <PanelsList />}
       </PageLayout>
     </div>
   );

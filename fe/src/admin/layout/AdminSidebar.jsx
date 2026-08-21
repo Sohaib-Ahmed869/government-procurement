@@ -69,7 +69,7 @@ const NAV = [
       { to: '/admin/tenders', label: 'Tenders', icon: 'link' },
       { to: '/admin/careers', label: 'Careers', icon: 'hand' },
       { to: '/admin/rules', label: 'Jurisdictional Links', icon: 'rails' },
-      { to: '/admin/panels', label: 'Government Panels', icon: 'link' },
+      { to: '/admin/panels', label: 'How to Engage Us', icon: 'link' },
       { to: '/admin/prompts', label: 'Prompt Library', icon: 'doc' },
       { to: '/admin/templates', label: 'Templates', icon: 'media' },
       { to: '/admin/bid-writers', label: 'Find a Bid Writer', icon: 'hand' },

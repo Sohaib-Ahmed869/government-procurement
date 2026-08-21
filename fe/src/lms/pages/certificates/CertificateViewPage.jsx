@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import CertificateDesign from '../../components/certificates/CertificateDesign.jsx';
+import CertificateDownload from '../../components/certificates/CertificateDownload.jsx';
 import { useCertificate } from '../../hooks/useCertificates.js';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 
@@ -13,10 +14,10 @@ export default function CertificateViewPage() {
   const { user } = useStudentAuth();
   const [copied, setCopied] = useState(false);
 
-  // Printing is the download: the browser's own "Save as PDF" produces a proper
-  // vector PDF at any paper size, and the print stylesheet isolates the
-  // certificate from the rest of the page. That beats rasterising it to an
-  // image, and needs no PDF dependency.
+  // Printing is now the SECOND way out, kept for anyone who wants paper.
+  // Download writes a real PDF directly (see utils/certificatePdf.js): vector
+  // text, A4 landscape, no browser headers, and a file the learner can attach
+  // to an application rather than a dialog they have to configure.
   const print = useCallback(() => window.print(), []);
 
   const copyLink = useCallback(async () => {
@@ -73,10 +74,13 @@ export default function CertificateViewPage() {
             <LmsIcon name={copied ? 'check' : 'link'} />
             {copied ? 'Link copied' : 'Copy verify link'}
           </button>
-          <button type="button" className="lms-btn lms-btn--primary" onClick={print}>
-            <LmsIcon name="download" />
-            Download / print
+          {/* Two actions, not one. The old single button said "Download" and
+              opened a print dialog, which is not what the word promises. */}
+          <button type="button" className="lms-btn" onClick={print}>
+            <LmsIcon name="printer" />
+            Print
           </button>
+          <CertificateDownload certificate={certificate} />
         </div>
       </div>
 

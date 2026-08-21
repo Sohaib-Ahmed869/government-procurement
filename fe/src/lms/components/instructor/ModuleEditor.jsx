@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import LmsIcon from '../LmsIcon.jsx';
+import DripScheduler from './DripScheduler.jsx';
+import { dripModeOf, dripSummary } from '../../utils/gating.js';
 
 const KIND_ICON = { text: 'text', video: 'video', quiz: 'quiz', youtube: 'play', doc: 'doc' };
 
@@ -16,10 +18,12 @@ export default function ModuleEditor({
   onMoveModule,
   onAddLesson,
   onMoveLesson,
+  onScheduleModule,
 }) {
   const [renaming, setRenaming] = useState(null);
   const [draft, setDraft] = useState('');
   const [adding, setAdding] = useState(null); // module id whose kind picker is open
+  const [scheduling, setScheduling] = useState(null); // module id whose drip panel is open
 
   const startRename = (m) => {
     setRenaming(m._id);
@@ -71,12 +75,47 @@ export default function ModuleEditor({
                   disabled={mi === modules.length - 1} aria-label="Move module down" title="Move down">
                   <LmsIcon name="chevron" />
                 </button>
+                {/* Drip scheduling (L4). On the module rather than the lesson
+                    because that is where the server holds it: a module is the
+                    unit a cohort is released in. */}
+                <button
+                  type="button"
+                  className={`lms-iconbtn${dripModeOf(m) === 'now' ? '' : ' is-on'}`}
+                  onClick={() => setScheduling(scheduling === m._id ? null : m._id)}
+                  aria-expanded={scheduling === m._id}
+                  aria-label={`Release schedule for ${m.title}`}
+                  title={dripSummary(m) || 'Release schedule'}
+                >
+                  <LmsIcon name="clock" />
+                </button>
                 <button type="button" className="lms-iconbtn is-danger" onClick={() => onRemoveModule(m._id)}
                   aria-label={`Delete module ${m.title}`} title="Delete module">
                   <LmsIcon name="plus" className="lms-rotate45" />
                 </button>
               </span>
             </header>
+
+            {/* A schedule is invisible until you open the panel otherwise, and a
+                module that quietly stays shut for a week is exactly the thing an
+                author needs reminding of while they build the one after it. */}
+            {dripSummary(m) && scheduling !== m._id ? (
+              <button
+                type="button"
+                className="lms-cmod__drip"
+                onClick={() => setScheduling(m._id)}
+              >
+                <LmsIcon name="clock" />
+                {dripSummary(m)}
+              </button>
+            ) : null}
+
+            {scheduling === m._id ? (
+              <DripScheduler
+                module={m}
+                onChange={(patch) => onScheduleModule(m._id, patch)}
+                onClose={() => setScheduling(null)}
+              />
+            ) : null}
 
             <ul className="lms-clessons">
               {m.lessons.map((l, li) => (

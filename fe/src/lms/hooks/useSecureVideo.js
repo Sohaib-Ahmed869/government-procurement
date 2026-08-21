@@ -21,7 +21,7 @@ const MIN_WAIT_MS = 5_000;
 // viewer can capture once it plays. Genuinely protecting the file needs
 // encrypted HLS/DASH with DRM key rotation, which is a media-pipeline decision
 // on the backend. See the caveat in SecureVideoPlayer.
-export function useSecureVideo(lessonId, { enabled = true } = {}) {
+export function useSecureVideo(lessonId, { enabled = true, hls = false } = {}) {
   const [state, setState] = useState({ url: null, expiresAt: null, status: 'loading' });
   const timerRef = useRef(null);
 
@@ -40,11 +40,16 @@ export function useSecureVideo(lessonId, { enabled = true } = {}) {
 
     const load = async () => {
       try {
-        const { url, expiresAt } = await videoApi.signedUrl(lessonId);
+        // An HLS lesson gets a playlist URL; everything else keeps the signed
+        // MP4 it has always had. Same { url, expiresAt } either way, so the
+        // refresh cycle below does not care which it is holding.
+        const { url, expiresAt } = hls
+          ? await videoApi.hlsUrl(lessonId)
+          : await videoApi.signedUrl(lessonId);
         if (!alive) return;
 
         const expiry = Date.parse(expiresAt);
-        setState({ url, expiresAt: expiry, status: 'ready' });
+        setState({ url, expiresAt: expiry, status: 'ready', kind: hls ? 'hls' : 'mp4' });
 
         // Re-issue before this one lapses. Reschedule from the server's expiry,
         // not from a local constant. The TTL is the server's to decide, and
@@ -73,7 +78,7 @@ export function useSecureVideo(lessonId, { enabled = true } = {}) {
       alive = false;
       clear();
     };
-  }, [lessonId, enabled, clear]);
+  }, [lessonId, enabled, hls, clear]);
 
   return state;
 }

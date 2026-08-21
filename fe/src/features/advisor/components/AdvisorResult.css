@@ -15,10 +15,9 @@
 
 .adv-result__eyebrow {
   margin: 0;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--gp-accent-ink);
 }
 
@@ -43,10 +42,9 @@
 
 .adv-result__h3 {
   margin: 0 0 16px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--gp-ink);
 }
 
@@ -94,10 +92,9 @@
 .adv-path__status {
   flex: 0 0 auto;
   padding: 3px 10px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   border-radius: 999px;
   background: var(--gp-paper-deep);
   color: var(--gp-muted);
@@ -266,11 +263,6 @@
   .pa-page__title {
     font-size: 18pt !important;
     color: #000 !important;
-  }
-
-  /* The lede sells the tool. On a file note it is noise. */
-  .pa-page__lede {
-    display: none !important;
   }
 
   .pa-page__body,

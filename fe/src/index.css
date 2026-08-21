@@ -84,50 +84,59 @@ body {
 }
 
 /* Big-screen scaling.
-   Pages are designed at a 1440px content width. On wider screens they would
-   otherwise sit in a fixed column with large empty margins. Instead we lay the
-   page out at exactly 1440px and use `zoom` to scale the whole thing up to fill
-   the viewport, so every text size, button, image and padding grows in the same
-   proportion — the laptop layout, just bigger. `zoom` (unlike transform) also
-   reflows, so nothing overlaps.
 
-   Wrap a page's <PageLayout> in `.page-scale` to opt in. This lives here rather
-   than in a per-page stylesheet so a new page only has to add the class; the
-   older `.<name>-scale` blocks in pages/public/*.css are the same rules under
-   per-page names and are being folded into this one. */
+   Pages are designed at a 1440px content width and scaled up to fill a wider
+   window, so a large monitor gets the laptop layout at its own size instead of
+   the design stranded in a column with a lot of empty either side.
+
+   --gp-scale is set by lib/pageScale.js, NOT by `calc(100vw / 1440px)` as it
+   once was. That formula looked right and broke the browser's zoom completely:
+   zoom works by changing the CSS viewport, so a factor derived from 100vw grew
+   by exactly the amount the visitor had just shrunk, and the page came out
+   pixel-identical at 50%, 80%, 100% and 125%. Stepping it through media queries
+   does not help either — zooming IN narrows the viewport into a lower step and
+   cancels again.
+
+   The JS measures the viewport as it would be at 100% zoom, so the factor holds
+   still while the visitor zooms and their zoom multiplies on top of it. See the
+   note in lib/pageScale.js.
+
+   Falls back to 1 if the script has not run, which is the design at its natural
+   size — the same thing every screen under 1441px gets. */
 @media (min-width: 1441px) {
   body {
-    /* The scaled page spans exactly 100vw; hide the sub-pixel/scrollbar spill. */
+    /* The scaled page spans the window; hide the sub-pixel/scrollbar spill. */
     overflow-x: hidden;
   }
 
-  .page-scale {
-    width: 1440px;
-    zoom: calc(100vw / 1440px);
+  .page-scale,
+  .home-scale,
+  .courses-scale,
+  .insights-scale,
+  .forum-scale,
+  .tenders-scale,
+  .expertise-scale {
+    /* Set by lib/pageScale.js to exactly one viewport divided by the scale, so
+       the painted page always spans the window — see the note there for why a
+       flat 1440px could not: it left the window white beside the page when the
+       visitor zoomed out, and cut the far side off when they zoomed in. */
+    width: var(--gp-page-width, 1440px);
+    zoom: var(--gp-scale, 1);
   }
 
   /* `.page-layout` sets `min-height: 100vh`, but `vh` inside a zoomed subtree
-     resolves to the real viewport and is then magnified by the zoom factor — so
-     the layout is forced to ~1.8 viewports tall. On a short page that stretches
-     the flex <main> and leaves a large empty gap above the footer. Divide the
-     height back down by the zoom factor so it targets exactly one real viewport,
-     keeping the footer at the bottom with no gap. */
-  .page-scale .page-layout {
-    min-height: calc(100vh / (100vw / 1440px));
+     resolves to the real viewport and is then magnified by the scale — so the
+     layout is forced to ~1.8 viewports tall and a short page leaves a large gap
+     above the footer. Divided back down, it targets exactly one real viewport. */
+  .page-scale .page-layout,
+  .home-scale .page-layout,
+  .courses-scale .page-layout,
+  .insights-scale .page-layout,
+  .forum-scale .page-layout,
+  .tenders-scale .page-layout,
+  .expertise-scale .page-layout {
+    min-height: calc(100vh / var(--gp-scale, 1));
   }
-}
-
-/* While an audience switch is resetting the page's reveal animations, hold every
-   transition. The reveals are two-way — the same 0.7s that fades a section in
-   would fade it out when it's hidden for the replay, so the section would drift
-   a few percent and come straight back: a flicker, not a reveal. Suppressed
-   here, the hidden state snaps into place and only the reveal itself animates.
-   Set by the audience toggle and cleared a frame or two later. */
-html[data-reveal-reset] *,
-html[data-reveal-reset] *::before,
-html[data-reveal-reset] *::after {
-  transition: none !important;
-  animation: none !important;
 }
 
 /* ---------------------------------------------------------------------------

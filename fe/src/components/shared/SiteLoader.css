@@ -100,10 +100,9 @@
   align-items: center;
   gap: calc(2px * var(--sl));
 
-  font-size: calc(15px * var(--sl));
+  font-size: calc(17px * var(--sl));
   font-weight: 400;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: rgba(255, 255, 255, 0.82);
 
   animation: site-loader-rise 700ms var(--gp-ease) both;

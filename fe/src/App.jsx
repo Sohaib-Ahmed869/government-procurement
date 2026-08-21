@@ -12,8 +12,6 @@ import GovernmentPanelsPage from './pages/public/GovernmentPanelsPage.jsx';
 import PromptLibraryPage from './pages/public/PromptLibraryPage.jsx';
 import TemplatesPage from './pages/public/TemplatesPage.jsx';
 import FindBidWriterPage from './pages/public/FindBidWriterPage.jsx';
-import PoliciesPage from './pages/public/PoliciesPage.jsx';
-import PolicyDetailPage from './pages/public/PolicyDetailPage.jsx';
 import BookConsultationPage from './pages/public/BookConsultationPage.jsx';
 import ForumHomePage from './pages/public/ForumHomePage.jsx';
 import ForumArticlePage from './pages/public/ForumArticlePage.jsx';
@@ -21,9 +19,13 @@ import ForumCategoriesPage from './pages/public/ForumCategoriesPage.jsx';
 import ForumSubmitPage from './pages/public/ForumSubmitPage.jsx';
 import ForumAnswerPage from './pages/public/ForumAnswerPage.jsx';
 import CoursesPage from './pages/public/CoursesPage.jsx';
+import BundleDetailPage from './pages/public/BundleDetailPage.jsx';
+import VerifyCertificatePage from './pages/public/VerifyCertificatePage.jsx';
+import PromptDetailPage from './pages/public/PromptDetailPage.jsx';
 import CourseDetailPage from './pages/public/CourseDetailPage.jsx';
 import InsightsPage from './pages/public/InsightsPage.jsx';
 import ArticleDetailPage from './pages/public/ArticleDetailPage.jsx';
+import PolicyDetailPage from './pages/public/PolicyDetailPage.jsx';
 // System / utility pages
 import ContactSentPage from './pages/system/ContactSentPage.jsx';
 import InterestRegisteredPage from './pages/system/InterestRegisteredPage.jsx';
@@ -98,6 +100,10 @@ function PublicSite() {
           <Route path="/government-panels" element={<GovernmentPanelsPage />} />
           {/* B4 — master prompts by topic, use case and tool. */}
           <Route path="/prompt-library" element={<PromptLibraryPage />} />
+          {/* One prompt, full page. It was a dialog over the library; a prompt
+              is a document somebody links, bookmarks and comes back to, and a
+              modal has no address. */}
+          <Route path="/prompt-library/:id" element={<PromptDetailPage />} />
           {/* B6 — sourced, licence-checked downloadable documents. */}
           <Route path="/templates" element={<TemplatesPage />} />
           {/* B7.8 — held from production. The route is not registered at all
@@ -108,6 +114,15 @@ function PublicSite() {
           )}
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
+          {/* Bundles are their own resource, not a course with a flag, so they
+              get their own path rather than sharing /courses/:id. */}
+          <Route path="/bundles/:slug" element={<BundleDetailPage />} />
+          {/* Certificate verification (LMS 12.0b). Public and outside /learn on
+              purpose: whoever opens this is an employer with a credential ID,
+              not a learner, and will not make an account to check one. The
+              bare path takes an ID typed off the printed certificate. */}
+          <Route path="/verify" element={<VerifyCertificatePage />} />
+          <Route path="/verify/:credentialId" element={<VerifyCertificatePage />} />
           <Route path="/insights" element={<InsightsPage />} />
           <Route path="/insights/:slug" element={<ArticleDetailPage />} />
           <Route path="/book-a-consultation" element={<BookConsultationPage />} />
@@ -129,15 +144,14 @@ function PublicSite() {
           <Route path="/qna" element={<RenamedPath base="/q-and-a" />} />
           <Route path="/qna/*" element={<RenamedPath base="/q-and-a" />} />
 
-          {/* B5 — policies. One index and one document template; the set and
-              its slugs live in features/policies/policies.js. */}
-          <Route path="/policies" element={<PoliciesPage />} />
+          {/* B5 — the policy documents themselves. The index that listed them
+              has gone; each policy is still its own page, reached from the
+              footer, because Privacy and Terms are linked from contracts and
+              app store listings and have to keep resolving. */}
           <Route path="/policies/:slug" element={<PolicyDetailPage />} />
 
-          {/* The old one-off policy URLs. They are in the footer of every page
-              already published, and Privacy and Terms are the kind of link that
-              gets pasted into contracts and app store listings, so they redirect
-              rather than 404. */}
+          {/* The old one-off policy URLs, kept as redirects for the same
+              reason. */}
           <Route path="/privacy" element={<Navigate to="/policies/privacy" replace />} />
           <Route path="/terms" element={<Navigate to="/policies/terms" replace />} />
           <Route

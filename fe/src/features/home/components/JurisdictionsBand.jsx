@@ -3,6 +3,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { JURISDICTIONS } from '../../jurisdictions/data.js';
 import './JurisdictionsBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // Every jurisdiction, each one a way into the rules page filtered to it.
 //
@@ -45,7 +46,7 @@ export default function JurisdictionsBand() {
         </ul>
 
         <Link className="hm-arrow" to="/jurisdictional-links">
-          See all jurisdictional links <span aria-hidden="true">→</span>
+          See all jurisdictional links <Arrow />
         </Link>
       </div>
     </section>

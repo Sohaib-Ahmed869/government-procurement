@@ -4,6 +4,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { careersApi } from '../../../api';
 import './CareersBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // The careers band.
 //
@@ -101,7 +102,7 @@ export default function CareersBand() {
         </ul>
 
         <Link className="hm-arrow" to="/careers">
-          See open roles <span aria-hidden="true">→</span>
+          See open roles <Arrow />
         </Link>
       </div>
     </section>

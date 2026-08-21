@@ -4,6 +4,7 @@ import LmsIcon from '../../components/LmsIcon.jsx';
 import SecureVideoPlayer from '../../components/player/SecureVideoPlayer.jsx';
 import YouTubeEmbed from '../../components/player/YouTubeEmbed.jsx';
 import TranscriptPanel from '../../components/player/TranscriptPanel.jsx';
+import PreviewGate from '../../components/lesson/PreviewGate.jsx';
 import LessonNav from '../../components/lesson/LessonNav.jsx';
 import ResourceList from '../../components/lesson/ResourceList.jsx';
 import NoteEditor from '../../components/progress/NoteEditor.jsx';
@@ -72,7 +73,15 @@ export default function VideoLessonPage() {
   // it for a locked lesson just earns a 403 the page already knows about.
   // A YouTube lesson has no signed URL to fetch, so the request is skipped
   // entirely rather than issued and thrown away.
-  const video = useSecureVideo(lessonId, { enabled: status === 'ready' && !isEmbed });
+  // A lesson packaged as encrypted HLS asks for a playlist; everything else
+  // keeps the signed MP4 it has always had. `hasHls` comes from the server, so
+  // a lesson that was never packaged — or one whose packaging failed — falls
+  // back rather than requesting a stream that does not exist.
+  const useHls = Boolean(data?.lesson?.video?.hasHls);
+  const video = useSecureVideo(lessonId, {
+    enabled: status === 'ready' && !isEmbed,
+    hls: useHls,
+  });
 
   const seek = useCallback((t) => {
     // An embed is somebody else's player, so seeking it goes through the API
@@ -163,7 +172,7 @@ export default function VideoLessonPage() {
     );
   }
 
-  const { lesson, module: mod, index, total, prev, next, resources, transcript, enrolled } = data;
+  const { course, lesson, module: mod, index, total, prev, next, resources, transcript, enrolled } = data;
 
   // The watermark carries who is watching. Signed out (preview), there is no
   // identity to stamp, so it renders nothing rather than a fake one.
@@ -218,6 +227,7 @@ export default function VideoLessonPage() {
         <SecureVideoPlayer
           videoRef={videoRef}
           src={video.url}
+          kind={video.kind ?? 'mp4'}
           watermark={watermark}
           startAt={initialStart}
           onTimeUpdate={onTime}
@@ -289,12 +299,18 @@ export default function VideoLessonPage() {
         )}
       </div>
 
+      {/* Above the nav, not below the tabs: somebody watching a preview signed
+          out has no notes and no next lesson to reach, so the offer is the next
+          thing on the page after the video rather than the last. */}
+      <PreviewGate course={course} lesson={lesson} enrolled={enrolled} />
+
       <LessonNav
         slug={slug}
         prev={prev}
         next={next}
         complete={complete}
         onToggleComplete={markComplete}
+        enrolled={enrolled}
       />
 
       <div className="lms-card lms-lesson-page__aside">

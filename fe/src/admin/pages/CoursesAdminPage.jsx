@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { reviewApi } from '../../api/lms.js';
 import AdminPathsPanel from '../components/AdminPathsPanel.jsx';
+import AdminBundlesPanel from '../components/AdminBundlesPanel.jsx';
 import CurriculumLesson from '../components/CurriculumLesson.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -223,10 +224,26 @@ export default function CoursesAdminPage() {
           >
             Learning paths
           </button>
+          {/* Bundles sit beside courses rather than in a page of their own:
+              what goes in one is a course, and the admin picking them has just
+              been looking at the list on the tab next door. */}
+          <button
+            type="button"
+            className={`admin-seg__btn${kind === 'bundles' ? ' is-active' : ''}`}
+            onClick={() => setKind('bundles')}
+          >
+            Bundles
+          </button>
         </div>
         <input
           className="admin-input"
-          placeholder={kind === 'paths' ? 'Search path or instructor…' : 'Search title or instructor…'}
+          placeholder={
+            kind === 'paths'
+              ? 'Search path or instructor…'
+              : kind === 'bundles'
+                ? 'Search bundles…'
+                : 'Search title or instructor…'
+          }
           value={q}
           onChange={(e) => setQ(e.target.value)}
           style={{ maxWidth: 280, marginLeft: 'auto' }}
@@ -234,6 +251,7 @@ export default function CoursesAdminPage() {
       </div>
 
       {kind === 'paths' ? <AdminPathsPanel isAdmin={isAdmin} query={q} /> : null}
+      {kind === 'bundles' ? <AdminBundlesPanel isAdmin={isAdmin} query={q} /> : null}
 
       {kind === 'courses' ? (
       <div className="admin-toolbar">

@@ -4,6 +4,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { coursesApi } from '../../../api';
 import './CoursesBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // Three courses off the catalogue. Renders nothing until the CMS has at least
 // one, so an empty install leaves no gap on the homepage — the same rule the
@@ -71,7 +72,7 @@ export default function CoursesBand() {
         </ul>
 
         <Link className="hm-arrow" to="/courses">
-          Browse the catalogue <span aria-hidden="true">→</span>
+          Browse the catalogue <Arrow />
         </Link>
       </div>
     </section>

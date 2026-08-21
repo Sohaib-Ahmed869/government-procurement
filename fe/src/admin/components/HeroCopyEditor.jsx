@@ -108,7 +108,7 @@ export default function HeroCopyEditor({ title, subtitle, load, save }) {
                 name="eyebrow"
                 value={form.eyebrow}
                 onChange={onChange}
-                hint="The small line above the heading."
+                hint="The small line above the heading. Shown exactly as you type it."
               />
               <FormField label="Heading" name="heading" value={form.heading} onChange={onChange} />
               <FormField

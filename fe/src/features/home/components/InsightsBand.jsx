@@ -4,6 +4,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { articlesApi } from '../../../api';
 import './InsightsBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // The Insights band on the single-page homepage (A1).
 //
@@ -104,7 +105,7 @@ export default function InsightsBand() {
         </div>
 
         <Link className="hm-arrow" to="/insights">
-          Read all insights <span aria-hidden="true">→</span>
+          Read all insights <Arrow />
         </Link>
       </div>
     </section>
@@ -130,7 +131,7 @@ function Card({ article, lead = false }) {
         <Meta article={article} />
         <h3 className="ib__title">{article.title}</h3>
         <span className="ib__more">
-          Read article <span aria-hidden="true">→</span>
+          Read article <Arrow />
         </span>
       </span>
     </Link>

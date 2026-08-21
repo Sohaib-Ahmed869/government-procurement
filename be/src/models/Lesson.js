@@ -79,6 +79,37 @@ const lessonSchema = new mongoose.Schema(
       mimeType: { type: String, default: '' },
       sizeBytes: { type: Number, default: 0 },
       durationSeconds: { type: Number, default: 0 },
+
+      /* Encrypted HLS (LMS 3.0), when the video has been packaged for it.
+
+         Additive, never a replacement. `key` above stays exactly as it was, so
+         a lesson uploaded before any of this — or one on an install with no
+         transcoder — keeps playing through the signed-MP4 endpoint. `status`
+         is what the player asks about: only 'ready' means there is a playlist
+         worth requesting.
+
+         No key material is stored here. Content keys are derived on demand from
+         HLS_KEY_SECRET (see hlsKeys.js), so this is a pointer and a count, and
+         a dump of this collection decrypts nothing. */
+      hls: {
+        status: {
+          type: String,
+          enum: ['none', 'pending', 'ready', 'failed'],
+          default: 'none',
+        },
+        // S3 key of the stored playlist. Its URIs are placeholders, rewritten
+        // per request — see hlsPackage.resolvePlaylist.
+        playlistKey: { type: String, default: '' },
+        // Prefix the encrypted segments live under.
+        segmentPrefix: { type: String, default: '' },
+        segmentCount: { type: Number, default: 0 },
+        // Held per-lesson rather than read from config at playback time: the
+        // setting can change, and the playlist that was written has to keep
+        // being described by the number it was written with.
+        rotateEvery: { type: Number, default: 0 },
+        packagedAt: { type: Date },
+        error: { type: String, default: '' },
+      },
     },
     transcript: { type: [cueSchema], default: [] },
 
@@ -157,7 +188,16 @@ lessonSchema.methods.forLearner = function forLearner() {
     }));
   }
 
-  if (o.video) o.video = { hasVideo: Boolean(o.video.key), durationSeconds: o.video.durationSeconds };
+  if (o.video) {
+    o.video = {
+      hasVideo: Boolean(o.video.key),
+      durationSeconds: o.video.durationSeconds,
+      // Whether to ask for the playlist instead of a signed MP4. A boolean, not
+      // the S3 keys: the player needs to know the stream exists, not where it
+      // is kept.
+      hasHls: o.video.hls?.status === 'ready',
+    };
+  }
 
   // Same rule for a downloadable resource: the learner gets the label and the
   // size so the list renders, and asks the signed-URL endpoint for the file

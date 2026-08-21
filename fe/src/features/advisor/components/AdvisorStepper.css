@@ -73,10 +73,9 @@
 
 .adv-step__count {
   margin: 0;
-  font-size: 12px;
+  font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--gp-accent-ink);
 }
 

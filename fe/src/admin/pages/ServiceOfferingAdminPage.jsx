@@ -28,6 +28,11 @@ const SERVICE_OPTS = [
 // For the six built-in services this decides which *copy* is used, not whether
 // the service is listed: all six appear under both segments either way. For a
 // service an editor adds, it decides where the service appears at all.
+//
+// These cards feed TWO public pages, which is worth knowing before editing one:
+// the Service Offering page, and the Win half of How to Engage Us, where each
+// card becomes a row with call / email / request-a-consultation on it. The Award
+// half of that page is the panels list, edited under Content → How to Engage Us.
 const AUDIENCE_OPTS = [
   { value: 'both', label: 'Both segments (one card)' },
   { value: 'win', label: 'Win contracts only' },
@@ -289,6 +294,12 @@ export default function ServiceOfferingAdminPage() {
             Use “Both segments” to write a service once and have it serve Win and Award
             together; pick a single segment only where the wording actually differs.
             Added services follow the six, in the order you set.
+          </p>
+          <p className="admin-page__subtitle">
+            These cards appear in two places: the <strong>Service Offering</strong> page,
+            and the <strong>Win Contracts</strong> half of{' '}
+            <strong>How to Engage Us</strong>, where each becomes a row with call, email
+            and request-a-consultation beside it. Editing a card changes both.
           </p>
         </div>
         <div className="admin-page__actions">

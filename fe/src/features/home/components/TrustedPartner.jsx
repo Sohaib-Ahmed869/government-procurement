@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import photo from '../../../assets/images/EnhanceExpImage.png';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // The band directly under the hero: what the firm does, said once, for whichever
 // side of the table the visitor is on.
@@ -62,7 +63,7 @@ export default function TrustedPartner() {
             </ul>
 
             <Link className="hm-arrow" to="/service-offering">
-              See how we work <span aria-hidden="true">→</span>
+              See how we work <Arrow />
             </Link>
           </div>
         </div>

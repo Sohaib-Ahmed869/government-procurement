@@ -77,8 +77,15 @@
      retracted), so a vh-sized hero is always a little too tall to fit.
      
      --gp-hero-offset is the header stack above this section. The floor keeps
-     the block usable on a very short window rather than crushing the copy. */
-  min-height: max(420px, calc(100svh - var(--gp-hero-offset, 140px)));
+     the block usable on a very short window rather than crushing the copy.
+
+     Divided by --gp-scale for the same reason .page-layout's 100vh is (see
+     index.css): above 1441px the page is inside a `zoom`ed subtree, and a
+     viewport unit there resolves to the REAL viewport and is THEN magnified by
+     the scale. Undivided, a 4K screen got a hero the best part of two viewports
+     tall, so the video filled the window and the heading and lede sat below the
+     fold — the one thing this rule exists to prevent. */
+  min-height: max(420px, calc(100svh / var(--gp-scale, 1) - var(--gp-hero-offset, 140px)));
   /* Capped harder than before. The block is bottom-aligned, so a big top pad
      only ever pushes the copy down when the content is taller than the space. */
   padding-top: clamp(80px, 8vw, 120px);
@@ -87,12 +94,23 @@
 
 .home-hero__col { max-width: 800px; }
 
+/* Set exactly as it is typed in the CMS.
+
+   This used to be 12px, tracked out to 0.16em and forced to uppercase — the
+   small caps label the rest of the site uses above a heading. It reads well,
+   but it meant the hero never matched what an editor saw in the field they had
+   just filled in, and this is the ONE eyebrow on the site whose words come from
+   the CMS rather than from a component. Where somebody is typing the copy, the
+   page should show them their copy.
+
+   The size and tracking move with it rather than staying behind. 12px at 0.16em
+   is built for capitals; sentence case at those values reads as a mistake and
+   gets lost under a 64px heading. So: a little larger, tracking near normal. */
 .home-hero__eyebrow {
   margin: 0 0 14px;
-  font-size: 12px;
+  font-size: clamp(14px, 1.15vw, 16px);
   font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  letter-spacing: 0.005em;
   color: var(--gp-accent);
   transition: var(--gp-fade);
 }

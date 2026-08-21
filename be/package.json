@@ -18,7 +18,9 @@
     "seed:capabilities": "node src/seed/seed-capabilities.js",
     "seed:demo-articles": "node src/seed/seed-demo-articles.js",
     "reset:courses": "node src/seed/reset-courses.js",
-    "check": "node --check src/server.js"
+    "check": "node --check src/server.js",
+    "hls:package": "node src/scripts/package-hls.js",
+    "hls:secret": "node src/scripts/package-hls.js --secret"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.658.0",

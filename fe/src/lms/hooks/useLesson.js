@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { catalogApi, progressApi } from '../../api/lms.js';
 import { textToBlocks } from '../utils/textBlocks.js';
 
@@ -36,6 +37,9 @@ function gateFromError(err) {
 }
 
 export function useLesson(slug, lessonId) {
+  // Null when a screen using this hook is rendered outside the player shell,
+  // which is why every call below is optional.
+  const { reloadOutline } = useOutletContext() ?? {};
   const [data, setData] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound | locked | error
   const [gate, setGate] = useState(null);
@@ -87,34 +91,25 @@ export function useLesson(slug, lessonId) {
         // Where they got to last time, or 0. The server decides whether there
         // is anything worth resuming, so the player just honours the number.
         resumeAt: lesson.resumeAt ?? 0,
-        // This lesson's own downloads first (L1). They are what the instructor
-        // attached to THIS lesson, so the slide deck sits beside the video it
-        // belongs to. The course-level media list is appended after, so the
-        // course-wide handouts a CMS-authored course carries are still there.
+        // This lesson's downloads, and only this lesson's (L1). What the
+        // instructor attached HERE, so the slide deck sits beside the video it
+        // belongs to.
         //
-        // `id` is the resource's own id for a lesson download, because that is
-        // what the signed-URL endpoint takes. A course media item has no such
-        // endpoint: its url was already public.
-        resources: [
-          ...(lesson.resources ?? []).map((r) => ({
-            id: r._id,
-            lessonId: entry.id,
-            title: r.title || r.name || 'Resource',
-            kind: r.kind ?? 'doc',
-            sizeBytes: r.sizeBytes ?? 0,
-            // Either it is ours, and needs a signed URL, or it is a link.
-            signed: Boolean(r.hasFile),
-            url: r.url ?? '',
-          })),
-          ...(outline.course?.media ?? []).map((m) => ({
-            id: m._id ?? m.url,
-            title: m.title || m.name || 'Resource',
-            kind: m.kind ?? 'pdf',
-            sizeBytes: m.sizeBytes ?? 0,
-            signed: false,
-            url: m.url,
-          })),
-        ],
+        // The course record's `media` used to be appended after this. It is a
+        // public marketing gallery with an unexpiring /files URL, so it was the
+        // one row in a gated list that always opened — and it is not lesson
+        // material. Course videos and handouts belong to a lesson, where the
+        // preview-or-enrol rule reaches them.
+        resources: (lesson.resources ?? []).map((r) => ({
+          id: r._id,
+          lessonId: entry.id,
+          title: r.title || r.name || 'Resource',
+          kind: r.kind ?? 'doc',
+          sizeBytes: r.sizeBytes ?? 0,
+          // Either it is ours, and needs a signed URL, or it is a link.
+          signed: Boolean(r.hasFile),
+          url: r.url ?? '',
+        })),
       });
       setStatus('ready');
     } catch (err) {
@@ -140,13 +135,20 @@ export function useLesson(slug, lessonId) {
     // it back rather than leaving the button unresponsive.
     setComplete(true);
     try {
-      return await progressApi.completeLesson(lessonId);
+      const result = await progressApi.completeLesson(lessonId);
+      // The player shell fetched the outline when it mounted and has no idea
+      // this just happened, so its progress bar and its rail keep showing the
+      // course as it was — a two-lesson course read 50% with both lessons
+      // finished. Telling it here rather than in each of the three lesson
+      // screens means none of them can forget to.
+      await reloadOutline?.();
+      return result;
     } catch (err) {
       setComplete(false);
       setError(err?.message ?? 'Could not save your progress');
       return null;
     }
-  }, [complete, lessonId]);
+  }, [complete, lessonId, reloadOutline]);
 
   return { data, status, gate, error, complete, markComplete, reload: load };
 }

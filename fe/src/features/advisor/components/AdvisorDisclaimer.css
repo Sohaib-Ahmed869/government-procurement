@@ -23,12 +23,10 @@
 
 .adv-disclaimer__lead { color: var(--gp-ink) !important; }
 
-/* In front of the questions it sits above the whole grid, so it spans both
-   columns of the stepper. */
-.adv-disclaimer--intro {
-  grid-column: 1 / -1;
-  margin-bottom: clamp(20px, 2.5vw, 30px);
-}
+/* The `intro` variant is no longer rendered — the stepper carried it above the
+   questions and it repeated what the picker screen already says before anyone
+   reaches this. The default is kept so the component still has one; only the
+   `result` variant is in use, on the printed answer. */
 
 .adv-disclaimer--result {
   margin-top: clamp(28px, 3vw, 40px);

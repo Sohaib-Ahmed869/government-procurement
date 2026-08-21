@@ -124,7 +124,7 @@ export default function InstructorPathsPage() {
                 </div>
 
                 {p.reviewNote && (state === 'rejected' || state === 'declined') ? (
-                  <p className="lms-alert lms-alert--error" style={{ marginTop: 10 }}>
+                  <p className="lms-alert lms-alert--error">
                     <strong>{state === 'declined' ? 'Not accepted' : 'Changes requested'}:</strong>{' '}
                     {p.reviewNote}
                   </p>

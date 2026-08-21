@@ -4,6 +4,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { tenderSitesApi } from '../../../api';
 import './TenderPortalsBand.css';
+import Arrow from '../../../components/shared/Arrow.jsx';
 
 // Three portals off the Tender Websites page, with the links that are actually
 // useful — open tenders, upcoming, register — rather than the homepage of each
@@ -73,7 +74,7 @@ export default function TenderPortalsBand() {
 
         <div className="hm-reveal" data-delay="4">
           <Link className="hm-arrow" to="/aus-list">
-            See the full list of tender websites <span aria-hidden="true">→</span>
+            See the full list of tender websites <Arrow />
           </Link>
         </div>
       </div>

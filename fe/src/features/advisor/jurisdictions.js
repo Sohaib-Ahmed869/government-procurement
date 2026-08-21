@@ -1,23 +1,63 @@
 import { rulePacksApi } from '../../api';
 
-// A6 — the jurisdictions the advisor offers, and how a rule pack is assembled.
-//
-// Only the ones that actually run are listed. The picker fills the rest of the
-// row with unnamed "Coming soon" boxes: naming a jurisdiction there would be a
-// commitment to which one is next, which nobody has made. Adding one is ship
-// its pack under rules/, add it here, and the placeholder count drops by one.
+/* A6 — every jurisdiction the advisor covers, and how a rule pack is assembled.
+
+   All nine are listed by name now, rather than the live ones plus a row of
+   unnamed "Coming soon" boxes. `live` is what separates them: only a
+   jurisdiction with a pack under BUILT_IN below is a link, and the rest are
+   inert cards. That flag and the pack list have to agree — a card marked live
+   with no pack behind it would take a visitor to a screen that loads forever.
+
+   `code` is the tier the jurisdiction sits in, not its abbreviation: what a
+   buyer needs to know first is which rulebook applies to them, and "State
+   Government" answers that where "NSW" only repeats the name underneath. */
 export const JURISDICTIONS = [
   {
+    slug: 'federal',
+    code: 'Australian Government',
+    name: 'Federal',
+    note: 'Coming Soon',
+    live: false,
+  },
+  {
     slug: 'nsw',
-    code: 'NSW',
+    code: 'State Government',
     name: 'New South Wales',
-    note: 'Available now',
+    note: 'Available Now',
+    live: true,
+  },
+  { slug: 'vic', code: 'State Government', name: 'Victoria', note: 'Coming Soon', live: false },
+  { slug: 'qld', code: 'State Government', name: 'Queensland', note: 'Coming Soon', live: false },
+  {
+    slug: 'wa',
+    code: 'State Government',
+    name: 'Western Australia',
+    note: 'Coming Soon',
+    live: false,
+  },
+  {
+    slug: 'sa',
+    code: 'State Government',
+    name: 'South Australia',
+    note: 'Coming Soon',
+    live: false,
+  },
+  { slug: 'tas', code: 'State Government', name: 'Tasmania', note: 'Coming Soon', live: false },
+  {
+    slug: 'act',
+    code: 'Territory Government',
+    name: 'Australian Capital Territory',
+    note: 'Coming Soon',
+    live: false,
+  },
+  {
+    slug: 'nt',
+    code: 'Territory Government',
+    name: 'Northern Territory',
+    note: 'Coming Soon',
+    live: false,
   },
 ];
-
-// How many boxes the row holds in total, so the picker keeps its shape as
-// jurisdictions are added.
-export const PICKER_SLOTS = 3;
 
 // The built-in packs. Imported lazily: the NSW pack is a thousand lines of
 // rules and sources, and nobody who doesn't open the advisor should pay for it.

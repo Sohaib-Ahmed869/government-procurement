@@ -1,0 +1,174 @@
+/* "How to Engage Us", Win segment — a service and the ways to start it.
+
+   Written against the site ramp rather than the --band-* roles, matching
+   PanelsList next door: both sit on --gp-paper under the same heading strip, so
+   the two sides of the toggle change content without the page changing shade. */
+
+.eng {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+}
+
+.eng__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  /* Same as the panels list, so the toggle does not shift the page. */
+  padding: clamp(24px, 2.8vw, 36px) clamp(20px, 4vw, 60px);
+}
+
+.eng__list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Copy left, actions right. `auto` on the second track so the buttons take the
+   width they need and the description keeps the rest — a fixed column would
+   either crop "Request a consultation" or leave a gap beside "Call". */
+.eng__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(20px, 3vw, 48px);
+  align-items: center;
+  padding: 20px 22px;
+  border: 1px solid var(--gp-line);
+  border-radius: 14px;
+  background: var(--gp-paper-alt);
+  transition: var(--gp-fade), border-color 0.16s var(--gp-ease);
+}
+
+.eng__row:hover { border-color: var(--gp-brand); }
+
+.eng__body { min-width: 0; }
+
+.eng__title {
+  margin: 0;
+  font-size: clamp(17px, 1.6vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.eng__copy {
+  margin: 6px 0 0;
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.eng__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.eng__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border: 1px solid var(--gp-line);
+  border-radius: 999px;
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: var(--gp-fade), border-color 0.16s var(--gp-ease),
+    background-color 0.16s var(--gp-ease);
+}
+
+.eng__action:hover {
+  border-color: var(--gp-brand);
+  background: var(--gp-paper-deep);
+}
+
+.eng__action:focus-visible {
+  outline: 2px solid var(--gp-brand);
+  outline-offset: 2px;
+}
+
+/* The one that carries the page's intent. Filled, so the row has an obvious
+   primary among three options rather than three equal ones. */
+.eng__action--primary {
+  border-color: var(--gp-brand);
+  background: var(--gp-brand);
+  color: var(--gp-paper);
+}
+
+.eng__action--primary:hover {
+  background: var(--gp-brand-lift);
+  border-color: var(--gp-brand-lift);
+}
+
+.eng__note {
+  margin: clamp(18px, 2vw, 26px) 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.eng__note a {
+  color: var(--gp-ink);
+  font-weight: 600;
+  text-underline-offset: 2px;
+}
+
+.eng[data-audience='award'] .eng__note a { color: var(--gp-green-600); }
+
+/* Visually hidden, still read aloud: the Call button says "Call", and the
+   number itself is what a screen reader needs to announce with it. */
+.eng__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- reveal on scroll-in, matching the panels list ------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .eng__row,
+  .eng__note {
+    opacity: 0;
+    translate: 0 var(--gp-reveal-shift);
+    transition:
+      opacity var(--gp-reveal-dur) var(--gp-ease),
+      translate var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  .eng.is-in .eng__row,
+  .eng.is-in .eng__note {
+    opacity: 1;
+    translate: none;
+    /* Capped at four steps: a per-row stagger down six rows ends on a delay
+       long enough to read as the page still loading. */
+    transition-delay: calc(min(var(--i, 0), 4) * var(--gp-reveal-step));
+  }
+}
+
+@media (max-width: 760px) {
+  /* Stacked: at this width the actions cannot sit beside the copy without
+     squeezing both, so they take a row of their own under it. */
+  .eng__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .eng__actions { justify-content: flex-start; }
+
+  /* Full width, so the primary action is a proper tap target rather than a pill
+     floating at one end of the row. */
+  .eng__action--primary { flex: 1 1 100%; justify-content: center; }
+}

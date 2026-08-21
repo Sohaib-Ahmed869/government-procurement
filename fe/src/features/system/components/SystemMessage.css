@@ -3,7 +3,10 @@
   align-items: center;
   justify-content: center;
   flex: 1 0 auto;
-  min-height: 60vh;
+  /* Divided by --gp-scale: on a wide screen this sits in a `zoom`ed subtree,
+     where a viewport unit resolves to the real viewport and is then magnified.
+     See the note in index.css. */
+  min-height: calc(60vh / var(--gp-scale, 1));
   padding: 72px 40px;
   background: var(--sysmsg-bg);
   color: #fff;

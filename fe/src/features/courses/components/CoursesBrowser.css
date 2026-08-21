@@ -553,3 +553,44 @@
     padding: 18px 4px 4px;
   }
 }
+
+/* Bundle price on a card: what it costs, with what it would have cost struck
+   through beside it. Two numbers rather than a percentage, because the saving
+   is the difference and a shopper is comparing the two anyway. */
+.courses-card__price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--band-ink);
+}
+
+.courses-card__price s {
+  font-size: 12.5px;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+/* "View more" — the glass pill the insights grid uses, so the two listings on
+   the site behave and read the same way. */
+.courses-main__more {
+  display: block;
+  margin: 40px auto 0;
+  padding: 13px 30px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--band-ink);
+  cursor: pointer;
+  background: var(--band-surface-hover);
+  border: 0;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background-color 0.15s ease;
+}
+
+.courses-main__more:hover { background: var(--band-surface); }
+.courses-main__more:focus-visible { outline: 2px solid var(--band-accent); outline-offset: 3px; }

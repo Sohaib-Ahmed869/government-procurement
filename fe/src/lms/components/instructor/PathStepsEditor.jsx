@@ -128,8 +128,12 @@ export default function PathStepsEditor({ steps, catalogue, onChange }) {
                 </div>
 
                 <div className="lms-pathstep__body">
+                  {/* The same switch every other on/off setting uses. This row
+                      used to put `lms-switch` on the input itself, which is the
+                      class for the TRACK — so the styles landed on nothing and
+                      the browser drew its own blue tick beside a green page. */}
                   <label className="lms-pref__label">
-                    <span>
+                    <span className="lms-pref__text">
                       <span className="lms-pref__name">Required</span>
                       <span className="lms-pref__hint">
                         An elective counts toward progress but is not needed for the
@@ -138,10 +142,13 @@ export default function PathStepsEditor({ steps, catalogue, onChange }) {
                     </span>
                     <input
                       type="checkbox"
-                      className="lms-switch"
+                      className="lms-switch__input lms-sr-only"
                       checked={step.required !== false}
                       onChange={(e) => patch(i, { required: e.target.checked })}
                     />
+                    <span className="lms-switch" aria-hidden="true">
+                      <span className="lms-switch__knob" />
+                    </span>
                   </label>
 
                   {others.length ? (

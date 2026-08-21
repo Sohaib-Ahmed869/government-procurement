@@ -2,8 +2,18 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
-import { coursesApi } from '../../../api';
+import { bundlesApi, coursesApi } from '../../../api';
 import './CoursesBrowser.css';
+
+// Whole dollars: these are course prices, and the cents are always zero.
+const formatPrice = (n, currency = 'AUD') =>
+  Number(n) > 0
+    ? new Intl.NumberFormat('en-AU', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 0,
+      }).format(Number(n))
+    : 'Free';
 
 // Availability badge copy keyed on the course's `availability` state.
 const AVAILABILITY_LABEL = {
@@ -12,12 +22,22 @@ const AVAILABILITY_LABEL = {
   closed: 'Closed',
 };
 
+// "Bundles" is not a course segment — it swaps the grid over to bundles
+// entirely, because a bundle is several courses and has nothing to say about
+// which audience a single one is for. It sits last, after the two contract
+// categories.
 const CATEGORY_OPTS = [
   { value: 'all', label: 'All Categories' },
   { value: 'general', label: 'General' },
   { value: 'award', label: 'Award Contracts' },
   { value: 'win', label: 'Win Contracts' },
+  { value: 'bundles', label: 'Bundles' },
 ];
+
+// Four rows of the 3-up desktop grid. Anything that would start a fifth row
+// waits behind "View more", the same as the insights grid.
+const PAGE_SIZE = 12;
+
 const LEVEL_OPTS = [
   { value: 'all', label: 'All Levels' },
   { value: 'beginner', label: 'Beginner' },
@@ -63,15 +83,24 @@ export default function CoursesBrowser() {
   const [level, setLevel] = useState('all');
 
   const [courses, setCourses] = useState([]);
+  const [bundles, setBundles] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
+  const [shown, setShown] = useState(PAGE_SIZE);
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const list = await coursesApi.list({ limit: 100 });
+        // Bundles are a separate resource, fetched alongside rather than after
+        // the filter is switched: one round trip on load beats a spinner every
+        // time somebody flicks between the two.
+        const [list, bundleList] = await Promise.all([
+          coursesApi.list({ limit: 100 }),
+          bundlesApi.list({ limit: 100 }).catch(() => []),
+        ]);
         if (!alive) return;
         setCourses(list || []);
+        setBundles(bundleList || []);
         setStatus('ready');
       } catch {
         if (alive) setStatus('error');
@@ -106,20 +135,35 @@ export default function CoursesBrowser() {
   //
   // The order is fixed at featured-first, then newest — what the "Popular" sort
   // did, and the only order left now that the sort control has gone.
+  const showingBundles = category === 'bundles';
+
   const visible = useMemo(() => {
+    const byNewest = (a, b) =>
+      new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+
+    // A bundle has no level, so the level filter has nothing to say about one.
+    // Applying it anyway would empty the grid the moment somebody left a level
+    // ticked from the tab before.
+    if (showingBundles) return [...bundles].sort(byNewest);
+
     const filtered = courses.filter((c) => {
       if (category !== 'all' && (c.segment || 'general') !== category) return false;
       if (level !== 'all' && (c.level || 'beginner') !== level) return false;
       return true;
     });
 
-    const byNewest = (a, b) =>
-      new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-
     return [...filtered].sort(
       (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byNewest(a, b),
     );
-  }, [courses, category, level]);
+  }, [courses, bundles, showingBundles, category, level]);
+
+  // Changing a filter starts the count again. Keeping the old one would show
+  // four rows of a two-item result, or hide the top of a longer one.
+  useEffect(() => {
+    setShown(PAGE_SIZE);
+  }, [category, level]);
+
+  const onScreen = visible.slice(0, shown);
 
   return (
     <section className={`courses-browse hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
@@ -154,14 +198,18 @@ export default function CoursesBrowser() {
             value={category}
             onChange={setCategory}
           />
-          <FilterGroup
-            icon={<span className="courses-filter__img courses-filter__img--level" />}
-            heading="Level"
-            name="level"
-            options={LEVEL_OPTS}
-            value={level}
-            onChange={setLevel}
-          />
+          {/* Hidden under Bundles: a bundle has no level, so leaving the group
+              there would be a control that does nothing to what is on screen. */}
+          {showingBundles ? null : (
+            <FilterGroup
+              icon={<span className="courses-filter__img courses-filter__img--level" />}
+              heading="Level"
+              name="level"
+              options={LEVEL_OPTS}
+              value={level}
+              onChange={setLevel}
+            />
+          )}
           </aside>
         </div>
 
@@ -189,44 +237,95 @@ export default function CoursesBrowser() {
           )}
           {status === 'ready' && visible.length === 0 && (
             <p className="courses-main__title">
-              {courses.length === 0
-                ? 'No courses have been published yet.'
-                : 'No resources match these filters.'}
+              {showingBundles
+                ? 'No bundles have been published yet.'
+                : courses.length === 0
+                  ? 'No courses have been published yet.'
+                  : 'No resources match these filters.'}
             </p>
           )}
 
           {status === 'ready' && visible.length > 0 && (
             <ul className="courses-grid">
-              {visible.map((course, i) => (
-                <li key={course._id || course.id} className="courses-card" style={{ '--i': i }}>
-                  <Link className="courses-card__link" to={`/courses/${course.slug}`}>
-                    <div
-                      className="courses-card__art"
-                      style={
-                        course.image?.url
-                          ? { backgroundImage: `url(${course.image.url})` }
-                          : undefined
-                      }
-                    />
-                    <div className="courses-card__body">
-                      <div className="courses-card__tags">
-                        {course.availability && (
+              {onScreen.map((item, i) =>
+                showingBundles ? (
+                  <li key={item._id || item.id} className="courses-card" style={{ '--i': i % PAGE_SIZE }}>
+                    <Link className="courses-card__link" to={`/bundles/${item.slug}`}>
+                      <div
+                        className="courses-card__art"
+                        style={
+                          item.image?.url
+                            ? { backgroundImage: `url(${item.image.url})` }
+                            : undefined
+                        }
+                      />
+                      <div className="courses-card__body">
+                        <div className="courses-card__tags">
                           <span className="courses-tag">
-                            {AVAILABILITY_LABEL[course.availability] || course.availability}
+                            {item.courseCount} {item.courseCount === 1 ? 'course' : 'courses'}
                           </span>
-                        )}
-                        {course.durationLabel && (
-                          <span className="courses-card__level">{course.durationLabel}</span>
-                        )}
+                          {/* The saving is the reason a bundle exists, so it is
+                              on the card rather than a click away. */}
+                          {item.saving > 0 && (
+                            <span className="courses-card__level">
+                              Save {formatPrice(item.saving, item.currency)}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="courses-card__title">{item.title}</h3>
+                        <p className="courses-card__price">
+                          {formatPrice(item.price, item.currency)}
+                          {item.listPrice > item.price && (
+                            <s>{formatPrice(item.listPrice, item.currency)}</s>
+                          )}
+                        </p>
                       </div>
-                      {/* Title only — the summary belongs on the course's own
-                          page, not on the card. */}
-                      <h3 className="courses-card__title">{course.title}</h3>
-                    </div>
-                  </Link>
-                </li>
-              ))}
+                    </Link>
+                  </li>
+                ) : (
+                  <li key={item._id || item.id} className="courses-card" style={{ '--i': i % PAGE_SIZE }}>
+                    <Link className="courses-card__link" to={`/courses/${item.slug}`}>
+                      <div
+                        className="courses-card__art"
+                        style={
+                          item.image?.url
+                            ? { backgroundImage: `url(${item.image.url})` }
+                            : undefined
+                        }
+                      />
+                      <div className="courses-card__body">
+                        <div className="courses-card__tags">
+                          {item.availability && (
+                            <span className="courses-tag">
+                              {AVAILABILITY_LABEL[item.availability] || item.availability}
+                            </span>
+                          )}
+                          {item.durationLabel && (
+                            <span className="courses-card__level">{item.durationLabel}</span>
+                          )}
+                        </div>
+                        {/* Title only — the summary belongs on the course's own
+                            page, not on the card. */}
+                        <h3 className="courses-card__title">{item.title}</h3>
+                      </div>
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
+          )}
+
+          {/* Past four rows the grid stops being something you scan and starts
+              being something you scroll past, so the rest waits behind a button
+              — the same rule the insights grid follows. */}
+          {status === 'ready' && visible.length > shown && (
+            <button
+              type="button"
+              className="courses-main__more"
+              onClick={() => setShown((n) => n + PAGE_SIZE)}
+            >
+              View more
+            </button>
           )}
         </div>
       </div>

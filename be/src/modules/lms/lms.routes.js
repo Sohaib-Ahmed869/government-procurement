@@ -31,10 +31,23 @@ router.get('/progress', protect, learning.myProgress);
 router.post('/progress/lessons/:lessonId/complete', protect, learning.completeLesson);
 router.patch('/progress/lessons/:lessonId/position', protect, learning.setPosition);
 
-router.get('/lessons/:lessonId/video-url', protect, learning.videoUrl);
-router.get('/lessons/:lessonId/document-url', protect, learning.documentUrl);
-router.get('/lessons/:lessonId/resources/:resourceId/url', protect, learning.resourceUrl);
-router.get('/lessons/:lessonId/transcript', protect, learning.transcript);
+// Lesson media is optional-auth, not protected (LMS 9.0b). A free preview has
+// to play for somebody who has not signed up, or it is not a preview. The
+// enrolment check has NOT moved: every one of these still runs gateFor(), which
+// returns `preview` only for a lesson the instructor flagged as one and
+// `locked-enrolment` for the rest, signed in or not.
+router.get('/lessons/:lessonId/video-url', optionalAuth, learning.videoUrl);
+router.get('/lessons/:lessonId/document-url', optionalAuth, learning.documentUrl);
+router.get('/lessons/:lessonId/resources/:resourceId/url', optionalAuth, learning.resourceUrl);
+router.get('/lessons/:lessonId/transcript', optionalAuth, learning.transcript);
+
+// Encrypted HLS (LMS 3.0). Optional-auth for the same reason the rest of the
+// lesson media is: a free preview has to play without an account. Both run the
+// enrolment gate, and the key endpoint runs it again on every request, so
+// revoking access stops playback rather than waiting for a page load.
+router.get('/lessons/:lessonId/hls', optionalAuth, learning.hlsTicket);
+router.get('/lessons/:lessonId/hls/index.m3u8', optionalAuth, learning.hlsPlaylist);
+router.get('/lessons/:lessonId/hls/key/:group', optionalAuth, learning.hlsKey);
 
 // Declared before /:lessonId so "attempts" isn't read as a lesson id.
 router.get('/quizzes/attempts', protect, learning.allMyAttempts);

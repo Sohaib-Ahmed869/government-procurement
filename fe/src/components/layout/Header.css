@@ -84,7 +84,10 @@
   max-width: var(--gp-shell-bar);
   min-height: 60px;
   margin: 0 auto;
-  padding: 0 var(--nav-gutter);
+  /* A little air above the brand row. The logo sat hard against the top edge of
+     the viewport, which read as the page having been cropped rather than as a
+     bar. Top only: the nav row below supplies the space underneath. */
+  padding: 10px var(--nav-gutter) 6px;
 }
 
 /* --- brand --- */
@@ -616,7 +619,18 @@
   height: clamp(24px, 4.2vh, 36px);
 }
 
-/* Staggered reveal of the menu items when the panel opens. */
+/* Staggered reveal of the menu items when the panel opens.
+
+   Driven by --i, set on each <li> from its index in Header.jsx. It used to be
+   thirteen items against ten hand-written :nth-child rules, so the last three
+   fell through to a 0s delay: they finished before the staggered ones had
+   started and read as already being there when the panel opened. Indexing the
+   items means the stagger cannot fall behind the length of the menu again.
+
+   Capped at the twelfth step. Past roughly 0.7s a menu stops looking like it is
+   arriving and starts looking like it is loading, and a nav long enough to hit
+   the cap is one where the last item should not be waiting on the other
+   fourteen. */
 @media (prefers-reduced-motion: no-preference) {
   .site-header__mobile-list li {
     opacity: 0;
@@ -624,42 +638,16 @@
     transition:
       opacity 0.4s ease,
       transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Closing runs in one movement rather than unwinding item by item: the
+       panel is on its way out, and a reversed stagger only delays it. The
+       .is-open rule below is more specific, so it still wins on the way in. */
+    transition-delay: 0s;
   }
 
   .site-header__mobile.is-open .site-header__mobile-list li {
     opacity: 1;
     transform: none;
-  }
-
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(1) {
-    transition-delay: 0.1s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(2) {
-    transition-delay: 0.15s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(3) {
-    transition-delay: 0.2s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(4) {
-    transition-delay: 0.25s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(5) {
-    transition-delay: 0.3s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(6) {
-    transition-delay: 0.35s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(7) {
-    transition-delay: 0.4s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(8) {
-    transition-delay: 0.45s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(9) {
-    transition-delay: 0.5s;
-  }
-  .site-header__mobile.is-open .site-header__mobile-list li:nth-child(10) {
-    transition-delay: 0.55s;
+    transition-delay: calc(0.1s + min(var(--i, 0), 12) * 0.05s);
   }
 }
 

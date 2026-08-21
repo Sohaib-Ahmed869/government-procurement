@@ -4848,6 +4848,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   align-items: center;
   justify-content: center;
   height: 110px;
+  /* Defaults live here, not in the component. A certificate's stored design
+     carries an accent but no soft variant, and one issued before the field
+     existed carries neither — so the card has to render with nothing passed in
+     rather than falling back to an unset custom property (which paints
+     nothing). The inline accent overrides only the one it sets. */
+  --cert-accent: #0a3114;
+  --cert-accent-soft: #7ee2a8;
   background: linear-gradient(135deg, var(--cert-accent), #14572a);
   color: var(--cert-accent-soft);
 }
@@ -4865,7 +4872,14 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-certcard__title a:hover { color: var(--lms-green-600); }
 .lms-certcard__meta { margin: 0 0 4px; font-size: 13px; color: var(--lms-muted); }
 .lms-certcard__id { margin: 0; font-size: 12px; color: var(--lms-muted); font-variant-numeric: tabular-nums; }
-.lms-certcard__foot { padding: 14px 18px; border-top: 1px solid var(--lms-border); background: var(--lms-surface-2); }
+.lms-certcard__foot {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-top: 1px solid var(--lms-border);
+  background: var(--lms-surface-2);
+}
 
 .lms-cert-stage { display: flex; justify-content: center; }
 
@@ -5244,11 +5258,319 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-certdoc__credential { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
 
+/* Printing a certificate.
+
+   The rules below used to say only "no border, no shadow", and the page came
+   out portrait, monochrome and framed by the browser's own header — because
+   two things were missing.
+
+   First, the OTHER print block in this file targets `.lms-cert`, which is the
+   placeholder's class. The real document renders as `.lms-certdoc`, so none of
+   that block's landscape sizing or colour handling ever applied to it.
+
+   Second, browsers drop background colours and images when printing unless
+   asked not to. The accent rule, the frame and the seal are colour, so without
+   print-color-adjust the certificate prints as grey text on white — which is
+   not the document the learner was shown. */
 @media print {
-  .lms-certdoc { border: none; box-shadow: none; max-width: none; }
+  /* Everything that is app furniture rather than the certificate. */
+  .lms-noprint,
+  .lms-sidebar,
+  .lms-header,
+  .lms-player__bar,
+  .lms-player__rail { display: none !important; }
+
+  .lms-shell,
+  .lms-content { display: block; padding: 0; background: #fff; }
+
+  .lms-certdoc {
+    max-width: none;
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    /* The aspect-ratio that shapes it on screen fights the paper, which already
+       has one. Let the page decide the height. */
+    aspect-ratio: auto;
+    /* Keep the colours the learner was shown. Both spellings: the unprefixed
+       property is the standard, the -webkit- one is what Chrome and Safari
+       still act on. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .lms-certdoc__frame {
+    /* cqw sizing needs a container to measure; on paper there isn't a useful
+       one, so the type is pinned to physical units and the design lands at the
+       same proportions it has on screen. */
+    font-size: 4.4mm;
+    padding: 12mm 14mm;
+    height: auto;
+    min-height: 170mm;
+  }
+
+  /* One page, landscape, and no orphaned second sheet. */
+  .lms-certdoc { break-inside: avoid; page-break-inside: avoid; }
+  @page { size: A4 landscape; margin: 10mm; }
 }
 
 /* Save failure in the builder. Sits directly under the bar, above the tabs, so
    it is in the path of anyone who is still typing. */
 .lms-builder__savefail { margin: 0 0 16px; }
 .lms-builder__saved.is-error { color: var(--lms-danger); font-weight: 600; }
+
+/* Path builder top bar (LMS 8.0) -------------------------------------------
+   The path builder's header was the one builder header with no styles of its
+   own, so "My paths" rendered as a bare underlined <a> next to two floating
+   words. It is the same bar the course builder has, so it gets the same
+   furniture: a real button back to the list, and the status/save pair pinned
+   to the far end of the row. */
+.lms-builder__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.lms-builder__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px 8px 11px;
+  border: 1px solid var(--lms-border-strong);
+  border-radius: 999px;
+  background: var(--lms-surface);
+  color: var(--lms-text);
+  font-size: 13.5px;
+  font-weight: 550;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: var(--lms-shadow-sm);
+  transition: background 0.15s var(--lms-ease), border-color 0.15s var(--lms-ease),
+    color 0.15s var(--lms-ease), transform 0.08s var(--lms-ease);
+}
+/* The chevron ships pointing down, so it is turned rather than swapped for a
+   second icon that means the same thing. */
+.lms-builder__back svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  transform: rotate(90deg);
+  transition: transform 0.15s var(--lms-ease);
+}
+.lms-builder__back:hover {
+  border-color: #b9c7bf;
+  background: var(--lms-surface-2);
+  color: var(--lms-green-600);
+}
+.lms-builder__back:hover svg { transform: rotate(90deg) translateY(2px); }
+.lms-builder__back:active { transform: translateY(1px); }
+.lms-builder__back:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-builder__save { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* The instructor path card puts its actions straight on the card rather than
+   inside a __foot, so without this the Edit button sits flush against the
+   card's own border. */
+.lms-icourse > .lms-icourse__actions {
+  padding: 14px 20px;
+  border-top: 1px solid var(--lms-border);
+  flex-wrap: wrap;
+}
+/* Same reason: the "changes requested" note is a direct child too, so it needs
+   the padding the card's sections normally carry. */
+.lms-icourse > .lms-alert { margin: 0 20px 14px; }
+
+/* Drip scheduling (L4) -----------------------------------------------------
+   Lives in the 330px curriculum rail, so everything here is sized for that
+   column rather than for the editor pane beside it. */
+.lms-iconbtn.is-on { background: var(--lms-mint-soft); color: var(--lms-green); }
+
+/* The chip under a scheduled module's header. A schedule is otherwise invisible
+   from the rail, and a module that stays shut for a week is the one thing an
+   author most needs reminding of while they build the next one. */
+.lms-cmod__drip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px 30px;
+  padding: 3px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--lms-mint-soft);
+  color: var(--lms-green);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+.lms-cmod__drip:hover { background: var(--lms-mint); }
+.lms-cmod__drip svg { width: 12px; height: 12px; flex-shrink: 0; }
+.lms-cmod__drip:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+
+.lms-drip {
+  margin: 2px 0 10px 30px;
+  padding: 11px 12px 12px;
+  border: 1px solid var(--lms-border);
+  border-radius: 11px;
+  background: var(--lms-surface-2);
+}
+.lms-drip__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.lms-drip__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lms-text);
+}
+.lms-drip__label svg { width: 14px; height: 14px; color: var(--lms-green); }
+
+/* Three modes, one row. They are answers to a single question, so they read as
+   a segmented control rather than three separate switches. */
+.lms-drip__modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--lms-surface-3);
+}
+.lms-drip__mode {
+  padding: 6px 4px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--lms-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.14s var(--lms-ease), color 0.14s var(--lms-ease);
+}
+.lms-drip__mode:hover { color: var(--lms-text); }
+.lms-drip__mode.is-on {
+  background: var(--lms-surface);
+  color: var(--lms-green);
+  box-shadow: var(--lms-shadow-sm);
+}
+.lms-drip__mode:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+
+.lms-drip__field { display: block; margin-top: 10px; }
+.lms-drip__hint {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--lms-muted);
+}
+.lms-drip__input { margin-top: 0 !important; padding: 7px 9px; font-size: 13px; }
+.lms-drip__days { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--lms-text-2); }
+.lms-drip__days .lms-drip__input { width: 72px; flex-shrink: 0; }
+
+.lms-drip__preview {
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--lms-border);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--lms-text-2);
+}
+.lms-drip__preview strong { color: var(--lms-green); }
+.lms-drip__note { margin: 6px 0 0; font-size: 11px; line-height: 1.45; color: var(--lms-muted); }
+
+/* Free-preview upgrade path (LMS 9.0b) -------------------------------------
+   The end of a sample. Deliberately not styled as a lock: nothing here is being
+   refused, something is being offered, so it takes the mint surface the LMS
+   uses for good news rather than the danger red of a gate. */
+.lms-previewgate {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 220px;
+  gap: 18px;
+  align-items: start;
+  margin-top: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--lms-mint);
+  border-radius: var(--lms-radius);
+  background: var(--lms-mint-soft);
+}
+.lms-previewgate__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--lms-surface);
+  color: var(--lms-green);
+}
+.lms-previewgate__mark svg { width: 22px; height: 22px; }
+.lms-previewgate__kicker {
+  margin: 0 0 3px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lms-green);
+}
+.lms-previewgate__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lms-text);
+}
+.lms-previewgate__text {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--lms-text-2);
+}
+.lms-previewgate__list {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+  font-size: 13.5px;
+  color: var(--lms-text-2);
+}
+.lms-previewgate__list li { display: flex; align-items: center; gap: 9px; }
+.lms-previewgate__list svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--lms-green); }
+.lms-previewgate__act { display: flex; flex-direction: column; gap: 10px; }
+.lms-previewgate__price {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--lms-text);
+}
+
+@media (max-width: 760px) {
+  .lms-previewgate { grid-template-columns: 44px minmax(0, 1fr); padding: 18px; }
+  /* The action drops to a full-width row under the copy rather than being
+     squeezed into a third column that no longer fits. */
+  .lms-previewgate__act { grid-column: 1 / -1; }
+}
+
+/* Secure video could not start — a browser with no HLS support and no hls.js.
+   Said out loud rather than left as a black rectangle. */
+.lms-video__error {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--lms-danger-soft);
+  color: var(--lms-danger);
+  font-size: 13.5px;
+  line-height: 1.5;
+}

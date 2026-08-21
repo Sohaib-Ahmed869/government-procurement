@@ -19,7 +19,9 @@
 .gp-list__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: clamp(36px, 5vw, 60px) clamp(20px, 4vw, 60px) clamp(48px, 7vw, 88px);
+  /* Even top and bottom, and both well under what they were: the list is short
+     and 60px above it with 88px below left it floating in the page. */
+  padding: clamp(24px, 2.8vw, 36px) clamp(20px, 4vw, 60px);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -63,15 +65,17 @@
   list-style: none;
 }
 
-/* Indented under the heading, the way the reference sets it — the mark sits in
-   the indent so the text of every row starts at the same x and the eye has one
-   edge to run down. */
+/* Flush with the group heading above it: the GP mark starts on the same left
+   edge the jurisdiction's name does, so the heading and the rows under it share
+   one line to run down. The rows used to carry an extra 30px of left padding,
+   which set the whole list in from its own heading and read as a stray indent
+   rather than as structure. */
 .gp-row {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   gap: 14px;
   align-items: start;
-  padding: 9px 0 9px clamp(0px, 2vw, 30px);
+  padding: 9px 0;
 }
 
 /* The GP mark as the bullet — the reference uses its own logo here, and a plain
@@ -164,7 +168,7 @@
 /* --- responsive ----------------------------------------------------------- */
 
 @media (max-width: 620px) {
-  .gp-list__inner { padding: 32px 20px 48px; }
+  .gp-list__inner { padding: 24px 20px; }
 
   .gp-row {
     grid-template-columns: 21px minmax(0, 1fr);

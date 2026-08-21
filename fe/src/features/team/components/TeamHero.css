@@ -30,9 +30,10 @@
 }
 
 .team-hero__inner {
-  max-width: var(--gp-shell);
+  /* The page's own width, shared with the grid below. */
+  max-width: var(--gp-team-shell);
   margin: 0 auto;
-  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
+  padding: var(--gp-head-pad) var(--gp-team-gutter);
 }
 
 .team-hero__eyebrow {
