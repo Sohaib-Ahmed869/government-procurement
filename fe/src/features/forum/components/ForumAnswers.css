@@ -11,7 +11,11 @@
   gap: 64px;
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px clamp(20px, 4vw, 60px) 48px;
+  /* Tight to the tools strip above and to the footer below. The heading sat
+     40px under a search row that itself sat 24px under the band, so "Recent
+     Answers" started most of a hundred pixels below the last thing the page
+     said. */
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 /* --- reveal on scroll-in --- */
@@ -44,7 +48,7 @@
 }
 
 .forum-answers__heading {
-  margin: 0 0 26px;
+  margin: 0 0 16px;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: var(--gp-section-title);
   font-weight: 400;
@@ -93,7 +97,7 @@
 .forum-card {
   display: block;
   width: 100%;
-  padding: 24px;
+  padding: 18px 20px;
   text-decoration: none;
   /* Raised the way the Procurement Advisor's jurisdiction boxes are: a tight
      contact shadow to seat the card and a wider soft one for the lift, and it
@@ -107,7 +111,9 @@
      body, tag and focus ring together. --band-muted is 0.82 rather than the
      dark band's 0.72 for the same reason it is there: these fills are lighter
      than a dark band, so secondary text loses contrast against them faster. */
-  background: var(--gp-brand-lift);
+  /* The heading band's own ground, so a card and the strip at the top of the
+     page are the same colour rather than two neighbouring steps of the ramp. */
+  background: var(--gp-head-bg);
   color: #fff;
 
   --band-ink: #fff;
@@ -152,8 +158,8 @@
 .forum-card__meta {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 16px;
+  gap: 14px;
+  margin-top: 10px;
 }
 
 .forum-card__date {
@@ -164,7 +170,7 @@
 /* Capped at three lines: in a grid the cards sit side by side, so an unclipped
    preview on one would set the height for the whole row. */
 .forum-card__body {
-  margin: 18px 0 0;
+  margin: 10px 0 0;
   font-size: 14px;
   line-height: 1.6;
   color: var(--band-ink);

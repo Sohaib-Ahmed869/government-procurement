@@ -32,7 +32,7 @@ const AUDIENCE_LINKS = [
   { label: 'Sourcing Advisor', href: '/advisory' },
   { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
   { label: 'How to Engage Us', href: '/government-panels' },
-  { label: 'Prompt Library', href: '/prompt-library' },
+  { label: 'AI Prompt Library', href: '/prompt-library' },
   { label: 'Templates', href: '/templates' },
   // B7.8 — footer entry appears with the nav entry, at `live` only.
   ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
@@ -107,7 +107,7 @@ const FLAT_ROWS = [
   [
     { label: 'Jurisdictional Links', href: '/jurisdictional-links' },
     { label: 'How to Engage Us', href: '/government-panels' },
-    { label: 'Prompt Library', href: '/prompt-library' },
+    { label: 'AI Prompt Library', href: '/prompt-library' },
   ],
   [
     { label: 'Templates', href: '/templates' },

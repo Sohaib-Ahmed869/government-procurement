@@ -7,9 +7,10 @@
 .insights__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  /* Top padding, so the filter row clears the heading band above it rather than
-     sitting on its edge. */
-  padding: clamp(24px, 3vw, 36px) clamp(20px, 4vw, 60px) 48px;
+  /* Enough that the filter row clears the heading band rather than sitting on
+     its edge, and no more: at 36px the gap was as deep as the row itself, and
+     the first line of cards — which is what the page is — started below it. */
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 /* --- filter pills --- */
@@ -17,11 +18,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  /* Clears the page-heading block above it. With no top margin the pill sat
-     hard against the dark band's bottom edge, so the two read as one control
-     attached to the heading rather than the start of the listing. */
-  margin-top: clamp(20px, 3vw, 32px);
-  margin-bottom: 24px;
+  /* No top margin. The clearance from the heading band is the container's own
+     top padding — this was a second helping of it stacked on top, and between
+     the two the pill sat 48px below the band with nothing in the gap. */
+  margin-top: 0;
+  margin-bottom: 18px;
 }
 
 .insights-pill {

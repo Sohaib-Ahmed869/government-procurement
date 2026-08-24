@@ -16,10 +16,13 @@ import './EngageServices.css';
    the same list answers a question they did not ask.
 
    What a bidder wants to know is: which of these do you do for me, and how do I
-   start? So each row names a service and carries the three ways to begin it —
-   call, email, or ask for a consultation. The action is on the row rather than
-   collected at the foot of the page, because the decision to get in touch is
-   made against a particular service, not against the page as a whole.
+   start? So each row names a service and carries the way to begin it: a
+   consultation request that arrives already naming the service. The action is on
+   the row rather than collected at the foot of the page, because the decision to
+   get in touch is made against a particular service, not against the page as a
+   whole — and for the same reason the row does NOT repeat the switchboard number
+   and the general inbox, which are the same on all six and are offered once,
+   under the list, to anyone who would rather start with a call.
 
    The services are the SAME six the Service Offering page lists, read from the
    same resolver, in the order a bidder meets them. A second hand-kept list here
@@ -27,7 +30,7 @@ import './EngageServices.css';
    ------------------------------------------------------------------------ */
 
 // Fallback copy, per service, for the Win side. Shown until an editor writes
-// the card in the CMS — a row that is a heading and three buttons tells a
+// the card in the CMS — a row that is a heading and a button tells a
 // bidder nothing about what they would be buying.
 const FALLBACK = {
   'procurement-strategy':
@@ -44,7 +47,9 @@ const FALLBACK = {
     'Keep the contract healthy through its term, and be ready for the extension or the re-tender at the end of it.',
 };
 
-function ActionIcon({ name }) {
+// Only the arrow is left, now that the rows carry one action; `name` stays in
+// the signature so a second icon can come back without changing the call sites.
+function ActionIcon() {
   const common = {
     viewBox: '0 0 24 24',
     width: 16,
@@ -56,21 +61,6 @@ function ActionIcon({ name }) {
     strokeLinejoin: 'round',
     'aria-hidden': true,
   };
-  if (name === 'phone') {
-    return (
-      <svg {...common}>
-        <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4 6.2 2 2 0 0 1 6 4z" />
-      </svg>
-    );
-  }
-  if (name === 'mail') {
-    return (
-      <svg {...common}>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="m3 7 9 6 9-6" />
-      </svg>
-    );
-  }
   return (
     <svg {...common}>
       <path d="M4 12h13" />
@@ -123,29 +113,21 @@ export default function EngageServices({ audience }) {
                 </p>
               </div>
 
-              {/* The three ways in, on the row. `tel:` and `mailto:` stay plain
-                  anchors — they are not routes, and handing them to the router
-                  would swallow them. The subject line names the service so an
-                  enquiry arrives already knowing what it is about. */}
+              {/* One way in, on the row. It carried three — call, email and the
+                  consultation form — and the two contact links were the wrong
+                  two to repeat six times: they are the same number and the same
+                  address on every row, they say nothing about the service they
+                  sit beside, and the note under the list already offers both to
+                  anyone who would rather start with a phone call. What is left
+                  is the action that IS particular to the row: a consultation
+                  request that arrives naming the service it came from. */}
               <div className="eng__actions">
-                <a className="eng__action" href={CONTACT_PHONE_HREF}>
-                  <ActionIcon name="phone" />
-                  <span className="eng__action-label">Call</span>
-                  <span className="eng__sr">{CONTACT_PHONE}</span>
-                </a>
-                <a
-                  className="eng__action"
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(service.title)}`}
-                >
-                  <ActionIcon name="mail" />
-                  <span className="eng__action-label">Email</span>
-                </a>
                 <Link
                   className="eng__action eng__action--primary"
                   to={`/book-a-consultation?service=${encodeURIComponent(service.key)}`}
                 >
                   <span className="eng__action-label">Request a consultation</span>
-                  <ActionIcon name="arrow" />
+                  <ActionIcon />
                 </Link>
               </div>
             </li>

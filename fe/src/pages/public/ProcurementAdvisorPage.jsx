@@ -68,7 +68,9 @@ export default function ProcurementAdvisorPage() {
               {/* The title alone. The lede under it described the questions
                   that begin immediately below, so it delayed the thing it was
                   describing. */}
-              <h1 className="pa-page__title hm-reveal">Sourcing Advisor</h1>
+              <h1 className="pa-page__title hm-reveal">
+                Rule-Based Guidance Specific to Jurisdiction
+              </h1>
             </div>
           </header>
 

@@ -18,7 +18,7 @@
   /* 28px on both ends, the same clearance every rule on the page carries: below
      the hero's rule down to "Roles we are hiring for", and below "Propose a
      role" up to the footer's own top rule. */
-  padding: 28px clamp(20px, 4vw, 60px);
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
@@ -53,7 +53,18 @@
    and put the gutter back inside it. */
 .careers__block {
   margin-inline: calc(clamp(20px, 4vw, 60px) * -1);
-  padding: 28px clamp(20px, 4vw, 60px);
+  /* Bottom only. The section already carries --gp-body-pad above the first
+     block, so a top padding here was landing on top of that and the first
+     block was given its own exception to cancel it — which left the SECOND
+     block sitting 16px lower than the first under its own edge: 43px of clear
+     space above "Create your own role" against 27 above "Roles we are hiring
+     for".
+     
+     With the top padding gone every block is the same: the space above a
+     heading is whatever the block above it left below its last element, and
+     that is this one value. Measured at 27px above the ink and 16px below the
+     last element, in both. */
+  padding: 0 clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 /* Alternating steps, starting on the section's own paper so the first block
@@ -63,15 +74,15 @@
 }
 
 /* A block's last element carries no trailing margin of its own — .careers__copy
-   has 18px, which would otherwise be added to the 28px above and push the rule
-   below a block that ends in a paragraph further away than one that ends in the
-   role cards. The 28px is the whole gap, either way. */
+   has 18px, which would otherwise be added to the block's own bottom padding and
+   push the rule below a block that ends in a paragraph further away than one
+   that ends in the role cards. The padding is the whole gap, either way. */
 .careers__block > :last-child {
   margin-bottom: 0;
 }
 
 .careers__heading {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   font-size: var(--gp-section-title);
   font-weight: 400;
   line-height: 1.1;
@@ -80,7 +91,7 @@
 
 .careers__copy {
   max-width: 720px;
-  margin: 0 0 18px;
+  margin: 0 0 12px;
   font-size: 16px;
   line-height: 1.7;
   color: var(--band-muted);
@@ -102,20 +113,20 @@
   margin-top: 28px;
 }
 
-/* Filled to match the team cards and the Q&A answer cards: --gp-brand-lift is
-   #4a4a4a on Win and #2f7d45 on Award, so one declaration covers both segments.
+/* The heading band's own ground, as on the Q&A answer cards. It was
+   --gp-brand-lift, one step up from that, which put a mid-green card on a paper
+   page under a dark-green band — three greens where the page only needs two.
 
-   As on .team-card in features/team/components/TeamGrid.css, that makes this a
-   dark island on a paper page, so it carries the DARK band's text roles instead
-   of the section's — one redefinition flips the title and body together.
-   --band-muted is 0.82 rather than the dark band's 0.72 for the same reason it
-   is there: these fills are lighter than a dark band, so secondary text loses
-   contrast against them faster. */
+   That makes this a dark island on a paper page, so it carries the DARK band's
+   text roles instead of the section's — one redefinition flips the title and
+   body together. --band-muted is 0.82 rather than the dark band's 0.72 because
+   these fills are lighter than a dark band, so secondary text loses contrast
+   against them faster. */
 .careers-role {
   display: flex;
   flex-direction: column;
-  padding: 28px;
-  background: var(--gp-brand-lift);
+  padding: 16px 18px;
+  background: var(--gp-head-bg);
   color: #fff;
 
   --band-ink: #fff;
@@ -130,7 +141,7 @@
 }
 
 .careers-role__title {
-  margin: 0 0 12px;
+  margin: 0 0 6px;
   font-size: 20px;
   font-weight: 600;
   color: var(--band-ink);

@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { pagesApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
-import { POLICY_BY_SLUG, PLACEHOLDER_SECTIONS, PLACEHOLDER_INTRO } from '../policies.js';
+import { POLICY_BY_SLUG, PLACEHOLDER_SECTIONS } from '../policies.js';
 import './PolicyDocument.css';
 import Arrow from '../../../components/shared/Arrow.jsx';
 
@@ -108,8 +108,6 @@ export default function PolicyDocument() {
   }
 
   const title = page?.title || policy.title;
-  const updated = page?.updatedLabel || '';
-  const intro = PLACEHOLDER_INTRO[slug] || policy.summary;
 
   return (
     <article className={`pol${shown ? ' is-in' : ''}`} data-audience={audience}>
@@ -119,9 +117,11 @@ export default function PolicyDocument() {
             <Arrow direction="left" /> All policies
           </Link>
 
+          {/* The title alone. The intro under it restated the policy's own
+              name in a sentence, and the "Last updated" line dated a document
+              whose date is in the document. Both sat between the heading and
+              the contents, which is what a reader came for. */}
           <h1 className="pol__title">{title}</h1>
-          {intro && <p className="pol__intro">{intro}</p>}
-          {updated && <p className="pol__updated">Last updated: {updated}</p>}
         </header>
 
         {/* B5.5 — impossible to mistake for the live policy, on screen and on

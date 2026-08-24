@@ -10,7 +10,7 @@
   gap: 56px;
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 24px clamp(20px, 4vw, 60px) 48px;
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 /* --- reveal on scroll-in --- */
@@ -51,11 +51,16 @@
 
 /* --- filter sidebar --- */
 /* Same surface as the course cards: 4% white fill with the glass edge. */
+/* Compressed. Two groups at 34px apart, in a 24px box, each heading carrying
+   32px of its own rule spacing and each option 14px from the next — the rail was
+   most of a laptop screen tall, so the courses beside it started below the fold
+   on the page whose whole job is to show you the courses. Nothing is smaller;
+   the air between them is. */
 .courses-filters {
   display: flex;
   flex-direction: column;
-  gap: 34px;
-  padding: 24px 20px;
+  gap: 20px;
+  padding: 16px 16px;
   background: var(--band-surface);
   border-radius: 24px;
   border: 1px solid var(--band-line);
@@ -65,8 +70,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 16px;
-  padding-bottom: 16px;
+  margin: 0 0 10px;
+  padding-bottom: 10px;
   font-size: 16px;
   font-weight: 600;
   /* The card's glass edge rather than solid white, so the rule sits in the same
@@ -106,7 +111,7 @@
 .courses-filter__options {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 9px;
 }
 
 /* --- custom radio --- */

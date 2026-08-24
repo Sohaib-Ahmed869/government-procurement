@@ -3,7 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import { templatesApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
+import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
+import { keepScrollOnNextNavigation } from '../../../components/shared/ScrollToTop.jsx';
 import { CATEGORIES, FORMATS, FORMAT_BY_VALUE, fileSize } from '../data.js';
 import './TemplatesBrowser.css';
 
@@ -53,8 +55,31 @@ export default function TemplatesBrowser() {
     const next = new URLSearchParams(params);
     if (value === ALL) next.delete(key);
     else next.set(key, value);
+    // A filter is a navigation, and without the line below every one of them
+    // threw the visitor back to the top of the page. See
+    // components/shared/ScrollToTop.jsx; same reasoning as the Prompt Library.
+    keepScrollOnNextNavigation();
     setParams(next, { replace: true });
+    // And then put the results back under the site header. Two behaviours were
+    // tried here and neither is this one: landing at the top of the DOCUMENT,
+    // which is what happens with no handling at all and throws you above the
+    // page's heading band; and staying exactly where you were, which leaves you
+    // looking at the middle of a list that has just been replaced. This scrolls
+    // to the top of the browse section — the rail and the first result, with the
+    // heading band scrolled past — so a filter always answers in the same place.
+    //
+    // The offset comes from `scroll-margin-top` on `.browse` (styles/browse.css)
+    // rather than from arithmetic here, which is what makes it right above
+    // 1441px too: the header is scaled there, and a scroll margin set inside the
+    // scaled subtree scales with it.
+    topRef.current?.scrollIntoView({ block: 'start' });
   };
+
+  // What the RESULTS are filtered by — behind the rail by the length of the
+  // fade-out, so the list leaving the screen is the one the visitor was looking
+  // at. See hooks/useFadeSwap.js.
+  const [appliedKey, fading] = useFadeSwap(JSON.stringify([category, useCase, format]));
+  const [shownCategory, shownUseCase, shownFormat] = JSON.parse(appliedKey);
 
   const [templates, setTemplates] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -141,9 +166,9 @@ export default function TemplatesBrowser() {
   const groups = useMemo(() => {
     const visible = templates.filter(
       (t) =>
-        (category === ALL || t.category === category) &&
-        (useCase === ALL || t.useCase === useCase) &&
-        (format === ALL || t.format === format),
+        (shownCategory === ALL || t.category === shownCategory) &&
+        (shownUseCase === ALL || t.useCase === shownUseCase) &&
+        (shownFormat === ALL || t.format === shownFormat),
     );
 
     return CATEGORIES.map((c) => {
@@ -161,7 +186,7 @@ export default function TemplatesBrowser() {
       cases.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
       return { ...c, cases };
     }).filter((c) => c.cases.length > 0);
-  }, [templates, category, useCase, format]);
+  }, [templates, shownCategory, shownUseCase, shownFormat]);
 
   const total = groups.reduce((n, c) => n + c.cases.reduce((m, g) => m + g.items.length, 0), 0);
   const filtered = category !== ALL || useCase !== ALL || format !== ALL;
@@ -216,7 +241,11 @@ export default function TemplatesBrowser() {
               <button
                 type="button"
                 className="browse-filters__reset"
-                onClick={() => setParams(new URLSearchParams(), { replace: true })}
+                onClick={() => {
+                  keepScrollOnNextNavigation();
+                  setParams(new URLSearchParams(), { replace: true });
+                  topRef.current?.scrollIntoView({ block: 'start' });
+                }}
               >
                 Reset filters
               </button>
@@ -240,6 +269,8 @@ export default function TemplatesBrowser() {
             </span>
           </button>
 
+          {/* Everything that answers the filters, and nothing that sets them. */}
+          <div className={`browse-results${fading ? ' is-swapping' : ''}`}>
           {status === 'loading' && <p className="browse-main__note">Loading templates…</p>}
           {status === 'error' && (
             <p className="browse-main__note">
@@ -258,9 +289,10 @@ export default function TemplatesBrowser() {
 
           {groups.map((group) => (
             <section className="browse-group tl-cat" key={group.value}>
+              {/* The heading alone. The blurb under it ("Documents for running
+                  a procurement.") restated the category it sat under. */}
               <header className="tl-cat__head">
                 <h2 className="tl-cat__title">{group.label}</h2>
-                <p className="tl-cat__blurb">{group.blurb}</p>
               </header>
 
               {group.cases.map((useCaseGroup) => (
@@ -275,6 +307,7 @@ export default function TemplatesBrowser() {
               ))}
             </section>
           ))}
+          </div>
         </div>
       </div>
     </section>
@@ -285,11 +318,17 @@ export default function TemplatesBrowser() {
 // which is what names the file, sets the media type and counts the tally — so
 // it works on middle-click and "save link as" the way a download should, rather
 // than depending on a click handler.
+//
+// The card carried two more lines: the licence attribution where one was
+// required, and a "Source:" credit. Both are provenance about the file rather
+// than anything a visitor decides on, and on a library seeded with preview
+// samples they printed placeholder text on every card — twice the height of the
+// card given over to it. The licence itself is still held on the record and is
+// still what gates publication; it just is not printed here.
 function TemplateCard({ template }) {
   const fmt = FORMAT_BY_VALUE[template.format];
   const size = fileSize(template.file?.size);
   const id = template._id || template.id;
-  const licence = template.licence || {};
 
   return (
     <li className="tl-card">
@@ -300,16 +339,6 @@ function TemplateCard({ template }) {
         </div>
 
         {template.description && <p className="tl-card__body">{template.description}</p>}
-
-        {/* B6.6 — attribution where the licence requires it. Rendered on the
-            card rather than tucked into a page footer, because the condition
-            attaches to this document and travels with it. */}
-        {licence.attributionRequired && licence.attributionText && (
-          <p className="tl-card__attribution">
-            <span className="tl-card__attribution-label">Attribution:</span>{' '}
-            {licence.attributionText}
-          </p>
-        )}
       </div>
 
       <div className="tl-card__foot">
@@ -332,10 +361,6 @@ function TemplateCard({ template }) {
         </a>
 
         {size && <span className="tl-card__size">{size}</span>}
-
-        {/* The source, where there is one to name. Not a licence notice: that is
-            the attribution line above, and only where it is required. */}
-        {template.source && <span className="tl-card__source">Source: {template.source}</span>}
       </div>
     </li>
   );

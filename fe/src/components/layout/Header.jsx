@@ -57,7 +57,7 @@ const NAV_LINKS = [
   // published to it.
   { label: 'How to Engage Us', href: '/government-panels' },
   // B4 — the AI Prompt Library.
-  { label: 'Prompt Library', href: '/prompt-library' },
+  { label: 'AI Prompt Library', href: '/prompt-library' },
   // B6 — the Templates library, on the top ribbon as the brief asks.
   { label: 'Templates', href: '/templates' },
   // B7.8 — only on the ribbon once the directory is live. On `preview` the page

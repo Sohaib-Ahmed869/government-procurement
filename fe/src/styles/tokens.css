@@ -101,7 +101,54 @@
      different height. Clamped rather than fixed, so it still tightens on a
      phone without each page needing its own breakpoint. */
   --gp-head-bg: var(--gp-brand-soft);
-  --gp-head-pad: clamp(24px, 2.8vw, 38px);
+  --gp-head-pad: clamp(16px, 1.6vw, 22px);
+
+  /* The optical correction, and why the band needs one.
+
+     Centring the band's content centres the title's LINE BOX, which is not the
+     same as centring the title. A page heading is capitals and x-height with
+     almost nothing below the baseline — "Our Team" measures 31px of ink above
+     the baseline and 1px below — so the ink sits low in a box built to hold
+     descenders too. Measured on the band before this: 38.9px of clear space
+     above the letters and 26.9px below, in a band whose padding was equal to
+     the pixel.
+
+     Half the difference comes off the top padding and goes onto the bottom,
+     which lifts the letters to the middle of the band and leaves its height
+     exactly where it was. */
+  --gp-head-optical: 6px;
+  --gp-head-pad-top: calc(var(--gp-head-pad) - var(--gp-head-optical));
+  --gp-head-pad-bottom: calc(var(--gp-head-pad) + var(--gp-head-optical));
+
+  /* And the height of the band itself, for the same reason the padding is
+     one value: equal padding only gets every page's title to the same
+     DISTANCE from the top of its band, not to the same height, because a
+     band with an eyebrow over the title is taller than one without. The
+     floor is set by the tallest of them, the copy is centred in whatever it
+     gets (styles/head.css), and a band whose content genuinely needs more
+     room still grows past it rather than clipping.
+
+     Derived rather than picked, and this is the point of it: 46px is the title's
+     line box (42px at 1.05) rounded up, so the floor is EXACTLY the height the
+     band comes to on its own. Every page's band is the same height, the gap
+     above the title equals the gap below it, and neither costs the page a pixel
+     of height it was not already spending — which a round number chosen above
+     the natural height would, on every interior page, on every screen.
+
+     The padding either side of it is deliberately tight. This band sits directly
+     under the site header, so everything it takes is height the page's actual
+     content starts further down; it was 38px a side and a 132px band, which put
+     the top of every page's content most of a scroll below the fold on a laptop. */
+  --gp-head-min: calc(var(--gp-head-pad) * 2 + 46px);
+
+  /* The space between the heading band and the page's own content, and between
+     that content and the footer. One value, top and bottom, on every page.
+
+     It was fourteen different values — 24/48, 28, 16/40, 20/36,
+     clamp(24,2.8vw,36), clamp(20,2.5vw,32) — so the distance from the band to
+     the first thing under it depended on which page you were on, and the
+     distance to the footer was routinely twice the distance from the band. */
+  --gp-body-pad: clamp(10px, 1.2vw, 16px);
 
   /* ---- The two ramps (Sprint 2, A4) ---------------------------------------
      Each segment now carries a full ramp rather than one ground colour: five
@@ -301,25 +348,8 @@
    the scale applied on top they made a large monitor show a narrower column than
    a laptop, which is backwards. */
 
-/* The Our Team page runs wider than --gp-shell.
-
-   The reference holds its directory in about 81% of the screen, with 9.5% of
-   margin down each side and correspondingly wide cards — the columns read as a
-   set because there is ground around them. 1246 is that 81% of the 1440px the
-   page lays out at before it is scaled up.
-
-   A variable rather than two literals because the hero above the grid has to
-   sit on the same left edge — the moment those two disagree the heading floats
-   off the column it introduces. */
-:root {
-  /* 81vw is the reference's own proportion — its directory sits in about 81% of
-     the screen with 9.5% of margin down each side. This was a flat 1246px,
-     which WAS that 81%, back when everything laid out at 1440 and was zoomed
-     up. With the zoom gone, 1246 of a real 1920px screen is 65% and the grid
-     stranded itself in the middle of the page.
-
-     Capped, unlike --gp-shell above: 81% of a 4K panel is a 3100px row, and a
-     third of that is one person's card the width of a door. */
-  --gp-team-shell: min(1246px, 100%);
-  --gp-team-gutter: clamp(20px, 2.8vw, 40px);
-}
+/* The Our Team page used to run wider than the shared column, on a private
+   shell-and-gutter pair of its own. It does not any more: its hero and its
+   grid both take --gp-shell, so the page's title starts on the same left edge
+   as every other page's, and the two variables went with the last call site.
+   See features/team/components/TeamGrid.css. */

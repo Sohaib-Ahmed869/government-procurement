@@ -11,7 +11,7 @@ export default function CareersHero() {
   return (
     <section className={`careers-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="careers-hero__inner">
-        <h1 className="careers-hero__title">Careers</h1>
+        <h1 className="careers-hero__title">Join Our Growing Team</h1>
       </div>
     </section>
   );

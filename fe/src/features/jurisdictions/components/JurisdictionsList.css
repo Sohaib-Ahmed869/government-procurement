@@ -29,7 +29,7 @@
 .jl__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 24px clamp(20px, 4vw, 60px) 48px;
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 /* --- filter panel --- */

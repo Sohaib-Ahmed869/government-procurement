@@ -16,7 +16,10 @@
 .pol__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: clamp(28px, 4vw, 52px) clamp(20px, 4vw, 60px) clamp(56px, 8vw, 96px);
+  /* Barely any top padding. A policy opens on its own title rather than on a
+     heading band, so this was the only thing between the site header and the
+     back link — and at 52px it read as a gap where a band should have been. */
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -40,9 +43,16 @@
 
 /* --- head ----------------------------------------------------------------- */
 
+/* The rule under the heading runs the full width of the page, not the width of
+   the column. It was capped at 70ch along with the intro it used to sit under,
+   then at the column; both stopped it short of the edge under a title that is
+   the widest thing on the page. Pulled out through the container's own side
+   padding and given it straight back, so the heading text stays on the column
+   while the line beneath it reaches the edge of the page. */
 .pol__head {
-  max-width: 70ch;
-  padding-bottom: clamp(20px, 3vw, 32px);
+  margin-inline: calc(-1 * clamp(20px, 4vw, 60px));
+  padding-inline: clamp(20px, 4vw, 60px);
+  padding-bottom: clamp(14px, 1.8vw, 20px);
   border-bottom: 1px solid var(--gp-line);
 }
 
@@ -72,11 +82,6 @@
   color: var(--gp-muted);
 }
 
-.pol__updated {
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: var(--gp-muted);
-}
 
 .pol__loading {
   margin: 32px 0 0;
@@ -90,9 +95,14 @@
    for design detail, so it takes the warm accent rather than a quiet tint, and
    it prints. */
 
+/* Full width of the page, not of the reading measure. It sits above the
+   document AND above the contents rail beside it, and at 70ch it stopped level
+   with the body column — so the notice that the whole page is scaffolding
+   appeared to be about the left-hand column only. It now ends where the "On
+   this page" box does. */
 .pol-draft {
   margin: clamp(24px, 3vw, 32px) 0 0;
-  max-width: 70ch;
+  max-width: none;
   padding: 18px 20px;
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-accent-ink);
@@ -122,7 +132,9 @@
   align-items: start;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(28px, 4vw, 56px);
-  margin-top: clamp(28px, 4vw, 44px);
+  /* Close under the rule. At 44px, plus the head's own padding, the first line
+     of a policy started 68px below the line that introduces it. */
+  margin-top: clamp(14px, 1.6vw, 20px);
 }
 
 /* The contents rail only exists on wide screens; below that it sits above the
@@ -248,7 +260,7 @@
 
 .pol-prose h2,
 .pol-prose h3 {
-  margin: 28px 0 10px;
+  margin: 18px 0 8px;
   font-weight: 600;
   line-height: 1.3;
   color: var(--gp-brand);

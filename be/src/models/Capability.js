@@ -58,17 +58,17 @@ const capabilitySchema = new mongoose.Schema(
     // *added* through the CMS carry one of its own.
     stage: { type: String, default: '', trim: true },
     icon: { type: String, enum: CAPABILITY_ICONS, default: 'target' },
-    // The photograph beside the copy on the Service Offering page's row for
-    // this service. Optional: a service with no image saved falls back to the
-    // built-in photograph named for it in
-    // fe/src/features/serviceOffering/components/ServiceRows.jsx, so a row is
-    // never a heading over an empty column while an editor is still choosing
-    // one. The card grids (homepage and the page's own summary) don't use it —
-    // they are drawn marks, not photographs.
-    image: {
-      key: { type: String, default: '' },
-      url: { type: String, default: '' },
-    },
+    // No image. The Service Offering page carried a photograph per service
+    // while it was a run of full-width rows; it is an accordion of headings
+    // now, with nowhere for one, and the card grids that also show a service
+    // (the homepage, the page's own summary) use drawn marks rather than
+    // photographs. The field, its two endpoints and the CMS picker went
+    // together rather than leaving an upload nothing would ever display.
+    //
+    // Documents saved before this keep their `image` sub-document in Mongo —
+    // the schema simply stops reading it — and the objects those pointed at are
+    // still in the bucket. Neither is served anywhere; clearing them is a
+    // one-off job for whoever owns the bucket, not something this file can do.
     audience: {
       type: String,
       enum: CAPABILITY_AUDIENCES,

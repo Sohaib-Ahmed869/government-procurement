@@ -33,7 +33,12 @@
 /* --- bands ---------------------------------------------------------------- */
 
 .hm-band {
-  padding: clamp(72px, 9vw, 112px) 0;
+  /* Was clamp(72px, 9vw, 112px). Nearly a quarter of a laptop screen of empty
+     ground above and below each band, on a page of six of them — the homepage
+     was 224px of padding between the end of one section's copy and the start of
+     the next's heading, which is a scroll-and-a-half of nothing. Still generous
+     enough that the bands read as separate sections rather than as one column. */
+  padding: clamp(44px, 5.5vw, 72px) 0;
   transition: var(--gp-fade);
 
   /* The ribbon scrolls to these, and the chrome above is sticky — without this
@@ -58,7 +63,7 @@
 /* The band directly under the hero opens a little lower, so the hero's bottom
    edge and the first heading aren't the same distance apart as two ordinary
    bands — the hero is taller and needs the extra air to settle. */
-.hm-band--hero-tail { padding-top: clamp(88px, 10vw, 124px); }
+.hm-band--hero-tail { padding-top: clamp(56px, 6.5vw, 84px); }
 
 /* The head is an .hm-shell too, so the measure is capped on the text rather than
    on this box. Putting a max-width here instead would collide with the shell's

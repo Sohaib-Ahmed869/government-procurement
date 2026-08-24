@@ -7,7 +7,7 @@
 /* --- results -------------------------------------------------------------- */
 
 /* Level 1 — Category. */
-.tl-cat + .tl-cat { margin-top: clamp(40px, 5vw, 64px); }
+.tl-cat + .tl-cat { margin-top: clamp(18px, 2vw, 26px); }
 
 .tl-cat__head {
   padding-bottom: 12px;
@@ -24,14 +24,9 @@
   transition: var(--gp-fade);
 }
 
-.tl-cat__blurb {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: var(--gp-muted);
-}
 
 /* Level 2 — Use Case. */
-.tl-case { margin-top: clamp(24px, 3vw, 36px); }
+.tl-case { margin-top: clamp(12px, 1.4vw, 18px); }
 
 .tl-case__title {
   margin: 0 0 14px;
@@ -90,8 +85,15 @@
    grouping by it would split every use case into three near-identical columns.
    The extension rather than the product name, because that is what tells you
    whether it opens in the thing you have. */
+/* Same box for DOCX, XLSX and PPTX. They are all four characters, but not four
+   of the same width, and a tag that changes size card to card reads as three
+   different tags. */
 .tl-format {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
+  min-width: 52px;
   padding: 4px 9px;
   font-size: 11px;
   font-weight: 700;
@@ -116,23 +118,6 @@
   color: var(--gp-muted);
 }
 
-/* B6.6 — the attribution a licence requires. Quiet but present, and attached to
-   the document it belongs to rather than pooled in a page footer. */
-.tl-card__attribution {
-  margin: 10px 0 0;
-  padding: 8px 10px;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--gp-muted);
-  background: var(--gp-paper);
-  border-left: 2px solid var(--gp-accent-ink);
-  border-radius: 0 4px 4px 0;
-}
-
-.tl-card__attribution-label {
-  font-weight: 600;
-  color: var(--gp-ink);
-}
 
 .tl-card__foot {
   display: flex;
@@ -141,10 +126,17 @@
   gap: 10px 12px;
 }
 
+/* Sized for "Download PowerPoint" and worn by all three, so a row of cards has
+   its buttons the same width and the size beside them on the same line. They
+   used to be set by their label — "Download Excel" against "Download
+   PowerPoint" is 40px of difference — which made two cards side by side look
+   like two different components. */
 .tl-download {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-width: 208px;
   padding: 9px 16px;
   font-size: 13.5px;
   font-weight: 600;
@@ -174,16 +166,11 @@
   line-height: 0;
 }
 
-.tl-card__size,
-.tl-card__source {
+/* The size sits next to the button because it is part of the decision to press
+   it. */
+.tl-card__size {
   font-size: 12.5px;
   color: var(--gp-muted);
-}
-
-/* The size sits next to the button because it is part of the decision to press
-   it; the source is provenance and can wrap away onto its own line. */
-.tl-card__source {
-  flex-basis: 100%;
 }
 
 @media (max-width: 560px) {

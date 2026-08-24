@@ -85,7 +85,17 @@
      the scale. Undivided, a 4K screen got a hero the best part of two viewports
      tall, so the video filled the window and the heading and lede sat below the
      fold — the one thing this rule exists to prevent. */
-  min-height: max(420px, calc(100svh / var(--gp-scale, 1) - var(--gp-hero-offset, 140px)));
+  /* --home-hero-fill is measured by the component and is the exact distance
+     from the top of this block to the bottom of the window, so the hero ends
+     where the screen does on every size of it. The calc behind it is what the
+     height was before, kept as the value for the first paint and for the case
+     where the effect never runs: it guesses the chrome above at 140px, which is
+     close on a desktop and wrong the moment the announcement banner wraps or is
+     dismissed. */
+  min-height: var(
+    --home-hero-fill,
+    max(420px, calc(100svh / var(--gp-scale, 1) - var(--gp-hero-offset, 140px)))
+  );
   /* Capped harder than before. The block is bottom-aligned, so a big top pad
      only ever pushes the copy down when the content is taller than the space. */
   padding-top: clamp(80px, 8vw, 120px);

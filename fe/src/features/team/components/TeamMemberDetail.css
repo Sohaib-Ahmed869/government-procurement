@@ -13,12 +13,33 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+/* The organisation's name in the role line takes its own colour, not the page
+   accent. On Award --tm-accent is mint, which is the brightest step of the same
+   family the hero band is painted in — so "Government Procurement" was a green
+   word on a green ground, low contrast and reading as a link that isn't one.
+   White on Award and grey on Win: legible on both, and still a step up from the
+   muted "Founder," beside it. */
 .tm[data-audience='award'] {
   --tm-accent: var(--gp-mint-300);
+  --tm-location: #fff;
+  /* White outline on the green band, and barely any fill behind it — the Award
+     band is already a colour, and a wash on top of it goes muddy rather than
+     grey. */
+  --tm-action-ink: #fff;
+  --tm-action-line: rgba(255, 255, 255, 0.7);
+  --tm-action-fill: rgba(255, 255, 255, 0.08);
 }
 
 .tm[data-audience='win'] {
   --tm-accent: #c9c9c9;
+  --tm-location: #c9c9c9;
+  /* The pill itself carries the grey, not the writing on it. A light wash of
+     white over the dark band reads as grey while leaving the label at full
+     white — greying the text as well was the previous attempt and cost 30% of
+     its contrast for a colour nobody asked to change. */
+  --tm-action-ink: #fff;
+  --tm-action-line: rgba(255, 255, 255, 0.55);
+  --tm-action-fill: rgba(255, 255, 255, 0.24);
 }
 
 .tm__inner {
@@ -78,7 +99,7 @@
    thing adding to it — kept short so the photo fills as much of the band as it
    can rather than sitting in a tall field of background. */
 .tm__inner--hero {
-  padding-top: 12px;
+  padding-top: 6px;
   padding-bottom: 0;
 }
 
@@ -112,20 +133,33 @@
    foot of the band. */
 .tm__hero {
   display: grid;
-  grid-template-columns: 440px 1fr;
+  /* 360, down from 440. The portrait's height follows its width and the band's
+     height follows the portrait, so this column was setting a 466px photo and a
+     434px band — and the introduction beside it, centred against that, started
+     62px below the top of the band with nothing in the gap. Narrowing the
+     column takes the band down with it and the slack goes with the band. */
+  grid-template-columns: 360px 1fr;
   gap: 56px;
   align-items: start;
 }
 
-/* Centred against the portrait rather than starting level with it. The text is
-   the shorter column, so top-aligning it left all of the slack in one run of
-   empty background under the buttons — which is what made the band read as tall
-   and the photo as small inside it. Splitting that slack above and below drops
-   the text down the band and lets the portrait, which spans the full height,
-   carry the section. */
+/* Centred against the portrait, which is what puts the same amount of band
+   above the back link as below the buttons — the column's slack is split evenly
+   by definition. Top-aligning it (the previous attempt) took the space off the
+   top and put all of it under the buttons instead, which is equal to nothing.
+
+   The 24px of bottom padding that used to be here went with it: padding inside
+   the centred block is slack the centring cannot see, so it pushed the visible
+   buttons up by 24px and the two gaps apart by the same. */
 .tm__intro {
   align-self: center;
-  padding-bottom: 24px;
+  /* Six pixels, and they are a correction rather than a gap. The band carries
+     6px of padding at its top and none at its foot — the portrait is meant to
+     stand on the foot of the band — so a block centred inside it comes out 6px
+     low, which put 29px above the back link against 23px below the buttons.
+     Padding at the bottom of the centred block moves it back up by half of
+     itself, so 6 here buys 3 off the top and adds 3 to the bottom: 26 and 26. */
+  padding-bottom: 6px;
 }
 
 .tm__avatar {
@@ -199,7 +233,7 @@
 }
 
 .tm__location {
-  color: var(--tm-accent);
+  color: var(--tm-location, #fff);
 }
 
 .tm__bio {
@@ -218,6 +252,12 @@
   margin-top: 28px;
 }
 
+/* Outlined in white rather than filled in the segment's own mid step. Filled,
+   they were a green pill on a green band and a grey pill on a grey one — the
+   button and the ground it sits on differing by one step of the same ramp, so
+   the edge of the control was the hardest thing on the band to find. A white
+   hairline reads on both, and the wash behind it is neutral, so the pair look
+   the same shape under either side of the toggle. */
 .tm__action {
   display: inline-flex;
   align-items: center;
@@ -225,15 +265,19 @@
   padding: 12px 22px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--band-ink);
+  color: var(--tm-action-ink, #fff);
   text-decoration: none;
-  background: var(--band-surface-hover);
+  background: var(--tm-action-fill, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--tm-action-line, rgba(255, 255, 255, 0.7));
   border-radius: 100px;
-  transition: background-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .tm__action:hover {
-  background: var(--band-surface-hover);
+  background: color-mix(in srgb, var(--tm-action-fill, rgba(255, 255, 255, 0.08)) 100%, #fff 12%);
+  border-color: var(--tm-action-ink, #fff);
 }
 
 /* Bare glyph in the link colour, as in the footer — no disc behind it. */
@@ -270,7 +314,7 @@
 
 /* Section heading above each block. */
 .tm__block-title {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   font-size: 24px;
   font-weight: 500;
   line-height: 1.25;
@@ -279,7 +323,7 @@
 }
 
 .tm__para {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   font-size: 17px;
   line-height: 1.7;
   color: var(--band-muted);
@@ -362,7 +406,7 @@
 .tm__expertise {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;

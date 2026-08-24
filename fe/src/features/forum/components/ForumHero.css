@@ -10,29 +10,72 @@
   --band-accent: var(--gp-accent);
   --band-on-accent: var(--gp-brand-deep);
 
-  /* Root is transparent (it sits on .forum-page); this var only drives the
-     mobile slide-up panel background so it tracks the audience theme. */
-  --forum-hero-panel-bg: var(--gp-ink-900);
-
   position: relative;
   z-index: 1;
   color: #fff;
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-.forum-hero[data-audience='award'] {
-  --forum-hero-panel-bg: var(--gp-green-900);
-}
+/* --- the tools strip, under the band -------------------------------------- */
 
-.forum-hero[data-audience='win'] {
+/* The search field and the submit pill, on the page rather than on the heading.
+   They were inside the dark band, which made this page's heading twice the
+   height of every other page's and read as though the field were part of the
+   title. Here they are the first thing the page offers, which is what they are.
+
+   Paper, so it carries the page's own ink roles rather than the band's white —
+   the glass field and pill below are drawn for a dark ground and would be
+   invisible on this one, so each takes a light equivalent of the same shape. */
+.forum-tools {
+  position: relative;
+  z-index: 1;
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+
+  /* Drives the mobile slide-up panel's background so it tracks the segment. The
+     panel is a child of this block now, not of the band. */
   --forum-hero-panel-bg: var(--gp-ink-900);
 }
 
+.forum-tools[data-audience='award'] {
+  --forum-hero-panel-bg: var(--gp-green-900);
+}
+
+.forum-tools[data-audience='win'] {
+  --forum-hero-panel-bg: var(--gp-ink-900);
+}
+
+/* The same two-column grid the answers below use, with the tools in the first
+   column and the second left empty. That is what puts the end of the submit
+   button on the end of the cards: the row and the listing are measured by the
+   same rule rather than by two that happen to agree, so they cannot drift when
+   the sidebar's width changes.
+
+   Mirrors .forum-answers__inner in ForumAnswers.css, including where it drops
+   to one column. */
+.forum-tools__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 64px;
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: clamp(12px, 1.3vw, 18px) clamp(20px, 4vw, 60px) 0;
+}
+
+@media (max-width: 1024px) {
+  .forum-tools__inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 /* `.forum-answers` is also `z-index: 1` and comes later in the DOM, so it would
-   paint over the panel. Lift the whole hero while the panel is open — above the
-   site header (z-index 100 on mobile) so the header's floating audience toggle
-   can't paint in front of the open categories panel. */
-.forum-hero.is-panel-open {
+   paint over the panel. Lift this block while the panel is open — above the site
+   header (z-index 100 on mobile) so the header's floating audience toggle can't
+   paint in front of the open categories panel. */
+.forum-tools.is-panel-open {
   z-index: 150;
 }
 
@@ -58,10 +101,12 @@
     transform: none;
     transition-delay: calc(var(--gp-reveal-step) * 2);
   }
-  .forum-hero.is-in .forum-hero__tools {
+  .forum-tools.is-in .forum-hero__tools {
     opacity: 1;
     transform: none;
-    transition-delay: calc(var(--gp-reveal-step) * 3);
+    /* One step behind the title above it, not three: there is nothing between
+       them any more. */
+    transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }
 
@@ -95,35 +140,51 @@
 }
 
 /* --- search + submit row --- */
-/* Left, under the heading — the row was centred to sit beneath a centred title,
-   and would read as detached from it now the title starts at the column edge. */
+/* Left, under the heading, and flush to the top of the strip that holds it —
+   the space above comes from .forum-tools__inner. */
 .forum-hero__tools {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 24px;
-  margin-top: 44px;
+  margin-top: 0;
 }
 
-/* Glass field box — same edge treatment as the Contact page fields. */
+/* The field box. Same shape, same size and the same magnifier-then-input order
+   it had on the dark band; what changed is the ground under it. The glass
+   treatment there was a translucent white fill and two white inset edges, which
+   is a box you can only see because the ground behind it is dark — on paper it
+   was a white box on a white page. A surface a step off the page and a hairline
+   round it is the same idea drawn the way this ground allows. */
 .forum-hero__search {
   display: flex;
   align-items: center;
   gap: 12px;
+  /* No width cap. It was held to 560px, which left the submit button stranded
+     in the middle of the row with a third of the column empty to its right;
+     the field takes whatever the row does not need instead, and the button
+     lands on the column's edge — which is the cards' edge. */
   flex: 1;
-  max-width: 560px;
+  min-width: 0;
   padding: 15px 20px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
+  color: var(--gp-ink);
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
   border-radius: 10px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  transition: var(--gp-fade), border-color 160ms var(--gp-ease);
+}
+
+/* Focus is a darker edge on the box, and nothing else. A 2px ring at 3px offset
+   was drawn around the input inside it — text inputs match :focus-visible on a
+   plain mouse click, not only on tab, so clicking into the field lit a second
+   rectangle inside the first and the whole control appeared to glow. */
+.forum-hero__search:focus-within {
+  border-color: var(--gp-brand);
+}
+
+.forum-hero__search-input:focus,
+.forum-hero__search-input:focus-visible {
+  outline: none;
 }
 
 /* The magnifier submits the form, so it's a button — stripped back to look the
@@ -132,7 +193,7 @@
   display: inline-flex;
   flex: none;
   padding: 0;
-  color: #fff;
+  color: var(--gp-muted);
   background: transparent;
   border: 0;
   cursor: pointer;
@@ -143,14 +204,14 @@
   min-width: 0;
   font-family: inherit;
   font-size: 15px;
-  color: #fff;
+  color: var(--gp-ink);
   background: transparent;
   border: none;
   outline: none;
 }
 
 .forum-hero__search-input::placeholder {
-  color: #fff;
+  color: var(--gp-muted);
 }
 
 /* strip the native search clear button */
@@ -159,6 +220,9 @@
 }
 
 /* --- submit-a-question pill --- */
+/* The same pill: same height, same radius, same white disc holding the glyph,
+   same label. Filled in the brand rather than in glass, for the reason the field
+   above is. */
 .forum-hero__submit {
   display: inline-flex;
   align-items: center;
@@ -167,27 +231,23 @@
   padding: 13px 24px;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  color: var(--gp-paper);
   text-decoration: none;
   white-space: nowrap;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
+  /* The answer cards' fill, which is the heading band's own ground — the button
+     and the cards under it are the one dark object on this page, not two. */
+  background: var(--gp-head-bg);
+  border: 1px solid var(--gp-head-bg);
   border-radius: 100px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  transition: box-shadow 0.15s ease;
+  transition:
+    background 160ms var(--gp-ease),
+    border-color 160ms var(--gp-ease),
+    var(--gp-fade);
 }
 
 .forum-hero__submit:hover {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.45),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+  background: var(--gp-brand-lift);
+  border-color: var(--gp-brand-lift);
 }
 
 .forum-hero__submit-icon {
@@ -210,6 +270,13 @@
 
 .forum-hero :is(a, input):focus-visible {
   outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* The pill and the icon buttons keep a ring; the search input does not — its
+   own box carries the state (above). */
+.forum-tools :is(a, button):not(.forum-hero__search-icon):focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
   outline-offset: 3px;
 }
 
@@ -270,6 +337,7 @@
   }
 
   /* Same glass circle as the submit button. */
+  /* Same circle as the "+" button beside it, drawn for paper. */
   .forum-hero__categories {
     display: inline-flex;
     align-items: center;
@@ -278,22 +346,11 @@
     width: 46px;
     height: 46px;
     padding: 0;
-    color: #fff;
+    color: var(--gp-ink);
     cursor: pointer;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0.02)
-    );
-    /* No UA button border — the glass edge comes from the inset shadows, same
-       as the "+" button. */
-    border: 0;
+    background: var(--gp-paper-alt);
+    border: 1px solid var(--gp-line);
     border-radius: 50%;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow:
-      inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-      inset -1px -1px 1px rgba(255, 255, 255, 0.12);
   }
 }
 
@@ -320,27 +377,16 @@
   }
 
   /* Article page: the article's own title follows the search row, so the hero
-     copy is dropped and the row moves up under the wave. */
-  .forum-hero--compact .forum-hero__title,
-  .forum-hero--compact .forum-hero__sub {
+     copy is dropped. With the row no longer inside the band, dropping the title
+     leaves an empty band — so the band goes with it and the strip below becomes
+     the top of the page. */
+  .forum-hero--compact {
     display: none;
-  }
-
-  /* Compact hero (article / answer / submit pages): keep a little top space so
-     the search row isn't jammed against the header's floating audience toggle. */
-  .forum-hero--compact .forum-hero__inner {
-    padding-top: 24px;
-    padding-bottom: 8px;
-  }
-
-  .forum-hero--compact .forum-hero__tools {
-    margin-top: 0;
   }
 
   /* Search field plus two circular action buttons, all on one row. */
   .forum-hero__tools {
     gap: 10px;
-    margin-top: 34px;
   }
 
   .forum-hero__search {
@@ -366,7 +412,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--gp-paper);
   }
 
 }

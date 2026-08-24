@@ -21,52 +21,66 @@ export const SERVICE_KEYS = [
   'contract-management',
 ];
 
-// `icon` names a mark in serviceIcons.jsx. `stage` is what makes the two
-// segments structurally different rather than only relabelled: on Award the six
-// run in the order a procurement is actually run, and on Win they run in the
-// order a bidder meets them. Same six services, two different journeys.
+// `icon` names a mark in serviceIcons.jsx. `stage` is the label that makes the
+// two segments read differently — the same service named for where it falls in
+// a buyer's procurement or in a bidder's response.
+//
+// `order` is deliberately NOT per-segment, and used to be. The six ran in the
+// order a procurement is run on Award and in the order a bidder meets them on
+// Win, which is a defensible idea and a bad experience: the toggle is a
+// re-labelling of the page you are already reading, and under it the rows
+// physically reordered — Process Management jumped from third to second and
+// everything below it shifted, so the section you had your eye on was somewhere
+// else when the fade finished. One order for both, so the toggle changes the
+// words and nothing moves.
 export const SERVICES = [
   {
     key: 'procurement-strategy',
     title: 'Procurement Strategy',
     icon: 'target',
-    award: { stage: 'Before market', order: 10 },
-    win: { stage: 'Before the tender drops', order: 10 },
+    order: 10,
+    award: { stage: 'Before market' },
+    win: { stage: 'Before the tender drops' },
   },
   {
     key: 'probity',
     title: 'Probity',
     icon: 'shield',
-    award: { stage: 'Throughout', order: 20 },
-    win: { stage: 'Throughout', order: 50 },
+    order: 20,
+    award: { stage: 'Throughout' },
+    win: { stage: 'Throughout' },
   },
   {
     key: 'process-management',
     title: 'Process Management',
     icon: 'flow',
-    award: { stage: 'To market', order: 30 },
-    win: { stage: 'While the tender is open', order: 20 },
+    order: 30,
+    award: { stage: 'To market' },
+    win: { stage: 'While the tender is open' },
   },
   {
     key: 'evaluation-negotiation',
     title: 'Evaluation & Negotiation',
     icon: 'scales',
-    award: { stage: 'Assessment', order: 40 },
-    win: { stage: 'Response and shortlist', order: 30 },
+    order: 40,
+    award: { stage: 'Assessment' },
+    win: { stage: 'Response and shortlist' },
   },
   {
     key: 'vendor-transition',
     title: 'Vendor Transition',
     icon: 'handover',
-    award: { stage: 'Award and handover', order: 50 },
-    win: { stage: 'Mobilisation', order: 40 },
+    order: 50,
+    award: { stage: 'Award and handover' },
+    win: { stage: 'Mobilisation' },
   },
   {
     key: 'contract-management',
     title: 'Contract Management',
     icon: 'document',
-    award: { stage: 'In life', order: 60 },
-    win: { stage: 'In life', order: 60 },
+    order: 60,
+    award: { stage: 'In life' },
+    win: { stage: 'In life' },
   },
 ];
 
@@ -103,10 +117,8 @@ export function resolveServices(saved, audience) {
       body: edited?.body || '',
       icon: edited?.icon || service.icon,
       stage: edited?.stage || seg.stage,
-      // Empty unless an editor has uploaded one; ServiceRows falls back to the
-      // built-in photograph named for this service.
-      image: edited?.image?.url || '',
-      order: seg.order,
+      // The service's own order, not the segment's — see the note on SERVICES.
+      order: service.order,
     };
   }).sort((a, b) => a.order - b.order);
 
@@ -120,7 +132,6 @@ export function resolveServices(saved, audience) {
       body: card.body || '',
       icon: card.icon || 'target',
       stage: card.stage || '',
-      image: card.image?.url || '',
       order: 100 + (Number(card.order) || i),
     }))
     .sort((a, b) => a.order - b.order);

@@ -29,10 +29,11 @@
      carries the same shell geometry as the bands and the footer row — putting
      it here as well would inset the content a gutter further than everything
      it is meant to line up with. */
-  /* Tighter. With the office card gone the band holds a heading, one line and
-     a field, and 76px above and below that was more space than the content in
-     it. */
-  padding-block: clamp(28px, 3.2vw, 44px);
+  /* Tighter again. With the office card gone the band holds a heading, one line
+     and a field; 44px above and below that was still more space than the three
+     of them take up. padding-block, so the two are the same number by
+     construction rather than by agreement. */
+  padding-block: clamp(18px, 2vw, 28px);
   /* The deepest paper step, not paper-alt.
      On an article page the related-insights grid directly above this is
      paper-alt, so the two ran together as one long block with a heading
@@ -101,7 +102,10 @@
   margin-inline: auto;
   /* Short at the top: the subscribe block sits directly above, and 56px left
      the brand floating well clear of it. */
-  padding: 28px clamp(20px, 4vw, 60px) 56px;
+  /* Equal top and bottom. It was 28 above and 56 below — twice as much empty
+     ground under the last link as over the first, at the very bottom of the
+     page where there is nothing after it to justify the room. */
+  padding: 28px clamp(20px, 4vw, 60px);
 }
 
 /* --- brand column --- */

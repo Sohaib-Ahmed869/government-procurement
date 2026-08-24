@@ -35,14 +35,57 @@ const MIN_VIEWPORT = 1441;
 // blow the layout up to a size nobody reads at.
 const MAX_SCALE = 3;
 
-// devicePixelRatio at load, whatever the display and the OS scaling make it.
-// Only its RATIO to the current value is used, so the absolute number does not
-// matter — a 1x laptop and a 2x retina both start at 1.
+// devicePixelRatio at the last baseline, whatever the display and the OS
+// scaling make it. Only its RATIO to the current value is used, so the absolute
+// number does not matter — a 1x laptop and a 2x retina both start at 1.
 let baseRatio = null;
+
+// The viewport's width in PHYSICAL pixels at that same baseline, and the reason
+// the baseline is no longer frozen at load.
+//
+// The ratio above can only see zoom CHANGES, never the zoom a page loaded with.
+// That was a documented limitation and it had a visible cost: open or close the
+// device toolbar and devicePixelRatio moves, so the ratio starts reporting a
+// zoom the visitor never applied, and the page renders at a size it would not
+// render at if you reloaded — the same window showing two different layouts
+// depending on how you got there.
+//
+// Physical width is what tells the two apart. Zooming changes devicePixelRatio
+// and innerWidth in opposite directions and leaves their product alone: the
+// window still covers the same pixels on the glass. Anything else that moves
+// devicePixelRatio — the device toolbar opening, a window resize, a drag to a
+// second monitor — moves that product too.
+//
+// So: product unchanged means a zoom, and the baseline is kept, which is what
+// keeps zoom working exactly as it did. Product changed means a new viewport,
+// and the baseline is retaken against it — which puts the page in the state a
+// reload would have put it in, rather than in a state only reachable by not
+// reloading.
+let basePhysicalWidth = null;
+
+// Zoom steps land innerWidth on whole pixels, so the product drifts a pixel or
+// two either side. Anything under this is rounding, not a new viewport.
+const PHYSICAL_WIDTH_TOLERANCE = 4;
+
+function physicalWidth() {
+  return window.innerWidth * window.devicePixelRatio;
+}
 
 function currentZoom() {
   if (typeof window === 'undefined' || !window.devicePixelRatio) return 1;
-  if (baseRatio === null) baseRatio = window.devicePixelRatio;
+
+  const physical = physicalWidth();
+  const newViewport =
+    baseRatio === null ||
+    basePhysicalWidth === null ||
+    Math.abs(physical - basePhysicalWidth) > PHYSICAL_WIDTH_TOLERANCE;
+
+  if (newViewport) {
+    baseRatio = window.devicePixelRatio;
+    basePhysicalWidth = physical;
+    return 1;
+  }
+
   const zoom = window.devicePixelRatio / baseRatio;
   // Guard against a value that has gone strange — a monitor change can move
   // devicePixelRatio without any zoom at all.
