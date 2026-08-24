@@ -51,6 +51,8 @@
 .pl-card {
   display: flex;
   flex-direction: column;
+  /* The containing block for the link's overlay — see .pl-card__open::after. */
+  position: relative;
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-line);
   border-radius: 14px;
@@ -81,6 +83,27 @@
   cursor: pointer;
 }
 .pl-card__open:focus-visible { outline: none; }
+
+/* The link covers the WHOLE card, not only the part it wraps.
+
+   The anchor holds the title and the teaser; "View prompt" sits in the foot
+   below it, outside the link, because the foot also holds Copy and a control
+   inside a link is invalid markup. That left the one thing on the card that
+   names the action as the one thing on the card that did not perform it —
+   green, bold, underlining as you hovered, and dead under the pointer.
+
+   This is the standard fix: an empty overlay belonging to the anchor, laid over
+   the card. The markup keeps its one link and its one focus stop, and every
+   pixel of the card — the label included — now navigates.
+
+   Copy has to come back above it. It sits under the overlay in paint order
+   otherwise and stops taking clicks, which trades one dead control for
+   another. */
+.pl-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
 
 .pl-card__head {
   display: flex;
@@ -155,6 +178,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Above the card-wide link overlay, so taking the prompt still takes it
+     rather than opening the page behind it. */
+  position: relative;
+  z-index: 1;
   padding: 9px 16px;
   font: inherit;
   font-size: 13.5px;
@@ -226,8 +253,10 @@
   }
 }
 
-/* Says what the card does. Not a button — the card itself is the control, and a
-   second focus stop for the same action is one tab too many. */
+/* Says what the card does. Not a control of its own — the card is the control,
+   and a second focus stop for the same action is one tab too many. It is
+   clickable all the same: the link's overlay covers the foot too, so the label
+   does what it says under the pointer while staying a single tab stop. */
 .pl-card__view {
   margin-right: auto;
   font-size: 13px;
