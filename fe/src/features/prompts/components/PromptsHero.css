@@ -9,9 +9,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .pl-hero__title,
-  .pl-hero__sub,
-  .pl-hero__note {
+  .pl-hero__title {
     opacity: 0;
     transform: translateY(var(--gp-reveal-shift));
     transition:
@@ -20,8 +18,6 @@
   }
 
   .pl-hero.is-in .pl-hero__title { opacity: 1; transform: none; transition-delay: var(--gp-reveal-step); }
-  .pl-hero.is-in .pl-hero__sub   { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 2); }
-  .pl-hero.is-in .pl-hero__note  { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 3); }
 }
 
 .pl-hero__inner {
@@ -38,24 +34,6 @@
   letter-spacing: -0.015em;
 }
 
-.pl-hero__sub {
-  max-width: 68ch;
-  margin: 20px 0 0;
-  font-size: clamp(15px, 1.25vw, 17px);
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-/* The caveat. Quieter than the lede but not hidden — it is the line that keeps
-   the page honest about what a prompt can and cannot do. */
-.pl-hero__note {
-  max-width: 62ch;
-  margin: 14px 0 0;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.6);
-}
-
 @media (max-width: 860px) {
   .pl-hero__title {
     font-family: 'Geist Variable', system-ui, sans-serif;
@@ -65,5 +43,4 @@
 
 @media (max-width: 760px) {
   .pl-hero__inner { padding: var(--gp-head-pad) 24px; }
-  .pl-hero__sub { max-width: none; font-size: 16px; }
 }

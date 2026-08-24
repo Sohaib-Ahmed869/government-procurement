@@ -30,10 +30,13 @@
 }
 
 .team-hero__inner {
-  /* The page's own width, shared with the grid below. */
-  max-width: var(--gp-team-shell);
+  /* The site's column, shared with the grid below. This page used to run wider
+     than every other one — its own --gp-team-shell at 1246px against the shared
+     1400 — so its title started on a different left edge from the title of the
+     page you had just come from. */
+  max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: var(--gp-head-pad) var(--gp-team-gutter);
+  padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
 .team-hero__eyebrow {

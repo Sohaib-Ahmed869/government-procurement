@@ -9,21 +9,12 @@
 // specifically. Kept in step with TEMPLATE_CATEGORIES in
 // be/src/models/Template.js, which is what the API validates against.
 export const CATEGORIES = [
-  {
-    value: 'award',
-    label: 'Award Contracts',
-    blurb: 'Documents for running a procurement.',
-  },
-  {
-    value: 'win',
-    label: 'Win Contracts',
-    blurb: 'Documents for responding to one.',
-  },
-  {
-    value: 'other',
-    label: 'Other',
-    blurb: 'Documents useful on either side.',
-  },
+  // No blurb on these. Each carried a line ("Documents for running a
+  // procurement.") printed under the heading in the results, which restated
+  // the category to a visitor who had just picked it out of the rail.
+  { value: 'award', label: 'Award Contracts' },
+  { value: 'win', label: 'Win Contracts' },
+  { value: 'other', label: 'Other' },
 ];
 
 export const CATEGORY_BY_VALUE = Object.fromEntries(CATEGORIES.map((c) => [c.value, c]));

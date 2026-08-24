@@ -39,7 +39,7 @@
   margin: 0 auto;
   /* 40px side gutters, matching every other section's __inner. Without them the
      grid runs edge to edge on any viewport under 1100px. */
-  padding: 40px clamp(20px, 4vw, 60px);
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) 40px;
 }
 
 /* --- two-column layout: intro + form --- */

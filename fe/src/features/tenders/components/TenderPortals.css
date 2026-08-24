@@ -85,7 +85,7 @@
 .tp__band--gov .tp__inner,
 .tp__band--local .tp__inner,
 .tp__band--other .tp__inner {
-  padding-block: clamp(36px, 4.5vw, 60px);
+  padding-block: var(--gp-body-pad);
 }
 
 /* --- reveal on mount --- */
@@ -328,7 +328,7 @@
 }
 
 /* A list under a heading needs the gap the heading's own margin used to give. */
-.tp__group-title + .tp__list { margin-top: 32px; }
+.tp__group-title + .tp__list { margin-top: 18px; }
 
 /* Glass pill — matches the subscribe button. */
 .tp__search-btn {
@@ -373,11 +373,15 @@
   margin: 0;
   padding: 0;
   display: grid;
-  /* 320px rather than 280px: the widest portal names ("Quotations and Tenders
-     Online") then fit on one line at the size below, instead of wrapping and
-     pushing that card's buttons out of line with its neighbours. */
-  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
-  gap: 20px;
+  /* 300px, which is what puts four across a full-width shell and three on
+     anything narrower — and the number is derived rather than chosen. The widest
+     portal name ("Quotations and Tenders Online") needs 259px on one line and
+     the card spends 40px on padding, so 299 is the narrowest a card can be and
+     still keep every name unwrapped. `auto-fill` then does the deciding: where
+     four of those fit, there are four; where they do not, it falls back to three
+     rather than squeezing a name onto two lines. */
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 16px;
 }
 
 .tp__row {
@@ -385,7 +389,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: 14px;
-  padding: 24px;
+  padding: 20px;
   border-radius: 24px;
   /* Was a white glass edge, which only ever worked on a dark ground. Raised off
      the band on its own surface step instead, so the same card reads correctly
@@ -432,14 +436,18 @@
   object-fit: contain;
 }
 
-/* The block reserves two title lines plus a subtitle whether or not it needs
-   them, so the buttons underneath start at the same height in every card —
-   a name that wraps no longer knocks its own card's row of buttons down. */
+/* Reserves ONE title line plus a subtitle, not two title lines plus a subtitle.
+   The reservation is there so the buttons underneath start at the same height
+   in every card; at 3.95em it was reserving a second title line that no portal
+   on the page uses, which is 22px of empty card between every subtitle and the
+   first button. The grid above is sized so a name never needs the second line,
+   and a name that somehow does still gets it — the card grows rather than
+   clipping, and only that card's buttons move. */
 .tp__name {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-height: 3.95em;
+  min-height: 2.6em;
   font-size: 17px;
   font-weight: 600;
   line-height: 1.25;

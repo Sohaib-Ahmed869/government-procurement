@@ -4,11 +4,11 @@
 
 /* --- related questions --- */
 .forum-related {
-  margin-top: 36px;
+  margin-top: 20px;
 }
 
 .forum-related__heading {
-  margin: 0 0 16px;
+  margin: 0 0 10px;
   font-size: 18px;
   font-weight: 600;
   color: var(--band-ink);
@@ -20,7 +20,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .forum-related__link {

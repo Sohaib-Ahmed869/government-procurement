@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { capabilitiesApi } from '../../api';
 // A5 — the icon set moved to the serviceOffering feature when Capabilities was
 // renamed, and became drawn marks rather than PNGs. Same keys, so cards saved
@@ -72,11 +72,6 @@ export default function ServiceOfferingAdminPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
-  // The image needs a saved card to attach to, so the picker only appears in
-  // edit mode — same as a team member's photo.
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageBusy, setImageBusy] = useState(false);
-  const fileRef = useRef(null);
 
   const load = () => {
     setStatus('loading');
@@ -115,46 +110,13 @@ export default function ServiceOfferingAdminPage() {
       order: row.order ?? 0,
       active: row.active !== false,
     });
-    setImageUrl(row.image?.url || '');
     setSaveError(null);
     setDrawerOpen(true);
   };
 
   const closeDrawer = () => {
-    if (saving || imageBusy) return;
+    if (saving) return;
     setDrawerOpen(false);
-  };
-
-  const onImage = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !editingId) return;
-    setImageBusy(true);
-    setSaveError(null);
-    try {
-      const updated = await capabilitiesApi.uploadImage(editingId, file);
-      setImageUrl(updated?.image?.url || '');
-      load();
-    } catch (err) {
-      setSaveError(err?.message || 'Failed to upload the image');
-    } finally {
-      setImageBusy(false);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  };
-
-  const onImageRemove = async () => {
-    if (!editingId) return;
-    setImageBusy(true);
-    setSaveError(null);
-    try {
-      await capabilitiesApi.removeImage(editingId);
-      setImageUrl('');
-      load();
-    } catch (err) {
-      setSaveError(err?.message || 'Failed to remove the image');
-    } finally {
-      setImageBusy(false);
-    }
   };
 
   const onSubmit = async (e) => {
@@ -181,10 +143,9 @@ export default function ServiceOfferingAdminPage() {
         setDrawerOpen(false);
       } else {
         // Stay in the drawer after creating, and switch it to edit mode, so the
-        // image can be attached without reopening the card.
+        // card can be adjusted without reopening it.
         const createdCard = await capabilitiesApi.create(body);
         setEditingId(createdCard?._id || createdCard?.id || null);
-        setImageUrl('');
       }
       load();
     } catch (err) {
@@ -223,21 +184,6 @@ export default function ServiceOfferingAdminPage() {
           <CapabilityIcon name={r.icon} size={26} />
         </span>
       ),
-    },
-    {
-      key: 'image',
-      header: 'Image',
-      width: 90,
-      render: (r) =>
-        r.image?.url ? (
-          <img
-            src={r.image.url}
-            alt=""
-            style={{ display: 'block', width: 56, height: 40, objectFit: 'cover', borderRadius: 4 }}
-          />
-        ) : (
-          <span style={{ color: 'var(--admin-muted)' }}>Built-in</span>
-        ),
     },
     { key: 'title', header: 'Title' },
     {
@@ -335,7 +281,7 @@ export default function ServiceOfferingAdminPage() {
               type="button"
               className="admin-btn"
               onClick={closeDrawer}
-              disabled={saving || imageBusy}
+              disabled={saving}
             >
               {editingId ? 'Close' : 'Cancel'}
             </button>
@@ -394,58 +340,6 @@ export default function ServiceOfferingAdminPage() {
             onChange={onChange}
             hint="Shown above the title."
           />
-          {/* The photograph beside the copy on the Service Offering page. Not
-              used by the card grids — those are drawn marks. */}
-          <div className="admin-field">
-            <span className="admin-field__label">Image</span>
-            {editingId ? (
-              <>
-                {imageUrl && (
-                  <img
-                    src={imageUrl}
-                    alt=""
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      maxWidth: 260,
-                      aspectRatio: '4 / 3',
-                      objectFit: 'cover',
-                      borderRadius: 6,
-                      marginBottom: 10,
-                    }}
-                  />
-                )}
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="admin-input"
-                  onChange={onImage}
-                  disabled={imageBusy}
-                />
-                <p className="admin-field__hint" style={{ marginLeft: 0 }}>
-                  {imageBusy
-                    ? 'Working…'
-                    : 'Shown beside this service on the Service Offering page. Without one the page uses its built-in photograph for this service.'}
-                </p>
-                {imageUrl && (
-                  <button
-                    type="button"
-                    className="admin-btn admin-btn--sm"
-                    onClick={onImageRemove}
-                    disabled={imageBusy}
-                  >
-                    Remove image
-                  </button>
-                )}
-              </>
-            ) : (
-              <p className="admin-field__hint" style={{ marginLeft: 0 }}>
-                Create the card first, then add its image.
-              </p>
-            )}
-          </div>
-
           <FormField
             label="Segment"
             name="audience"

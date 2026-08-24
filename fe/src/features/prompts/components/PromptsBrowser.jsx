@@ -3,7 +3,9 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { promptsApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
+import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
+import { keepScrollOnNextNavigation } from '../../../components/shared/ScrollToTop.jsx';
 import { TOPICS, TOOLS, TOOL_BY_VALUE } from '../data.js';
 import './PromptsBrowser.css';
 
@@ -67,8 +69,33 @@ export default function PromptsBrowser() {
     else next.set(key, value);
     // Replace rather than push: dragging down a radio list would otherwise
     // stack a history entry per option and bury the page the visitor came from.
+    //
+    // Without the line below, this navigation is like any other and throws the
+    // visitor back to the top of the page — from a rail they had scrolled
+    // halfway down to reach. See components/shared/ScrollToTop.jsx.
+    keepScrollOnNextNavigation();
     setParams(next, { replace: true });
+    // And then put the results back under the site header. Two behaviours were
+    // tried here and neither is this one: landing at the top of the DOCUMENT,
+    // which is what happens with no handling at all and throws you above the
+    // page's heading band; and staying exactly where you were, which leaves you
+    // looking at the middle of a list that has just been replaced. This scrolls
+    // to the top of the browse section — the rail and the first result, with the
+    // heading band scrolled past — so a filter always answers in the same place.
+    //
+    // The offset comes from `scroll-margin-top` on `.browse` (styles/browse.css)
+    // rather than from arithmetic here, which is what makes it right above
+    // 1441px too: the header is scaled there, and a scroll margin set inside the
+    // scaled subtree scales with it.
+    topRef.current?.scrollIntoView({ block: 'start' });
   };
+
+  // What the RESULTS are filtered by. Behind the rail by the length of the
+  // fade-out, so the list that leaves the screen is the one the visitor was
+  // looking at — see hooks/useFadeSwap.js. The rail itself reads the live values
+  // above, so a radio answers the click that selected it straight away.
+  const [appliedKey, fading] = useFadeSwap(JSON.stringify([topic, useCase, tool]));
+  const [shownTopic, shownUseCase, shownTool] = JSON.parse(appliedKey);
 
   const [prompts, setPrompts] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -164,9 +191,9 @@ export default function PromptsBrowser() {
   const groups = useMemo(() => {
     const visible = prompts.filter(
       (p) =>
-        (topic === ALL || p.mainTopic === topic) &&
-        (useCase === ALL || p.useCase === useCase) &&
-        (tool === ALL || p.tool === tool),
+        (shownTopic === ALL || p.mainTopic === shownTopic) &&
+        (shownUseCase === ALL || p.useCase === shownUseCase) &&
+        (shownTool === ALL || p.tool === shownTool),
     );
 
     return TOPICS.map((t) => {
@@ -186,7 +213,7 @@ export default function PromptsBrowser() {
       cases.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
       return { ...t, cases };
     }).filter((t) => t.cases.length > 0);
-  }, [prompts, topic, useCase, tool]);
+  }, [prompts, shownTopic, shownUseCase, shownTool]);
 
   const total = groups.reduce((n, t) => n + t.cases.reduce((m, c) => m + c.items.length, 0), 0);
   const filtered = topic !== ALL || useCase !== ALL || tool !== ALL;
@@ -242,7 +269,11 @@ export default function PromptsBrowser() {
               <button
                 type="button"
                 className="browse-filters__reset"
-                onClick={() => setParams(new URLSearchParams(), { replace: true })}
+                onClick={() => {
+                  keepScrollOnNextNavigation();
+                  setParams(new URLSearchParams(), { replace: true });
+                  topRef.current?.scrollIntoView({ block: 'start' });
+                }}
               >
                 Reset filters
               </button>
@@ -266,6 +297,10 @@ export default function PromptsBrowser() {
             </span>
           </button>
 
+          {/* Everything that answers the filters, and nothing that sets them:
+              the button above opens the phone panel and must not fade out from
+              under the thumb that just pressed it. */}
+          <div className={`browse-results${fading ? ' is-swapping' : ''}`}>
           {status === 'loading' && <p className="browse-main__note">Loading prompts…</p>}
           {status === 'error' && (
             <p className="browse-main__note">
@@ -281,9 +316,11 @@ export default function PromptsBrowser() {
 
           {groups.map((group) => (
             <section className="browse-group pl-topic" key={group.value}>
+              {/* The heading alone. The blurb under it ("Buying: going to
+                  market and running the process.") restated the topic it sat
+                  under, to a visitor who had just chosen that topic. */}
               <header className="pl-topic__head">
                 <h2 className="pl-topic__title">{group.label}</h2>
-                <p className="pl-topic__blurb">{group.blurb}</p>
               </header>
 
               {group.cases.map((useCaseGroup) => (
@@ -299,6 +336,7 @@ export default function PromptsBrowser() {
               ))}
             </section>
           ))}
+          </div>
         </div>
       </div>
 

@@ -50,7 +50,7 @@
 }
 
 .subscribe-form__copy {
-  margin: 16px auto 0;
+  margin: 10px auto 0;
   /* A readable measure while it is wrapping. Lifted on a laptop below, where
      the point is that it does not wrap at all. */
   max-width: 54ch;
@@ -63,8 +63,11 @@
   transition: var(--gp-fade);
 }
 
+/* Close under the standfirst it belongs to. At 26px the field floated between
+   the sentence above it and the band's own bottom padding, so the three parts of
+   this block read as three things rather than one. */
 .subscribe-form__form {
-  margin: 26px 0 0;
+  margin: 14px 0 0;
 }
 
 .subscribe-form__field {

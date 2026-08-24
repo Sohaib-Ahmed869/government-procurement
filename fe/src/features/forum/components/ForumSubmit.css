@@ -11,7 +11,7 @@
   gap: 64px;
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px clamp(20px, 4vw, 60px) 48px;
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
@@ -63,7 +63,7 @@
 }
 
 .forum-submit__heading {
-  margin: 0 0 28px;
+  margin: 0 0 16px;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: var(--gp-section-title);
   font-weight: 400;
@@ -74,7 +74,7 @@
 .forum-submit__form {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 14px;
   max-width: 620px;
 }
 

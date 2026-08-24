@@ -21,7 +21,7 @@
   margin: 0 auto;
   /* Even top and bottom, and both well under what they were: the list is short
      and 60px above it with 88px below left it floating in the page. */
-  padding: clamp(24px, 2.8vw, 36px) clamp(20px, 4vw, 60px);
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 @media (prefers-reduced-motion: no-preference) {

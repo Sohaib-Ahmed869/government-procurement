@@ -140,7 +140,7 @@ export default function TenderPortals() {
           list carries its own h2. */}
       <section className="tp__band tp__band--head hm-band--dark">
         <div className="tp__inner">
-          <h1 className="tp__title">Explore Tender Websites</h1>
+          <h1 className="tp__title">Explore Australian Tender Websites</h1>
 
           {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
           {status === 'error' && (

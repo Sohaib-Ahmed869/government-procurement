@@ -104,8 +104,6 @@ export const capabilitiesApi = {
   ...createResource('capabilities'),
   // The service photograph. Its own endpoints because the file has to be stored
   // before there is a URL to save — same shape as a team member's photo.
-  uploadImage: (id, file) => api.upload(`/capabilities/${id}/image`, file),
-  removeImage: (id) => api.del(`/capabilities/${id}/image`),
 };
 
 // A6 — versioned rule overlays for the Procurement Advisor.  is the

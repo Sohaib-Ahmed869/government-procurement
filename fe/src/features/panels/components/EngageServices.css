@@ -15,7 +15,7 @@
   max-width: var(--gp-shell);
   margin: 0 auto;
   /* Same as the panels list, so the toggle does not shift the page. */
-  padding: clamp(24px, 2.8vw, 36px) clamp(20px, 4vw, 60px);
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 .eng__list {
@@ -95,8 +95,9 @@
   outline-offset: 2px;
 }
 
-/* The one that carries the page's intent. Filled, so the row has an obvious
-   primary among three options rather than three equal ones. */
+/* The row's one action, filled. The modifier and the base rule below it are
+   kept apart rather than merged: the base is the outline treatment, and it is
+   what a second action on the row would take if one is ever added back. */
 .eng__action--primary {
   border-color: var(--gp-brand);
   background: var(--gp-brand);
@@ -123,19 +124,6 @@
 
 .eng[data-audience='award'] .eng__note a { color: var(--gp-green-600); }
 
-/* Visually hidden, still read aloud: the Call button says "Call", and the
-   number itself is what a screen reader needs to announce with it. */
-.eng__sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
 
 /* --- reveal on scroll-in, matching the panels list ------------------------ */
 @media (prefers-reduced-motion: no-preference) {

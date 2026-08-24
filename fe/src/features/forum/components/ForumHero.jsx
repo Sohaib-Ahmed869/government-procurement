@@ -7,6 +7,14 @@ import './ForumHero.css';
 
 // `compact` drops the hero title/intro on small screens — used on the article
 // page, where the article's own title takes over directly below the search row.
+//
+// The search row sits BELOW the heading band rather than inside it. It was in
+// the band, which made this page's heading twice the height of every other
+// page's and put "Recent Answers" that much further down; and it made the row
+// read as part of the title rather than as the first thing the page offers. The
+// band is now the same title-only strip the rest of the site has, and the row is
+// the top of the page under it — same field, same pill, same order, drawn for a
+// paper ground instead of a dark one.
 export default function ForumHero({ compact = false }) {
   const { audience } = useAudience();
 
@@ -53,15 +61,25 @@ export default function ForumHero({ compact = false }) {
   }, [panelOpen]);
 
   return (
+    <>
     <section
-      className={`forum-hero${compact ? ' forum-hero--compact' : ''}${mounted ? ' is-in' : ''}${panelOpen ? ' is-panel-open' : ''}`}
+      className={`forum-hero${compact ? ' forum-hero--compact' : ''}${mounted ? ' is-in' : ''}`}
       data-audience={audience}
     >
       <div className="forum-hero__inner">
         <h1 className="forum-hero__title">
-          Question and Answers - Complementary Service
+          Real Procurement Questions, Answered Complementary
         </h1>
+      </div>
+    </section>
 
+    <div
+      className={`forum-tools${compact ? ' forum-tools--compact' : ''}${mounted ? ' is-in' : ''}${
+        panelOpen ? ' is-panel-open' : ''
+      }`}
+      data-audience={audience}
+    >
+      <div className="forum-tools__inner">
         <div className="forum-hero__tools">
           <form className="forum-hero__search" role="search" onSubmit={onSearch}>
             <button className="forum-hero__search-icon" type="submit" aria-label="Search questions">
@@ -135,6 +153,7 @@ export default function ForumHero({ compact = false }) {
           <ForumSidebar />
         </div>
       </div>
-    </section>
+    </div>
+    </>
   );
 }

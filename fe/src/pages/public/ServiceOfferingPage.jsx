@@ -1,6 +1,6 @@
 import PageLayout from '../../components/layout/PageLayout.jsx';
 import { useMountReveal } from '../../hooks/useMountReveal.js';
-import ServiceRows from '../../features/serviceOffering/components/ServiceRows.jsx';
+import ServiceAccordion from '../../features/serviceOffering/components/ServiceAccordion.jsx';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import './ServiceOfferingPage.css';
 
@@ -38,10 +38,10 @@ export default function ServiceOfferingPage() {
             </div>
           </header>
 
-          {/* Six rows, each with its photograph and copy, the sides and the band
-              alternating down the page. The rows carry their own full-bleed
-              backgrounds, so they sit outside the page shell. */}
-          <ServiceRows audience={audience} />
+          {/* The six services as a list of headings, one open at a time. It was
+              six full-width photo rows, which showed one service per screen and
+              never showed the visitor what the page held. */}
+          <ServiceAccordion audience={audience} />
         </div>
       </PageLayout>
     </div>

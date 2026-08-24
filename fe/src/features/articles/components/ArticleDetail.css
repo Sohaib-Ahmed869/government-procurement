@@ -54,8 +54,10 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 80px 50px 80px 40px;
-  min-height: 440px;
+  /* Was 80px of padding on a 440px floor: a title, a date and a read time in a
+     panel two-thirds of a laptop screen tall, before a word of the article. */
+  padding: 36px 50px 36px 40px;
+  min-height: 240px;
   background: var(--art-panel);
 }
 
@@ -124,7 +126,7 @@
 .article-body {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 36px clamp(20px, 4vw, 60px) 8px;
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) 8px;
 }
 
 /* ---------- Byline + share ---------- */
@@ -134,7 +136,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 20px;
-  padding-bottom: 22px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--art-border);
 }
 
@@ -177,7 +179,7 @@
 }
 
 .article-prose {
-  margin-top: 34px;
+  margin-top: 20px;
 }
 
 .article-prose p {
@@ -319,7 +321,7 @@
   /* Tight under the rule, which is what separates this from the article above
      it — 56px left the heading floating well clear of its own divider. Light at
      the foot too: the footer's subscribe block adds its own spacing on top. */
-  padding: 24px 40px 32px;
+  padding: var(--gp-body-pad) 40px var(--gp-body-pad);
 }
 
 .article-related__inner {
@@ -680,7 +682,7 @@
 .article-body {
   background: var(--gp-paper);
   color: var(--gp-ink);
-  padding-bottom: clamp(40px, 6vw, 72px);
+  padding-bottom: var(--gp-body-pad);
   transition: var(--gp-fade);
 }
 
@@ -748,7 +750,7 @@
   background: var(--rel-bg);
   border-top: 0;
   color: #fff;
-  padding-bottom: clamp(40px, 6vw, 64px);
+  padding-bottom: var(--gp-body-pad);
   transition: var(--gp-fade);
 }
 

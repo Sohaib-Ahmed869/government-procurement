@@ -9,6 +9,9 @@
 @import './styles/browse.css';
 /* The shared fade-in used by every page's sections. */
 @import './styles/reveal.css';
+/* The page-heading band's shared height and centring, so every page's title
+   sits at the same place. */
+@import './styles/head.css';
 
 *,
 *::before,

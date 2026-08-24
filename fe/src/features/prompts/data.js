@@ -9,9 +9,11 @@
 // neither side specifically. Kept in step with PROMPT_TOPICS in
 // be/src/models/Prompt.js, which is what the API validates against.
 export const TOPICS = [
-  { value: 'award', label: 'Award Contracts', blurb: 'Buying: going to market and running the process.' },
-  { value: 'win', label: 'Win Contracts', blurb: 'Bidding: responding and positioning to win.' },
-  { value: 'other', label: 'Other', blurb: 'Research, summarising and general drafting.' },
+  // No blurb on these. Each carried a line printed under the topic heading in
+  // the results, restating the topic to a visitor who had just chosen it.
+  { value: 'award', label: 'Award Contracts' },
+  { value: 'win', label: 'Win Contracts' },
+  { value: 'other', label: 'Other' },
 ];
 
 export const TOPIC_BY_VALUE = Object.fromEntries(TOPICS.map((t) => [t.value, t]));

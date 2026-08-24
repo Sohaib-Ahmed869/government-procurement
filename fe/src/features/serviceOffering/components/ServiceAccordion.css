@@ -1,0 +1,183 @@
+/* A5 — the six services as an accordion.
+
+   Ruled rather than boxed: a hairline above each name and one under the last,
+   so the six read as one list rather than as six cards that happen to be
+   stacked. The rule is what the reference uses and it is the right call here
+   too — a card carries a background, and six backgrounds on a paper page is a
+   second page. */
+
+.sv {
+  background: var(--gp-paper);
+  color: var(--gp-ink);
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
+
+  /* The hover colour, one per segment. --gp-brand-lift is already exactly the
+     pair asked for — #2f7d45 on Award and #4a4a4a on Win — so this is that
+     token under a name that says what it is for here, rather than a second set
+     of hexes to keep in step with the ramp.
+
+     NOT --gp-accent-ink, which was the first attempt and is clay on Award and
+     mint on Win: the warm accent, and the wrong way round for a page whose
+     hover should read as a lift of the segment's own colour. */
+  --sv-hover: var(--gp-brand-lift);
+}
+
+/* The list, the full width of the column. It shared the row with a picture
+   column for a while; the rules and the names read better across the whole
+   width, and the copy is held to a measure by .sv__copy rather than by the
+   container. */
+.sv__inner {
+  max-width: var(--gp-shell);
+  margin: 0 auto;
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
+}
+
+.sv__list {
+  /* The copy is set to a reading measure while the rules run the column, which
+     is what stops a paragraph stretching to 1285px. */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--gp-line);
+}
+
+.sv__item {
+  border-bottom: 1px solid var(--gp-line);
+}
+
+.sv__heading {
+  margin: 0;
+  font: inherit;
+}
+
+/* The whole row is the control, so the target is the row and not the words in
+   it — pressing anywhere on the line opens the service. */
+.sv__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: clamp(11px, 1.2vw, 15px) 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.sv__head:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+.sv__name {
+  font-size: clamp(18px, 1.9vw, 24px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--gp-brand);
+  transition: var(--gp-fade);
+}
+
+@media (hover: hover) {
+  .sv__head:hover .sv__name {
+    color: var(--sv-hover);
+  }
+
+  /* A wash of the same colour under the row, pulled out to the rules either
+     side so the whole line lights rather than the words in it. */
+  .sv__head:hover {
+    background: color-mix(in srgb, var(--sv-hover) 8%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--sv-hover) 10%, transparent);
+  }
+}
+
+/* The plus, drawn rather than typed: two bars, and the upright one is what goes
+   when the panel opens. A "+"/"−" pair set as text sits on a baseline and jumps
+   between the two glyphs' widths; two bars rotate into each other. */
+.sv__sign {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.sv__sign::before,
+.sv__sign::after {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: translateY(-50%);
+  transition: transform 220ms var(--gp-ease), opacity 220ms var(--gp-ease);
+}
+
+.sv__sign::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.sv__item.is-open .sv__sign::after {
+  transform: translateY(-50%) rotate(0deg);
+  opacity: 0;
+}
+
+/* --- the panel ------------------------------------------------------------ */
+
+/* Collapsed by a grid row rather than by max-height. max-height needs a number
+   picked above the tallest panel, which is a guess that is either too small for
+   one service's copy or slow to close for all the others; 0fr → 1fr animates to
+   the panel's own height, whatever that turns out to be. */
+.sv__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms var(--gp-ease);
+}
+
+.sv__item.is-open .sv__panel {
+  grid-template-rows: 1fr;
+}
+
+.sv__panel-inner {
+  overflow: hidden;
+  /* Close under the heading it belongs to. The row's own bottom padding is
+     what separated the two, and it is sized for a CLOSED row — the copy was
+     landing a full row's worth of space below its own title. */
+  padding-top: 2px;
+}
+
+.sv__copy {
+  /* Held to a measure, and the bottom padding is inside the collapsing box so
+     it goes with the panel rather than leaving a gap under a closed one. */
+  max-width: 68ch;
+  margin: 0;
+  padding-bottom: clamp(10px, 1.2vw, 14px);
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--gp-muted);
+}
+
+/* The copy fades in behind the row opening, so a panel does not arrive with its
+   text already at full strength halfway through the movement. */
+.sv__panel-inner > * {
+  opacity: 0;
+  transition: opacity 180ms var(--gp-ease);
+}
+
+.sv__item.is-open .sv__panel-inner > * {
+  opacity: 1;
+  transition-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv__panel,
+  .sv__panel-inner > *,
+  .sv__sign::before,
+  .sv__sign::after {
+    transition: none;
+  }
+}

@@ -47,7 +47,7 @@
      nothing between the page title and the picker, so 76px above it and 110px
      below left the page mostly empty. */
   /* Equal top and bottom. One value, so they cannot drift apart again. */
-  padding: clamp(20px, 2.5vw, 32px) 0;
+  padding: var(--gp-body-pad) 0;
 }
 
 .pa-note {
@@ -92,8 +92,14 @@
    the tool works, not a warning, so it is set as a note rather than as an
    alert. */
 .pa-disclaimer {
-  max-width: 78ch;
-  margin: 0 0 clamp(20px, 2.5vw, 30px);
+  /* Full width of the column, in line with the picker under it. It was capped
+     at 78ch, which on this page is a little over half the shell — so the note
+     ended in mid-air with the grid below it running on another 400px, and the
+     two read as belonging to different pages. A measure cap is right for a
+     paragraph you sit and read; this is three lines above the thing they are
+     about. */
+  max-width: none;
+  margin: 0 0 var(--gp-body-pad);
   padding: 14px 18px;
   border: 1px solid var(--gp-line);
   border-radius: 12px;

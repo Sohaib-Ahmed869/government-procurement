@@ -179,6 +179,12 @@
 .site-header__nav-list {
   display: flex;
   align-items: stretch;
+  /* Wraps rather than overflows. The metrics here fit the twelve labels on one
+     row at every width this ribbon is drawn at, and the wrap is the safety net
+     if a future label is long enough to break that — a second row is ugly, an
+     overflowing one is unusable. Sentence-length labels were tried here and are
+     what forced the type down to 11px; they are back to their short names and
+     the row is back to its own size. */
   flex-wrap: wrap;
   max-width: var(--gp-shell-bar);
   margin: 0 auto;

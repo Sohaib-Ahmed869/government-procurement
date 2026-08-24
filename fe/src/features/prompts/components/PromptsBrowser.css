@@ -8,7 +8,7 @@
 /* --- results -------------------------------------------------------------- */
 
 /* Level 1 — Main Topic. */
-.pl-topic + .pl-topic { margin-top: clamp(40px, 5vw, 64px); }
+.pl-topic + .pl-topic { margin-top: clamp(18px, 2vw, 26px); }
 
 .pl-topic__head {
   padding-bottom: 12px;
@@ -25,15 +25,10 @@
   transition: var(--gp-fade);
 }
 
-.pl-topic__blurb {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: var(--gp-muted);
-}
 
 /* Level 2 — Use Case. Ruled rather than filled, so it reads as a divider inside
    the topic rather than as a second topic. */
-.pl-case { margin-top: clamp(24px, 3vw, 36px); }
+.pl-case { margin-top: clamp(12px, 1.4vw, 18px); }
 
 .pl-case__title {
   margin: 0 0 14px;
@@ -68,17 +63,21 @@
    visitor sees the CARD highlighted rather than a rectangle inside it. */
 .pl-card:focus-within { border-color: var(--gp-brand); }
 
-/* The clickable body. A button, so it is reset to look like the card it fills
-   rather than like a control. */
+/* The clickable body, reset to look like the card it fills rather than like a
+   control. `text-decoration: none` is load-bearing and was missing: this started
+   as a <button> and is a <Link> now, so the browser was drawing its own
+   underline under the title AND the teaser — the whole card came out underlined,
+   which is not what either line is. */
 .pl-card__open {
   display: block;
   width: 100%;
-  padding: 18px 20px 14px;
+  padding: 14px 18px 10px;
   border: 0;
   background: none;
   font: inherit;
   color: inherit;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 .pl-card__open:focus-visible { outline: none; }
@@ -148,8 +147,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 20px 16px;
-  margin-top: 14px;
+  padding: 0 18px 12px;
+  margin-top: 6px;
 }
 
 .pl-copy {
@@ -178,6 +177,14 @@
   outline-offset: 3px;
 }
 
+/* Copy now sits on the card's right edge, level with the tool tag above it. It
+   used to stop 12px short, because the live region after it is a real element in
+   the flex row and took the row's gap even while empty — so the tag and the
+   button, the only two things on that edge, were out of line by exactly one gap.
+   Taking the status out of the flow (below) is the whole fix; `.pl-card__view`
+   already carries the `margin-right: auto` that pushes the button over, and a
+   second auto margin here would split the free space between the two instead. */
+
 /* Confirmed state. A colour change alone would be invisible to anyone who
    cannot see it and to anyone who cannot tell the two greens apart, so the
    label changes to "Copied" and the icon becomes a tick as well. */
@@ -192,9 +199,19 @@
   line-height: 0;
 }
 
+/* Announced, not shown. The button already says "Copied" and shows a tick, so
+   this exists for a screen reader alone — and as a laid-out element it was
+   pushing the button off the card's right edge. */
 .pl-copy__status {
-  font-size: 13px;
-  color: var(--gp-muted);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (max-width: 560px) {

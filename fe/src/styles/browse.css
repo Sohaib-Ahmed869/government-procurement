@@ -21,9 +21,15 @@
    this shell pair it with <BackToTop /> instead. */
 
 .browse {
-  /* BackToTop scrolls here, so it has to stop clear of the sticky site chrome
-     rather than landing underneath it. */
-  scroll-margin-top: 96px;
+  /* Both BackToTop and every filter click scroll here, so the section has to
+     stop clear of the sticky site chrome rather than landing underneath it.
+     112 against a 107px chrome: the bar's height and a few pixels of air.
+
+     In design pixels, deliberately. Above 1441px the header is inside the page
+     scale and so is this margin, so the two grow together — a figure worked out
+     against the real viewport would be right at one width and wrong at
+     the rest. */
+  scroll-margin-top: 112px;
 
   background: var(--gp-paper);
   color: var(--gp-ink);
@@ -37,11 +43,18 @@
 .browse__inner {
   display: grid;
   align-items: start;
-  grid-template-columns: 220px minmax(0, 1fr);
+  /* 250, not the Courses page's 220. The widest thing in the rail is a use-case
+     name written by an editor, and at 220 most of them wrapped to two lines —
+     five wrapped rows is 95px of rail, which is more than anything the padding
+     had left to give. The results column pays 30px for it and does not notice. */
+  grid-template-columns: 250px minmax(0, 1fr);
   gap: 56px;
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: clamp(28px, 3.5vw, 44px) clamp(20px, 4vw, 60px) clamp(56px, 7vw, 88px);
+  /* Tighter at the top than it was. The rail below has to reach its last group
+     without the page being scrolled, and every pixel above it is a pixel out of
+     that budget. */
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -65,11 +78,20 @@
 
 /* --- the rail ------------------------------------------------------------- */
 
+/* Tightened so the whole rail is on screen at once.
+
+   It ran to three groups of up to five options at 30px between groups and 15px
+   of box per row, which put the AI tool / Format group below the fold on a
+   laptop — you had to scroll the results column to reach the third of the three
+   filters, and scrolling the results is exactly what you were trying to avoid by
+   filtering. Nothing is smaller: the type, the dots and the counts are all the
+   size they were, and the row is still a comfortable target. What went is the
+   air between them. */
 .browse-filters {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-  padding: 22px 20px;
+  gap: 10px;
+  padding: 10px 12px;
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-line);
   border-radius: 20px;
@@ -77,7 +99,7 @@
 }
 
 .browse-filter__heading {
-  margin: 0 0 12px;
+  margin: 0 0 2px;
   font-size: 13.5px;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -87,7 +109,6 @@
 .browse-filter__options {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 /* Radios rather than checkboxes: each level narrows to one choice, and "all" is
@@ -95,8 +116,8 @@
 .browse-radio {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 8px;
+  gap: 8px;
+  padding: 2px 8px;
   border-radius: 8px;
   font-size: 14px;
   line-height: 1.35;
@@ -152,7 +173,7 @@
 }
 
 .browse-filters__reset {
-  padding: 10px 14px;
+  padding: 6px 14px;
   font: inherit;
   font-size: 13.5px;
   font-weight: 600;
@@ -169,6 +190,38 @@
 /* --- results column ------------------------------------------------------- */
 
 .browse-main { min-width: 0; }
+
+/* Everything the filters answer, so choosing one is a fade rather than a swap
+   between two paints. `is-swapping` is held for the length of the fade-out by
+   hooks/useFadeSwap.js, which is also what keeps the OLD results on screen
+   underneath it — so what fades away is the list you were looking at, and what
+   fades back is the one you asked for.
+
+   The movement is the segment toggle's, to the millisecond and the pixel: out
+   over 380ms lifting 6px, back over 640ms settling. Those are the numbers in
+   index.css under html[data-audience-swap] — a filter and the win/award toggle
+   both replace the copy on the page, and two different fades for the same kind
+   of change is what makes a site feel assembled rather than designed.
+
+   The rail is outside this on purpose: a radio has to answer the click that
+   selected it immediately, whatever the results are doing. */
+.browse-results {
+  transition:
+    opacity 640ms var(--gp-ease),
+    transform 640ms var(--gp-ease);
+}
+
+.browse-results.is-swapping {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition-duration: 380ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .browse-results {
+    transition: none;
+  }
+}
 
 .browse-main__note {
   margin: 0;

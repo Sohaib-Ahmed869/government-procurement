@@ -1,0 +1,91 @@
+/* The page-heading band, made one shape.
+
+   --gp-head-pad (styles/tokens.css) already gave every page's heading the same
+   padding above and below, and that was enough while every band held the same
+   thing. It stopped being enough as soon as they didn't: Our Team sets an
+   eyebrow over its title, the Prompt Library and Templates each carried a lede
+   and a caveat under theirs, and Tender Websites carries a title alone. Equal
+   padding around unequal content is unequal bands — five pages, five heights,
+   and a title landing somewhere different every time you moved between them.
+
+   So the band takes a floor as well as its padding, and centres what it holds
+   inside it. The floor is --gp-head-min, tall enough for the tallest of them,
+   which makes every band the same height; the centring is what keeps the gap
+   above the title equal to the gap below it whatever that band happens to hold.
+
+   Selectors rather than a shared class because these bands are thirteen
+   components that were written separately and each named its own block. Listing
+   them here is the smaller change — and the list is the honest record of which
+   bands are in the set.
+
+   Two are the band element itself (.so-page__head, .pa-page__head) rather than
+   an inner: those two pages paint the ground on the element that also carries
+   the padding, and put their column in a __shell inside it. Centring the band
+   works the same either way.
+
+   NOT in the set: .xp__inner (the Expertise hero is a 460px picture band, not a
+   heading), .cd__inner and .tm__inner (used by every band on those pages, not
+   only the head), and the homepage hero, which is sized to the window — see
+   features/home/components/HomeHero.css. */
+
+.bw-hero__inner,
+.careers-hero__inner,
+.courses-hero__inner,
+.forum-hero__inner,
+.gp-hero__inner,
+.insights-hero__inner,
+.jl-hero__inner,
+.pa-page__head,
+.pd__head .pd__inner,
+.pl-hero__inner,
+.polh__inner,
+.so-page__head,
+.team-hero__inner,
+.tl-hero__inner,
+.tp__band--head .tp__inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--gp-head-min);
+}
+
+/* Both of these set a bottom margin on their title, which is the one thing that
+   can still put a band's copy off centre once the band itself is centred: it
+   pushed each of them 7px above the middle of its own band. They are title-only
+   bands now — the lede that margin was separating the title from was dropped
+   from each — so the margin has nothing left to do.
+
+   Scoped through the band rather than left as a bare class. Each page's own
+   stylesheet is imported by its component and so loads AFTER this file; at equal
+   specificity theirs wins, and the margin came back. */
+.so-page__head .so-page__title,
+.pa-page__head .pa-page__title {
+  margin-bottom: 0;
+}
+
+/* The optical correction (see --gp-head-optical in styles/tokens.css): the same
+   total padding, split unevenly, so the LETTERS sit in the middle of the band
+   rather than their line box.
+
+   Written parent-then-child purely for weight. Each of these bands sets its own
+   `padding: var(--gp-head-pad) …` in its component stylesheet, and those load
+   after this file — at equal specificity theirs wins and the split is thrown
+   away, which is exactly what happened the first time this was tried with a
+   bare class. */
+.bw-hero .bw-hero__inner,
+.careers-hero .careers-hero__inner,
+.courses-hero .courses-hero__inner,
+.forum-hero .forum-hero__inner,
+.gp-hero .gp-hero__inner,
+.insights-hero .insights-hero__inner,
+.jl-hero .jl-hero__inner,
+.pa-page .pa-page__head,
+.pd__head .pd__inner,
+.pl-hero .pl-hero__inner,
+.polh .polh__inner,
+.so-page .so-page__head,
+.team-hero .team-hero__inner,
+.tl-hero .tl-hero__inner,
+.tp__band--head .tp__inner {
+  padding-block: var(--gp-head-pad-top) var(--gp-head-pad-bottom);
+}

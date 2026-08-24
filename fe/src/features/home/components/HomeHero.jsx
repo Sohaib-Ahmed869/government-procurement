@@ -18,10 +18,18 @@ import './HomeHero.css';
 // The source is CMS copy (Pages → Homepage), the same as the words are, so the
 // clip can be swapped without a deploy.
 //
-// The bundled fallback is boardroom footage — advisers around a table with
-// tender documents and a city skyline behind them — so the hero reads as the
-// work the firm does even before the CMS has anything to say. It replaces the
-// sunset clip that was standing in here, which said nothing about procurement.
+// The bundled fallback is boardroom footage — a mixed team talking a tender
+// across the table, charted documents in front of them — so the hero reads as
+// the work the firm does even before the CMS has anything to say. A group shot
+// rather than a close-up on one person: the whole table is the point, which is
+// also why it is cut from the head of the clip, before the camera pushes in.
+//
+// It runs at 1.5x. At native speed the meeting barely moved over the length of
+// the loop and the hero read as a still that happened to breathe; the faster
+// cut also fits 21 seconds of the source into the same 14, so the loop comes
+// back round to the same frame less often. Every source frame is kept rather
+// than dropped to hit 25fps, hence the 37.5fps stream.
+//
 // The poster is its own first frame, so the still and the footage are the same
 // shot and the swap from one to the other is invisible.
 //
@@ -102,6 +110,57 @@ export default function HomeHero() {
   const [videoFailed, setVideoFailed] = useState(false);
   const videoRef = useRef(null);
 
+  /* A1 — the hero ends exactly where the window does.
+
+     Its height used to be `100svh minus a hard-coded 140px` for the chrome
+     above it, which is right only on the screens where that stack happens to be
+     140px tall. It is not a constant: the announcement banner is CMS copy, so it
+     wraps to two lines on some messages and disappears entirely once a visitor
+     dismisses it, and above 1441px the whole page sits inside a `zoom`ed subtree
+     where a viewport unit and a layout pixel stop being the same length. The
+     footage stopped short of the fold on some screens and ran past it on others.
+
+     Nothing here needs to know what is above it — only how far down the window
+     this block starts, which is the one thing that can simply be measured. The
+     distance from there to the bottom of the viewport is the height it should
+     be. Written back as a custom property rather than an inline style so the
+     stylesheet keeps both the pre-measurement fallback and the short-window
+     rules that tighten the copy.
+
+     Divided by --gp-scale because the measurement is in painted pixels and the
+     property is consumed inside the zoomed subtree, where lengths are in design
+     pixels — see lib/pageScale.js. */
+  const innerRef = useRef(null);
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el) return undefined;
+
+    const measure = () => {
+      const scale =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gp-scale')) || 1;
+      // Distance down the DOCUMENT, not down the viewport: a resize can land
+      // while the visitor is scrolled, and this is the number that holds still.
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const fill = (window.innerHeight - top) / scale;
+      el.style.setProperty('--home-hero-fill', `${Math.max(0, Math.round(fill))}px`);
+    };
+
+    measure();
+    window.addEventListener('resize', measure);
+
+    // The chrome above can change height after this first runs — the banner is
+    // dismissible, and its copy arrives from the CMS a moment after first paint.
+    const chrome = document.querySelector('.page-layout__chrome');
+    const observer =
+      chrome && typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+    if (observer) observer.observe(chrome);
+
+    return () => {
+      window.removeEventListener('resize', measure);
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
   // Some browsers refuse autoplay until the element is muted in the DOM rather
   // than only in the attribute, and iOS additionally wants the play() call.
   // Failing that, the poster is already correct, so the rejection is ignored.
@@ -152,7 +211,7 @@ export default function HomeHero() {
         <div className="home-hero__tint" />
       </div>
 
-      <div className="home-hero__inner hm-shell">
+      <div className="home-hero__inner hm-shell" ref={innerRef}>
         {/* The lines carry `hm-reveal` one by one rather than the column
             carrying it for all of them. As a single block the hero faded in
             flat, with no stagger at all, which is why it read as a different

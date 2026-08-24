@@ -11,7 +11,10 @@
   gap: 64px;
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: 40px clamp(20px, 4vw, 60px) 48px;
+  /* The same drop from the tools strip that the answers listing takes, and the
+     same clearance at the foot — this page opened 40px under the search row
+     where "Recent Answers" opens 16 under it, on the page you came from. */
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
