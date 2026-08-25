@@ -121,13 +121,10 @@
   padding: var(--gp-head-pad) clamp(20px, 4vw, 60px);
 }
 
+/* Size, weight, line-height and tracking come from styles/head.css, shared with
+   every other page-heading band. */
 .forum-hero__title {
   margin: 0;
-  font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.015em;
 }
 
 .forum-hero__sub {
@@ -355,19 +352,6 @@
 }
 
 @media (max-width: 720px) {
-  /* Clears the rest of the corner wave (≈155px tall at its mobile width) and
-     leaves a gap before the title. The first ~118px of that wave is already
-     covered by the header's toggle overlay space above this section. */
-  .forum-hero__inner {
-    padding: 92px 20px 36px;
-  }
-
-  .forum-hero__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    /* Shared with the article and submit page headings. */
-    font-size: var(--gp-page-title-phone);
-  }
-
   /* Matches the footer blurb. */
   .forum-hero__sub {
     max-width: 420px;

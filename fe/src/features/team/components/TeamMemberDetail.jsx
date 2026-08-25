@@ -23,7 +23,7 @@ function BackLink() {
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         <polyline points="15 6 9 12 15 18" />
       </svg>
-      Back to Our Team
+      Back to Meeting the Team
     </Link>
   );
 }

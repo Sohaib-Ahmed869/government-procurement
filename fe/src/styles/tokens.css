@@ -103,22 +103,30 @@
   --gp-head-bg: var(--gp-brand-soft);
   --gp-head-pad: clamp(16px, 1.6vw, 22px);
 
-  /* The optical correction, and why the band needs one.
+  /* There is no optical correction, and this is the note about why there is
+     not one any more.
 
-     Centring the band's content centres the title's LINE BOX, which is not the
-     same as centring the title. A page heading is capitals and x-height with
-     almost nothing below the baseline — "Our Team" measures 31px of ink above
-     the baseline and 1px below — so the ink sits low in a box built to hold
-     descenders too. Measured on the band before this: 38.9px of clear space
-     above the letters and 26.9px below, in a band whose padding was equal to
-     the pixel.
+     There was: --gp-head-optical took 6px off the top padding and put it on the
+     bottom, on the reasoning that centring the band's content centres the
+     title's LINE BOX rather than its ink, and a page heading is capitals and
+     x-height with almost nothing below the baseline. The 38.9px-above /
+     26.9px-below it was measured against was real — but it was measured on the
+     band BEFORE the band centred its content, when the title's own line-height
+     and margins were still doing the positioning.
 
-     Half the difference comes off the top padding and goes onto the bottom,
-     which lifts the letters to the middle of the band and leaves its height
-     exactly where it was. */
-  --gp-head-optical: 6px;
-  --gp-head-pad-top: calc(var(--gp-head-pad) - var(--gp-head-optical));
-  --gp-head-pad-bottom: calc(var(--gp-head-pad) + var(--gp-head-optical));
+     Once the band centres the line box, the correction has nothing left to
+     correct: the space between the top of the line box and the cap line equals
+     the space between the baseline and the bottom of the line box, so a centred
+     line box already puts the ink in the middle. Measured on the finished band
+     at 1440px — 90px tall, 30px of cap-to-baseline — the leftover 60px split
+     24/36 with the correction applied and 30/30 without it. The correction was
+     the thing pushing the title 6px above centre.
+
+     Descenders are deliberately not part of that reckoning. A heading is read
+     off its cap line and its baseline; letting a stray "y" pull the whole title
+     up would put a page whose title happens to have one at a different height
+     from a page whose title does not — which is the drift this band exists to
+     stop. */
 
   /* And the height of the band itself, for the same reason the padding is
      one value: equal padding only gets every page's title to the same

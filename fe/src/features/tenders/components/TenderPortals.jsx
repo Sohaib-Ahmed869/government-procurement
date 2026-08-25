@@ -141,15 +141,27 @@ export default function TenderPortals() {
       <section className="tp__band tp__band--head hm-band--dark">
         <div className="tp__inner">
           <h1 className="tp__title">Explore Australian Tender Websites</h1>
-
-          {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
-          {status === 'error' && (
-            <p className="tp__featured">
-              We couldn&apos;t load the tender websites right now. Please try again shortly.
-            </p>
-          )}
         </div>
       </section>
+
+      {/* The loading line and the failure message, below the band rather than
+          inside it. In the band they were part of what it had to hold, so the
+          heading strip was 132px tall while the list was still coming and 90px
+          once it arrived — the title jumping up by the height of a line on
+          every visit, and staying down on a page that had failed to load. They
+          are the page's first content, and this is where the page starts. */}
+      {status !== 'ready' && (
+        <section className="tp__band tp__band--status hm-band--light">
+          <div className="tp__inner">
+            {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
+            {status === 'error' && (
+              <p className="tp__featured">
+                We couldn&apos;t load the tender websites right now. Please try again shortly.
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {status === 'ready' && (
         <>

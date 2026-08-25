@@ -347,7 +347,7 @@
 
 @media (max-width: 760px) {
   .jl__inner {
-    padding: 16px 24px 40px;
+    padding: 16px clamp(20px, 4vw, 60px) 40px;
   }
 
   .jl__filters {

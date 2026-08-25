@@ -63,15 +63,16 @@
   margin-bottom: 0;
 }
 
-/* The optical correction (see --gp-head-optical in styles/tokens.css): the same
-   total padding, split unevenly, so the LETTERS sit in the middle of the band
-   rather than their line box.
+/* Equal padding, top and bottom — which, with the band centring what it holds,
+   is what puts the title in the middle of the strip. It was split unevenly for
+   a while (--gp-head-optical, 6px off the top and onto the bottom); the note in
+   styles/tokens.css says why that was wrong, and what it measured.
 
    Written parent-then-child purely for weight. Each of these bands sets its own
    `padding: var(--gp-head-pad) …` in its component stylesheet, and those load
-   after this file — at equal specificity theirs wins and the split is thrown
-   away, which is exactly what happened the first time this was tried with a
-   bare class. */
+   after this file — at equal specificity theirs wins and the value here is
+   thrown away, which is exactly what happened the first time this was tried
+   with a bare class. */
 .bw-hero .bw-hero__inner,
 .careers-hero .careers-hero__inner,
 .courses-hero .courses-hero__inner,
@@ -87,5 +88,92 @@
 .team-hero .team-hero__inner,
 .tl-hero .tl-hero__inner,
 .tp__band--head .tp__inner {
-  padding-block: var(--gp-head-pad-top) var(--gp-head-pad-bottom);
+  padding-block: var(--gp-head-pad);
+}
+
+/* The title itself, for the same reason the band is here rather than in
+   thirteen stylesheets.
+
+   Equal padding and a shared floor put every band at the same height; they do
+   not put the LETTERS in the same place, because a title's line box is its font
+   size times its line-height, and these had drifted to 1.02 (Courses, Q&A), 1.1
+   (Tender Websites) and 1.05 (everywhere else). A taller line box in a
+   min-height band pushes its own band open — Tender Websites' 1.1 came to
+   46.2px against the 46px floor --gp-head-min is derived from, so that one page
+   grew past a floor that was calculated to hold it exactly.
+
+   Worse was the phone size. --gp-page-title-phone is swapped in at 860px on
+   most pages, but Courses had it at 700px, and Q&A and Tender Websites at
+   720px. Between those widths and 860px --gp-page-title is still in force, and
+   it shrinks with the viewport: on a 768px screen those three pages rendered
+   their heading at 27px while every other page rendered its own at 52px.
+
+   So the size, the weight, the line-height and the tracking are set once, here,
+   for every band in the set. Colour and margins stay with each page — those
+   genuinely are its own.
+
+   Two-class selectors again, for the reason given above: each page's stylesheet
+   is imported by its component and loads after this file. */
+.bw-hero .bw-hero__title,
+.careers-hero .careers-hero__title,
+.courses-hero .courses-hero__title,
+.forum-hero .forum-hero__title,
+.gp-hero .gp-hero__title,
+.insights-hero .insights-hero__title,
+.jl-hero .jl-hero__title,
+.pa-page .pa-page__title,
+.pl-hero .pl-hero__title,
+.so-page .so-page__title,
+.team-hero .team-hero__title,
+.tl-hero .tl-hero__title,
+.tp__band--head .tp__title {
+  font-family: 'Geist Variable', system-ui, sans-serif;
+  font-size: var(--gp-page-title);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+/* The one breakpoint, on every band at once. */
+@media (max-width: 860px) {
+  .bw-hero .bw-hero__title,
+  .careers-hero .careers-hero__title,
+  .courses-hero .courses-hero__title,
+  .forum-hero .forum-hero__title,
+  .gp-hero .gp-hero__title,
+  .insights-hero .insights-hero__title,
+  .jl-hero .jl-hero__title,
+  .pa-page .pa-page__title,
+  .pl-hero .pl-hero__title,
+  .so-page .so-page__title,
+  .team-hero .team-hero__title,
+  .tl-hero .tl-hero__title,
+  .tp__band--head .tp__title {
+    font-size: var(--gp-page-title-phone);
+  }
+}
+
+/* And the gutter either side of it.
+
+   The bands agreed on clamp(20px, 4vw, 60px) — the site's column gutter, shared
+   with .so-page__shell and every content section — and then nine of them
+   overrode it below 760px, 720px or 700px with a flat 24px or 20px. Three
+   breakpoints and three values, so on a 700px screen the heading started at
+   20px on Courses, 24px on Our Team and 28px on Service Offering.
+
+   Only the bands that carry their own inline padding are listed: Service
+   Offering and the Sourcing Advisor paint the ground on the band and put the
+   gutter on the __shell inside it, so adding it here would pay for it twice. */
+.bw-hero .bw-hero__inner,
+.careers-hero .careers-hero__inner,
+.courses-hero .courses-hero__inner,
+.forum-hero .forum-hero__inner,
+.gp-hero .gp-hero__inner,
+.insights-hero .insights-hero__inner,
+.jl-hero .jl-hero__inner,
+.pl-hero .pl-hero__inner,
+.team-hero .team-hero__inner,
+.tl-hero .tl-hero__inner,
+.tp__band--head .tp__inner {
+  padding-inline: clamp(20px, 4vw, 60px);
 }

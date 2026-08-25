@@ -13,7 +13,6 @@ const REQUIRED_FIELDS = {
   name: () => 'Please enter your full name.',
   email: () => 'Please enter your work email.',
   organisation: (orgLabel) => `Please enter your ${orgLabel.toLowerCase()}.`,
-  reason: () => 'Please tell us your reason for contacting us.',
   message: () => 'Please tell us a little about what you need.',
 };
 
@@ -23,7 +22,6 @@ const EMPTY_FORM = {
   phone: '',
   organisation: '',
   role: '',
-  reason: '',
   message: '',
 };
 
@@ -84,7 +82,6 @@ export default function ConsultationForm() {
         phone: form.phone.trim(),
         organisation: form.organisation.trim(),
         role: form.role.trim(),
-        reason: form.reason.trim(),
         message: form.message.trim(),
       });
       navigate('/contact-sent');
@@ -217,27 +214,6 @@ export default function ConsultationForm() {
                 value={form.role}
                 onChange={handleChange}
               />
-            </div>
-
-            <div className="consult__field">
-              <label className="consult__label" htmlFor="consult-reason">
-                Reason for contacting
-              </label>
-              <input
-                id="consult-reason"
-                name="reason"
-                type="text"
-                className="consult__input"
-                placeholder="Tell us why you're getting in touch"
-                value={form.reason}
-                onChange={handleChange}
-                aria-invalid={Boolean(errors.reason)}
-              />
-              {errors.reason && (
-                <p className="consult__error" role="alert">
-                  {errors.reason}
-                </p>
-              )}
             </div>
 
             <div className="consult__field">

@@ -38,7 +38,7 @@ export const HOME_SECTIONS = [
   { id: 'trusted-partner', nav: null },
   { id: 'service-offering', nav: 'Service Offering' },
   { id: 'advisory', nav: 'Sourcing Advisor' },
-  { id: 'our-team', nav: 'Our Team' },
+  { id: 'our-team', nav: 'Meeting the Team' },
   { id: 'courses', nav: 'Courses' },
   { id: 'insights', nav: 'Insights' },
   { id: 'q-and-a', nav: 'Q&A' },

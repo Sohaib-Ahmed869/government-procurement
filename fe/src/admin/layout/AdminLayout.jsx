@@ -13,7 +13,7 @@ const SECTION_TITLES = {
   courses: 'Courses',
   pages: 'Pages',
   categories: 'Dropdown List',
-  team: 'Our Team',
+  team: 'Meeting the Team',
   tenders: 'Tenders',
   careers: 'Careers',
   rules: 'Jurisdictional Links',

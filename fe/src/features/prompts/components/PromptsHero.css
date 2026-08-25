@@ -28,19 +28,4 @@
 
 .pl-hero__title {
   margin: 0;
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-}
-
-@media (max-width: 860px) {
-  .pl-hero__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: var(--gp-page-title-phone);
-  }
-}
-
-@media (max-width: 760px) {
-  .pl-hero__inner { padding: var(--gp-head-pad) 24px; }
 }

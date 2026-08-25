@@ -5,8 +5,6 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
-
-
 @media (prefers-reduced-motion: no-preference) {
   .team-hero__eyebrow,
   .team-hero__title {
@@ -49,23 +47,4 @@
 
 .team-hero__title {
   margin: 0;
-  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-}
-
-/* Shared page-title breakpoint, matching the homepage and advisory heroes. */
-@media (max-width: 860px) {
-  .team-hero__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: var(--gp-page-title-phone);
-  }
-}
-
-@media (max-width: 760px) {
-  .team-hero__inner {
-    padding: var(--gp-head-pad) 24px;
-  }
 }

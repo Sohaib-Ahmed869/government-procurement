@@ -54,15 +54,21 @@ export default function ServiceAccordion({ audience }) {
 
   const services = resolveServices(saved, audience);
 
-  // The first service is open on arrival, so the page opens on a paragraph
-  // rather than on a list of closed headings that looks like it failed to load.
+  // EVERYTHING CLOSED on arrival. -1 is "no service open".
+  //
+  // This used to open the first one, on the reasoning that a page of closed
+  // headings looks like it failed to load. It reads the other way round: an
+  // expanded first panel makes the service that happens to be listed first look
+  // like the one being recommended, and it pushes the rest of the list down the
+  // page so a visitor scrolling for the service they came for has to get past it.
+  // The whole list visible and equal is the page.
   //
   // Index rather than key: the toggle recolours the page and rewrites the copy,
   // and holding a key would keep a service open across a change that rewrites
-  // what it says. Reset to the top instead — same position, new segment.
-  const [openIndex, setOpenIndex] = useState(0);
+  // what it says. Closing on a segment change is the honest reset.
+  const [openIndex, setOpenIndex] = useState(-1);
   useEffect(() => {
-    setOpenIndex(0);
+    setOpenIndex(-1);
   }, [audience]);
 
   return (

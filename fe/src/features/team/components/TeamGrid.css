@@ -53,12 +53,17 @@
 }
 
 /* --- card --- */
-/* Square-cornered, and filled in the segment's lift step rather than the paper
-   tint it used to take: #4a4a4a on Win, #2f7d45 on Award. Both are already in
-   the palette as --gp-brand-lift, so the two segments need one declaration, not
-   a rule each.
+/* Square-cornered, and filled with THE SAME COLOUR AS THE HEADING STRIP above
+   the grid: --gp-head-bg, which is #242424 on Win and #0e3e1b on Award. One
+   token for both segments, and the same token the band uses, so the two can no
+   longer drift apart.
 
-   That makes the card a dark island on a paper page, so it carries the DARK
+   It used to take the lift step (--gp-brand-lift: #4a4a4a / #2f7d45), a
+   noticeably lighter tone than the band. Two dark blocks on one page in two
+   near-but-not-equal darks read as a mistake rather than a choice — the page
+   looks like the cards failed to pick up the heading's colour.
+
+   The card is still a dark island on a paper page, so it carries the DARK
    band's text roles instead of the section's. Redefining them here is what
    flips the name, role, summary, rule, icons and focus ring in one move — the
    alternative was overriding --band-ink at seven separate call sites and
@@ -98,14 +103,16 @@
   min-height: 430px;
   padding: 20px 18px 12px;
   text-align: center;
-  background: var(--gp-brand-lift);
+  background: var(--gp-head-bg);
   color: #fff;
 
   --band-ink: #fff;
-  /* 0.82 rather than the dark band's 0.72. These fills are lighter than a dark
-     band, so the summary line loses contrast against them faster: at 0.72 it
-     measures 3.5:1 on the Award green, under the 4.5:1 AA wants at 13.5px.
-     0.82 brings it to about 4:1 and still reads as secondary to the name. */
+  /* 0.82 rather than the dark band's 0.72. Kept at 0.82 after the fill moved
+     from the lift step to the heading colour: that change makes the ground
+     DARKER, so this can only gain contrast, and the summary still reads as
+     secondary to the name at this value. (0.82 was originally needed because
+     the lighter lift fill put the summary at 3.5:1 on the Award green, under
+     the 4.5:1 AA wants at 13.5px.) */
   --band-muted: rgba(255, 255, 255, 0.82);
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: rgba(255, 255, 255, 0.06);
@@ -375,10 +382,6 @@
 }
 
 @media (max-width: 760px) {
-  .team__inner {
-    padding: var(--gp-body-pad) 24px;
-  }
-
   .team__grid {
     grid-template-columns: 1fr;
   }

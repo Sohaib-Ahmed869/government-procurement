@@ -62,7 +62,7 @@ const NAV = [
       { to: '/admin/home-hero', label: 'Homepage', icon: 'page' },
       { to: '/admin/service-offering', label: 'Service Offering', icon: 'page' },
       { to: '/admin/advisory-rules', label: 'Advisory Rules', icon: 'rails' },
-      { to: '/admin/team', label: 'Our Team', icon: 'users' },
+      { to: '/admin/team', label: 'Meeting the Team', icon: 'users' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/articles', label: 'Insights', icon: 'doc' },
       { to: '/admin/moderation', label: 'Q&A', icon: 'chat' },

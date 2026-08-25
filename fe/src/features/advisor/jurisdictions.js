@@ -11,20 +11,25 @@ import { rulePacksApi } from '../../api';
    `code` is the tier the jurisdiction sits in, not its abbreviation: what a
    buyer needs to know first is which rulebook applies to them, and "State
    Government" answers that where "NSW" only repeats the name underneath. */
+// NSW FIRST, then the rest in tier order (Federal, states, territories). Not
+// alphabetical and not by tier at the top: NSW is the only one with a pack
+// behind it, so it is the only card on the page that goes anywhere. Leading with
+// a "Coming Soon" box asks a visitor to read past the thing that doesn't work to
+// find the thing that does.
 export const JURISDICTIONS = [
-  {
-    slug: 'federal',
-    code: 'Australian Government',
-    name: 'Federal',
-    note: 'Coming Soon',
-    live: false,
-  },
   {
     slug: 'nsw',
     code: 'State Government',
     name: 'New South Wales',
     note: 'Available Now',
     live: true,
+  },
+  {
+    slug: 'federal',
+    code: 'Australian Government',
+    name: 'Federal',
+    note: 'Coming Soon',
+    live: false,
   },
   { slug: 'vic', code: 'State Government', name: 'Victoria', note: 'Coming Soon', live: false },
   { slug: 'qld', code: 'State Government', name: 'Queensland', note: 'Coming Soon', live: false },
