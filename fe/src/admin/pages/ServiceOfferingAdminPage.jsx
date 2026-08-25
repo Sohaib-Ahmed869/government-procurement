@@ -4,7 +4,6 @@ import { capabilitiesApi } from '../../api';
 // renamed, and became drawn marks rather than PNGs. Same keys, so cards saved
 // against the old set still resolve.
 import { CAPABILITY_ICONS, CapabilityIcon } from '../../features/serviceOffering/serviceIcons.jsx';
-import { SERVICES, SERVICE_BY_KEY } from '../../features/serviceOffering/services.js';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
@@ -13,21 +12,14 @@ import FormField from '../components/FormField.jsx';
 
 const ICON_OPTS = CAPABILITY_ICONS.map((i) => ({ value: i.key, label: i.label }));
 
-// A card is either the copy for one of the six services the brief fixes, or a
-// service added beyond them. The blank option is the second case: it appends a
-// new service to whichever segment the card is written for.
-const SERVICE_OPTS = [
-  { value: '', label: 'A new service (not one of the six)' },
-  ...SERVICES.map((s) => ({ value: s.key, label: s.title })),
-];
-
 // Which side of the site's audience toggle a card is written for, and the
 // default. "Both" is one card serving each segment, so a service whose wording
 // does not change between them is written once rather than twice.
 //
-// For the six built-in services this decides which *copy* is used, not whether
-// the service is listed: all six appear under both segments either way. For a
-// service an editor adds, it decides where the service appears at all.
+// This decides where the service appears at all. Win and Award do not list the
+// same services, or the same NUMBER of them, so a card written for one segment
+// is absent from the other — which is what "Both segments" is for on the ones
+// that genuinely are shared.
 //
 // These cards feed TWO public pages, which is worth knowing before editing one:
 // the Service Offering page, and the Win half of How to Engage Us, where each
@@ -41,7 +33,6 @@ const AUDIENCE_OPTS = [
 const AUDIENCE_LABEL = Object.fromEntries(AUDIENCE_OPTS.map((o) => [o.value, o.label]));
 
 const EMPTY = {
-  key: '',
   title: '',
   body: '',
   stage: '',
@@ -51,18 +42,17 @@ const EMPTY = {
   active: true,
 };
 
-// The six service cards on the Service Offering page.
+// The service cards on the Service Offering page.
 //
-// Everything the site shows for a service is editable here: its title, the
-// stage label over it, the description, the drawn mark the card grids use, and
-// the photograph the Service Offering page runs beside the copy. The icon comes
-// from a fixed set rather than an upload, so every card is drawn in the same
-// style; the photograph is an upload, because it is a photograph.
+// Every service the site shows is one of these — there is no built-in set behind
+// them any more, and no "which of the six is this" to answer. A card carries its
+// own title, the stage label over it, the description, the drawn mark the card
+// grids use, and the segment it belongs to. The icon comes from a fixed set
+// rather than an upload, so every card is drawn in the same style.
 //
-// The six built-in services run in the order the brief fixes for each segment:
-// the stages of a procurement on Award, the points a bidder meets them on Win.
-// That order lives in services.js and the Order field below does not affect it.
-// Order applies to services an editor *adds*, which always follow the six.
+// Order is what the page runs on, for every card rather than only for the ones
+// added past a fixed six: lowest first, ties falling back to the order the cards
+// were created in.
 export default function ServiceOfferingAdminPage() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -93,7 +83,6 @@ export default function ServiceOfferingAdminPage() {
   const openCreate = () => {
     setEditingId(null);
     setForm(EMPTY);
-    setImageUrl('');
     setSaveError(null);
     setDrawerOpen(true);
   };
@@ -101,7 +90,6 @@ export default function ServiceOfferingAdminPage() {
   const openEdit = (row) => {
     setEditingId(row._id || row.id);
     setForm({
-      key: row.key || '',
       title: row.title || '',
       body: row.body || '',
       stage: row.stage || '',
@@ -128,7 +116,6 @@ export default function ServiceOfferingAdminPage() {
     setSaving(true);
     setSaveError(null);
     const body = {
-      key: form.key,
       title: form.title,
       body: form.body,
       stage: form.stage,
@@ -162,17 +149,6 @@ export default function ServiceOfferingAdminPage() {
   };
 
   const columns = [
-    {
-      key: 'key',
-      header: 'Service',
-      width: 200,
-      // A card with no key is an added service, not a broken one — it shows as
-      // such rather than as an empty cell.
-      render: (r) =>
-        SERVICE_BY_KEY[r.key]?.title ?? (
-          <span style={{ color: 'var(--admin-muted)' }}>Added service</span>
-        ),
-    },
     {
       key: 'icon',
       header: 'Icon',
@@ -236,10 +212,10 @@ export default function ServiceOfferingAdminPage() {
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Service Offering</h2>
           <p className="admin-page__subtitle">
-            The copy on each of the six services, and any service you add beyond them.
-            Use “Both segments” to write a service once and have it serve Win and Award
-            together; pick a single segment only where the wording actually differs.
-            Added services follow the six, in the order you set.
+            Every service on the page. Win and Award list different services, and
+            different numbers of them, so a card belongs to the segment you write it
+            for — use “Both segments” only for a service that genuinely reads the same
+            under each. The page runs them in the order you set, lowest first.
           </p>
           <p className="admin-page__subtitle">
             These cards appear in two places: the <strong>Service Offering</strong> page,
@@ -264,14 +240,14 @@ export default function ServiceOfferingAdminPage() {
         rows={rows}
         loading={status === 'loading'}
         error={status === 'error' ? 'Failed to load the service copy' : null}
-        emptyText="No copy written yet. The page is showing the six services with their built-in titles."
+        emptyText="No services yet. The Service Offering page is empty until you add one."
       />
 
       <AdminDrawer
         open={drawerOpen}
         title={editingId ? 'Edit card' : 'New card'}
         subtitle={
-          editingId ? 'Update this card.' : 'Write the copy for one of the six services.'
+          editingId ? 'Update this service.' : 'Add a service to the Service Offering page.'
         }
         onClose={closeDrawer}
         busy={saving}
@@ -300,21 +276,12 @@ export default function ServiceOfferingAdminPage() {
           {saveError && <div className="admin-alert admin-alert--error">{saveError}</div>}
 
           <FormField
-            label="Service"
-            name="key"
-            as="select"
-            options={SERVICE_OPTS}
-            value={form.key}
-            onChange={onChange}
-            hint="Which of the six this card is the copy for."
-          />
-          <FormField
             label="Title"
             name="title"
             value={form.title}
             onChange={onChange}
             required
-            hint="Leave as the service's own name unless this segment calls it something else."
+            hint="The service's name, as it appears on the page."
           />
           <FormField
             label="Description"
@@ -329,7 +296,7 @@ export default function ServiceOfferingAdminPage() {
             name="stage"
             value={form.stage}
             onChange={onChange}
-            hint="The small label over the title, e.g. “Before market”. The six carry their own unless you set one here."
+            hint="The small label over the title, e.g. “Before market”. Optional."
           />
           <FormField
             label="Icon"
@@ -355,7 +322,7 @@ export default function ServiceOfferingAdminPage() {
             type="number"
             value={form.order}
             onChange={onChange}
-            hint="Only used by added services, which always follow the six. Lowest first."
+            hint="Position on the page. Lowest first; cards left on the same number keep the order you created them in."
           />
 
           <div className="admin-field">

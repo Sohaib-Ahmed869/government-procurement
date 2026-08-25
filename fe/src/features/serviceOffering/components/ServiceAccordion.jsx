@@ -4,31 +4,24 @@ import { useInView } from '../../../hooks/useInView.js';
 import { resolveServices } from '../services.js';
 import './ServiceAccordion.css';
 
-// A5 — the six services, as an accordion.
+// The services, as an accordion. However many there are — the list is whatever
+// the CMS holds for this segment, which is not the same list or the same number
+// on Win as on Award.
 //
 // This was six full-width rows, each a photograph beside a paragraph, the sides
 // and the band alternating down the page. It read well and it was six screens
 // long: to find out whether the firm does contract management you scrolled past
 // five other services first, and the page never showed you what it held.
 //
-// An accordion shows the whole list at once — the six names, one under the
-// other, on a rule each — and gives you the paragraph for the one you asked
-// about. One open at a time, so opening a service closes the one before it and
-// the list never grows to the length it used to be.
+// An accordion shows the whole list at once — every name, one under the other,
+// on a rule each — and gives you the paragraph for the one you asked about. One
+// open at a time, so opening a service closes the one before it and the list
+// never grows to the length it used to be.
 //
 // No photograph. It had a picture column on the right that changed with the
 // open service; the list is the page, and the picture was half the width doing
 // none of the work. The CMS image field went with it — model, endpoints and
 // the admin picker — rather than leaving an upload nothing would display.
-
-// Shown when the CMS has nothing written for a service yet, so an open panel is
-// never a heading over nothing. Replaced the moment an editor saves a card.
-const FALLBACK_BODY = {
-  award:
-    'Our advisers work alongside your team on this through the whole procurement, from the decisions taken before market through to the contract you end up managing.',
-  win:
-    'Our advisers work alongside your team on this from the moment an opportunity appears, through the response itself, and into the contract if you win it.',
-};
 
 export default function ServiceAccordion({ audience }) {
   const [saved, setSaved] = useState(capabilityCardsCache.get);
@@ -128,7 +121,7 @@ export default function ServiceAccordion({ audience }) {
                 >
                   <div className="sv__panel-inner">
                     <p className="sv__copy">
-                      {service.body || FALLBACK_BODY[audience] || FALLBACK_BODY.award}
+                      {service.body}
                     </p>
                   </div>
                 </div>

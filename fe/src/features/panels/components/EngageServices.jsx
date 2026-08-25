@@ -21,31 +21,14 @@ import './EngageServices.css';
    the row rather than collected at the foot of the page, because the decision to
    get in touch is made against a particular service, not against the page as a
    whole — and for the same reason the row does NOT repeat the switchboard number
-   and the general inbox, which are the same on all six and are offered once,
+   and the general inbox, which are the same on every row and are offered once,
    under the list, to anyone who would rather start with a call.
 
-   The services are the SAME six the Service Offering page lists, read from the
-   same resolver, in the order a bidder meets them. A second hand-kept list here
-   would drift from that page the first time an editor renamed something.
+   The services are the SAME ones the Service Offering page lists, read from the
+   same resolver and from the same CMS cards, in the order a bidder meets them.
+   A second hand-kept list here would drift from that page the first time an
+   editor renamed something.
    ------------------------------------------------------------------------ */
-
-// Fallback copy, per service, for the Win side. Shown until an editor writes
-// the card in the CMS — a row that is a heading and a button tells a
-// bidder nothing about what they would be buying.
-const FALLBACK = {
-  'procurement-strategy':
-    'Read the approach before it is published, and decide whether this is a bid worth putting a team on.',
-  probity:
-    'Understand the probity rules the buyer is working to, so nothing in your response puts the bid at risk.',
-  'process-management':
-    'Keep the response on track: addenda, clarification questions, and a submission that meets every formatting rule.',
-  'evaluation-negotiation':
-    'Know how your response will be scored, and hold your position through negotiation without losing the contract.',
-  'vendor-transition':
-    'Stand the contract up cleanly once you have won it, against the transition plan you committed to.',
-  'contract-management':
-    'Keep the contract healthy through its term, and be ready for the extension or the re-tender at the end of it.',
-};
 
 // Only the arrow is left, now that the rows carry one action; `name` stays in
 // the signature so a second icon can come back without changing the call sites.
@@ -108,14 +91,12 @@ export default function EngageServices({ audience }) {
             <li className="eng__row" key={service.key} style={{ '--i': i }}>
               <div className="eng__body">
                 <h2 className="eng__title">{service.title}</h2>
-                <p className="eng__copy">
-                  {service.body || FALLBACK[service.key] || ''}
-                </p>
+                <p className="eng__copy">{service.body}</p>
               </div>
 
               {/* One way in, on the row. It carried three — call, email and the
                   consultation form — and the two contact links were the wrong
-                  two to repeat six times: they are the same number and the same
+                  two to repeat on every row: they are the same number and the same
                   address on every row, they say nothing about the service they
                   sit beside, and the note under the list already offers both to
                   anyone who would rather start with a phone call. What is left

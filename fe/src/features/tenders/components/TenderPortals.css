@@ -393,10 +393,29 @@
   gap: 16px;
 }
 
+/* A subgrid, not a flex column, and that is what lines the buttons up across a
+   row of cards.
+
+   Each card holds the same slots in the same order — logo, name, buttons, and
+   for the paywalled sites a fee note — and `grid-template-rows: subgrid` hands
+   the sizing of those slots to the list above. Cards sharing a row therefore
+   share their row tracks, so every slot is as tall as the tallest card's version
+   of it and the next slot starts at the same height in all of them.
+
+   Before this each card sized itself: .tp__name carried a min-height that
+   reserved one title line and one subtitle line, so a two-line subtitle
+   ("Widely used by Local Governments across Australia") pushed its own card's
+   button down while the card beside it kept its button where it was.
+
+   Where subgrid is not supported the declaration is dropped and the card falls
+   back to a plain auto-row grid, which lays out exactly as the flex column did —
+   the buttons simply stop lining up, which is where this started. */
 .tp__row {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  display: grid;
+  grid-template-rows: subgrid;
+  /* Logo, name, buttons. */
+  grid-row: span 3;
+  align-items: start;
   gap: 14px;
   padding: 20px;
   border-radius: 24px;
@@ -420,7 +439,10 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  align-self: flex-start;
+  /* align-self kept the tile off the flex column's stretch; in a grid the
+     stretch it has to escape is the inline one. */
+  justify-self: start;
+  align-self: start;
   width: 64px;
   height: 64px;
   padding: 8px;
@@ -445,18 +467,22 @@
   object-fit: contain;
 }
 
-/* Reserves ONE title line plus a subtitle, not two title lines plus a subtitle.
-   The reservation is there so the buttons underneath start at the same height
-   in every card; at 3.95em it was reserving a second title line that no portal
-   on the page uses, which is 22px of empty card between every subtitle and the
-   first button. The grid above is sized so a name never needs the second line,
-   and a name that somehow does still gets it — the card grows rather than
+/* No min-height any more. It existed to make the buttons underneath start at
+   the same height in every card, by reserving one title line and one subtitle
+   line — which works only for as long as every subtitle is one line, and stops
+   the moment one wraps. The subgrid on .tp__row does that job properly now, by
+   measuring the cards against each other instead of against a guess.
+
+   Kept for the record, because the reasoning is still worth having: at 3.95em it
+   reserved a second title line that no portal on the page uses, which was 22px
+   of empty card between every subtitle and the first button. The grid above is
+   sized so a name never needs the second line, and a name that somehow does
+   still gets it — the card grows rather than
    clipping, and only that card's buttons move. */
 .tp__name {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-height: 2.6em;
   font-size: 17px;
   font-weight: 600;
   line-height: 1.25;
@@ -471,6 +497,13 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+}
+
+/* The paywalled cards carry the fee note as a fourth slot. Only this list does,
+   so only this list spans the extra track — a government card spanning four
+   would pay a gap for an empty row at its foot. */
+.tp__list--other .tp__row {
+  grid-row: span 4;
 }
 
 /* Fee disclaimer under the paywalled sign-in button. Quieter and smaller than

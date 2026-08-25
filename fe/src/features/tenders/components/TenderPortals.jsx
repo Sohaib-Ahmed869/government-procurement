@@ -53,7 +53,7 @@ function TenderList({ sites, group = 'australian', audience }) {
   }
 
   return (
-    <ul ref={ref} className={`tp__list${inView ? ' is-in' : ''}`}>
+    <ul ref={ref} className={`tp__list tp__list--${group}${inView ? ' is-in' : ''}`}>
       {sites.map((site) => (
         <li className="tp__row" key={site._id || site.id || site.name}>
           {/* The tile shows whether or not a logo has been uploaded, so the
@@ -81,10 +81,15 @@ function TenderList({ sites, group = 'australian', audience }) {
                   {gated && site.loginRequired ? `${label} (Login Required)` : label}
                 </a>
               ))}
-
-            {/* Sits under the buttons: the fee disclaimer for paywalled sites. */}
-            {site.note && <span className="tp__note">{site.note}</span>}
           </span>
+
+          {/* The fee disclaimer for paywalled sites, a sibling of the buttons
+              rather than a child of them. It has to be its own row of the card's
+              subgrid (TenderPortals.css) for the buttons above it to line up
+              across the cards in a row — inside .tp__links, a two-line subtitle
+              in one card pushed that whole block down and took the button with
+              it. */}
+          {site.note && <span className="tp__note">{site.note}</span>}
         </li>
       ))}
     </ul>
@@ -188,7 +193,7 @@ export default function TenderPortals() {
           {other.length > 0 && (
             <section className="tp__band tp__band--other hm-band--light-2">
               <div className="tp__inner">
-                <h2 className="tp__group-title">Other Tender Websites</h2>
+                <h2 className="tp__group-title">Other Useful Websites</h2>
                 <TenderList sites={other} group="other" audience={audience} />
               </div>
             </section>
