@@ -152,11 +152,40 @@ export const videoApi = {
 };
 
 // ---- L3 · Progress and assessment -------------------------------------------
+// The learner's own clock, sent with anything that lands on a calendar day.
+// The server records activity against the LEARNER's day, not its own — a lesson
+// finished at 9pm in Sydney is already tomorrow in UTC, and the streak would
+// land on a day they were asleep for. See localDay() in study.controller.js.
+const tzOffset = () => new Date().getTimezoneOffset();
+
 export const progressApi = {
   mine: () => api.get('/lms/progress'),
-  completeLesson: (lessonId) => api.post(`/lms/progress/lessons/${lessonId}/complete`),
+  completeLesson: (lessonId) =>
+    api.post(`/lms/progress/lessons/${lessonId}/complete`, { tzOffset: tzOffset() }),
   setPosition: (lessonId, seconds) =>
     api.patch(`/lms/progress/lessons/${lessonId}/position`, { seconds }),
+};
+
+// Day-by-day study history, zero-filled and ending on the learner's today, for
+// the dashboard's week strip and the My Progress chart. Both used to run on a
+// hardcoded fortnight that was the same for everyone.
+export const activityApi = {
+  mine: (days = 7) => api.get('/lms/activity', { days, tzOffset: tzOffset() }),
+};
+
+// Notes and bookmarks. Both were localStorage until now, so they stayed on one
+// browser and did not survive clearing it.
+export const notesApi = {
+  list: () => api.get('/lms/notes'),
+  create: (body) => api.post('/lms/notes', body),
+  update: (id, body) => api.patch(`/lms/notes/${id}`, body),
+  remove: (id) => api.del(`/lms/notes/${id}`),
+};
+
+export const bookmarksApi = {
+  list: () => api.get('/lms/bookmarks'),
+  create: (body) => api.post('/lms/bookmarks', body),
+  remove: (id) => api.del(`/lms/bookmarks/${id}`),
 };
 
 export const quizzesApi = {
@@ -165,7 +194,11 @@ export const quizzesApi = {
   // Only answers are sent. The server marks and returns the score; a score in
   // this body would be ignored.
   submit: (lessonId, answers, durationSeconds) =>
-    api.post(`/lms/quizzes/${lessonId}/submit`, { answers, durationSeconds }),
+    api.post(`/lms/quizzes/${lessonId}/submit`, {
+      answers,
+      durationSeconds,
+      tzOffset: tzOffset(),
+    }),
   attempts: (lessonId) => api.get(`/lms/quizzes/${lessonId}/attempts`),
   // Every quiz sat across every course, one row each, holding the best result
   // and how many goes it took. What the progress page summarises.
@@ -201,6 +234,32 @@ export const discussionsApi = {
   accept: (id, replyId) => api.post(`/lms/discussions/${id}/replies/${replyId}/accept`),
   // The teaching side's inbox: every question on the courses they wrote.
   inbox: () => api.get('/lms/authoring/discussions'),
+};
+
+// ---- LMS 18.0 · Course Coach -------------------------------------------------
+// AI study help, scoped to one course the learner is enrolled in. Every request
+// names a course because the server answers from that course's lessons and
+// nothing else — there is no general-purpose ask. That is what keeps it clear of
+// the Procurement Advisor at /advisory, which is not AI.
+export const coachApi = {
+  status: () => api.get('/lms/coach/status'),
+  // `history` is the recent conversation; the server trims it and never trusts
+  // its length.
+  ask: (body) => api.post('/lms/coach/ask', body),
+};
+
+// ---- R2 · Notifications ------------------------------------------------------
+// The bell. Server-emitted rows only — discussion replies and new questions on
+// a course you teach. Read state is per ACCOUNT, so dismissing on a laptop
+// settles it on a phone; the two derived kinds the bell also shows (study
+// reminders, review decisions) have no server event behind them and keep their
+// read state in the browser. See fe/src/lms/hooks/useNotifications.js.
+export const notificationsApi = {
+  list: () => api.get('/lms/notifications'),
+  // Ids, or everything. One endpoint because it is one intent, and because
+  // "mark all read" as a loop over ids is a burst of writes that can half-fail.
+  markRead: (ids) => api.post('/lms/notifications/read', { ids }),
+  markAllRead: () => api.post('/lms/notifications/read', { all: true }),
 };
 
 // ---- L5 · Course reviews -----------------------------------------------------

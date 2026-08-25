@@ -1,31 +1,49 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
-import { authoringApi, discussionsApi, enrollmentsApi } from '../../api/lms.js';
+import { authoringApi, enrollmentsApi, notificationsApi } from '../../api/lms.js';
 import { createStore } from '../utils/localStore.js';
 import { useSettings } from './useProfile.js';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
 
 /* ---------------------------------------------------------------------------
-   In-app notifications (R2).
+   In-app notifications (R2). TWO SOURCES, one list.
 
-   DERIVED, not stored. There is no notification table and no endpoint that
-   emits one; every item below is computed from records the LMS already keeps:
-   a reply on a thread you started, a course you began and stopped. That is a
-   deliberate choice rather than a shortcut.
+   EMITTED — discussion replies, and new questions on a course you teach. These
+   are rows the server writes when the thing happens (be/src/models/
+   Notification.js), and their read state lives on the record.
 
-     · nothing can be notified about that isn't already true in the data, so a
-       notification can never survive the thing it describes being deleted;
-     · no fan-out to write, no backfill for existing learners, and no second
-       copy of the truth to keep in step with the first.
+   DERIVED — study reminders and course review decisions. These are still
+   computed here from records the LMS already keeps, because nothing emits them:
+   "you started this and stopped" is not an event, it is the absence of one. A
+   server-side notification would need a scheduled job to notice it, which is a
+   bigger thing than the nudge deserves. Their read state stays in localStorage,
+   since there is no record to hang it off.
 
-   What it costs is push. Nothing arrives while a page is open unless something
-   refetches, so this polls on an interval and refreshes when the panel opens.
+   This file used to derive EVERYTHING, including replies. That could not work
+   past a point, and the reasons are worth keeping written down:
 
-   TODO: when a notifications endpoint exists, replace `derive()` with it and
-   keep the read-state store below. The shape each item takes is the contract.
+     · read state in localStorage does not follow the account. A reply dismissed
+       on a laptop was unread again on a phone;
+     · deriving only ever notices what the reader can already fetch, which is
+       why an instructor was never told a question was waiting. Nothing they
+       poll says "this arrived while you were away";
+     · nothing could be emailed, because there was no moment to send from.
+
+   What has NOT changed is the shape of an item. The server renders the same
+   { id, kind, icon, at, title, detail, context, to } the derived kinds produce,
+   so both sources sort into one timeline and the menu cannot tell them apart.
+   Only `source` distinguishes them, and only so a dismissal goes to the right
+   place.
+
+   Still polled. Nothing is pushed, so this refetches on an interval and
+   whenever the panel is opened.
    ------------------------------------------------------------------------ */
 
-// Which items the learner has already seen. Ids only, so this stays small and
-// survives the underlying record changing.
+/* Which DERIVED items have been seen. Ids only, so this stays small.
+
+   Emitted items are no longer written here — they carry `readAt` on the record
+   instead. Anything left over from when they were (ids like "reply:abc") is
+   pruned on the next write by persistRead, which drops whatever is no longer
+   live. No migration needed; it clears itself. */
 const readStore = createStore('gp.lms.notifications.read');
 
 // How long a course sits untouched before it is worth mentioning. A day would
@@ -40,33 +58,11 @@ function useReadIds() {
   return useMemo(() => new Set(rows), [rows]);
 }
 
-// Read ids are pruned against the items that currently exist. Without this the
-// list grows forever: a thread deleted two years ago would keep its id here.
+// Read ids are pruned against the derived items that currently exist. Without
+// this the list grows forever: a reminder raised two years ago would keep its id
+// here.
 function persistRead(ids, liveIds) {
   readStore.write([...new Set(ids)].filter((id) => liveIds.has(id)));
-}
-
-/* Replies from other people on threads THIS learner started.
-   `mine` is decided by the server on both the thread and each reply, so the
-   client never has to guess whose post is whose. Your own replies to your own
-   thread are not news, hence the second check. */
-function replyItems(threads) {
-  return threads
-    .filter((t) => t.mine)
-    .flatMap((t) =>
-      (t.replies ?? [])
-        .filter((r) => !r.mine)
-        .map((r) => ({
-          id: `reply:${r.id}`,
-          kind: 'discussion',
-          icon: 'chat',
-          at: r.createdAt,
-          title: `${r.author} replied to your question`,
-          detail: t.title,
-          context: t.courseTitle,
-          to: `/learn/discussions/${t.id}`,
-        })),
-    );
 }
 
 /* A course started and then left alone. `at` is the moment it BECAME stale,
@@ -142,16 +138,19 @@ function reviewItems(courses) {
     });
 }
 
+const NO_SERVER = { items: [], unread: 0 };
+
 export function useNotifications() {
   const settings = useSettings();
   const readIds = useReadIds();
   const { isInstructor } = useStudentAuth();
 
-  const [data, setData] = useState({ threads: [], enrolments: [], courses: [] });
+  const [server, setServer] = useState(NO_SERVER);
+  const [derived, setDerived] = useState({ enrolments: [], courses: [] });
   const [status, setStatus] = useState('loading'); // loading | ready | error
 
-  // Both toggles off means there is nothing to compute, so nothing is fetched.
-  // A learner who turned these off should not be generating requests for them.
+  // Every toggle off means there is nothing to show, so nothing is fetched. A
+  // learner who turned these off should not be generating requests for them.
   const wantsDiscussion = settings.inAppDiscussion !== false;
   const wantsReminders = settings.inAppReminders !== false;
   // Review outcomes only exist for someone who submits courses, so this is
@@ -162,20 +161,21 @@ export function useNotifications() {
 
   const load = useCallback(async () => {
     if (!enabled) {
-      setData({ threads: [], enrolments: [], courses: [] });
+      setServer(NO_SERVER);
+      setDerived({ enrolments: [], courses: [] });
       setStatus('ready');
       return;
     }
     try {
       // Settled rather than all: a learner with no enrolments still deserves
       // their replies, and one endpoint being down shouldn't empty the bell.
-      const [threads, enrolments, courses] = await Promise.allSettled([
-        wantsDiscussion ? discussionsApi.list() : Promise.resolve([]),
+      const [rows, enrolments, courses] = await Promise.allSettled([
+        wantsDiscussion ? notificationsApi.list() : Promise.resolve(NO_SERVER),
         wantsReminders ? enrollmentsApi.mine() : Promise.resolve([]),
         wantsReviews ? authoringApi.myCourses() : Promise.resolve([]),
       ]);
-      setData({
-        threads: threads.status === 'fulfilled' ? (threads.value ?? []) : [],
+      setServer(rows.status === 'fulfilled' ? (rows.value ?? NO_SERVER) : NO_SERVER);
+      setDerived({
         enrolments: enrolments.status === 'fulfilled' ? (enrolments.value ?? []) : [],
         courses: courses.status === 'fulfilled' ? (courses.value ?? []) : [],
       });
@@ -192,32 +192,76 @@ export function useNotifications() {
     return () => clearInterval(t);
   }, [load, enabled]);
 
-  const items = useMemo(() => {
+  /* The derived half, with its browser-held read state. Kept separate from the
+     merged list below because these are also the only ids persistRead may
+     write — pruning against the merged set would keep emitted ids alive in
+     localStorage forever. */
+  const localItems = useMemo(() => {
     const rows = [
-      ...(wantsDiscussion ? replyItems(data.threads) : []),
-      ...(wantsReminders ? resumeItems(data.enrolments) : []),
-      ...(wantsReviews ? reviewItems(data.courses) : []),
+      ...(wantsReminders ? resumeItems(derived.enrolments) : []),
+      ...(wantsReviews ? reviewItems(derived.courses) : []),
     ];
-    return rows
-      .map((r) => ({ ...r, read: readIds.has(r.id) }))
-      .sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
-  }, [data, readIds, wantsDiscussion, wantsReminders, wantsReviews]);
+    return rows.map((r) => ({ ...r, source: 'local', read: readIds.has(r.id) }));
+  }, [derived, readIds, wantsReminders, wantsReviews]);
 
-  const liveIds = useMemo(() => new Set(items.map((i) => i.id)), [items]);
+  const localIds = useMemo(() => new Set(localItems.map((i) => i.id)), [localItems]);
+
+  const items = useMemo(() => {
+    const emitted = (server.items ?? []).map((r) => ({ ...r, source: 'server' }));
+    return [...emitted, ...localItems].sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  }, [server, localItems]);
+
+  /* The badge counts the server's OWN unread total, not the unread rows in
+     `items`. The list is capped at fifty and the count is not, so deriving one
+     from the other is how a bell gets stuck saying "50". */
+  const unread = server.unread + localItems.filter((i) => !i.read).length;
 
   const markRead = useCallback(
-    (id) => persistRead([...readIds, id], liveIds),
-    [readIds, liveIds],
+    async (id) => {
+      const item = items.find((i) => i.id === id);
+      if (!item || item.read) return;
+
+      if (item.source !== 'server') {
+        persistRead([...readIds, id], localIds);
+        return;
+      }
+
+      // Applied here first, then sent. Following a notification navigates away
+      // in the same breath, and a row that stays bold until the next poll reads
+      // as though the click did nothing.
+      setServer((s) => ({
+        items: (s.items ?? []).map((i) => (i.id === id ? { ...i, read: true } : i)),
+        unread: Math.max(0, s.unread - 1),
+      }));
+
+      try {
+        await notificationsApi.markRead([id]);
+      } catch {
+        // Put the truth back rather than leaving the optimistic guess standing.
+        load();
+      }
+    },
+    [items, readIds, localIds, load],
   );
 
-  const markAllRead = useCallback(
-    () => persistRead([...readIds, ...liveIds], liveIds),
-    [readIds, liveIds],
-  );
+  const markAllRead = useCallback(async () => {
+    persistRead([...readIds, ...localIds], localIds);
+    if (!server.unread && !(server.items ?? []).some((i) => !i.read)) return;
+
+    setServer((s) => ({
+      items: (s.items ?? []).map((i) => ({ ...i, read: true })),
+      unread: 0,
+    }));
+    try {
+      await notificationsApi.markAllRead();
+    } catch {
+      load();
+    }
+  }, [readIds, localIds, server, load]);
 
   return {
     items,
-    unread: items.filter((i) => !i.read).length,
+    unread,
     status,
     enabled,
     reload: load,

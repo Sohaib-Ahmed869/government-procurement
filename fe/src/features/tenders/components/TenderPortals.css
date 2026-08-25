@@ -77,15 +77,25 @@
   padding-inline: clamp(20px, 4vw, 60px);
 }
 
-/* The heading band keeps the shared page-heading spacing (--gp-head-pad), so
-   this page's title sits at the same height as every other page's. The list
-   bands are their own thing and run a little tighter. */
-.tp__band--head .tp__inner { padding-block: var(--gp-head-pad); }
+/* No rule here for the heading band: its spacing is in styles/head.css with
+   every other page's. There was one — `padding-block: var(--gp-head-pad)`, equal
+   top and bottom — and it threw the shared optical split away, because it had
+   the same specificity as the shared rule and came later in the cascade. The
+   result was this one page's title sitting 6px lower in its band than the title
+   of the page you had just come from.
 
+   The list bands below are their own thing and run a little tighter. */
 .tp__band--gov .tp__inner,
 .tp__band--local .tp__inner,
-.tp__band--other .tp__inner {
+.tp__band--other .tp__inner,
+.tp__band--status .tp__inner {
   padding-block: var(--gp-body-pad);
+}
+
+/* The status line is the only thing in its band, so it has nothing to be spaced
+   away from — the 24px below is the gap it used to keep from the h1 above it. */
+.tp__band--status .tp__featured {
+  margin-top: 0;
 }
 
 /* --- reveal on mount --- */
@@ -138,21 +148,20 @@
   .tp__list.is-in .tp__row:nth-child(n + 5) { transition-delay: calc(var(--gp-reveal-step) * 4); }
 }
 
+/* Size, weight, line-height and tracking come from styles/head.css, shared with
+   every other page-heading band. */
 .tp__title {
   margin: 0;
-  /* Shared page-title size — see --gp-page-title in styles/tokens.css. */
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
 }
 
 /* This is the headline the shared size is set by — it's the longest on the
-   site. No override here: --gp-page-title already sizes it to hold one line. */
+   site, and --gp-page-title is picked to hold it on one line.
 
-.tp__title strong {
-  font-weight: 700;
-}
+   No `strong` rule any more. There was one, at weight 700, from when the title
+   read "Explore Federal, State and Territory Tender Websites" and bolded part
+   of itself. The h1 has been plain text since, so the rule bolded nothing — and
+   it was the one selector on the site that could still have put a nav page's
+   heading at a different weight from every other page's. */
 
 /* Heading for a list. A step down from the page title so it reads as a section
    within the page rather than a second page title. No top margin: it is the
@@ -587,12 +596,6 @@
   .tp__wave--phone {
     display: block;
     width: 230px;
-  }
-
-  .tp__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    /* Shared phone size — see --gp-page-title-phone in styles/tokens.css. */
-    font-size: var(--gp-page-title-phone);
   }
 
   .tp__group-title {

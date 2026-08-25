@@ -1,4 +1,4 @@
-import { CERTIFICATE_DEFAULTS } from '../components/certificates/CertificateDesign.jsx';
+import { CERTIFICATE_DEFAULTS, certificateDuration } from '../components/certificates/CertificateDesign.jsx';
 
 /* ---------------------------------------------------------------------------
    The certificate, as a real PDF (LMS 12.0b).
@@ -88,11 +88,16 @@ export async function downloadCertificatePdf(certificate) {
   const CONTENT_W = PAGE.w - (MARGIN + FRAME_INSET) * 2 - 24;
   const centre = PAGE.w / 2;
 
-  /* Centred lines, top-down. Returns the height used so the caller can keep a
-     running y without every call site doing pt-to-mm arithmetic. Long values
-     wrap rather than running off the paper — a course title can be 60
-     characters and a recipient's name is not always short. */
-  let y = MARGIN + FRAME_INSET + 26;
+  /* Centred lines, top-down, advancing a running y so no call site has to do
+     pt-to-mm arithmetic. Long values wrap rather than running off the paper — a
+     course title can be 60 characters and a recipient's name is not always
+     short.
+
+     `dry` draws nothing and only advances y. That is what lets the body block be
+     measured before it is placed, which is what centres it (see below). */
+  const FRAME_TOP = MARGIN + FRAME_INSET;
+  let y = FRAME_TOP + 22;
+  let dry = false;
 
   const line = (
     value,
@@ -113,41 +118,68 @@ export async function downloadCertificatePdf(certificate) {
     const lineH = size * PT * 1.3;
 
     lines.forEach((l) => {
-      doc.text(l, centre, y, { align: 'center', ...(opts ?? {}) });
+      if (!dry) doc.text(l, centre, y, { align: 'center', ...(opts ?? {}) });
       y += lineH;
     });
     y += gapAfter;
   };
 
-  // --- the document, in the order the screen shows it ----------------------
+  /* --- the foot ------------------------------------------------------------
+     Pinned to the bottom of the frame rather than following the flow above it.
+     A certificate with no footnote and a short title would otherwise float its
+     signature into the middle of the page.
+
+     Computed here, before the body, because the body needs to know where the
+     space it has to fill ends. */
+  const footY = PAGE.h - MARGIN - FRAME_INSET - 24;
+
+  // --- the masthead, at the top of the frame -------------------------------
   line((certificate?.issuerName || d.issuerName || '').toUpperCase(), {
     size: 11,
     style: 'bold',
     colour: accent,
     spacing: 0.9,
-    gapAfter: 5,
+    gapAfter: 7,
   });
 
-  line(d.heading, { size: 30, style: 'bold', gapAfter: 8 });
-  line(d.preamble, { size: 12, colour: muted, gapAfter: 4 });
-  line(certificate?.recipientName || 'Recipient name', { size: 26, style: 'bold', gapAfter: 6 });
-  line(d.statement, { size: 12, colour: muted, gapAfter: 4 });
-  line(certificate?.title || 'Course title', { size: 19, style: 'bold', colour: accent, gapAfter: 5 });
+  line(d.heading, { size: 30, style: 'bold' });
 
-  if (d.showHours && certificate?.hours) {
-    const h = certificate.hours;
-    line(`${h} ${h === 1 ? 'hour' : 'hours'} of learning`, { size: 11, colour: muted, gapAfter: 3 });
-  }
+  /* --- the body, CENTRED in what the masthead and the foot leave it --------
+     Drawn in flow, it stacked straight under the heading while the foot stayed
+     pinned to the bottom, so a short certificate printed with a band of empty
+     paper between the course title and the signature — the gap the screen
+     version had too. Measuring the block first and then placing it puts that
+     space evenly above and below instead. */
+  const bodyTop = y + 6;
+  const bodyBottom = footY - 14;
 
-  if (d.footnote) {
-    line(d.footnote, { size: 10, colour: muted, gapBefore: 2, maxWidth: CONTENT_W - 30 });
-  }
+  const drawBody = () => {
+    line(d.preamble, { size: 12, colour: muted, gapAfter: 4 });
+    line(certificate?.recipientName || 'Recipient name', { size: 26, style: 'bold', gapAfter: 6 });
+    line(d.statement, { size: 12, colour: muted, gapAfter: 4 });
+    line(certificate?.title || 'Course title', { size: 19, style: 'bold', colour: accent, gapAfter: 5 });
 
-  /* --- the foot ------------------------------------------------------------
-     Pinned to the bottom of the frame rather than following the flow above it.
-     A certificate with no footnote and a short title would otherwise float its
-     signature into the middle of the page. */
-  const footY = PAGE.h - MARGIN - FRAME_INSET - 24;
+    if (d.showHours) {
+      // Same wording the on-screen certificate uses, from the same function, so
+      // the file and the page cannot disagree about how long the course was.
+      line(certificateDuration(certificate ?? {}), { size: 11, colour: muted, gapAfter: 3 });
+    }
+
+    if (d.footnote) {
+      line(d.footnote, { size: 10, colour: muted, gapBefore: 2, maxWidth: CONTENT_W - 30 });
+    }
+  };
+
+  dry = true;
+  y = bodyTop;
+  drawBody();
+  const bodyHeight = y - bodyTop;
+  dry = false;
+
+  // Never negative: an unusually tall body starts at bodyTop and simply runs on.
+  y = bodyTop + Math.max(0, (bodyBottom - bodyTop - bodyHeight) / 2);
+  drawBody();
+
   const footL = MARGIN + FRAME_INSET + 14;
   const footR = PAGE.w - MARGIN - FRAME_INSET - 14;
 
@@ -183,11 +215,17 @@ export async function downloadCertificatePdf(certificate) {
   if (d.showCredentialId && certificate?.credentialId) {
     doc.setFontSize(9);
     doc.text(String(certificate.credentialId), footR, footY + 11, { align: 'right' });
-    // Where to check it. A certificate that names its own verification address
-    // is one an employer can act on without being told how.
+    /* Where to check it. A certificate that names its own verification address
+       is one an employer can act on without being told how.
+
+       The host is read from wherever the file was generated, so this follows the
+       deployment rather than being pinned to one domain — it says localhost on a
+       dev machine and the live host in production, with nothing to change at
+       go-live. The scheme is dropped because it is noise on a printed page and
+       the address is meant to be typed, not clicked. */
     doc.setFontSize(7.5);
     doc.text(
-      `Verify at ${window.location.origin}/verify/${certificate.credentialId}`,
+      `Verify at ${window.location.host}/verify/${certificate.credentialId}`,
       footR,
       footY + 16,
       { align: 'right' },

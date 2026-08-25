@@ -32,10 +32,6 @@
 
 .bw-hero__title {
   margin: 0;
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
 }
 
 .bw-hero__sub {
@@ -70,14 +66,6 @@
   border-radius: 999px;
 }
 
-@media (max-width: 860px) {
-  .bw-hero__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: var(--gp-page-title-phone);
-  }
-}
-
 @media (max-width: 760px) {
-  .bw-hero__inner { padding: var(--gp-head-pad) 24px; }
   .bw-hero__sub { max-width: none; font-size: 16px; }
 }

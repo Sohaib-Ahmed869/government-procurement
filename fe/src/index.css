@@ -108,8 +108,16 @@ body {
    size — the same thing every screen under 1441px gets. */
 @media (min-width: 1441px) {
   body {
-    /* The scaled page spans the window; hide the sub-pixel/scrollbar spill. */
-    overflow-x: hidden;
+    /* The scaled page spans the window; hide the sub-pixel/scrollbar spill.
+
+       `clip`, not `hidden` — the same distinction, and for the same reason, as
+       .page-layout above. `hidden` on one axis forces the other to compute to
+       `auto`, which makes <body> a scroll container; every `position: sticky`
+       inside the page then anchors to a box that never scrolls, and so never
+       sticks. That is why the course page's pricing card scrolled away above
+       1441px and stayed put below it. `clip` hides the same spill without
+       making a scroll container. */
+    overflow-x: clip;
   }
 
   .page-scale,

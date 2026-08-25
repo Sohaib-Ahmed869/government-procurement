@@ -56,12 +56,17 @@
   border-bottom: 1px solid var(--gp-line);
 }
 
+/* The page's own ink, on both segments — not --gp-accent-ink, which drew this
+   in the deep mint on Win and the deep clay on Award. A coloured line directly
+   above a black page title read as a second, louder heading rather than as the
+   way back out of the document. It is still obviously a link: the arrow, the
+   600 weight and the underline on hover all stay. */
 .pol__back {
   display: inline-block;
   margin-bottom: 18px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--gp-accent-ink);
+  color: var(--gp-ink);
   text-decoration: none;
 }
 

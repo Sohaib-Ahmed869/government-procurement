@@ -116,6 +116,17 @@ export function StudentAuthProvider({ children }) {
     return next;
   }, []);
 
+  // The learner's own profile and notification preferences, which live on the
+  // user record. Held here rather than in their own hook for the same reason
+  // the instructor profile is: the session already carries a copy, and a save
+  // that did not update it would leave the header and the profile page quoting
+  // different details until the next reload.
+  const saveAccount = useCallback(async (patch) => {
+    const next = await authApi.updateMe(patch);
+    setUser(next);
+    return next;
+  }, []);
+
   // Signing out from a gated screen would be bounced to the login page by
   // StudentRoute anyway, but from a public one (the catalogue, say) nothing
   // would move and the click would look like it failed. Navigating here makes
@@ -143,10 +154,11 @@ export function StudentAuthProvider({ children }) {
       signup,
       logout,
       saveInstructorProfile,
+      saveAccount,
       // TODO (L6): back this with the enrolment record once it exists.
       isEnrolled: () => Boolean(user),
     }),
-    [user, instructor, loading, login, signup, logout, saveInstructorProfile],
+    [user, instructor, loading, login, signup, logout, saveInstructorProfile, saveAccount],
   );
 
   return <StudentAuthContext.Provider value={value}>{children}</StudentAuthContext.Provider>;

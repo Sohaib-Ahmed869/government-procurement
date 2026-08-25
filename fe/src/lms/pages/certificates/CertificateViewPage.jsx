@@ -103,6 +103,7 @@ export default function CertificateViewPage() {
           recipientName={certificate.recipientName || recipient}
           courseTitle={certificate.title}
           hours={certificate.hours}
+          minutes={certificate.minutes}
           credentialId={certificate.credentialId}
           issuedAt={certificate.issuedAt}
           issuerName={certificate.issuerName}

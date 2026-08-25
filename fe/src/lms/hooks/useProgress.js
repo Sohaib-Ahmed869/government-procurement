@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { certificatesApi, enrollmentsApi, quizzesApi } from '../../api/lms.js';
-import { WEEK_ACTIVITY } from './placeholderData.js';
+import { useActivity } from './useActivity.js';
 import { useNotes } from './useNotes.js';
 import { useBookmarks } from './useBookmarks.js';
 
@@ -22,26 +22,18 @@ import { useBookmarks } from './useBookmarks.js';
    (a learner saw nothing after switching device) and required shipping the
    answer key to the client to mark them. Both are gone.
 
-   Two things here are still local, and honestly so:
-     · notes and bookmarks are local features; there is no server model yet
-     · WEEK_ACTIVITY, the per-day chart. Nothing records daily activity: the
-       Progress model holds total minutes and a last-accessed date, not a
-       history. A real chart needs that history stored first.
+   Notes, bookmarks and the streak are requests too now. All three used to be
+   read out of the browser: notes and bookmarks from localStorage, and the
+   streak from a hardcoded fortnight of activity — so every learner had the same
+   streak, including one who had never opened a lesson.
    ------------------------------------------------------------------------ */
-
-// Consecutive days with activity, counting back from the most recent day.
-function streak(days) {
-  let n = 0;
-  for (let i = days.length - 1; i >= 0; i -= 1) {
-    if (days[i].minutes > 0) n += 1;
-    else break;
-  }
-  return n;
-}
 
 export function useProgress() {
   const notes = useNotes();
   const bookmarks = useBookmarks();
+  // A streak is only ever counted back from today, so the week window is the
+  // whole of what it needs — and it is the same request the dashboard makes.
+  const { streak } = useActivity(7);
 
   const [data, setData] = useState({ enrolments: [], quizzes: [], certificates: [] });
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -127,12 +119,12 @@ export function useProgress() {
         certificates: data.certificates.length,
         notes: notes.length,
         bookmarks: bookmarks.length,
-        streak: streak(WEEK_ACTIVITY),
+        streak,
         quizzesPassed: quizzes.filter((q) => q.passed).length,
         quizzesTaken: quizzes.length,
       },
     };
-  }, [data, notes.length, bookmarks.length]);
+  }, [data, notes.length, bookmarks.length, streak]);
 
   return { ...rollup, status, error };
 }

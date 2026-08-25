@@ -61,7 +61,10 @@ export default function NotificationsMenu() {
   const follow = (item) => {
     markRead(item.id);
     close();
-    navigate(item.to);
+    // An emitted notification points at a record that can since have been
+    // deleted, in which case the server sends no link. Reading it is still the
+    // right outcome — there is just nowhere to go.
+    if (item.to) navigate(item.to);
   };
 
   return (

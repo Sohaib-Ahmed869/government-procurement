@@ -135,9 +135,10 @@ Benchmarks: mckinsey.com/au, fticonsulting.com/australia. Video treatment: deloi
 
 ### A2 — First-load animation *(depends on A1)*
 - [x] **A2.1** Loader is a logo-based spinner in `fe/src/components/shared/SiteLoader.jsx` — two counter-rotating accent rings around the mark, painted in the active segment's ramp.
-- [x] **A2.2** Plays once per tab (`sessionStorage`), never on client-side navigation — it sits outside `<Routes>` and the router never remounts it.
-- [x] **A2.3** Dismisses on `load` with a 900ms floor and a 3500ms ceiling, so it can neither flash nor trap.
-- [x] **A2.4** Skipped under `prefers-reduced-motion`, and now for `/admin` and `/learn` — **this was missing**; the loader was showing in front of the CMS login. Added `NO_LOADER_PATHS`.
+- [x] **A2.2** Plays on every full page load, never on client-side navigation — it sits outside `<Routes>` and the router never remounts it. *(The `sessionStorage` once-per-tab gate this line used to describe is gone; the loader is not suppressed by any stored state.)*
+- [x] **A2.3** Dismisses once the window has loaded — and, on the homepage, once the hero video can play — with a 1800ms floor and a 6000ms ceiling, so it can neither flash nor trap.
+- [x] **A2.4** Skipped for `/admin` and `/learn` — **this was missing**; the loader was showing in front of the CMS login. Added `NO_LOADER_PATHS`.
+- [x] **A2.5** Shows under `prefers-reduced-motion` as a *still* mark rather than being skipped — **this was the "loader only appears in some browsers" bug**. That preference is an OS setting each browser reads for itself (on Windows it follows the "Animation effects" toggle, which power-saving can flip), so skipping the overlay on it meant the intro vanished per-browser and intermittently with nothing to explain why. It asks for less motion, not less content: `SiteLoader.css` now drops the spin and the sweep and restores the rings and bar to a resting state. Verified showing in Chromium, Firefox and WebKit, with and without the preference.
 
 ### A3 — Award / Win toggle transition
 - [x] **A3.1** Cross-fade on audience switch — verified: main opacity drops to 0.01 and returns, `data-audience-swap` goes `out` → `in`.
@@ -530,14 +531,19 @@ Already in place: `be/src/modules/lms/`, `fe/src/lms/`, and the models `Course`,
 
 ## Phase 15 — LMS: Engagement & delivery (LMS 16.0–18.0)
 
+> **Two pathways for this phase.** `docs/LIVE-SESSIONS-PATHWAY.md` — what the
+> 17.0a decision actually is, what can be built before it is answered, and the
+> adapter boundary that keeps it reversible. `docs/AI-COACH-PATHWAY.md` — how
+> 18.0 works *if* it turns out to be AI, and how it stays clear of A6.
+
 - [ ] **16.0a** Q&A and discussion scoped to a course or lesson — `Discussion`, `Question` and `discussions.controller.js` already exist, extend them.
 - [ ] **16.0b** Instructor answers, marking answered, pinning.
 - [ ] **16.0c** Moderation and reporting path, tied into the existing moderation queue.
 - [ ] **16.0d** Notifications on reply.
-- [ ] **17.0a** Choose the live session platform (Zoom versus an embedded provider) and confirm cost.
-- [ ] **17.0b** Session scheduling, enrolment-gated join links, calendar invite.
-- [ ] **17.0c** Recordings published back into the course, honouring the Phase 11 streaming rules.
-- [ ] **18.0** Embedded course coach — define the scope first. **Note:** if this means an AI assistant, keep it strictly separate from the Procurement Advisor (A6), which is contractually not AI. Confirm with Mohamed before building.
+- [ ] **17.0a** Choose the live session platform (Zoom versus an embedded provider) and confirm cost. **Client decision** — the sizing and pricing questions to put to Mohamed are written out in `docs/LIVE-SESSIONS-PATHWAY.md`.
+- [ ] **17.0b** Session scheduling, enrolment-gated join links, calendar invite. *Most of this is buildable before 17.0a is answered, against a stub adapter.*
+- [ ] **17.0c** Recordings published back into the course, honouring the Phase 11 streaming rules. *Reuses the existing encrypted-HLS pipeline rather than adding one — a recording is an MP4 that goes through `packageLessonVideo`.*
+- [ ] **18.0** Embedded course coach — define the scope first. **Note:** if this means an AI assistant, keep it strictly separate from the Procurement Advisor (A6), which is contractually not AI. Confirm with Mohamed before building. **If the answer is AI, the pathway is `docs/AI-COACH-PATHWAY.md`** — the A6 separation has to be built in code before the model call, not written into a system prompt.
 
 **Exit criteria:** students ask and get answered in-course, and a live session runs with its recording landing in the course.
 

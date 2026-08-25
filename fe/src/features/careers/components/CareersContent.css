@@ -57,9 +57,10 @@
      block, so a top padding here was landing on top of that and the first
      block was given its own exception to cancel it — which left the SECOND
      block sitting 16px lower than the first under its own edge: 43px of clear
-     space above "Create your own role" against 27 above "Roles we are hiring
-     for".
-     
+     space above its heading against 27 above the first block's. (The two have
+     since swapped places, which is why this is written by position rather than
+     by name.)
+
      With the top padding gone every block is the same: the space above a
      heading is whatever the block above it left below its last element, and
      that is this one value. Measured at 27px above the ink and 16px below the
@@ -247,7 +248,9 @@
 
 @media (max-width: 760px) {
   .careers__inner {
-    padding: 24px;
+    /* Block only. The gutter is the site column's, matching the heading band
+       above and every other page. */
+    padding-block: 24px;
   }
 
   .careers__block + .careers__block {

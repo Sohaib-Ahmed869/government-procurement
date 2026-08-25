@@ -60,8 +60,10 @@
   letter-spacing: -0.015em;
 }
 
+/* The summary belongs to the title above it, so it hugs it — 10px, closer than
+   the 14px rhythm the blocks below keep between each other. */
 .cd__subtitle {
-  margin: 20px 0 0;
+  margin: 10px 0 0;
   max-width: 60ch;
   font-size: 16px;
   line-height: 1.55;
@@ -69,12 +71,16 @@
 }
 
 /* --- instructor row --- */
+/* 14px above, and 14px is what every block down this column now uses: the
+   byline, the cover image, the two cards and the interest form. It was 28 / 24 /
+   18 / 24, four values for the one job of separating one block from the next,
+   and together they put the cover image most of a screen below the title. */
 .cd-instructor {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 28px;
-  padding: 14px 18px;
+  margin-top: 14px;
+  padding: 10px 16px;
   background: var(--band-surface);
   border-radius: 14px;
   border: 1px solid var(--band-line);
@@ -119,7 +125,7 @@
 .cd-video {
   display: block;
   width: 100%;
-  margin-top: 24px;
+  margin-top: 14px;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   border-radius: 16px;
@@ -128,16 +134,25 @@
 }
 
 /* --- info panels (What you'll learn / Requirements) --- */
+/* 14px of block padding, down from 26. The vertical space was reading as dead
+   space at the bottom of the "What you'll learn" card, where the last row is a
+   short line and there is nothing under it but the box. The 28px either side
+   stays — that is the card's gutter, and tightening it would only crowd the
+   text against the edge without buying back any height.
+
+   Both cards, deliberately: they sit one directly under the other and are drawn
+   identically, so a difference of 8px between them reads as a mistake rather
+   than as one of them being tighter on purpose. */
 .cd-panel {
-  margin-top: 24px;
-  padding: 26px 28px;
+  margin-top: 14px;
+  padding: 14px 28px;
   background: var(--band-surface);
   border-radius: 16px;
   border: 1px solid var(--band-line);
 }
 
 .cd-panel__title {
-  margin: 0 0 20px;
+  margin: 0 0 10px;
   font-size: 20px;
   font-weight: 600;
 }
@@ -145,7 +160,9 @@
 .cd-learn {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 40px;
+  /* The 40px between the columns is untouched — the rows are what carried the
+     slack, not the gutter. */
+  gap: 6px 40px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -154,9 +171,13 @@
 .cd-learn__item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   font-size: 14.5px;
-  line-height: 1.4;
+  /* 1.25, down from 1.4. These are single-clause outcomes, most of them one
+     line — the looser leading was buying air between points rather than
+     legibility within one, and it also set the height of the empty half-cell a
+     one-line point leaves beside a two-line one. */
+  line-height: 1.25;
   color: var(--band-ink);
 }
 
@@ -173,15 +194,19 @@
   padding-left: 20px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   font-size: 14px;
   line-height: 1.2;
   color: var(--band-ink);
 }
 
 /* --- long-form sections (description / audience), nested in the panel --- */
+/* 14px between sections, down from 32, and the same 14px the blocks in the main
+   column keep between each other. Each section already announces itself with a
+   22px heading; the rest was separating things the type size had already
+   separated, and it fell between every pair of sections in the card. */
 .cd-section {
-  margin-top: 32px;
+  margin-top: 14px;
 }
 
 .cd-section--first {
@@ -189,7 +214,7 @@
 }
 
 .cd-section__title {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   font-size: 22px;
   font-weight: 600;
 }
@@ -197,7 +222,16 @@
 /* Rich HTML authored in the CMS (course description). */
 .cd-prose {
   font-size: 14.5px;
-  line-height: 1.6;
+  /* 1.4, down from 1.6. The description is the longest run of prose on the
+     page, so its leading is what the card's height mostly is: at 1.6 a nine-line
+     paragraph spent 35px on leading alone that the reader was not being paid
+     back for.
+
+     1.4 is also the floor. Below it a paragraph this long stops being a paragraph
+     and becomes a block, and the reader loses their place returning to the
+     left edge — so further compression here comes out of the gaps around the
+     prose, not out of its leading. */
+  line-height: 1.4;
   /* Same ink as Requirements (.cd-bullets) and Who should take this course
      (.cd-rich-list). The description is body copy of the same standing as
      those two, and setting it in --band-muted read as a caption sitting
@@ -206,20 +240,20 @@
 }
 
 .cd-prose p {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
 }
 
 .cd-prose ul,
 .cd-prose ol {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   padding-left: 22px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
 }
 
 .cd-prose li {
-  line-height: 1.5;
+  line-height: 1.35;
 }
 
 .cd-prose strong {
@@ -234,18 +268,18 @@
 }
 
 .cd-section__para {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   font-size: 14.5px;
-  line-height: 1.5;
+  line-height: 1.4;
   color: var(--band-ink);
 }
 
 .cd-rich-list {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   padding-left: 22px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   font-size: 14.5px;
   line-height: 1.25;
   color: var(--band-ink);
@@ -258,20 +292,45 @@
 
 /* --- coming-soon: register-interest form in the main column --- */
 .cd-interest {
-  margin-top: 24px;
+  margin-top: 14px;
   max-width: 560px;
   /* Offset for the sticky header so the in-page anchor doesn't hide the title. */
   scroll-margin-top: 96px;
 }
 
 /* --- pricing sidebar --- */
+/* Held on screen while the description scrolls past it. The card is the one
+   thing on this page a visitor is here to act on, and it used to leave with the
+   first screenful.
+
+   112px, matching .browse's scroll-margin-top (styles/browse.css): the sticky
+   chrome is about 107px of banner and header, and the rest is air. In design
+   pixels, deliberately — above 1441px the header sits inside the page scale and
+   so does this offset, so the two grow together. A figure worked out against
+   the real viewport would be right at one width and wrong at every other.
+
+   The height cap is what keeps the bottom of the card reachable on a short
+   window. Without it a card taller than the space below the chrome has its top
+   pinned and its foot permanently off screen — sticky does not scroll an
+   element that does not fit. 100vh is divided by the scale for the reason
+   .page-layout's min-height is (see index.css): inside a zoomed subtree `vh`
+   resolves against the real viewport and is then magnified. */
 .cd__aside {
   position: sticky;
-  top: 24px;
+  top: 112px;
+  max-height: calc(100vh / var(--gp-scale, 1) - 136px);
+  overflow-y: auto;
 }
 
+/* Sized to fit. This card is sticky (see .cd__aside above), and a sticky card
+   taller than the window is a card whose foot you can only reach by scrolling
+   inside it — so every value below is set against a budget rather than picked
+   for its own sake. At these numbers a full card (title, blurb, price, CTA and
+   both lists) comes to roughly 430px, which clears the ~524px a 768px-tall
+   laptop leaves below the site chrome. The cap on .cd__aside stays as the
+   backstop for an unusually long blurb or a third list. */
 .cd-buy {
-  padding: 22px 32px;
+  padding: 18px 24px;
   background: var(--band-surface);
   border-radius: 20px;
   border: 1px solid var(--band-line);
@@ -288,21 +347,21 @@
 
 .cd-buy__title {
   margin: 0;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.15;
 }
 
 .cd-buy__blurb {
-  margin: 12px 0 0;
-  font-size: 13.5px;
-  line-height: 1.45;
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
   color: var(--band-ink);
 }
 
 .cd-buy__price {
-  margin: 18px 0 0;
-  font-size: 40px;
+  margin: 12px 0 0;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1;
 }
@@ -316,8 +375,11 @@
 .cd-buy__cta {
   display: block;
   width: 100%;
-  margin-top: 20px;
-  padding: 14px 16px;
+  margin-top: 14px;
+  /* 12px, so the button still comes to ~40px tall. This sidebar is replaced by
+     the bottom bar below 940px, so it is only ever driven by a pointer — the
+     44px touch floor is the bar's problem, not this one's. */
+  padding: 12px 16px;
   font-family: inherit;
   font-size: 14.5px;
   font-weight: 600;
@@ -344,9 +406,11 @@
   outline-offset: 2px;
 }
 
+/* The rule and the space around it were the single most expensive thing in the
+   card — 50px a time, twice over, to separate two short lists. */
 .cd-buy__group-label {
-  margin: 20px 0 12px;
-  padding-top: 18px;
+  margin: 12px 0 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--band-line);
   font-size: 12.5px;
   font-weight: 700;
@@ -357,7 +421,7 @@
 .cd-buy__list {
   display: flex;
   flex-direction: column;
-  gap: 11px;
+  gap: 7px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -366,14 +430,15 @@
 .cd-buy__row {
   display: flex;
   align-items: center;
-  gap: 11px;
-  font-size: 14px;
+  gap: 9px;
+  font-size: 13.5px;
+  line-height: 1.25;
   color: var(--band-ink);
 }
 .cd-buy__row svg {
   flex: none;
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   color: var(--cd-accent);
 }
 
@@ -393,8 +458,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* One column, so the card is below the description rather than beside it and
+     has nothing to be held alongside. The height cap goes with the sticking:
+     left on, it would clip a card that is now free to be as tall as it likes. */
   .cd__aside {
     position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 

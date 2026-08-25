@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import PreferencesForm from '../../components/account/PreferencesForm.jsx';
-import { updateSetting, useSettings } from '../../hooks/useProfile.js';
+import { useSettings, useUpdateSetting } from '../../hooks/useProfile.js';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 
 /* ---------------------------------------------------------------------------
@@ -59,6 +59,7 @@ const AUTHORING = [
 // Account, notification and privacy settings (L6).
 export default function AccountSettingsPage() {
   const settings = useSettings();
+  const updateSetting = useUpdateSetting();
   const { user, logout, isAuthenticated, isInstructor } = useStudentAuth();
 
   const section = (title, icon, fields, note) => (

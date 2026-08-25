@@ -204,9 +204,9 @@ export default function TeamAdminPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Our Team</h2>
+          <h2 className="admin-page__title">Meeting the Team</h2>
           <p className="admin-page__subtitle">
-            People shown on the Our Team page, in the order set below.
+            People shown on the Meeting the Team page, in the order set below.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -234,7 +234,7 @@ export default function TeamAdminPage() {
         subtitle={
           editingId
             ? 'Update this person’s card, photo and profile.'
-            : 'Add a person to the Our Team page. Save first, then add their photo.'
+            : 'Add a person to the Meeting the Team page. Save first, then add their photo.'
         }
         onClose={closeDrawer}
         busy={saving}

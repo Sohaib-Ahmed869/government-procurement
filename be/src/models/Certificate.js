@@ -23,6 +23,16 @@ const certificateSchema = new mongoose.Schema(
     // The snapshot.
     recipientName: { type: String, required: true },
     title: { type: String, required: true },
+    // Total taught time. `minutes` is the truth; `hours` is the rounded value
+    // kept for records issued before minutes existed.
+    //
+    // Rounding to whole hours at issue meant a 40-minute course certified "0
+    // hours", and the document then hid the line entirely because 0 is falsy —
+    // which is why short courses printed with nothing where the duration goes.
+    // Deliberately no default: an absent value means "issued before this field
+    // existed", which is what the read-time backfill looks for. A default of 0
+    // would hydrate old records as a real zero and they'd never be repaired.
+    minutes: { type: Number },
     hours: { type: Number, default: 0 },
     issuerName: { type: String, default: 'Government Procurement' },
     signatoryName: { type: String, default: '' },
@@ -79,6 +89,7 @@ certificateSchema.methods.toVerification = function toVerification() {
     recipientName: this.recipientName,
     title: this.title,
     issuedAt: this.issuedAt,
+    minutes: this.minutes,
     hours: this.hours,
     issuerName: this.issuerName,
     valid: !this.revokedAt,

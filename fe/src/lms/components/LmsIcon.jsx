@@ -32,6 +32,10 @@ const ICONS = {
   pdf: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M8.5 17v-3.5h1.2a1.2 1.2 0 0 1 0 2.4H8.5" /></>,
   doc: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></>,
   chat: <><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z" /></>,
+  // The Course Coach (LMS 18.0). A four-point spark, not the speech bubble the
+  // discussion board uses: the coach and the discussions are different things
+  // and sit two rows apart in the sidebar, so they must not share a glyph.
+  sparkle: <><path d="M12 3.2 13.9 9 19.8 11l-5.9 2L12 18.8 10.1 13 4.2 11 10.1 9z" /><path d="M18.5 4.2v3M17 5.7h3" /></>,
   mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></>,
   cart: <><circle cx="9" cy="20" r="1.5" /><circle cx="18" cy="20" r="1.5" /><path d="M2 3h3l2.7 11.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.55L21 8H6" /></>,
   link: <><path d="M10 13a4 4 0 0 0 5.7.3l3-3a4 4 0 0 0-5.7-5.7L11 6" /><path d="M14 11a4 4 0 0 0-5.7-.3l-3 3a4 4 0 0 0 5.7 5.7L13 18" /></>,

@@ -69,7 +69,7 @@ export default function ProcurementAdvisorPage() {
                   that begin immediately below, so it delayed the thing it was
                   describing. */}
               <h1 className="pa-page__title hm-reveal">
-                Rule-Based Guidance Specific to Jurisdiction
+                Rule-Based Guidance Specific to Jurisdiction for Officials
               </h1>
             </div>
           </header>

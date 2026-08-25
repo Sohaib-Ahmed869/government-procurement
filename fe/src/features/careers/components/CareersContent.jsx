@@ -69,6 +69,27 @@ export default function CareersContent() {
           so `vw` resolves against the real viewport and is then magnified by
           the zoom, leaving the tint short of the edges on every side. */}
 
+      {/* --- reverse brief: propose a role rather than answer an advert ---
+
+          First on the page, ahead of the advertised roles. The invitation does
+          not depend on anything being open, and putting it above the list is
+          what stops the page reading as a dead end on the days the list is
+          empty — which is most days for a firm this size. */}
+      <section className="careers__block">
+        <div className="careers__inner">
+          <h2 className="careers__heading">Create your own role</h2>
+          <p className="careers__copy">
+            Tell us the role you think we should be hiring for and why you are
+            the person to do it. Send your CV with a short
+            note covering what the role would involve, the problem it solves for
+            our clients, and the experience you would bring to it.
+          </p>
+          <a className="careers__cta-btn" href={OWN_ROLE_HREF}>
+            Propose a role
+          </a>
+        </div>
+      </section>
+
       {/* The heading stands whether or not anything is open: an empty careers
           page reads as broken, and "nothing right now" is useful in itself. */}
       <section className="careers__block">
@@ -101,22 +122,6 @@ export default function CareersContent() {
               in the meantime.
             </p>
           )}
-        </div>
-      </section>
-
-      {/* --- reverse brief: propose a role rather than answer an advert --- */}
-      <section className="careers__block">
-        <div className="careers__inner">
-          <h2 className="careers__heading">Create your own role</h2>
-          <p className="careers__copy">
-            Tell us the role you think we should be hiring for and why you are
-            the person to do it. Send your CV with a short
-            note covering what the role would involve, the problem it solves for
-            our clients, and the experience you would bring to it.
-          </p>
-          <a className="careers__cta-btn" href={OWN_ROLE_HREF}>
-            Propose a role
-          </a>
         </div>
       </section>
     </section>

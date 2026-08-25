@@ -53,11 +53,32 @@ export const login = asyncHandler(async (req, res) => {
 export const me = asyncHandler(async (req, res) => ok(res, req.user.toSafeJSON()));
 
 // PATCH /me — update own name and/or password.
+const PROFILE_FIELDS = ['title', 'organisation', 'location', 'bio', 'website'];
+
 export const updateMe = asyncHandler(async (req, res) => {
-  const { name, password } = req.body;
+  const { name, password, profile, settings } = req.body;
   if (name !== undefined) req.user.name = name;
   // Assigning triggers the model's pre-save hook, which re-hashes the password.
   if (password) req.user.password = password;
+
+  // Field by field off a whitelist, not a wholesale assign: `profile` arrives
+  // from the browser, and a spread would let it carry keys the schema does not
+  // have — or, on a document, ones it does.
+  if (profile && typeof profile === 'object') {
+    PROFILE_FIELDS.forEach((field) => {
+      if (profile[field] !== undefined) req.user.profile[field] = String(profile[field]);
+    });
+  }
+
+  // Settings are booleans and nothing else. The keys are the client's to choose
+  // (see the note on the model) but the values are not: anything truthy is
+  // stored as `true` rather than as whatever arrived.
+  if (settings && typeof settings === 'object') {
+    Object.entries(settings).forEach(([key, value]) => {
+      if (typeof key === 'string' && key.length <= 64) req.user.settings.set(key, Boolean(value));
+    });
+  }
+
   await req.user.save();
   return ok(res, req.user.toSafeJSON());
 });

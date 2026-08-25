@@ -29,16 +29,11 @@
   transition: var(--gp-fade);
 }
 
+/* The size, weight, line-height and tracking are in styles/head.css, shared
+   with every other page-heading band. The bottom margin is zeroed there too —
+   this is a title-only band, so there is nothing under it to be spaced from. */
 .pa-page__title {
   margin: 0 0 14px;
-  /* The shared page-title size, weight and tracking (--gp-page-title in
-     styles/tokens.css). These two pages were the only ones still carrying their
-     own clamp, which made their headings a different size and tighter tracking
-     than every other page's. */
-  font-size: var(--gp-page-title);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
   color: #fff;
 }
 
@@ -78,14 +73,6 @@
 .pa-disclaimer p + p {
   margin-top: 10px;
   color: var(--gp-muted);
-}
-
-/* Shared page-title breakpoint, matching every other page's hero. */
-@media (max-width: 860px) {
-  .pa-page__title {
-    font-family: 'Geist Variable', system-ui, sans-serif;
-    font-size: var(--gp-page-title-phone);
-  }
 }
 
 /* The disclaimer above the picker. Quiet — it is a statement of fact about how

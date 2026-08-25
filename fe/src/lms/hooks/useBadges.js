@@ -3,7 +3,7 @@ import { TIERS, levelFor } from '../constants/badgeTiers.js';
 import { useProgress } from './useProgress.js';
 import { useDiscussions } from './useDiscussions.js';
 import { useReviews } from './useReviews.js';
-import { usePaths } from './usePaths.js';
+import { usePaths } from './usePrograms.js';
 
 /* ---------------------------------------------------------------------------
    Badges and gamification (L5).

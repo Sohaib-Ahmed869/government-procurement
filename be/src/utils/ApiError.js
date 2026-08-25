@@ -24,4 +24,13 @@ export class ApiError extends Error {
   static conflict(msg = 'Conflict') {
     return new ApiError(409, msg);
   }
+  static tooManyRequests(msg = 'Too many requests') {
+    return new ApiError(429, msg);
+  }
+  // For a dependency that is absent or unconfigured rather than broken — the
+  // caller should try later or an operator should fix the configuration, and
+  // neither is the 500 that "something threw" means.
+  static unavailable(msg = 'Temporarily unavailable') {
+    return new ApiError(503, msg);
+  }
 }

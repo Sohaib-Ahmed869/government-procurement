@@ -2,7 +2,7 @@ import { useState } from 'react';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import StudentAvatar from '../../components/account/StudentAvatar.jsx';
 import ProfileForm from '../../components/account/ProfileForm.jsx';
-import { saveProfile, useProfile } from '../../hooks/useProfile.js';
+import { useProfile, useSaveProfile } from '../../hooks/useProfile.js';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { useProgress } from '../../hooks/useProgress.js';
 import { useBadges } from '../../hooks/useBadges.js';
@@ -11,6 +11,7 @@ import { useBadges } from '../../hooks/useBadges.js';
 // the learner has done, which is what makes a profile worth visiting.
 export default function ProfilePage() {
   const profile = useProfile();
+  const saveProfile = useSaveProfile();
   const { user } = useStudentAuth();
   const { totals } = useProgress();
   const { earned, level, points } = useBadges();
@@ -83,8 +84,11 @@ export default function ProfilePage() {
           <ProfileForm
             profile={profile}
             onCancel={() => setEditing(false)}
-            onSave={(next) => {
-              saveProfile(next);
+            onSave={async (next) => {
+              // Closed only once the save lands. Closing first and saving in
+              // the background is how a failed request leaves the page showing
+              // details the server never took.
+              await saveProfile(next);
               setEditing(false);
             }}
           />

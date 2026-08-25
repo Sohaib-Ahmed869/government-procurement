@@ -24,7 +24,7 @@ import './Footer.css';
 const AUDIENCE_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Service Offering', href: '/service-offering' },
-  { label: 'Our Team', href: '/our-team' },
+  { label: 'Meeting the Team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
   { label: 'Insights', href: '/insights' },
   { label: 'Q&A', href: '/q-and-a' },
@@ -95,7 +95,7 @@ const FLAT_ROWS = [
   ],
   [
     { label: 'Service Offering', href: '/service-offering' },
-    { label: 'Our Team', href: '/our-team' },
+    { label: 'Meeting the Team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
     { label: 'Insights', href: '/insights' },
   ],

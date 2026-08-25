@@ -17,6 +17,17 @@
      scaled up around 2.6×. These steps put it back in proportion. */
   --sl: 1;
 
+  /* A SECOND multiplier, on the logo alone.
+
+     The mark sits inside two rings with a deliberate margin between them, and
+     on a laptop that margin is what stops the lockup feeling crowded. On a
+     large display the same ratio reads as a small glyph rattling around inside
+     a big hoop — the empty space scales up with everything else, so there is
+     visibly more of it. Above 1440px the logo takes some of that space back
+     without the rings moving, which is why this is separate from `--sl` rather
+     than another step in it. */
+  --sl-logo: 1;
+
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -84,10 +95,12 @@
   animation: site-loader-spin 2.1s linear infinite reverse;
 }
 
+/* 60 × 52 keeps the SVG's own 176.68 : 153.19 proportions, so both dimensions
+   have to move together — scaling one alone would squash the mark. */
 .site-loader__logo {
   position: relative;
-  width: calc(60px * var(--sl));
-  height: calc(52px * var(--sl));
+  width: calc(60px * var(--sl) * var(--sl-logo));
+  height: calc(52px * var(--sl) * var(--sl-logo));
   animation: site-loader-breathe 2.4s var(--gp-ease) infinite;
 }
 
@@ -158,8 +171,18 @@
   to { transform: translateX(240%); }
 }
 
-/* The component returns null under reduced motion, so this only ever applies if
-   the preference is switched on with the overlay already up. */
+/* Reduced motion — the overlay still shows, it just stops moving.
+
+   The preference asks for less MOTION, not less content, so hiding the intro
+   from these visitors was the wrong reading (and was the reason it appeared in
+   one browser but not another — see SiteLoader.jsx). What it gets instead is a
+   still version of the same picture.
+
+   Stopping the animations alone is not enough: `animation: none` leaves each
+   element wherever its first keyframe put it, so the rings freeze as two
+   lopsided arcs and the bar keeps a 42%-wide fill parked at the left, which
+   reads as a progress bar that has stalled. Both are restored to a resting
+   state that looks deliberate — complete rings, and a full quiet track. */
 @media (prefers-reduced-motion: reduce) {
   .site-loader__ring,
   .site-loader__mark::after,
@@ -168,16 +191,42 @@
   .site-loader__bar-fill {
     animation: none;
   }
+
+  /* Whole rings rather than two arcs stopped mid-turn. */
+  .site-loader__ring { border-color: var(--gp-accent); opacity: 0.55; }
+  .site-loader__mark::after { border-color: var(--gp-accent-warm); opacity: 0.35; }
+
+  /* The bar becomes a plain rule: no fill pretending to be progress. */
+  .site-loader__bar-fill { display: none; }
+  .site-loader__bar { background: rgba(255, 255, 255, 0.22); }
+
+  /* The wordmark's entrance is a rise-and-fade; without the animation it would
+     be stuck at the keyframe's starting opacity. */
+  .site-loader__wordmark { opacity: 1; transform: none; }
 }
 
 /* --- scale steps ---------------------------------------------------------
 
    The page itself is laid out at 1440px and zoomed to fill anything wider, so
-   the overlay steps up alongside it. The numbers track that zoom factor rather
-   than being picked by eye: at 1680px the page is at ~1.17, at 2560px ~1.78, at
-   3840px ~2.67. Stepped rather than continuous because `zoom` is not available
-   here — the overlay is `position: fixed`, and a zoomed fixed element resolves
-   its inset against the magnified viewport and drifts off screen. */
+   the overlay steps up alongside it. Stepped rather than continuous because
+   `zoom` is not available here — the overlay is `position: fixed`, and a zoomed
+   fixed element resolves its inset against the magnified viewport and drifts
+   off screen.
+
+   Above laptop width the steps deliberately RUN WELL AHEAD of the page's own
+   zoom (~1.17 at 1680px, ~1.78 at 2560px, ~2.67 at 3840px). Matching it exactly
+   is what the numbers used to do, and it was the wrong target: the page is a
+   column of content that keeps its measure, while this is a single mark alone
+   on an empty field, where the same ratio reads as a badge adrift in the middle
+   of a large display. These sit around 1.5x the zoom factor, which is a
+   deliberately generous splash rather than a proportional one.
+
+   The ceiling on all of them is viewport HEIGHT, not width — a wide, short
+   screen (an ultrawide at 1080, a 1600x800 laptop) is the case that overflows
+   first, because the lockup is a vertical stack. Anything raised here should be
+   re-measured against those, not just against 4K.
+
+   Laptop widths and below are untouched — they were already right. */
 
 .site-loader { --sl: 0.82; }
 
@@ -186,27 +235,35 @@
   .site-loader { --sl: 1; }
 }
 
-/* Past the page's own scaling threshold. */
+/* Past the page's own scaling threshold — a large laptop, or any desktop
+   monitor. This is the first step above laptop width and the one most people
+   will actually see. */
 @media (min-width: 1441px) {
-  .site-loader { --sl: 1.2; }
+  .site-loader { --sl: 2; }
+
+  /* The logo grows into the ring's inner margin from here up. Held at 1.32:
+     the mark's bounding box is wider than the glyph, and past roughly this the
+     box's corners start meeting the inner ring even though the artwork itself
+     still looks clear. */
+  .site-loader { --sl-logo: 1.32; }
 }
 
 /* 1440p, and a 4K display at 200% OS scaling — which reports 1920 CSS px and is
    the common way a 4K monitor is actually run. */
 @media (min-width: 1921px) {
-  .site-loader { --sl: 1.7; }
+  .site-loader { --sl: 2.7; }
 }
 
 /* 4K at 150% scaling. */
 @media (min-width: 2561px) {
-  .site-loader { --sl: 2.2; }
+  .site-loader { --sl: 3.4; }
 }
 
 /* 4K and 5K at native density. Capped here: past this the mark is already the
    size the page's own 2.67× zoom would give it, and going further would fill
    the screen rather than sit on it. */
 @media (min-width: 3201px) {
-  .site-loader { --sl: 2.7; }
+  .site-loader { --sl: 4; }
 }
 
 /* Tracking is the one thing that isn't linear — the wordmark needs to tighten
