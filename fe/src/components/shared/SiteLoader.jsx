@@ -16,10 +16,25 @@ import './SiteLoader.css';
 //             and the footage cuts in a second later, which is exactly the
 //             swap the loader exists to cover.
 //
-// It renders nothing for a visitor who has asked for reduced motion, and
-// nothing inside the CMS or the LMS. It does not render on client-side
-// navigation either — this is a page load's intro, and the router never
-// remounts it.
+// It renders nothing inside the CMS or the LMS. It does not render on
+// client-side navigation either — this is a page load's intro, and the router
+// never remounts it.
+//
+// ---- Reduced motion is handled in CSS, not here -----------------------------
+//
+// This used to skip the overlay entirely for `prefers-reduced-motion: reduce`,
+// which is why the loader appeared in one browser and not another on the same
+// machine: that preference is an operating-system setting each browser reads
+// for itself, and on Windows it follows the "Animation effects" toggle, which
+// power-saving modes can flip on their own. A visitor with animations turned
+// off got no intro at all, intermittently, with nothing on the page to explain
+// why.
+//
+// The preference asks for LESS MOTION, not less content — hiding a branded
+// splash was never what it meant. So the overlay now shows for everyone, and
+// SiteLoader.css drops the spin and the sweep under the same media query,
+// leaving a still mark on the brand ground. That block already existed and was
+// unreachable, because this function returned before anything could render it.
 const MIN_MS = 1800;
 const MAX_MS = 6000;
 
@@ -35,12 +50,6 @@ const NO_LOADER_PATHS = ['/admin', '/learn'];
 
 function shouldSkip() {
   if (typeof window === 'undefined') return true;
-  if (
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    return true;
-  }
   // Read off `location` rather than the router: this is decided before the
   // first paint, and the component sits outside <Routes> so it has no match to
   // consult. A deep link straight into /admin never sees the overlay at all.

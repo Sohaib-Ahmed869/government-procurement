@@ -60,6 +60,10 @@ export default function CertificateBuilder({
   const item = subject ?? course ?? {};
   const c = { ...defaults, ...(item.certificate ?? {}) };
   const totalMinutes = minutes ?? item.minutes ?? 0;
+  // The preview falls back to a sample duration when nothing is timed yet, so
+  // the "hours" toggle has something visible to toggle. Real certificates carry
+  // the lesson times.
+  const previewMinutes = totalMinutes || 90;
   const set = (patch) => onChange({ certificate: { ...c, ...patch } });
 
   const field = (key, label, hint, props = {}) => (
@@ -236,7 +240,7 @@ export default function CertificateBuilder({
               design={c}
               recipientName={previewName || 'Sam Taylor'}
               courseTitle={item.title || `Untitled ${noun}`}
-              hours={Math.max(1, Math.round(totalMinutes / 60))}
+              minutes={previewMinutes}
               credentialId="GP-2026-XXXXXXXX"
               issuedAt={new Date().toISOString()}
               issuerName={c.issuerName}

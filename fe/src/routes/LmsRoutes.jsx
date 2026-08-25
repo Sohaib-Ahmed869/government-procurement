@@ -23,6 +23,7 @@ import QuizAnalyticsPage from '../lms/pages/instructor/QuizAnalyticsPage.jsx';
 import StudentRosterPage from '../lms/pages/instructor/StudentRosterPage.jsx';
 import LmsLayout from '../lms/layout/LmsLayout.jsx';
 import DashboardPage from '../lms/pages/dashboard/DashboardPage.jsx';
+import CoachPage from '../lms/pages/coach/CoachPage.jsx';
 import MyCoursesPage from '../lms/pages/dashboard/MyCoursesPage.jsx';
 import CatalogPage from '../lms/pages/catalog/CatalogPage.jsx';
 import CourseOverviewPage from '../lms/pages/catalog/CourseOverviewPage.jsx';
@@ -186,6 +187,13 @@ export default function LmsRoutes() {
           <Route path="bookmarks" element={me(<BookmarksPage />)} />
           <Route path="certificates" element={me(<CertificatesPage />)} />
           <Route path="certificates/:id" element={me(<CertificateViewPage />)} />
+
+          {/* Course Coach (LMS 18.0). Mounted HERE and only here — never on
+              /advisory, where the Procurement Advisor is contractually not AI
+              and says so on screen. me(), because the coach answers from the
+              learner's own enrolments and there is nothing to answer from
+              without an account. */}
+          <Route path="coach" element={me(<CoachPage />)} />
 
           {/* Community */}
           <Route path="discussions" element={me(<CourseDiscussionPage />)} />

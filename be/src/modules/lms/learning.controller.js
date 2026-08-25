@@ -8,10 +8,12 @@ import { Lesson } from '../../models/Lesson.js';
 import { Enrollment, ENROLMENT_SOURCE } from '../../models/Enrollment.js';
 import { User } from '../../models/User.js';
 import { Progress } from '../../models/Progress.js';
+import { LearningActivity } from '../../models/LearningActivity.js';
 import { QuizAttempt } from '../../models/QuizAttempt.js';
 import { Certificate } from '../../models/Certificate.js';
 import { Program, PROGRAM_CERTIFICATE_DEFAULTS } from '../../models/Program.js';
 import { resolveForLearner } from './programs.controller.js';
+import { localDay } from './study.controller.js';
 import { markAttempt, reviewFor } from '../../utils/grading.js';
 import { getObject, presignGet } from '../../config/s3.js';
 import { env } from '../../config/env.js';
@@ -708,6 +710,19 @@ export const completeLesson = asyncHandler(async (req, res) => {
   if (!already) {
     progress.completedLessons.push(lesson._id);
     progress.minutesLearned += lesson.minutes || 0;
+
+    // The learner's day, not the server's — see localDay(). Only on a FIRST
+    // completion: re-opening a finished lesson is revision, and counting it
+    // again would let a learner run their week's minutes up by clicking.
+    //
+    // Not awaited and never fatal: an activity row is a chart, and a chart is
+    // not worth failing a completion the learner has earned.
+    LearningActivity.record({
+      user: req.user._id,
+      day: localDay(req.body?.tzOffset),
+      minutes: lesson.minutes || 0,
+      lessons: 1,
+    }).catch(() => {});
   }
   progress.lastLesson = lesson._id;
   progress.lastLessonAt = new Date();
@@ -833,6 +848,17 @@ export const submitQuiz = asyncHandler(async (req, res) => {
     durationSeconds: Number(req.body.durationSeconds) || 0,
     submittedAt: new Date(),
   });
+
+  // A day spent on assessment is a day spent learning. Minutes come from the
+  // attempt's own clock rather than the lesson's estimate, which is written for
+  // a video and means nothing for a quiz. Same fire-and-forget as a completion:
+  // the chart is not worth failing a submitted attempt over.
+  LearningActivity.record({
+    user: req.user._id,
+    day: localDay(req.body?.tzOffset),
+    minutes: Math.round((Number(req.body.durationSeconds) || 0) / 60),
+    quizzes: 1,
+  }).catch(() => {});
 
   return created(res, {
     attempt: {
@@ -971,7 +997,11 @@ async function issueCertificate({ user, courseId }) {
   if (!course) return null;
 
   const lessons = await Lesson.find({ course: courseId }).select('minutes');
-  const hours = Math.round(lessons.reduce((s, l) => s + (l.minutes || 0), 0) / 60);
+  // Minutes, not rounded hours. A 40-minute course used to certify "0 hours",
+  // and the document dropped the line because 0 is falsy. The certificate
+  // decides how to word it; the record just carries the number.
+  const minutes = lessons.reduce((s, l) => s + (l.minutes || 0), 0);
+  const hours = Math.round(minutes / 60);
 
   // The instructor's wording for THIS course, copied in rather than referenced.
   // Rewording the course's certificate later must not silently reword every one
@@ -984,6 +1014,7 @@ async function issueCertificate({ user, courseId }) {
     credentialId: `GP-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`,
     recipientName: user.name,
     title: course.title,
+    minutes,
     hours,
     issuerName: c.issuerName || 'Government Procurement',
     // The instructor's named signatory wins; the course byline is the fallback.
@@ -1041,7 +1072,8 @@ async function issueProgramCertificates({ user, courseId }) {
     const lessons = await Lesson.find({ course: { $in: program.steps.map((s) => s.course) } })
       .select('minutes')
       .lean();
-    const hours = Math.round(lessons.reduce((sum, l) => sum + (l.minutes || 0), 0) / 60);
+    const minutes = lessons.reduce((sum, l) => sum + (l.minutes || 0), 0);
+    const hours = Math.round(minutes / 60);
 
     // eslint-disable-next-line no-await-in-loop
     const cert = await Certificate.create({
@@ -1051,6 +1083,7 @@ async function issueProgramCertificates({ user, courseId }) {
       credentialId: `GP-${new Date().getFullYear()}-${randomUUID().slice(0, 8).toUpperCase()}`,
       recipientName: user.name,
       title: program.title,
+      minutes,
       hours,
       issuerName: c.issuerName || 'Government Procurement',
       signatoryName: c.signatoryName || '',
@@ -1072,17 +1105,48 @@ async function issueProgramCertificates({ user, courseId }) {
   return issued;
 }
 
+/* Certificates issued before `minutes` existed carry only whole hours, and any
+   course under half an hour rounded to 0 — so the document had nothing to print
+   where the taught time goes.
+
+   Rather than a migration script, the number is recomputed from the lessons the
+   first time such a record is read, and written back so it is only ever done
+   once. The recomputation is the same sum issueCertificate() does, so a
+   backfilled record says what it would have said had it been issued today.
+
+   Only records genuinely missing the field are touched: a stored 0 that came
+   from a course with no timed lessons is a real answer and stays. */
+async function withMinutes(rows) {
+  const stale = rows.filter((r) => r.minutes == null);
+  if (!stale.length) return rows;
+
+  await Promise.all(stale.map(async (row) => {
+    const courseIds = row.course
+      ? [row.course]
+      : (await Program.findById(row.program).select('steps.course').lean())
+        ?.steps?.map((s) => s.course) ?? [];
+    if (!courseIds.length) return;
+
+    const lessons = await Lesson.find({ course: { $in: courseIds } }).select('minutes').lean();
+    row.minutes = lessons.reduce((sum, l) => sum + (l.minutes || 0), 0);
+    await Certificate.updateOne({ _id: row._id }, { $set: { minutes: row.minutes } });
+  }));
+
+  return rows;
+}
+
 export const myCertificates = asyncHandler(async (req, res) => {
   const rows = await Certificate.find({ user: req.user._id, revokedAt: null })
     .sort({ issuedAt: -1 })
     .lean();
-  return ok(res, rows);
+  return ok(res, await withMinutes(rows));
 });
 
 export const getCertificate = asyncHandler(async (req, res) => {
-  const cert = await Certificate.findOne({ _id: req.params.id, user: req.user._id });
+  const cert = await Certificate.findOne({ _id: req.params.id, user: req.user._id }).lean();
   if (!cert) throw ApiError.notFound('Certificate not found');
-  return ok(res, cert);
+  const [row] = await withMinutes([cert]);
+  return ok(res, row);
 });
 
 // GET /lms/certificates/verify/:credentialId. PUBLIC, no auth.
@@ -1093,5 +1157,8 @@ export const getCertificate = asyncHandler(async (req, res) => {
 export const verifyCertificate = asyncHandler(async (req, res) => {
   const cert = await Certificate.findOne({ credentialId: req.params.credentialId });
   if (!cert) throw ApiError.notFound('No certificate with that credential ID');
+  // Same backfill as the learner's own view, so the public page and the
+  // downloaded document quote the same taught time.
+  if (cert.minutes == null) await withMinutes([cert]);
   return ok(res, cert.toVerification());
 });

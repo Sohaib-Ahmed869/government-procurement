@@ -78,6 +78,37 @@ export const env = {
     ffmpegPath: process.env.FFMPEG_PATH || '',
   },
 
+  /* Course Coach (LMS 18.0) — the AI study assistant inside the student LMS.
+
+     THREE SEPARATE KNOBS, on purpose, because "change the AI" means three
+     different things and they should not need a code change:
+
+       provider   which vendor's adapter runs. One file per provider under
+                  modules/lms/coach/providers/; this names which one.
+       model      which model that provider is asked for.
+       apiKey     WHOSE ACCOUNT is billed. Swapping accounts is this line and
+                  nothing else.
+
+     Absent a key the coach reports itself unavailable and the screen says so.
+     It never falls back to a different provider or a stub answer: a study
+     assistant that quietly starts making things up when its credentials expire
+     is worse than one that is plainly switched off.
+
+     `enabled` is the separate kill switch, so the feature can be turned off
+     with the credentials left in place. */
+  coach: {
+    enabled: process.env.COACH_ENABLED !== 'false',
+    provider: process.env.COACH_PROVIDER || 'anthropic',
+    model: process.env.COACH_MODEL || 'claude-opus-5',
+    // How hard the model works per answer. 'low' is right for routine
+    // "what did this lesson mean" questions; raise it if answers feel thin.
+    effort: process.env.COACH_EFFORT || 'low',
+    apiKey: process.env.ANTHROPIC_API_KEY || '',
+    // Questions per learner per hour. An LLM endpoint behind a login with no
+    // ceiling is a bill waiting to happen.
+    hourlyLimit: Number(process.env.COACH_HOURLY_LIMIT) || 30,
+  },
+
   mail: {
     host: process.env.SMTP_HOST || '',
     port: Number(process.env.SMTP_PORT) || 587,

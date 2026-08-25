@@ -853,12 +853,13 @@
   background: radial-gradient(circle, rgba(126, 226, 168, 0.26) 0%, rgba(126, 226, 168, 0) 68%);
   pointer-events: none;
 }
+/* Sentence-cased, not tracked-out capitals. "GOOD AFTERNOON" reads as a label
+   on a form; the greeting is meant to be read as words. */
 .lms-greeting__eyebrow {
-  margin: 0 0 8px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  margin: 0 0 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--lms-mint);
 }
 .lms-greeting__name {
@@ -5212,8 +5213,22 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   letter-spacing: -0.01em;
   color: var(--cert-accent);
 }
+/* Everything between the heading and the signature, centred in whatever space
+   the two leave it. `min-height: 0` so a long course title can still shrink the
+   block rather than push the foot off the paper. */
+.lms-certdoc__body {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 .lms-certdoc__preamble,
-.lms-certdoc__statement { margin: 1.1em 0 0; font-size: 1em; color: var(--cert-muted); }
+.lms-certdoc__statement { margin: 1em 0 0; font-size: 1em; color: var(--cert-muted); }
+/* The first line of the body sets its own space against the heading above. */
+.lms-certdoc__body > :first-child { margin-top: 0; }
 .lms-certdoc__name {
   margin: 0.35em 0 0;
   font-size: 2.1em;
@@ -5573,4 +5588,151 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   color: var(--lms-danger);
   font-size: 13.5px;
   line-height: 1.5;
+}
+
+/* Course Coach (LMS 18.0) -------------------------------------------------
+   The AI study assistant. Styled as a document the learner reads rather than a
+   chat app: answers are prose with their sources underneath, because the
+   sources are the point. A messenger bubble treatment would make the citations
+   look like an afterthought, and they are the reason this can be trusted at
+   all. */
+.lms-coach { display: flex; flex-direction: column; gap: 14px; }
+
+.lms-coach__bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--lms-border);
+}
+.lms-coach__picker { margin: 0; min-width: 240px; flex: 1; max-width: 420px; }
+
+.lms-coach__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* Bounded so the composer stays in view on a long conversation rather than
+     being pushed off the bottom of the page. */
+  max-height: 58vh;
+  min-height: 220px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* The mark that says "this was written by a model". Deliberately consistent
+   wherever the coach speaks, so an answer is never mistaken for a person's. */
+.lms-coach__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--lms-mint-soft);
+  color: var(--lms-green-600);
+}
+.lms-coach__mark svg { width: 18px; height: 18px; }
+.lms-coach__mark--sm { width: 26px; height: 26px; }
+.lms-coach__mark--sm svg { width: 14px; height: 14px; }
+
+.lms-coach__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 28px 16px;
+  margin: auto 0;
+}
+.lms-coach__introtitle { margin: 0; font-size: 16px; font-weight: 600; }
+.lms-coach__introtext {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--lms-muted);
+}
+.lms-coach__suggestions {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.lms-coach__suggestions button {
+  border: 1px solid var(--lms-border);
+  background: var(--lms-surface-2);
+  color: var(--lms-text-2);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.lms-coach__suggestions button:hover:not(:disabled) { border-color: var(--lms-mint); }
+.lms-coach__suggestions button:disabled { opacity: 0.55; cursor: default; }
+
+.lms-coach__turn { display: flex; gap: 10px; align-items: flex-start; }
+/* The learner's own question sits right and tight; the coach's answer runs full
+   width, because one is a line and the other is something to read. */
+.lms-coach__turn.is-user { justify-content: flex-end; }
+.lms-coach__turn.is-user .lms-coach__bubble {
+  max-width: 78%;
+  background: var(--lms-mint-soft);
+  border-radius: var(--lms-radius-sm);
+  padding: 10px 14px;
+}
+.lms-coach__turn.is-assistant .lms-coach__bubble { flex: 1; min-width: 0; }
+
+.lms-coach__bubble p { margin: 0 0 10px; font-size: 14.5px; line-height: 1.65; }
+.lms-coach__bubble p:last-child { margin-bottom: 0; }
+.lms-coach__bubble--wait { color: var(--lms-muted); font-size: 14px; padding-top: 4px; }
+.lms-coach__note { color: var(--lms-muted); }
+
+/* The sources. Understated, but always present when there are any — they are
+   what makes an answer checkable. */
+.lms-coach__sources {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--lms-border);
+}
+.lms-coach__sources-label {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+}
+.lms-coach__sources ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lms-coach__sources li { display: flex; flex-direction: column; gap: 2px; }
+.lms-coach__sources a { font-size: 13.5px; font-weight: 600; color: var(--lms-green-600); }
+.lms-coach__quote {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--lms-muted);
+  /* One line: enough to see why the lesson was cited, not a second copy of it. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lms-coach__composer { display: flex; gap: 10px; align-items: flex-end; }
+.lms-coach__composer .lms-textarea { flex: 1; resize: vertical; }
+
+.lms-coach__disclaimer {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--lms-muted);
+}
+
+@media (max-width: 640px) {
+  .lms-coach__picker { max-width: none; }
+  .lms-coach__turn.is-user .lms-coach__bubble { max-width: 100%; }
 }

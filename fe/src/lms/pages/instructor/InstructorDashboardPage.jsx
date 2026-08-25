@@ -5,9 +5,9 @@ import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { firstNameOf } from '../../utils/names.js';
 
 function greeting(hour) {
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'Good Morning';
+  if (hour < 18) return 'Good Afternoon';
+  return 'Good Evening';
 }
 
 // The instructor's home (R1).

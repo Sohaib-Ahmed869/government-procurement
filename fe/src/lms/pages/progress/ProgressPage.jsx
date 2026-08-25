@@ -5,7 +5,7 @@ import ActivityChart from '../../components/progress/ActivityChart.jsx';
 import ProgressRing from '../../components/progress/ProgressRing.jsx';
 import CompletionSummary from '../../components/progress/CompletionSummary.jsx';
 import { useProgress } from '../../hooks/useProgress.js';
-import { WEEK_ACTIVITY, QUARTER_ACTIVITY } from '../../hooks/placeholderData.js';
+import { useActivity } from '../../hooks/useActivity.js';
 
 function duration(minutes) {
   if (!minutes) return '0m';
@@ -24,6 +24,9 @@ function when(iso) {
 export default function ProgressPage() {
   const { courses, quizzes, totals, status, error } = useProgress();
   const [range, setRange] = useState('week');
+  // Both windows come from the same endpoint; the toggle changes how many days
+  // it asks for rather than switching between two shapes of data.
+  const { activity } = useActivity(range === 'week' ? 7 : 90);
 
   // Everything below is one picture of where the learner stands, so it waits
   // for the whole of it rather than painting a page of zeros and then
@@ -111,10 +114,12 @@ export default function ProgressPage() {
         </div>
       </section>
 
-      {/* Activity. The one part of this page still on placeholder data:
-          nothing records per-day activity yet. Progress holds total minutes and
-          a last-accessed date, not a history, so a real chart needs that
-          history stored before it can be drawn. */}
+      {/* Activity, from GET /lms/activity. Progress holds total minutes and a
+          last-accessed date but no history, so this chart had nothing to read
+          and ran on a hardcoded fortnight — the same fortnight for everyone,
+          including an account that had finished nothing. A day is written on
+          each first lesson completion and each quiz submission now, against the
+          LEARNER's calendar day rather than the server's. */}
       <section className="lms-card" style={{ marginTop: 18 }}>
         <div className="lms-card__head">
           <h2 className="lms-card__title">
@@ -139,7 +144,7 @@ export default function ProgressPage() {
           </div>
         </div>
         <ActivityChart
-          data={range === 'week' ? WEEK_ACTIVITY : QUARTER_ACTIVITY}
+          data={activity}
           caption={range === 'week' ? 'Minutes learned per day' : 'Minutes learned per week'}
           step={range === 'week' ? 30 : 60}
         />

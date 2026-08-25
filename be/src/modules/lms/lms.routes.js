@@ -8,8 +8,11 @@ import * as authoring from './authoring.controller.js';
 import * as learning from './learning.controller.js';
 import * as analytics from './analytics.controller.js';
 import * as discussions from './discussions.controller.js';
+import * as notifications from './notifications.controller.js';
+import * as coach from './coach.controller.js';
 import * as reviews from './reviews.controller.js';
 import * as programs from './programs.controller.js';
+import * as study from './study.controller.js';
 
 const router = Router();
 
@@ -28,6 +31,21 @@ router.post('/enrollments', protect, learning.enrol);
 router.get('/enrollments', protect, learning.myEnrollments);
 
 router.get('/progress', protect, learning.myProgress);
+
+/* ---- A learner's own study record ----------------------------------------
+   Notes, bookmarks and the day-by-day activity the dashboard and My Progress
+   chart. All three were browser-only until now — see study.controller.js. */
+router.get('/activity', protect, study.myActivity);
+
+router.get('/notes', protect, study.listNotes);
+router.post('/notes', protect, study.createNote);
+router.patch('/notes/:id', protect, study.updateNote);
+router.delete('/notes/:id', protect, study.removeNote);
+
+router.get('/bookmarks', protect, study.listBookmarks);
+router.post('/bookmarks', protect, study.createBookmark);
+router.delete('/bookmarks/:id', protect, study.removeBookmark);
+
 router.post('/progress/lessons/:lessonId/complete', protect, learning.completeLesson);
 router.patch('/progress/lessons/:lessonId/position', protect, learning.setPosition);
 
@@ -66,6 +84,20 @@ router.post('/discussions/:id/replies', protect, discussions.addReply);
 router.post('/discussions/:id/vote', protect, discussions.toggleVote);
 router.post('/discussions/:id/replies/:replyId/vote', protect, discussions.toggleVote);
 router.post('/discussions/:id/replies/:replyId/accept', protect, discussions.acceptReply);
+
+/* The bell (R2). Read state is per account, not per browser, so dismissing a
+   notification on a laptop settles it on a phone too. */
+router.get('/notifications', protect, notifications.myNotifications);
+router.post('/notifications/read', protect, notifications.markNotificationsRead);
+
+/* Course Coach (LMS 18.0). Course-scoped AI study help.
+
+   Every question names a course and the controller checks the enrolment, so
+   there is deliberately no "ask anything" route: the coach answers from one
+   course's lessons or it does not answer. That boundary is what keeps it clear
+   of the Procurement Advisor (A6), which is contractually not AI. */
+router.get('/coach/status', protect, coach.status);
+router.post('/coach/ask', protect, coach.ask);
 
 /* Course reviews (L5). Same records the instructor's Reviews page reads.
    Enrolment and progress are checked on write, in the controller. */

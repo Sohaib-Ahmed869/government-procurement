@@ -23,6 +23,7 @@
     "hls:secret": "node src/scripts/package-hls.js --secret"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.120.0",
     "@aws-sdk/client-s3": "^3.658.0",
     "@aws-sdk/s3-request-presigner": "^3.658.0",
     "bcryptjs": "^2.4.3",

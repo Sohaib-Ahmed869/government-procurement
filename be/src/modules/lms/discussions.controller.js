@@ -5,6 +5,7 @@ import { Course } from '../../models/Course.js';
 import { Lesson } from '../../models/Lesson.js';
 import { Enrollment } from '../../models/Enrollment.js';
 import { Discussion } from '../../models/Discussion.js';
+import { notifyDiscussionReply, notifyDiscussionQuestion } from './notify.js';
 import { STAFF_ROLES } from '../../constants/roles.js';
 
 /* ---------------------------------------------------------------------------
@@ -197,6 +198,15 @@ export const askQuestion = asyncHandler(async (req, res) => {
     lastActivityAt: new Date(),
   });
 
+  /* Tell the instructor. Best-effort on purpose: the question is already saved,
+     and a notification that could not be written is not a reason to tell the
+     learner their question failed — they would ask it again. */
+  try {
+    await notifyDiscussionQuestion({ thread, course, actor: req.user });
+  } catch {
+    /* see above */
+  }
+
   return created(res, serialise(await withAuthors(Discussion.findById(thread._id)), {
     course,
     user: req.user,
@@ -213,6 +223,16 @@ export const addReply = asyncHandler(async (req, res) => {
   thread.replies.push({ author: req.user._id, body: body.trim() });
   thread.lastActivityAt = new Date();
   await thread.save();
+
+  // Whoever asked, and whoever teaches. Best-effort for the same reason asking
+  // is: the reply is saved, and a failed notification must not report it as a
+  // failed post. `thread.author` is populated by loadThread, which notify.js
+  // unwraps.
+  try {
+    await notifyDiscussionReply({ thread, course, actor: req.user });
+  } catch {
+    /* see above */
+  }
 
   return created(res, serialise(await withAuthors(Discussion.findById(thread._id)), {
     course,

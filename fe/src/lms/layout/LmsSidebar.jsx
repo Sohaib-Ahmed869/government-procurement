@@ -46,6 +46,10 @@ const NAV = [
       { to: '/learn/my-courses', label: 'My Courses', icon: 'book' },
       { to: '/learn/courses', label: 'Browse Catalogue', icon: 'grid' },
       { to: '/learn/paths', label: 'Learning Paths', icon: 'path' },
+      // The AI study assistant (LMS 18.0). Sits under Learning because that is
+      // what it is for, and deliberately NOT next to Discussions — one is
+      // people, the other is a model, and the sidebar should not blur that.
+      { to: '/learn/coach', label: 'Course Coach', icon: 'sparkle' },
     ],
   },
   {
