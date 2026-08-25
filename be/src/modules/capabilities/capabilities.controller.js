@@ -4,7 +4,7 @@ import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Capability } from '../../models/Capability.js';
 
-const EDITABLE = ['key', 'title', 'body', 'stage', 'icon', 'audience', 'order', 'active'];
+const EDITABLE = ['title', 'body', 'stage', 'icon', 'audience', 'order', 'active'];
 
 function pickEditable(body) {
   const out = {};

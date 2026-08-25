@@ -18,44 +18,32 @@ export const CAPABILITY_ICONS = [
   'handover',
 ];
 
-// The six services the Service Offering page is built on (A5). The set is fixed
-// by the brief, so a card names one of them rather than carrying a free-typed
-// title — see SERVICE_KEYS in fe/src/features/serviceOffering/services.js,
-// which must stay in step with this list.
-//
-// Blank is allowed: cards saved before the rename have no key, and the site
-// falls back to matching them on their slugified title.
-export const SERVICE_KEYS = [
-  'procurement-strategy',
-  'probity',
-  'process-management',
-  'evaluation-negotiation',
-  'vendor-transition',
-  'contract-management',
-];
-
 // Which side of the site's audience toggle a card belongs to. 'both' shows it
 // under either, which is what every card created before this field existed
 // falls back to.
+//
+// This is what decides whether a service is listed at all. Win and Award do not
+// offer the same services, or the same number of them, so most cards belong to
+// one segment; 'both' is for the ones that genuinely read the same under each.
 export const CAPABILITY_AUDIENCES = ['both', 'win', 'award'];
 
-// One of the six service cards on the Service Offering page.
+// A service card on the Service Offering page.
+//
+// No `key`. There was one, an enum naming which of six fixed services a card
+// supplied the copy for, because the set was fixed by the brief and the page was
+// built on it. The two segments now carry different services in different
+// numbers — neither of them six — so there is no set for a card to name, and the
+// CMS dropdown that asked which of six a card was had no right answer for most
+// of them. A card IS the service now: its title is the service's name.
+//
+// Documents saved before this keep their `key` in Mongo — the schema simply
+// stops reading it — the same way `image` was left behind when it went.
 const capabilitySchema = new mongoose.Schema(
   {
-    // Which of the six this card is the copy for. `enum` includes '' so the
-    // cards that predate the rename still validate on their next save.
-    key: {
-      type: String,
-      enum: [...SERVICE_KEYS, ''],
-      default: '',
-      index: true,
-    },
     title: { type: String, required: true, trim: true },
     body: { type: String, default: '', trim: true },
     // The small uppercase label over the title — "Before market", "Throughout".
-    // The six built-in services carry their own per-segment stage in
-    // fe/src/features/serviceOffering/services.js; this is what lets a service
-    // *added* through the CMS carry one of its own.
+    // Optional: a card without one simply doesn't show a stage.
     stage: { type: String, default: '', trim: true },
     icon: { type: String, enum: CAPABILITY_ICONS, default: 'target' },
     // No image. The Service Offering page carried a photograph per service
@@ -75,7 +63,7 @@ const capabilitySchema = new mongoose.Schema(
       default: 'both',
       index: true,
     },
-    // Lowest first; ties fall back to creation order.
+    // Position on the page. Lowest first; ties fall back to creation order.
     order: { type: Number, default: 0 },
     active: { type: Boolean, default: true, index: true },
   },
