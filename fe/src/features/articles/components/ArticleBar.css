@@ -146,19 +146,39 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 2px;
+  /* 5px, not 2. At two it was a hairline the width of the screen and read as
+     the bar's bottom border rather than as anything that moved — you had to
+     already know it was a progress rule to notice it filling. */
+  height: 5px;
   background: var(--gp-line);
   overflow: hidden;
 }
 
-/* Transformed rather than sized: a width change on every scroll frame is a
-   layout each time, a transform is not. */
+/* The fill: the clay orange, on BOTH segments.
+
+   This is the colour the bar started as — --gp-accent-ink, which resolves to
+   --gp-award-warm-ink on Award — and it is back after a detour worth recording,
+   because the detour is what a per-segment progress bar costs.
+
+   It went to --gp-band-tint first (#e6f0e4 / #e9ebeb), which is LIGHTER than
+   the track it runs over (--gp-line, #cfdcc9 / #d9d9d5): the read part
+   dissolved into the near-white page while the unread part stayed as the only
+   visible thing, so the bar read backwards and nothing appeared to move. Then
+   to #7ee2a8 / #a3a39d, legible side by side but still too faint to follow at
+   5px tall. Then a step darker again. At which point the honest answer was that
+   a rule this thin, on paper, needs a colour with some weight behind it — and
+   the segment ramps have exactly one of those on the light side.
+
+   So it does NOT follow the toggle any more, and that is deliberate rather than
+   an oversight: --gp-award-warm-ink is stated directly rather than reached
+   through --gp-accent-ink, which would swap it for the Win ramp's deep mint and
+   put us back to hunting for a second colour that reads as well as this one. */
 .article-bar__progress-fill {
   display: block;
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: var(--gp-accent-ink);
+  background: var(--gp-award-warm-ink);
   transition: var(--gp-fade);
 }
 

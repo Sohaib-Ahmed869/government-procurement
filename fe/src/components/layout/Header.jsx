@@ -30,7 +30,7 @@ const NAV_LINKS = [
   // page, route and components all still exist — restore this line to bring the
   // link back.
   // { label: 'Our Expertise', href: '/our-expertise' },
-  { label: 'Meeting the Team', href: '/our-team' },
+  { label: 'Our Team', href: '/our-team' },
   { label: 'Courses', href: '/courses' },
   // /insights covers the listing and /insights/:slug for a single article.
   { label: 'Insights', href: '/insights' },

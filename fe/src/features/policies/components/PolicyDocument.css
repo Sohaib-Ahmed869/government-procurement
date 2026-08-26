@@ -56,22 +56,6 @@
   border-bottom: 1px solid var(--gp-line);
 }
 
-/* The page's own ink, on both segments — not --gp-accent-ink, which drew this
-   in the deep mint on Win and the deep clay on Award. A coloured line directly
-   above a black page title read as a second, louder heading rather than as the
-   way back out of the document. It is still obviously a link: the arrow, the
-   600 weight and the underline on hover all stay. */
-.pol__back {
-  display: inline-block;
-  margin-bottom: 18px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gp-ink);
-  text-decoration: none;
-}
-
-.pol__back:hover { text-decoration: underline; }
-
 .pol__title {
   margin: 0;
   font-size: clamp(30px, 4vw, 46px);
@@ -92,42 +76,6 @@
   margin: 32px 0 0;
   font-size: 15px;
   color: var(--gp-muted);
-}
-
-/* --- placeholder banner (B5.5) --------------------------------------------
-
-   Loud on purpose. This is the one thing on the page that must not be mistaken
-   for design detail, so it takes the warm accent rather than a quiet tint, and
-   it prints. */
-
-/* Full width of the page, not of the reading measure. It sits above the
-   document AND above the contents rail beside it, and at 70ch it stopped level
-   with the body column — so the notice that the whole page is scaffolding
-   appeared to be about the left-hand column only. It now ends where the "On
-   this page" box does. */
-.pol-draft {
-  margin: clamp(24px, 3vw, 32px) 0 0;
-  max-width: none;
-  padding: 18px 20px;
-  background: var(--gp-paper-alt);
-  border: 1px solid var(--gp-accent-ink);
-  border-left: 5px solid var(--gp-accent-ink);
-  border-radius: 6px;
-}
-
-.pol-draft__title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--gp-accent-ink);
-}
-
-.pol-draft__body {
-  margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--gp-ink);
 }
 
 /* --- layout --------------------------------------------------------------- */
@@ -294,7 +242,6 @@
     max-width: none;
   }
 
-  .pol__back,
   .pol-toc {
     display: none;
   }
@@ -332,15 +279,4 @@
   }
 
   .pol-section__anchor { display: none; }
-
-  /* The warning has to survive the trip to paper. */
-  .pol-draft {
-    border: 2px solid #000;
-    background: #fff;
-  }
-
-  .pol-draft__title,
-  .pol-draft__body {
-    color: #000;
-  }
 }

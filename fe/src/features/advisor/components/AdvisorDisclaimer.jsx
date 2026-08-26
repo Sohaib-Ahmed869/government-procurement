@@ -16,8 +16,11 @@ import './AdvisorDisclaimer.css';
 // so explicitly rather than inherit a variant that styles nothing.
 export default function AdvisorDisclaimer({ variant = 'result' }) {
   return (
-    <aside className={`adv-disclaimer adv-disclaimer--${variant}`} aria-label="Important information">
-      <p className="adv-disclaimer__lead">
+    <aside
+      className={`gp-notice adv-disclaimer adv-disclaimer--${variant}`}
+      aria-label="Important information"
+    >
+      <p className="gp-notice__lead">
         <strong>This tool is not AI-powered.</strong> No data is stored or used for
         training.
       </p>

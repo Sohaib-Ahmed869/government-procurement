@@ -21,46 +21,19 @@ import { useLocation } from 'react-router-dom';
    A hash is an explicit request for a particular place on the page, so it is
    left alone: an in-page anchor gets to keep its destination.
 
-   And so is a navigation a page has asked to be left alone — see
-   keepScrollOnNextNavigation below. */
-
-/* Suppresses the next scroll-to-top, for a navigation that should not move the
-   visitor.
-
-   The browse pages (Prompt Library, Templates) keep their filters in the URL,
-   which is right: a filtered view should be linkable and walk back through the
-   back button. But it makes choosing a filter a navigation like any other, and
-   every one of them was landing the visitor back at the top of the page —
-   picking a use case from a rail you had scrolled down to reach threw you above
-   the heading, once per filter, which reads as the page fighting you.
-
-   The caller says so, rather than this file trying to infer it from the shape of
-   the URL: same-pathname-different-query is exactly what the footer's segment
-   links are too, and those must still scroll.
-
-   A module flag rather than `navigate(..., { state })`, which is the obvious
-   way and does not survive the trip: AudienceContext writes the segment back
-   into the URL with a bare history.replaceState({}), which replaces
-   history.state wholesale and takes the router's own state with it.
-
-   Windowed rather than a plain boolean, so a navigation that is asked for and
-   then does not happen cannot sit on the flag and swallow the scroll of the next
-   one that does. */
-let keepScrollUntil = 0;
-
-export function keepScrollOnNextNavigation() {
-  keepScrollUntil = Date.now() + 1000;
-}
+   Nothing opts out of this any more. The browse pages (Prompt Library,
+   Templates) used to, through a keepScrollOnNextNavigation flag exported from
+   here: their filters live in the URL, so choosing one is a navigation, and
+   they wanted the visitor left near the rail rather than sent to the top. That
+   is no longer what those pages want — a filter should answer on the whole
+   page, its heading band included — so the suppression and the flag have both
+   gone. */
 
 export default function ScrollToTop() {
   const { key, hash } = useLocation();
 
   useEffect(() => {
     if (hash) return;
-    if (Date.now() < keepScrollUntil) {
-      keepScrollUntil = 0;
-      return;
-    }
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [key, hash]);
 

@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { capabilitiesApi, capabilityCardsCache } from '../../../api';
+import { engageServicesApi } from '../../../api';
 import { useInView } from '../../../hooks/useInView.js';
-import { resolveServices } from '../../serviceOffering/services.js';
-import { CONTACT_EMAIL, CONTACT_PHONE, CONTACT_PHONE_HREF } from '../../../constants/contact.js';
 import './EngageServices.css';
 
 /* ---------------------------------------------------------------------------
@@ -21,13 +19,21 @@ import './EngageServices.css';
    the row rather than collected at the foot of the page, because the decision to
    get in touch is made against a particular service, not against the page as a
    whole — and for the same reason the row does NOT repeat the switchboard number
-   and the general inbox, which are the same on every row and are offered once,
-   under the list, to anyone who would rather start with a call.
+   and the general inbox, which are the same on every row. The "Prefer to talk it
+   through first?" line that used to carry those under the list has gone with
+   them: the header's Request a Consultation button and the footer's contact
+   block are on every page and say the same thing.
 
-   The services are the SAME ones the Service Offering page lists, read from the
-   same resolver and from the same CMS cards, in the order a bidder meets them.
-   A second hand-kept list here would drift from that page the first time an
-   editor renamed something.
+   The rows are this page's OWN content, edited in the CMS under How to Engage
+   Us → Win Contracts.
+
+   They used to be the Service Offering page's capability cards, read through
+   that page's resolver, on the reasoning that a second hand-kept list would
+   drift from it. That traded one problem for a worse one: the two pages are
+   written for different readers, so an editor who wanted this one to say
+   something a bidder needed had nowhere to say it, and an editor who renamed a
+   service on Service Offering rewrote this page without knowing. They are
+   separate collections now — drifting apart is what they are FOR.
    ------------------------------------------------------------------------ */
 
 // Only the arrow is left, now that the rows carry one action; `name` stays in
@@ -52,28 +58,34 @@ function ActionIcon() {
   );
 }
 
+// Where a row's action goes. The service reference is what the consultation
+// form reads to arrive pre-filled; a row without one still links to the form,
+// it just arrives unlabelled rather than pointing at `?service=undefined`.
+function consultationHref(service) {
+  const key = String(service.serviceKey || '').trim();
+  return key
+    ? `/book-a-consultation?service=${encodeURIComponent(key)}`
+    : '/book-a-consultation';
+}
+
 export default function EngageServices({ audience }) {
   const { ref, inView } = useInView({ threshold: 0 });
-  const [saved, setSaved] = useState(capabilityCardsCache.get);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     let alive = true;
-    capabilitiesApi
+    engageServicesApi
       .list()
       .then((list) => {
-        if (!list) return;
-        capabilityCardsCache.set(list);
-        if (alive) setSaved(list);
+        if (alive) setServices(list || []);
       })
       .catch(() => {
-        /* leave whatever is already on screen */
+        /* the section renders empty rather than breaking the page */
       });
     return () => {
       alive = false;
     };
   }, []);
-
-  const services = resolveServices(saved, audience);
 
   return (
     <section
@@ -88,7 +100,7 @@ export default function EngageServices({ audience }) {
             // `--i` drives the reveal stagger in the stylesheet. Set here rather
             // than by :nth-child so adding a service cannot leave the new row
             // with no delay while the rest still animate.
-            <li className="eng__row" key={service.key} style={{ '--i': i }}>
+            <li className="eng__row" key={service._id || service.id} style={{ '--i': i }}>
               <div className="eng__body">
                 <h2 className="eng__title">{service.title}</h2>
                 <p className="eng__copy">{service.body}</p>
@@ -96,16 +108,15 @@ export default function EngageServices({ audience }) {
 
               {/* One way in, on the row. It carried three — call, email and the
                   consultation form — and the two contact links were the wrong
-                  two to repeat on every row: they are the same number and the same
-                  address on every row, they say nothing about the service they
-                  sit beside, and the note under the list already offers both to
-                  anyone who would rather start with a phone call. What is left
-                  is the action that IS particular to the row: a consultation
-                  request that arrives naming the service it came from. */}
+                  two to repeat on every row: they are the same number and the
+                  same address on every row, and they say nothing about the
+                  service they sit beside. What is left is the action that IS
+                  particular to the row: a consultation request that arrives
+                  naming the service it came from. */}
               <div className="eng__actions">
                 <Link
                   className="eng__action eng__action--primary"
-                  to={`/book-a-consultation?service=${encodeURIComponent(service.key)}`}
+                  to={consultationHref(service)}
                 >
                   <span className="eng__action-label">Request a consultation</span>
                   <ActionIcon />
@@ -115,11 +126,6 @@ export default function EngageServices({ audience }) {
           ))}
         </ul>
 
-        <p className="eng__note" style={{ '--i': services.length }}>
-          Prefer to talk it through first? Call{' '}
-          <a href={CONTACT_PHONE_HREF}>{CONTACT_PHONE}</a> or email{' '}
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-        </p>
       </div>
     </section>
   );

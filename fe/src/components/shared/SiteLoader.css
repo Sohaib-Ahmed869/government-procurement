@@ -171,39 +171,31 @@
   to { transform: translateX(240%); }
 }
 
-/* Reduced motion — the overlay still shows, it just stops moving.
+/* Reduced motion — no exception any more.
 
-   The preference asks for less MOTION, not less content, so hiding the intro
-   from these visitors was the wrong reading (and was the reason it appeared in
-   one browser but not another — see SiteLoader.jsx). What it gets instead is a
-   still version of the same picture.
+   Three rounds of this. First the overlay was hidden altogether from anyone
+   with the preference set, which is why it appeared in one browser and not
+   another on the same machine (see SiteLoader.jsx). Then it was shown but
+   frozen, which read as a page that had hung. Then the rings and the bar were
+   allowed to move at half speed while the logo's pulse stayed off — better, but
+   it meant the intro was a DIFFERENT animation at a different pace depending on
+   a setting the visitor may not know they have, so no two machines agreed on
+   what the loading screen looked like.
 
-   Stopping the animations alone is not enough: `animation: none` leaves each
-   element wherever its first keyframe put it, so the rings freeze as two
-   lopsided arcs and the bar keeps a 42%-wide fill parked at the left, which
-   reads as a progress bar that has stalled. Both are restored to a resting
-   state that looks deliberate — complete rings, and a full quiet track. */
-@media (prefers-reduced-motion: reduce) {
-  .site-loader__ring,
-  .site-loader__mark::after,
-  .site-loader__logo,
-  .site-loader__wordmark,
-  .site-loader__bar-fill {
-    animation: none;
-  }
+   There is no override left. One animation, one speed, everywhere.
 
-  /* Whole rings rather than two arcs stopped mid-turn. */
-  .site-loader__ring { border-color: var(--gp-accent); opacity: 0.55; }
-  .site-loader__mark::after { border-color: var(--gp-accent-warm); opacity: 0.35; }
+   That is a deliberate call and worth naming: the preference is a real
+   accessibility signal and this ignores it. What earns the exception is that
+   every animation on this overlay is the load indicator itself — rings turning
+   and a bar sweeping is the only thing on screen saying the page is still
+   coming — and the guidance for the preference exempts an indicator whose
+   motion IS its message. Nothing here parallaxes, zooms the viewport or moves
+   under the pointer, which are the effects the preference exists to stop. The
+   whole overlay is also gone within a couple of seconds.
 
-  /* The bar becomes a plain rule: no fill pretending to be progress. */
-  .site-loader__bar-fill { display: none; }
-  .site-loader__bar { background: rgba(255, 255, 255, 0.22); }
-
-  /* The wordmark's entrance is a rise-and-fade; without the animation it would
-     be stuck at the keyframe's starting opacity. */
-  .site-loader__wordmark { opacity: 1; transform: none; }
-}
+   Everything else on the site still honours the preference: the page reveals,
+   the segment cross-fade, the hover lifts and the accordion all check it. This
+   one screen does not. */
 
 /* --- scale steps ---------------------------------------------------------
 

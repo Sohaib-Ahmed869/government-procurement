@@ -42,7 +42,7 @@ export default function SubscribeForm() {
       </h2>
       <p className="subscribe-form__copy">
         High-impact briefings on regulatory shifts, current affairs, and professional
-        developments.
+        developments
       </p>
 
       {status === 'success' ? (

@@ -9,25 +9,32 @@ import './TenderPortals.css';
 // subtitle, a logo and its destinations — a button appears only for the links
 // that have been filled in.
 //
-// The three sections offer different destinations. The government portals —
-// federal, state and local alike — carry the same three buttons. The 'other'
-// sites are paywalled and carry a single sign-in link plus the note printed
-// under it.
+// The three sections offer different destinations.
 //
-// `gated` marks the labels that pick up "(Login Required)" — the two that lead
-// into listings. Creating an account is the thing you do *because* of the wall,
-// so it never carries the suffix. Whether it shows at all is the per-entry tick
-// in the CMS, not something assumed of a whole section: today that is South
-// Australia and nothing else.
-const GOVERNMENT_DESTINATIONS = [
-  { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
-  { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
-  { key: 'createAccountUrl', label: 'Create Free Account' },
-];
-
+// The federal/state portals carry three: the open tender search, the
+// upcoming/forecast notices, and where to register. `gated` marks the labels
+// that pick up "(Login Required)" — the two that lead into listings. Creating
+// an account is the thing you do *because* of the wall, so it never carries the
+// suffix. Whether it shows at all is the per-entry tick in the CMS, not
+// something assumed of a whole section: today that is South Australia and
+// nothing else.
+//
+// Local government carries ONE: the council's own site. A council does not
+// publish a forecast pipeline or run a supplier registration the way a state
+// portal does, so two of the three buttons were always going to be empty on
+// these cards. The single link reuses `openTendersUrl` — the field the entries
+// already store their address in — under the label that describes what it
+// actually is.
+//
+// The 'other' sites are paywalled and carry a single sign-in link plus the note
+// printed under it.
 const DESTINATIONS = {
-  australian: GOVERNMENT_DESTINATIONS,
-  local: GOVERNMENT_DESTINATIONS,
+  australian: [
+    { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
+    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
+    { key: 'createAccountUrl', label: 'Create Free Account' },
+  ],
+  local: [{ key: 'openTendersUrl', label: 'Website Link' }],
   other: [{ key: 'loginUrl', label: 'Login (Paid wall)' }],
 };
 
@@ -184,7 +191,7 @@ export default function TenderPortals() {
           {local.length > 0 && (
             <section className="tp__band tp__band--local hm-band--dark">
               <div className="tp__inner">
-                <h2 className="tp__group-title">Local Government</h2>
+                <h2 className="tp__group-title">Local Government (Council)</h2>
                 <TenderList sites={local} group="local" audience={audience} />
               </div>
             </section>

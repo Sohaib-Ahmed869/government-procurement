@@ -1,0 +1,39 @@
+/* A boxed notice — a short, unmissable statement set apart from the page.
+
+   Its one job is to be read, so it is given a surface and an accent edge rather
+   than set as small print at the foot of something. First written for the
+   Sourcing Advisor's "this tool is not AI-powered" line
+   (features/advisor/components/AdvisorDisclaimer), and shared from here the
+   moment a second page needed the same box, so the two cannot drift into two
+   slightly different boxes.
+
+   What belongs here: the box. What does NOT: the spacing around it, which is
+   the caller's — a notice above a list needs different clearance from one at
+   the foot of a printed answer, and hard-coding either here would make the
+   other override it. */
+
+.gp-notice {
+  padding: 18px 22px;
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
+  border-left: 3px solid var(--gp-accent-ink);
+  border-radius: 6px;
+  transition: var(--gp-fade);
+}
+
+.gp-notice p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--gp-muted);
+}
+
+.gp-notice p + p {
+  margin-top: 8px;
+}
+
+/* The opening sentence, in the page's full ink — what the box is actually
+   there to say, with anything qualifying it stepped back below. */
+.gp-notice__lead {
+  color: var(--gp-ink);
+}

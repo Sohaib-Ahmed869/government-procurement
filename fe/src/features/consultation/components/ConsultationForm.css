@@ -43,16 +43,21 @@
 }
 
 /* --- two-column layout: intro + form --- */
+/* `stretch`, not `start`: the intro column is the shorter of the two and the
+   photograph at the foot of it is what takes up the slack, so the column has to
+   be given the row's full height to hand on. */
 .consult__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
   gap: 72px;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* --- intro / what to expect --- */
 .consult__intro {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* The eyebrow that used to sit above the title has gone, so the title now opens
@@ -66,38 +71,69 @@
   letter-spacing: -0.015em;
 }
 
+/* Full width of the intro column, so the paragraph ends where the photograph
+   under it does. It was held to 420px against a column half again as wide,
+   which wrapped it into a narrow block with the picture running well past it on
+   the right. */
 .consult__lead {
   margin: 22px 0 0;
   font-size: 18px;
   line-height: 1.6;
   color: #fff;
-  max-width: 420px;
 }
 
-/* Photo at the foot of the intro column, taking up the space the shorter column
-   leaves beside the form. Sits directly on the section's background with the
-   corners rounded, no frame or border of its own. */
+/* Photo at the foot of the intro column, taking ALL the space the shorter
+   column leaves beside the form: it starts where it always did, keeps the
+   column's width, and now runs down to the bottom of the form — level with the
+   Request consultation button — instead of stopping halfway and leaving a panel
+   of empty green beneath it.
+
+   `flex: 1` is what claims that space, and the floor is there for the narrow
+   widths where the two columns are closer in height. Sits directly on the
+   section's background with the corners rounded, no frame or border. */
 .consult__figure {
+  flex: 1;
+  min-height: 260px;
   margin: 40px 0 0;
 }
 
 .consult__photo {
   display: block;
   width: 100%;
-  /* The source is already a wide landscape shot — left at its own proportions
-     rather than cropped to a fixed ratio, which would cut the people at the
-     edges of the frame. */
-  height: auto;
+  /* Fills the figure and crops to it, rather than being stretched to it: the
+     shot is a wide landscape and scaling it to a tall box would smear every
+     face in the frame. `center` keeps the group in the middle of the crop. */
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   border-radius: 22px;
   box-shadow: 0 22px 44px rgba(0, 0, 0, 0.3);
 }
 
+/* On a dark green band, so it is white with a soft underline rather than the
+   page's accent ink — which is a deep mint and all but invisible here. */
+.consult__lead-link {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms var(--gp-ease);
+}
+
+.consult__lead-link:hover,
+.consult__lead-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
 /* --- form --- */
+/* The fields fill their column, which runs to the shell's right edge — the same
+   edge the header's last nav item (Careers) ends on. The 520px cap stopped them
+   short of it and left a strip of empty band down the side of the form. */
 .consult__form {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  max-width: 520px;
 }
 
 .consult__row {
@@ -243,11 +279,6 @@
   .consult__grid {
     grid-template-columns: 1fr;
     gap: 44px;
-  }
-
-  /* Intro sits above the form on narrower screens. */
-  .consult__form {
-    max-width: none;
   }
 
   /* Shared page-title breakpoint, matching the homepage / contact heroes. */

@@ -219,29 +219,37 @@ export default function InsightsGrid() {
                       {image && <img src={image} alt="" />}
                     </span>
 
-                    {meta && <span className="insights-card__topic">{meta}</span>}
+                    {/* The text takes its own half of the card. It used to be
+                        three loose children of the box, so the image half and
+                        the text half were sized by their own contents and the
+                        picture always came out the taller of the two. Wrapped,
+                        the two halves can be told to split the card evenly —
+                        see .insights-card__text. */}
+                    <span className="insights-card__text">
+                      {meta && <span className="insights-card__topic">{meta}</span>}
 
-                    <h2 className="insights-card__title">
-                      {article.title}
-                      <svg
-                        className="insights-card__chevron"
-                        viewBox="0 0 24 24"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.4"
-                        aria-hidden="true"
-                      >
-                        <polyline points="9 6 15 12 9 18" />
-                      </svg>
-                    </h2>
+                      <h2 className="insights-card__title">
+                        {article.title}
+                        <svg
+                          className="insights-card__chevron"
+                          viewBox="0 0 24 24"
+                          width="16"
+                          height="16"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.4"
+                          aria-hidden="true"
+                        >
+                          <polyline points="9 6 15 12 9 18" />
+                        </svg>
+                      </h2>
 
-                    {date && (
-                      <p className="insights-card__summary">
-                        <span className="insights-card__date">{date}</span>
-                      </p>
-                    )}
+                      {date && (
+                        <p className="insights-card__summary">
+                          <span className="insights-card__date">{date}</span>
+                        </p>
+                      )}
+                    </span>
                   </Link>
                 </li>
               );

@@ -11,7 +11,7 @@ export default function InsightsHero() {
   return (
     <section className={`insights-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="insights-hero__inner">
-        <h1 className="insights-hero__title">Insights</h1>
+        <h1 className="insights-hero__title">Latest Insights</h1>
       </div>
     </section>
   );

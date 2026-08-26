@@ -47,9 +47,33 @@ export function useReadingProgress({ offset = 0 } = {}) {
         return;
       }
 
-      // How much of the article sits above the reading line.
-      const read = line - rect.top;
-      setProgress(Math.min(1, Math.max(0, read / total)));
+      // Measured in SCROLL POSITIONS, not in how much of the article happens to
+      // be above the reading line.
+      //
+      // It used to be `(line - rect.top) / total`, and that is why the bar
+      // arrived part-filled: on a page opened at the top, the first screenful
+      // of the article is already above the reading line, so the fraction was
+      // whatever share of the article that screenful happened to be — a third
+      // of a short one, more on a phone. The reader had read none of it.
+      //
+      // So: `begin` is the scroll position where reading starts and `end` the
+      // one where the last line clears the reading line, and progress is where
+      // we are between them. `begin` is floored at 0 — the top of the page —
+      // which is what makes an article that opens above the fold start empty.
+      const scrolled = window.scrollY;
+      const top = rect.top + scrolled;
+      const end = top + total - line;
+      const begin = Math.max(0, Math.min(top - line, end));
+      const span = end - begin;
+
+      // An article shorter than the space above the reading line has no scroll
+      // to measure: it is either wholly read or not reached yet.
+      if (span <= 0) {
+        setProgress(rect.bottom <= line ? 1 : 0);
+        return;
+      }
+
+      setProgress(Math.min(1, Math.max(0, (scrolled - begin) / span)));
     };
 
     // Coalesced to one measurement per frame — scroll fires far more often than

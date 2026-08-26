@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { pagesApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { POLICY_BY_SLUG, PLACEHOLDER_SECTIONS } from '../policies.js';
 import './PolicyDocument.css';
-import Arrow from '../../../components/shared/Arrow.jsx';
 
 // B5.3 — the long-form policy template.
 //
@@ -69,20 +68,23 @@ export default function PolicyDocument() {
   }, [slug]);
 
   // What actually renders: CMS sections, else CMS rich-text body, else the
-  // placeholder. `isPlaceholder` drives the banner and nothing else.
+  // fallback copy in policies.js.
+  //
+  // B5.5's "this is placeholder text" banner has been removed. It was drawn
+  // from `isPlaceholder`, which is true on the first paint of EVERY policy —
+  // the CMS fetch has not resolved yet, so the fallback is what `doc` holds —
+  // and then went away a second later when the real page arrived. A warning
+  // that flashes on a published policy and retracts itself is worse than no
+  // warning: nobody reads it in time, and everybody sees it.
   const doc = useMemo(() => {
     const cmsSections = Array.isArray(page?.sections) ? page.sections.filter((s) => s?.heading || s?.body) : [];
     if (cmsSections.length) {
-      return { kind: 'sections', sections: cmsSections, isPlaceholder: false };
+      return { kind: 'sections', sections: cmsSections };
     }
     if (page?.body && page.body.trim()) {
-      return { kind: 'html', html: page.body, isPlaceholder: false };
+      return { kind: 'html', html: page.body };
     }
-    return {
-      kind: 'sections',
-      sections: PLACEHOLDER_SECTIONS[slug] || [],
-      isPlaceholder: true,
-    };
+    return { kind: 'sections', sections: PLACEHOLDER_SECTIONS[slug] || [] };
   }, [page, slug]);
 
   // The contents list, and the ids the headings carry. Built once from whatever
@@ -100,7 +102,7 @@ export default function PolicyDocument() {
         <div className="pol__inner">
           <h1 className="pol__title">Policy not found</h1>
           <p className="pol__intro">
-            We could not find that policy. <Link to="/policies">See all policies</Link>.
+            We could not find that policy. It may have been moved or renamed.
           </p>
         </div>
       </article>
@@ -113,30 +115,12 @@ export default function PolicyDocument() {
     <article className={`pol${shown ? ' is-in' : ''}`} data-audience={audience}>
       <div className="pol__inner">
         <header className="pol__head">
-          <Link className="pol__back" to="/policies">
-            <Arrow direction="left" /> All policies
-          </Link>
-
           {/* The title alone. The intro under it restated the policy's own
               name in a sentence, and the "Last updated" line dated a document
               whose date is in the document. Both sat between the heading and
               the contents, which is what a reader came for. */}
           <h1 className="pol__title">{title}</h1>
         </header>
-
-        {/* B5.5 — impossible to mistake for the live policy, on screen and on
-            paper. Printed too, deliberately: a placeholder that prints clean is
-            a placeholder that gets circulated as if it were the real thing. */}
-        {doc.isPlaceholder && (
-          <div className="pol-draft" role="note">
-            <p className="pol-draft__title">This is placeholder text, not our policy.</p>
-            <p className="pol-draft__body">
-              The wording below is scaffolding used while this page was built. It has
-              no legal effect and should not be relied on. The final policy is being
-              prepared and will replace it here.
-            </p>
-          </div>
-        )}
 
         {status === 'loading' && <p className="pol__loading">Loading…</p>}
 

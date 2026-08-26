@@ -36,3 +36,13 @@
   margin: 0 0 14px;
   color: #fff;
 }
+
+/* The Win segment's notice, between the heading band and the list it describes.
+
+   Its own clearance rather than the shared box's: above it is the band's own
+   edge, below it is the accordion's first rule, and the list's container
+   already carries --gp-body-pad at the top — so this only has to open the gap
+   under the band and leave the rest alone. */
+.so-page__notice {
+  margin-top: clamp(14px, 1.6vw, 20px);
+}

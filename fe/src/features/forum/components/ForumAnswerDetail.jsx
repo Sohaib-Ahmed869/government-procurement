@@ -20,7 +20,6 @@ export default function ForumAnswerDetail() {
 
   const { audience } = useAudience();
   const [answer, setAnswer] = useState(null);
-  const [related, setRelated] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound
 
   // resetKey includes status so the IntersectionObserver re-attaches once the
@@ -49,19 +48,6 @@ export default function ForumAnswerDetail() {
       }
       setAnswer(item);
       setStatus('ready');
-
-      // A few other questions from the same category, for further reading.
-      try {
-        const list = await questionsApi.publicList({ limit: 100, category: item.category });
-        if (!alive) return;
-        setRelated(
-          (list || [])
-            .filter((q) => (q.slug || q._id) !== (item.slug || item._id))
-            .slice(0, 3),
-        );
-      } catch {
-        if (alive) setRelated([]);
-      }
     })();
     return () => {
       alive = false;
@@ -141,26 +127,6 @@ export default function ForumAnswerDetail() {
             )}
           </article>
 
-          {related.length > 0 && (
-            <div className="forum-related">
-              <h2 className="forum-related__heading">Related questions</h2>
-              <ul className="forum-related__list">
-                {related.map((item) => (
-                  <li key={item._id}>
-                    <Link
-                      className="forum-related__link"
-                      to={`/q-and-a/answers/${item.slug || item._id}`}
-                    >
-                      <span className="forum-related__title">{item.title}</span>
-                      <span className="forum-related__tag">
-                        {CATEGORY_LABEL[item.category] ?? item.category}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
 
         <ForumSidebar />

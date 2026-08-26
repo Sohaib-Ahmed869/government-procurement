@@ -33,54 +33,77 @@
 }
 
 /* ---------- Hero ----------
-   Full-bleed: title panel on the left, hero image filling the right half, both
-   running to the edges of the screen. Only the content below is in the site
-   container. The panel takes the same lifted fill as the "Enhance your
-   Experience" card — green-800 on Award, ink-800 on Win.
+   Title panel on the left, hero image on the right half. The two sit in the
+   SITE CONTAINER, exactly the column .article-body below uses — same max-width,
+   same gutters — so the title starts on the same left edge as the article's
+   first paragraph and the photograph stops on the same right edge the prose
+   does, rather than running off the side of the screen.
 
-   The panel's text is right-aligned inside its half so it still lands on the
-   page's text edge: the half is 50% wide and the content column is 1100px
-   centred with 40px gutters, so the text starts at (50% - 550px + 40px) —
-   hence the block and its right padding sum to 510. */
+   It used to be full-bleed on both sides, with the panel's text right-aligned
+   inside its half against a hand-worked 460+50 sum meant to land it on the text
+   edge. That arithmetic was against a 1100px column the page no longer uses, so
+   the title sat well inside the paragraph beneath it; and the photograph ran to
+   the screen edge while everything else on the page stopped at the container.
+
+   The BAND still runs the full width of the screen — the panel's own green,
+   painted on the hero itself, so the strip continues past the title on the left
+   and past the photograph on the right. Only the two columns are in the
+   container; the ground behind them is not. Left to right that reads: green,
+   the title on the container's left edge, the photograph, and green again from
+   the container's right edge to the screen's.
+
+   The green is painted by the hero's own background rather than bled out of the
+   panel with a pseudo-element or a negative margin, both of which were tried:
+   one needs an ancestor's overflow to clip it, the other opens a horizontal
+   scrollbar, and neither covers the right-hand side at all.
+
+   The panel takes the same lifted fill as the "Enhance your Experience" card —
+   green-800 on Award, ink-800 on Win. */
 .article-hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  background: var(--art-bg);
+  /* Full width, and the container is the PADDING rather than a max-width: the
+     ground reaches the screen edges while the columns start and stop exactly
+     where .article-body's text does. The expression is that file's
+     `max-width: var(--gp-shell); margin: 0 auto; padding-inline: <gutter>`
+     rewritten as the inset it works out to — `100%` here is the hero's own
+     width, which is the full width of the page. */
+  padding-inline: calc(
+    max(0px, (100% - var(--gp-shell)) / 2) + clamp(20px, 4vw, 60px)
+  );
+  background: var(--art-panel);
   color: #fff;
 }
 
 .article-hero__panel {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  /* Flush left: the title's left edge IS the content column's left edge. */
+  justify-content: flex-start;
   /* Was 80px of padding on a 440px floor: a title, a date and a read time in a
-     panel two-thirds of a laptop screen tall, before a word of the article. */
-  padding: 36px 50px 36px 40px;
+     panel two-thirds of a laptop screen tall, before a word of the article.
+     Right side only now — the left is the column's own gutter. */
+  padding: 36px 50px 36px 0;
   min-height: 240px;
+  /* Same green as the band behind it, so the two are one surface. Stated rather
+     than left transparent because the print rules below strip the hero's
+     background and this one has to go with it. */
   background: var(--art-panel);
 }
 
 .article-hero__panel-inner {
   width: 100%;
-  max-width: 460px; /* 460 + 50px padding = 510 — see the note above. */
 }
 
-/* No hero image on the article: one full-width panel, normal page gutters. */
+/* No hero image on the article: one panel across the whole content column. */
 .article-hero--plain {
   grid-template-columns: 1fr;
 }
 
 .article-hero--plain .article-hero__panel {
-  justify-content: center;
-  padding: 72px 40px;
+  padding: 72px 0;
   min-height: 0;
-}
-
-/* 1100px content column less its two 40px gutters, so the title lines up with
-   the body text rather than with the column's outer edge. */
-.article-hero--plain .article-hero__panel-inner {
-  max-width: 1020px;
 }
 
 .article-hero__media {
@@ -122,6 +145,32 @@
   color: rgba(255, 255, 255, 0.3);
 }
 
+/* ---------- Byline ----------
+   Last cell of the hero's meta line, after the read time. It carries the same
+   size and colour as the rest of that line; only the name itself is lifted to
+   white, so "By" stays as quiet as "12 min read" beside it. */
+.article-hero__byline-name {
+  color: #fff;
+}
+
+.article-hero__byline-link {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-underline-offset: 4px;
+}
+
+.article-hero__byline-link:hover {
+  text-decoration-color: var(--art-accent);
+  color: var(--art-accent);
+}
+
+.article-hero__byline-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 /* ---------- Body ---------- */
 .article-body {
   max-width: var(--gp-shell);
@@ -129,63 +178,47 @@
   padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) 8px;
 }
 
-/* ---------- Byline + share ---------- */
-.article-byline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--art-border);
-}
-
-.article-byline__author {
-  margin: 0;
+/* The way out of a missing or broken article. It used to borrow
+   .article-related__cta, which is styled for the dark related-insights band —
+   so on this state, which renders on the body's paper, it was white on
+   near-white. That band has gone; this is its own link now. */
+.article-back {
+  display: inline-block;
+  margin-top: 28px;
   font-size: 15px;
-  color: var(--art-muted);
-}
-
-.article-byline__name {
-  color: #fff;
-}
-
-.article-byline__link {
-  color: #fff;
+  font-weight: 600;
+  color: var(--gp-accent-ink);
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.4);
   text-underline-offset: 4px;
 }
 
-.article-byline__link:hover {
-  text-decoration-color: var(--art-accent);
-  color: var(--art-accent);
-}
-
-.article-byline__link:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-  border-radius: 2px;
-}
-
 /* ---------- High-level overview ---------- */
+/* No top margin. This is the first thing under the hero band, and its 34px sat
+   on top of .article-body's own top padding — a 50px band of empty paper
+   between the title strip and the first line of the article. The body's padding
+   is the whole clearance now. */
 .article-overview {
-  margin: 34px 0 0;
+  margin: 0;
   max-width: 46em;
   font-size: 22px;
-  line-height: 1.55;
+  line-height: 1.45;
   letter-spacing: -0.01em;
   color: #fff;
 }
 
+/* The rhythm through the article is tighter than it was throughout: paragraphs
+   at 14px apart rather than 22, headings at 26/10 rather than 44/18, list items
+   at 6 rather than 10, and line-heights a notch down from 1.75 / 1.65. Set for
+   a reading measure of 18px type, and it was spaced as if for a much shorter
+   page — a two-screen article was running to four. */
 .article-prose {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .article-prose p {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   font-size: 18px;
-  line-height: 1.75;
+  line-height: 1.6;
   color: var(--art-text);
 }
 
@@ -198,7 +231,7 @@
 .article-prose__subhead,
 .article-prose h2,
 .article-prose h3 {
-  margin: 44px 0 18px;
+  margin: 26px 0 10px;
   font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: clamp(24px, 3vw, 30px);
   font-weight: 400;
@@ -226,7 +259,7 @@
 
 .article-prose__quote,
 .article-prose blockquote {
-  margin: 34px 0;
+  margin: 20px 0;
   padding: 20px 26px;
   border-left: 3px solid var(--art-accent);
   border-radius: 0 14px 14px 0;
@@ -240,20 +273,24 @@
 .article-prose__list,
 .article-prose ul,
 .article-prose ol {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   padding-left: 22px;
 }
 
 .article-prose__list li,
 .article-prose li {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-size: 18px;
-  line-height: 1.65;
+  line-height: 1.55;
   color: var(--art-text);
 }
 
+/* Black. This was #fff, written when the article body sat on the dark band —
+   the body moved onto paper further down this file and the markers stayed
+   white, so every bullet on the page was invisible against it while the text
+   beside it read normally. */
 .article-prose li::marker {
-  color: #fff;
+  color: #000;
 }
 
 /* ---------- Share row ----------
@@ -454,6 +491,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* Stacked, the hero goes back to running edge to edge and carrying its own
+     gutters on the panel: a 24px-wide strip of paper down each side of a phone
+     is not a container, it is a margin of error. */
+  .article-hero {
+    padding-inline: 0;
+  }
+
   .article-hero__media {
     grid-row: 1;
     min-height: 220px;
@@ -468,10 +512,6 @@
     min-height: 0;
   }
 
-  .article-hero__panel-inner,
-  .article-hero--plain .article-hero__panel-inner {
-    max-width: none;
-  }
 
   .article-hero__title {
     font-family: 'Geist Variable', system-ui, sans-serif;
@@ -486,11 +526,6 @@
 @media (max-width: 760px) {
   .article-body {
     padding: 28px 24px 8px;
-  }
-
-  /* Label above the buttons; four pills and a label won't sit on one line. */
-  .article-byline {
-    align-items: flex-start;
   }
 
   .article-share {
@@ -579,8 +614,7 @@
     color: #000 !important;
   }
 
-  .article-hero__meta,
-  .article-byline {
+  .article-hero__meta {
     font-size: 9pt;
     color: #444 !important;
   }
@@ -684,16 +718,6 @@
   color: var(--gp-ink);
   padding-bottom: var(--gp-body-pad);
   transition: var(--gp-fade);
-}
-
-.article-body .article-byline__author,
-.article-body .article-byline__name {
-  color: var(--gp-muted);
-}
-
-.article-body .article-byline__link {
-  color: var(--gp-accent-ink);
-  text-decoration-color: currentColor;
 }
 
 .article-overview {
@@ -820,6 +844,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* Stacked, the hero goes back to running edge to edge and carrying its own
+     gutters on the panel: a 24px-wide strip of paper down each side of a phone
+     is not a container, it is a margin of error. */
+  .article-hero {
+    padding-inline: 0;
+  }
+
   .article-hero__media {
     grid-row: 1;
     min-height: 220px;
@@ -834,10 +865,6 @@
     min-height: 0;
   }
 
-  .article-hero__panel-inner,
-  .article-hero--plain .article-hero__panel-inner {
-    max-width: none;
-  }
 
   .article-hero__title {
     font-family: 'Geist Variable', system-ui, sans-serif;
@@ -852,11 +879,6 @@
 @media (max-width: 760px) {
   .article-body {
     padding: 28px 24px 8px;
-  }
-
-  /* Label above the buttons; four pills and a label won't sit on one line. */
-  .article-byline {
-    align-items: flex-start;
   }
 
   .article-share {
@@ -945,8 +967,7 @@
     color: #000 !important;
   }
 
-  .article-hero__meta,
-  .article-byline {
+  .article-hero__meta {
     font-size: 9pt;
     color: #444 !important;
   }

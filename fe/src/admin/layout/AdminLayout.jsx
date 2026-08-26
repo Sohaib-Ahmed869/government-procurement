@@ -7,19 +7,29 @@ import '../admin.css';
 const STORAGE_KEY = 'gp.admin.sidebar.collapsed';
 
 // Page title shown in the header, keyed by the first path segment under /admin.
+//
+// These are the SIDEBAR's labels, which are in turn the website nav's own — an
+// editor who clicks "Tender Websites" should not land on a page headed
+// "Tenders". Four had drifted (Meeting the Team, Tenders, Advisory Rules,
+// Prompt Library) and two were missing altogether, so /admin/panels and
+// /admin/bid-writers both fell through to the "Admin" default.
 const SECTION_TITLES = {
   '': 'Dashboard',
   articles: 'Insights',
   courses: 'Courses',
   pages: 'Pages',
   categories: 'Dropdown List',
-  team: 'Meeting the Team',
-  tenders: 'Tenders',
+  team: 'Our Team',
+  tenders: 'Tender Websites',
   careers: 'Careers',
   rules: 'Jurisdictional Links',
+  panels: 'How to Engage Us',
+  prompts: 'AI Prompt Library',
+  templates: 'Templates',
+  'bid-writers': 'Find a Bid Writer',
   'home-hero': 'Homepage',
   'service-offering': 'Service Offering',
-  'advisory-rules': 'Advisory Rules',
+  'advisory-rules': 'Sourcing Advisor',
   moderation: 'Q&A',
   subscribers: 'Subscribers',
   consultations: 'Consultations',

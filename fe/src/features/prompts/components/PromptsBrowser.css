@@ -124,16 +124,45 @@
   min-width: 0;
 }
 
+/* The assistant's mark on a pill. It used to be the assistant's NAME on one —
+   three words of similar length and colour, which is slow to tell apart down a
+   column of thirty cards, where the mark is instantly recognisable.
+
+   Fixed square, so the three pills are the same object whichever assistant a
+   prompt was written for. The marks themselves are normalised to one optical
+   weight in features/prompts/toolMarks.jsx; this is what holds the box around
+   them steady. */
 .pl-tool {
   flex: none;
-  padding: 4px 10px;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
-  white-space: nowrap;
   color: var(--gp-paper);
   background: var(--gp-brand);
+}
+
+/* The name is still there for a screen reader, and still the accessible name of
+   the pill; it is the mark beside it that carries it on screen. */
+.pl-tool__name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Same mark in the filter rail, where it sits beside the name rather than
+   replacing it. */
+.browse-radio__label .tool-mark {
+  margin-right: 7px;
+  vertical-align: -2px;
 }
 
 /* The three are told apart by fill as well as by name, so a visitor scanning

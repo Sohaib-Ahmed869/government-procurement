@@ -17,7 +17,7 @@ export default function TemplatesHero() {
   return (
     <section className={`tl-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="tl-hero__inner">
-        <h1 className="tl-hero__title">Templates</h1>
+        <h1 className="tl-hero__title">Complementary Tools, Forms and Assets</h1>
       </div>
     </section>
   );

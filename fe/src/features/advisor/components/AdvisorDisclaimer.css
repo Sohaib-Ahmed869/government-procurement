@@ -1,27 +1,11 @@
 /* A6.9 / A6.10 — the disclaimer, in both the places it has to appear.
 
-   Given a surface and an accent edge rather than set as small print, because
-   the requirement is that it cannot be missed. */
-
-.adv-disclaimer {
-  padding: 18px 22px;
-  background: var(--gp-paper-alt);
-  border: 1px solid var(--gp-line);
-  border-left: 3px solid var(--gp-accent-ink);
-  border-radius: 6px;
-  transition: var(--gp-fade);
-}
-
-.adv-disclaimer p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--gp-muted);
-}
-
-.adv-disclaimer p + p { margin-top: 8px; }
-
-.adv-disclaimer__lead { color: var(--gp-ink) !important; }
+   The BOX is now .gp-notice (styles/notice.css), shared with the Service
+   Offering page's notice so the two cannot drift into two slightly different
+   boxes. What is left here is this page's own spacing around it, which is the
+   one thing that genuinely differs between the places a notice appears.
+   `.adv-disclaimer__lead` went with the box too — it is `.gp-notice__lead`
+   now, and no longer needs `!important` to beat a rule in its own file. */
 
 /* The `intro` variant is no longer rendered — the stepper carried it above the
    questions and it repeated what the picker screen already says before anyone

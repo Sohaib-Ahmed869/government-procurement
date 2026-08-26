@@ -7,10 +7,15 @@
 .insights__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
+  padding-inline: clamp(20px, 4vw, 60px);
   /* Enough that the filter row clears the heading band rather than sitting on
-     its edge, and no more: at 36px the gap was as deep as the row itself, and
-     the first line of cards — which is what the page is — started below it. */
-  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
+     its edge, and no more. --gp-body-pad (up to 16px) is the site's general
+     figure for a content band and it is more than this page needs at either
+     end: the filter pill has its own visual margin built into the control, and
+     the grid below is a row of bordered cards that do not need to be held off
+     the footer. Halved, and stated here rather than borrowed, so changing it
+     cannot move every other band on the site. */
+  padding-block: clamp(4px, 0.6vw, 8px);
 }
 
 /* --- filter pills --- */
@@ -22,7 +27,9 @@
      top padding — this was a second helping of it stacked on top, and between
      the two the pill sat 48px below the band with nothing in the gap. */
   margin-top: 0;
-  margin-bottom: 18px;
+  /* Close to the first row of cards. At 18 the pill floated between the band
+     above and the grid below, belonging to neither. */
+  margin-bottom: 12px;
 }
 
 .insights-pill {
@@ -162,8 +169,9 @@
    (see the audience rule below). The hover lift still applies on top. */
 .insights-card__inner {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  /* Picture half, text half. See the note on .insights-card__text below. */
+  grid-template-rows: minmax(120px, 1fr) 1fr;
   width: 100%;
   height: 100%;
   /* No side padding: the image runs the full width of the box, as on the
@@ -188,6 +196,34 @@
   padding-right: 16px;
 }
 
+/* --- the two halves ---
+
+   The card is split evenly: the picture takes the top half, the text the
+   bottom. It used to be an image at a fixed 16/10 ratio with the text sized by
+   its own contents underneath, which made the picture the taller of the two in
+   every card on the page.
+
+   Two `1fr` rows rather than a ratio on either half. In an auto-height grid a
+   pair of `1fr` tracks both resolve to the taller one's content, so the halves
+   come out equal without either being pinned to a guessed height — and because
+   every card in a row is stretched to the row's height, the split lands at the
+   same y in all of them. That is what lines the topic, the title and the date
+   up across the row.
+
+   The TEXT is what sets that height, not the picture. The image used to carry a
+   16/10 ratio, so it was the taller of the two and the text half was padded out
+   to match it — the halves were equal, but the card was as tall as the picture
+   wanted to be and only about two rows of them fitted on a screen. The image is
+   absolutely positioned inside its half (below), so it contributes no height of
+   its own and the row it sits in shrinks to whatever the text beside it needs.
+   The `minmax(120px, …)` on that row is the floor, so a card whose title runs to
+   a single line still shows a picture rather than a sliver of one. */
+.insights-card__text {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 /* Status / empty message shown while insights load or when none exist. */
 .insights__empty {
   margin: 0;
@@ -196,11 +232,12 @@
   color: var(--band-muted);
 }
 
-/* Fixed ratio so every row of titles starts at the same height, whether or not
-   an article has a hero image. */
+/* The picture takes the height its row is given and asks for none of its own —
+   see the note above. `position: relative` is what the absolutely positioned
+   image inside it is measured against. */
 .insights-card__art {
+  position: relative;
   display: block;
-  aspect-ratio: 16 / 10;
   overflow: hidden;
   /* Square — the box's own 14px radius and overflow clip the two top corners,
      so the image sits in the corner rather than floating inside it. */
@@ -208,7 +245,11 @@
   background: var(--gp-paper);
 }
 
+/* Taken out of flow so its natural height cannot push the row open — that is
+   what lets the picture follow the text rather than the other way round. */
 .insights-card__art img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;

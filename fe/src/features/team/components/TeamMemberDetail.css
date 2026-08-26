@@ -68,10 +68,23 @@
 .tm__hero-band {
   /* The page's heading band. It keeps the dark ground and carries the dark
      --band-* roles with it, so everything inside stays white type while the
-     page below reads on paper. */
+     page below reads on paper.
+
+     ALL of it is white here, muted included. --band-muted is normally white at
+     72% — the site's step down for secondary text on a dark band — and in this
+     hero it was carrying the back link, the role line and the bio, i.e. three
+     of the five things in the band, so most of the block read grey against a
+     white name. The location keyword goes with them: it was #c9c9c9 on Win,
+     set at .tm and overridden here because a custom property resolves from the
+     nearest ancestor that declares it, not by specificity.
+
+     Only the band is affected. The blocks below it are outside this element and
+     keep their own muted step, which is what gives the page its hierarchy once
+     it is on paper. */
   color: #fff;
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.72);
+  --band-muted: #fff;
+  --tm-location: #fff;
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: var(--gp-brand);
   --band-surface-hover: var(--gp-brand-mid);
@@ -230,6 +243,27 @@
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--band-muted);
+}
+
+/* Every line in the band is #fff, stated on the elements themselves.
+
+   Setting --band-muted above is what SHOULD do it, and on its own it did in
+   test — but the role line and the bio were still coming out grey in the
+   browser, and a role token is an indirection with three places it can be
+   re-declared (bands.css, .tm, this band) and a resolution rule that depends on
+   ancestry rather than specificity. For six elements it is not worth the
+   indirection: this says the thing it means, outweighs every single-class rule
+   below at two classes, and cannot be undone by a token moving.
+
+   The muted step is not lost — it still separates the blocks BELOW the band,
+   which is where the page's hierarchy actually lives once it is on paper. */
+.tm__hero-band .tm__back,
+.tm__hero-band .tm__name,
+.tm__hero-band .tm__role,
+.tm__hero-band .tm__location,
+.tm__hero-band .tm__bio,
+.tm__hero-band .tm__action {
+  color: #fff;
 }
 
 .tm__location {

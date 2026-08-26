@@ -5,7 +5,6 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
-import { keepScrollOnNextNavigation } from '../../../components/shared/ScrollToTop.jsx';
 import { CATEGORIES, FORMATS, FORMAT_BY_VALUE, fileSize } from '../data.js';
 import './TemplatesBrowser.css';
 
@@ -23,7 +22,10 @@ function FilterGroup({ heading, name, options, value, onChange }) {
       <h3 className="browse-filter__heading">{heading}</h3>
       <div className="browse-filter__options">
         {options.map((opt) => (
-          <label key={opt.value} className="browse-radio">
+          <label
+            key={opt.value}
+            className={`browse-radio${value === opt.value ? ' is-active' : ''}`}
+          >
             <input
               type="radio"
               name={name}
@@ -55,24 +57,10 @@ export default function TemplatesBrowser() {
     const next = new URLSearchParams(params);
     if (value === ALL) next.delete(key);
     else next.set(key, value);
-    // A filter is a navigation, and without the line below every one of them
-    // threw the visitor back to the top of the page. See
-    // components/shared/ScrollToTop.jsx; same reasoning as the Prompt Library.
-    keepScrollOnNextNavigation();
+    // Choosing a filter is a navigation, and ScrollToTop takes every
+    // navigation to the top of the page — heading band included. Same
+    // behaviour, and the same reasoning, as the Prompt Library.
     setParams(next, { replace: true });
-    // And then put the results back under the site header. Two behaviours were
-    // tried here and neither is this one: landing at the top of the DOCUMENT,
-    // which is what happens with no handling at all and throws you above the
-    // page's heading band; and staying exactly where you were, which leaves you
-    // looking at the middle of a list that has just been replaced. This scrolls
-    // to the top of the browse section — the rail and the first result, with the
-    // heading band scrolled past — so a filter always answers in the same place.
-    //
-    // The offset comes from `scroll-margin-top` on `.browse` (styles/browse.css)
-    // rather than from arithmetic here, which is what makes it right above
-    // 1441px too: the header is scaled there, and a scroll margin set inside the
-    // scaled subtree scales with it.
-    topRef.current?.scrollIntoView({ block: 'start' });
   };
 
   // What the RESULTS are filtered by — behind the rail by the length of the
@@ -131,6 +119,16 @@ export default function TemplatesBrowser() {
     ];
   }, [templates, useCase, format]);
 
+  // The middle level. Unlike the other two rails, this one lists EVERY use case
+  // the library holds, whatever is selected above and below it. It used to drop
+  // any option with nothing left under the other filters, which made the rail
+  // itself move: picking a topic or a tool shortened the use-case list, so the
+  // option a visitor was reaching for jumped or vanished under the pointer, and
+  // there was no way to see the library's full middle level at all.
+  //
+  // The counts still answer to the other filters, so a number is what clicking
+  // that option actually yields — a zero is the honest answer for a combination
+  // that holds nothing, and the results column says so in words.
   const useCaseOptions = useMemo(() => {
     const matches = (t) =>
       (category === ALL || t.category === category) && (format === ALL || t.format === format);
@@ -140,15 +138,13 @@ export default function TemplatesBrowser() {
     }
     return [
       { value: ALL, label: 'All use cases', count: templates.filter(matches).length },
-      ...seen
-        .map((name) => ({
-          value: name,
-          label: name,
-          count: templates.filter((t) => t.useCase === name && matches(t)).length,
-        }))
-        .filter((o) => o.count > 0 || o.value === useCase),
+      ...seen.map((name) => ({
+        value: name,
+        label: name,
+        count: templates.filter((t) => t.useCase === name && matches(t)).length,
+      })),
     ];
-  }, [templates, category, format, useCase]);
+  }, [templates, category, format]);
 
   const formatOptions = useMemo(() => {
     const matches = (t) =>
@@ -242,9 +238,7 @@ export default function TemplatesBrowser() {
                 type="button"
                 className="browse-filters__reset"
                 onClick={() => {
-                  keepScrollOnNextNavigation();
                   setParams(new URLSearchParams(), { replace: true });
-                  topRef.current?.scrollIntoView({ block: 'start' });
                 }}
               >
                 Reset filters

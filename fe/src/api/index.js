@@ -37,8 +37,15 @@ export const careersApi = {
 export const rulesApi = createResource('rules');
 
 // B2 — government panels and prequalification schemes, listed by jurisdiction
-// on /government-panels and edited in Content → Government Panels.
+// on /government-panels and edited in Content → How to Engage Us. This is the
+// AWARD half of that page.
 export const panelsApi = createResource('panels');
+
+// ...and the WIN half: the services a bidder can start with us, one row each.
+// It used to be the Service Offering cards read through the same resolver,
+// which meant renaming a service on that page silently rewrote this one, and
+// there was no way to say something different to a bidder.
+export const engageServicesApi = createResource('engage-services');
 
 // B4 — the AI Prompt Library: master prompts by topic, use case and tool.
 export const promptsApi = createResource('prompts');
