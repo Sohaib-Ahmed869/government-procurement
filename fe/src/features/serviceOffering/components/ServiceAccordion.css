@@ -143,6 +143,17 @@
 }
 
 .sv__panel-inner {
+  /* Both of these are what actually makes the 0fr row collapse.
+
+     A grid item's automatic minimum size is its CONTENT, not zero — so a row
+     told to be `0fr` still opens to the height of the paragraph inside it
+     unless the item is allowed to shrink below that. `overflow: hidden` is
+     supposed to be enough on its own (it sets the automatic minimum to zero),
+     and in most browsers it is; in the ones where it is not, every panel on the
+     page rendered open, which is what "the first service is already open" looks
+     like when the first is the only one above the fold. `min-height: 0` says it
+     outright and is honoured everywhere. */
+  min-height: 0;
   overflow: hidden;
   /* Close under the heading it belongs to. The row's own bottom padding is
      what separated the two, and it is sized for a CLOSED row — the copy was
@@ -151,9 +162,11 @@
 }
 
 .sv__copy {
-  /* Held to a measure, and the bottom padding is inside the collapsing box so
-     it goes with the panel rather than leaving a gap under a closed one. */
-  max-width: 68ch;
+  /* Runs the full width of the list, so an open panel's copy reaches the same
+     right edge its heading's rule does. It was held to a 68ch measure, which
+     stopped it well short of the container and left the right of every open
+     panel empty. The bottom padding is inside the collapsing box so it goes
+     with the panel rather than leaving a gap under a closed one. */
   margin: 0;
   padding-bottom: clamp(10px, 1.2vw, 14px);
   font-size: 16px;

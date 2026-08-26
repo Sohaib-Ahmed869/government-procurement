@@ -5,6 +5,8 @@ import { promptsApi } from '../../api';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../hooks/useMountReveal.js';
 import { TOOL_BY_VALUE, TOPICS } from '../../features/prompts/data.js';
+import ToolMark from '../../features/prompts/toolMarks.jsx';
+import { unwrapPrompt } from '../../features/prompts/promptText.js';
 import './PromptDetailPage.css';
 import Arrow from '../../components/shared/Arrow.jsx';
 
@@ -70,7 +72,8 @@ export default function PromptDetailPage() {
   }, [id]);
 
   const copy = useCallback(async () => {
-    const text = prompt?.body || '';
+    // The same text that is on screen — see features/prompts/promptText.js.
+    const text = unwrapPrompt(prompt?.body);
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -142,19 +145,29 @@ export default function PromptDetailPage() {
             <Arrow direction="left" /> Prompt Library
           </Link>
           <h1 className="pd__title hm-reveal" data-delay="1">{prompt.title}</h1>
-          <p className="pd__meta hm-reveal" data-delay="1">
-            {[topic?.label, prompt.useCase].filter(Boolean).join(' · ')}
-            {tool || prompt.tool ? (
-              <span className={`pl-tool pl-tool--${prompt.tool}`}>
-                {tool?.label || prompt.tool}
-              </span>
-            ) : null}
-          </p>
         </div>
       </header>
 
       <div className="pd__body">
         <div className="pd__inner">
+          {/* Topic, use case and the assistant's mark — below the heading strip
+              rather than inside it. In the strip they turned a title band into a
+              three-line block and made this page's heading sit lower than every
+              other page's; here they read as what they are, the prompt's filing
+              details, at the top of the prompt itself. */}
+          <p className="pd__meta">
+            {[topic?.label, prompt.useCase].filter(Boolean).join(' · ')}
+            {tool || prompt.tool ? (
+              <span
+                className={`pl-tool pl-tool--${prompt.tool}`}
+                title={tool?.label || prompt.tool}
+              >
+                <ToolMark tool={prompt.tool} />
+                <span className="pl-tool__name">{tool?.label || prompt.tool}</span>
+              </span>
+            ) : null}
+          </p>
+
           <div className="pd__bar">
             <h2 className="pd__label">The prompt</h2>
             <button type="button" className={`pd__copy${copied ? ' is-copied' : ''}`} onClick={copy}>
@@ -166,21 +179,22 @@ export default function PromptDetailPage() {
             </span>
           </div>
 
-          {/* Monospace and pre-wrap: a prompt's line breaks and placeholder
-              markers are part of it, and a proportional paragraph hides both —
-              what is copied would stop matching what is shown. */}
-          <pre className="pd__prompt">{prompt.body}</pre>
+          {/* Monospace and pre-wrap: a prompt's paragraph breaks, list items
+              and placeholder markers are part of it, and a proportional
+              paragraph hides all three.
 
-          {prompt.notes ? (
-            <>
-              <h2 className="pd__label pd__label--notes">How to use it</h2>
-              <p className="pd__notes">{prompt.notes}</p>
-            </>
-          ) : null}
+              The text is un-hard-wrapped first, so a paragraph fills the width
+              of the box instead of stopping at whatever column it was typed at
+              and leaving the right half empty. Structure survives — see
+              features/prompts/promptText.js — and the Copy button takes the
+              same string, so what is on the clipboard is what is on screen. */}
+          <pre className="pd__prompt">{unwrapPrompt(prompt.body)}</pre>
 
-          <Link className="pd__more" to="/prompt-library">
-            <Arrow direction="left" /> Back to the Prompt Library
-          </Link>
+          {/* The "How to use it" note that used to follow the prompt has gone,
+              and so has the "Back to the Prompt Library" link under it — the
+              back link at the top of the heading strip is the way out, and one
+              per page is enough. `notes` is still on the model and still
+              editable in the CMS; this page simply no longer prints it. */}
         </div>
       </div>
     </>,

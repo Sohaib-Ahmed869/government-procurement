@@ -5,6 +5,18 @@ import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
+import EngageServicesPanel from '../components/EngageServicesPanel.jsx';
+import { JURISDICTIONS } from '../../features/jurisdictions/data.js';
+
+// Every jurisdiction, offered as a heading whether or not a panel has been
+// filed under it yet. The Jurisdictional Links screen lists all nine from this
+// same source; this one used to offer only the headings already in use, so a
+// brand new jurisdiction had to be typed out by hand — and a typo makes a
+// second heading rather than an error.
+//
+// Labels, not values: `group` is the heading PRINTED on the page, so it stores
+// "Western Australia" rather than "WA".
+const JURISDICTION_HEADINGS = JURISDICTIONS.map((j) => j.label);
 
 const STATUS_OPTS = [
   { value: 'draft', label: 'Draft' },
@@ -34,7 +46,16 @@ const EMPTY = {
 // risk worth designing against: a typo makes a second heading rather than an
 // error. The field is backed by a datalist of the headings already in use, so
 // picking an existing one is a click and only a genuinely new heading is typed.
+// The page has two sides and so does this screen. 'award' is the panels list
+// below; 'win' is the services a bidder can start with us, which is its own
+// component (EngageServicesPanel) against its own collection.
+const SIDES = [
+  { value: 'award', label: 'Award Contracts' },
+  { value: 'win', label: 'Win Contracts' },
+];
+
 export default function PanelsAdminPage() {
+  const [side, setSide] = useState('award');
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [groupFilter, setGroupFilter] = useState('all');
@@ -45,10 +66,13 @@ export default function PanelsAdminPage() {
   const [saveError, setSaveError] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
 
-  // Every heading in use, for the filter and the datalist. Taken from all rows
-  // rather than from the filtered view, so filtering to one heading doesn't
-  // shrink the list of headings you can move an entry to.
-  const [allGroups, setAllGroups] = useState([]);
+  // Every heading on offer, for the filter and the datalist: the nine
+  // jurisdictions first, in their own order, then anything else already in use
+  // — a council or a buying group that has its own heading — alphabetically
+  // after them. Headings in use are taken from ALL rows rather than from the
+  // filtered view, so filtering to one heading doesn't shrink the list of
+  // headings you can move an entry to.
+  const [allGroups, setAllGroups] = useState(JURISDICTION_HEADINGS);
 
   const load = () => {
     setStatus('loading');
@@ -68,12 +92,26 @@ export default function PanelsAdminPage() {
       .list()
       .then((items) => {
         const seen = [...new Set((items || []).map((i) => i.group).filter(Boolean))];
-        setAllGroups(seen.sort((a, b) => a.localeCompare(b)));
+        const extra = seen
+          .filter((g) => !JURISDICTION_HEADINGS.includes(g))
+          .sort((a, b) => a.localeCompare(b));
+        setAllGroups([...JURISDICTION_HEADINGS, ...extra]);
       })
       .catch(() => {
-        /* the filter falls back to "all"; the datalist is simply empty */
+        /* the filter and the datalist fall back to the jurisdictions alone */
       });
   }, [rows.length]);
+
+  // The Heading dropdown's options. A blank first entry so a new panel opens on
+  // "no heading chosen" rather than silently defaulting to the first
+  // jurisdiction — `required` on the field is what then makes it a choice.
+  const groupOptions = useMemo(
+    () => [
+      { value: '', label: 'Choose a heading…' },
+      ...allGroups.map((g) => ({ value: g, label: g })),
+    ],
+    [allGroups],
+  );
 
   // Suggests the next heading position, so an editor adding a brand new group
   // doesn't have to look up what the last one used.
@@ -207,9 +245,36 @@ export default function PanelsAdminPage() {
 
   return (
     <div>
+      {/* The page answers a different question on each side of the audience
+          toggle, so the screen that edits it has a side too. The tabs sit under
+          the title rather than beside it, because everything below them —
+          including the description — changes with the tab. */}
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">How to Engage Us — Award</h2>
+          <h2 className="admin-page__title">How to Engage Us</h2>
+          <div className="admin-tabs" role="tablist" aria-label="Audience">
+            {SIDES.map((s) => (
+              <button
+                key={s.value}
+                type="button"
+                role="tab"
+                aria-selected={side === s.value}
+                className={`admin-tab${side === s.value ? ' is-active' : ''}`}
+                onClick={() => setSide(s.value)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {side === 'win' && <EngageServicesPanel />}
+
+      {side === 'award' && (
+        <>
+      <div className="admin-page__head">
+        <div className="admin-page__heading">
           <p className="admin-page__subtitle">
             The panels and prequalification schemes we can be engaged through, listed on the
             <strong> How to Engage Us</strong> page when the visitor is on{' '}
@@ -218,11 +283,9 @@ export default function PanelsAdminPage() {
             immediately; drafts are visible on the page to you and to nobody else.
           </p>
           <p className="admin-page__subtitle">
-            The <strong>Win Contracts</strong> side of the same page shows services and how
-            to start one, not panels — a supplier cannot engage us through a panel, because
-            a panel is how government buys. That half is edited under{' '}
-            <strong>Content → Service Offering</strong>: any card tagged “Win contracts
-            only” or “Both segments” appears there.
+            The <strong>Win Contracts</strong> tab above is the other half of the same
+            page: services and how to start one, not panels — a supplier cannot engage us
+            through a panel, because a panel is how government buys.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -290,22 +353,26 @@ export default function PanelsAdminPage() {
         <form id="panel-form" onSubmit={onSubmit}>
           {saveError && <div className="admin-alert admin-alert--error">{saveError}</div>}
 
+          {/* A real dropdown, not a free-text box with a datalist behind it.
+              The datalist offered the same headings but let anything be typed,
+              and a typo there does not error — it silently makes a SECOND
+              heading on the page, which is the one mistake an editor cannot see
+              from this screen. Choosing from a closed list cannot do that.
+
+              The options are the nine jurisdictions, plus any heading already in
+              use — so an entry filed under a council's own heading before this
+              screen changed can still be opened, saved and moved without its
+              heading being lost. */}
           <FormField
             label="Heading"
             name="group"
+            as="select"
             value={form.group}
             onChange={onChange}
             required
-            list="panel-groups"
-            hint="The heading this sits under, e.g. “Victorian Government” or “Toowoomba Regional Council”. Pick an existing one from the list. A new spelling makes a new heading."
+            options={groupOptions}
+            hint="The heading this sits under, on the How to Engage Us page. Entries sharing a heading are listed under it together."
           />
-          {/* Backed by what is already in use, so the common case is a click and
-              only a genuinely new heading gets typed. */}
-          <datalist id="panel-groups">
-            {allGroups.map((g) => (
-              <option key={g} value={g} />
-            ))}
-          </datalist>
 
           <FormField
             label="Heading position"
@@ -372,6 +439,8 @@ export default function PanelsAdminPage() {
         onConfirm={onDelete}
         onCancel={() => setConfirmId(null)}
       />
+        </>
+      )}
     </div>
   );
 }

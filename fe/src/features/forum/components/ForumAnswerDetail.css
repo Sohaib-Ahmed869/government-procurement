@@ -1,79 +1,7 @@
-/* Additions layered on top of ForumArticle.css for the single-answer view:
-   the "Related questions" block and the not-found state. The breadcrumb trail
-   that used to open this page has been removed, and its styling with it. */
-
-/* --- related questions --- */
-.forum-related {
-  margin-top: 20px;
-}
-
-.forum-related__heading {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--band-ink);
-}
-
-.forum-related__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.forum-related__link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 18px;
-  text-decoration: none;
-  background: var(--band-surface);
-  border: 1px solid var(--band-line);
-  border-radius: 10px;
-  /* The link had no colour of its own, so its title fell through to the
-     browser default: blue, and purple once visited. */
-  color: var(--band-ink);
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.25s ease;
-}
-
-.forum-related__link:hover {
-  background: var(--band-surface);
-  border-color: var(--band-accent);
-  transform: translateY(-2px);
-}
-
-.forum-related__title {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--band-ink);
-}
-
-/* The category, sitting at the right-hand end of the row.
-
-   --gp-brand, which is the deep green on Award and near-black on Win, so the
-   label follows the segment without either side being named here. It used to be
-   --gp-mint-300 with a #c9c9c9 override for Win: both were picked when this row
-   sat on a dark ground, and once the page moved to paper they were a pale green
-   and a pale grey on near-white — legible in neither segment. */
-.forum-related__tag {
-  flex-shrink: 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gp-brand);
-}
-
-/* The Win segment carries no green, so the hover edge drops to the grey that
-   side uses for accents. The category label needs no override any more — it
-   reads --gp-brand, which is already black on this side. */
-.forum-article[data-audience='win'] .forum-related__link:hover {
-  border-color: var(--band-muted);
-}
+/* Additions layered on top of ForumArticle.css for the single-answer view: the
+   not-found state. The breadcrumb trail that used to open this page has been
+   removed, and its styling with it — as has the "Related questions" block that
+   used to close it. */
 
 /* --- not found --- */
 .forum-answer-missing__text {
@@ -102,10 +30,6 @@
 }
 
 @media (max-width: 720px) {
-  .forum-related__title {
-    font-size: 17px;
-  }
-
   .forum-answer-missing__text {
     font-size: 18px;
   }

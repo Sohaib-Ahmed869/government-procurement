@@ -18,6 +18,10 @@
    them here is the smaller change — and the list is the honest record of which
    bands are in the set.
 
+   The prompt detail page's title (.pd__title) is scoped through .pd__head
+   because that page reuses the same class on its not-found and error states,
+   which are plain paper rather than a heading band.
+
    Two are the band element itself (.so-page__head, .pa-page__head) rather than
    an inner: those two pages paint the ground on the element that also carries
    the padding, and put their column in a __shell inside it. Centring the band
@@ -91,6 +95,59 @@
   padding-block: var(--gp-head-pad);
 }
 
+/* A title whose words change with the audience toggle — see
+   components/shared/SegmentTitle.jsx for why both are rendered.
+
+   One grid cell, both titles in it. The cell is as tall as the taller of them,
+   so the band's height is the same on Win as on Award and pressing the toggle
+   moves nothing. `visibility: hidden` rather than `display: none` or opacity: it
+   has to be LAID OUT to be measured, and it must not be read aloud or found by
+   a text search, which opacity alone would not prevent. */
+.seg-title {
+  display: grid;
+}
+
+.seg-title > * {
+  grid-area: 1 / 1;
+}
+
+.seg-title__ghost {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* And they do not stretch.
+
+   `.page-layout__main > * { flex: 1 0 auto }` in index.css exists so a page
+   shorter than the window still reaches the footer — without it a short page
+   leaves a band of bare body colour above it. But it grows EVERY top-level
+   section by an equal share, and a heading band is one of them: on How to
+   Engage Us with a handful of panels listed, the 90px strip came out 374px
+   tall, which is 284px of empty dark ground sitting between the page's title
+   and the first heading under it, and the same again in paper under the last
+   row. The band is chrome with a designed height — --gp-head-min above sets it
+   — so it takes none of the slack, and the content section below it takes all
+   of it, which is what the index.css rule was for.
+
+   Child combinator: several of the bands in the sets above are nested inside a
+   page wrapper rather than sitting directly in <main>, and those pages already
+   put the slack where it belongs. Listing them costs nothing — the selector
+   simply doesn't match. */
+.page-layout__main > .bw-hero,
+.page-layout__main > .careers-hero,
+.page-layout__main > .courses-hero,
+.page-layout__main > .forum-hero,
+.page-layout__main > .gp-hero,
+.page-layout__main > .insights-hero,
+.page-layout__main > .jl-hero,
+.page-layout__main > .pl-hero,
+.page-layout__main > .polh,
+.page-layout__main > .team-hero,
+.page-layout__main > .tl-hero {
+  flex: 0 0 auto;
+}
+
 /* The title itself, for the same reason the band is here rather than in
    thirteen stylesheets.
 
@@ -122,6 +179,7 @@
 .insights-hero .insights-hero__title,
 .jl-hero .jl-hero__title,
 .pa-page .pa-page__title,
+.pd__head .pd__title,
 .pl-hero .pl-hero__title,
 .so-page .so-page__title,
 .team-hero .team-hero__title,
@@ -144,6 +202,7 @@
   .insights-hero .insights-hero__title,
   .jl-hero .jl-hero__title,
   .pa-page .pa-page__title,
+  .pd__head .pd__title,
   .pl-hero .pl-hero__title,
   .so-page .so-page__title,
   .team-hero .team-hero__title,

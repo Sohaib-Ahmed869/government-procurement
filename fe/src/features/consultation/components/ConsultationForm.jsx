@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { consultationsApi } from '../../../api';
@@ -106,8 +106,12 @@ export default function ConsultationForm() {
               Connect with a member of our team for a complimentary,
               no-obligation consultation, in person or online, to discuss where
               you are in your journey. We&rsquo;ll share insights on how we can
-              assist and help you plan your next steps. Please note: We do not
-              advise bidders on open tenders.
+              assist and help you plan your next steps. For more information,
+              please refer to our{' '}
+              <Link className="consult__lead-link" to="/policies/conflicts-of-interest">
+                Conflict of Interest Policy
+              </Link>
+              .
             </p>
 
             {/* Fills the space the intro column leaves beside the taller form. */}

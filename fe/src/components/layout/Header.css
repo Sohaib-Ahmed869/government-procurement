@@ -25,6 +25,14 @@
   --control-radius: 4px;
   /* STANDARDISED PREVIEW: one size for every label in the bar. */
   --control-font: 13.5px;
+  /* The first line's box height, shared by the toggle's label and the CTA.
+     Both were on `line-height: normal`, which is not a fixed ratio — it is
+     whatever the font's own metrics say, and it differs between font stacks and
+     between platforms. That is enough to leave the two labels a pixel or two
+     apart on one machine and level on another, which is exactly the kind of
+     "it looks aligned here but not there" this bar cannot afford. Pinned, so
+     the two first lines are the same box everywhere. */
+  --control-line: 18px;
   --control-hint-font: 13.5px;
   --control-edge: rgba(255, 255, 255, 0.28);
   /* Outer edge of both controls: the glass edge the tender cards carry — lit
@@ -32,6 +40,11 @@
   --control-edge-shadow:
     inset 1px 1px 1px rgba(255, 255, 255, 0.3),
     inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  /* The toggle track's own fill. The chosen segment is NOT just --control-active
+     over the header — it is --control-active over this, because the segment sits
+     inside the track. The CTA lays the same two coats in the same order, so the
+     two come out the same colour rather than merely the same-ish. */
+  --control-track: rgba(241, 238, 234, 0.05);
   /* Fill of the chosen segment, which the CTA also takes. */
   --control-active: rgba(255, 255, 255, 0.16);
   /* One width for all three cells in the bar — the two toggle segments and the
@@ -304,7 +317,11 @@
 }
 
 /* Same fill, size and type as the chosen segment beside it: the bar reads as one
-   set of controls rather than a toggle plus a button from somewhere else. */
+   set of controls rather than a toggle plus a button from somewhere else.
+
+   The label sits in the middle of the button rather than on the toggle's first
+   line: the toggle carries two lines — a label over a hint — and this carries
+   one, so centring is what makes it look placed inside its own button. */
 .site-header__cta {
   display: inline-flex;
   align-items: center;
@@ -313,11 +330,21 @@
   min-height: var(--control-height);
   padding: var(--control-pad-y) var(--control-pad-x);
   font-size: var(--control-font);
+  /* Shared with .audience-toggle__label — see --control-line. */
+  line-height: var(--control-line, 18px);
   font-weight: 400;
   color: #fff;
   text-decoration: none;
   white-space: nowrap;
-  background: var(--control-active);
+  /* Two coats, same order as the chosen segment: --control-active over the
+     track fill. A single coat of --control-active left the CTA reading a shade
+     darker than the segment beside it, which is the tell that gives away two
+     controls built separately. The gradient is the layering trick — a solid
+     colour cannot be a background LAYER, so it goes in as a two-stop gradient
+     of itself. */
+  background:
+    linear-gradient(var(--control-active), var(--control-active)),
+    var(--control-track, rgba(241, 238, 234, 0.05));
   border-radius: var(--control-radius);
   box-shadow: var(--control-edge-shadow);
   backdrop-filter: blur(12px);
@@ -359,7 +386,9 @@
   }
 
   .site-header__cta:hover {
-    background: rgba(255, 255, 255, 0.24);
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)),
+      var(--control-track, rgba(241, 238, 234, 0.05));
   }
 
   .site-header__cta:hover .site-header__cta-arrow,
@@ -393,7 +422,7 @@
     inset 1px 1px 1px rgba(255, 255, 255, 0.3),
     inset -1px -1px 1px rgba(255, 255, 255, 0.12)
   );
-  background: rgba(241, 238, 234, 0.05);
+  background: var(--control-track, rgba(241, 238, 234, 0.05));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -430,6 +459,8 @@
    the option is a block, so the rule goes on the label's own inline box. */
 .audience-toggle__label {
   font-size: var(--control-font, 13px);
+  /* Shared with .site-header__cta — see --control-line. */
+  line-height: var(--control-line, 18px);
   font-weight: 400;
   text-decoration: underline;
   text-underline-offset: 3px;

@@ -36,12 +36,14 @@
   color: var(--gp-ink);
 }
 
-/* Two across where there is room. Unlike a prompt, a template card is short —
-   a title, a line of description and a download — so a single column of them
-   wastes most of the width. */
+/* One across, each card the full width of the results column — the same shape
+   the Prompt Library's cards take, and the reason both pages share this shell.
+   It was `repeat(auto-fill, minmax(320px, 1fr))`, two or three to a row, which
+   made the two libraries read as different pages and left the cards narrower
+   than anything else in the column. */
 .tl-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   margin: 0;
   padding: 0;
@@ -174,7 +176,6 @@
 }
 
 @media (max-width: 560px) {
-  .tl-cards { grid-template-columns: minmax(0, 1fr); }
 
   .tl-card__head {
     flex-direction: column;

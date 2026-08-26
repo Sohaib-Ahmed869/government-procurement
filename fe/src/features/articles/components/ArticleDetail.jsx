@@ -31,7 +31,6 @@ function profilePath(team, name) {
 
 export default function ArticleDetail({ slug }) {
   const [article, setArticle] = useState(null);
-  const [related, setRelated] = useState([]);
   const [team, setTeam] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound | error
   const { audience } = useAudience();
@@ -63,9 +62,8 @@ export default function ArticleDetail({ slug }) {
       try {
         // The team list is only needed to resolve the byline link, so a failure
         // there leaves the name as plain text rather than failing the page.
-        const [item, list, people] = await Promise.all([
+        const [item, people] = await Promise.all([
           articlesApi.getBySlug(slug),
-          articlesApi.list({ limit: 4 }).catch(() => []),
           teamApi.list({ limit: 100 }).catch(() => []),
         ]);
         if (!alive) return;
@@ -74,7 +72,6 @@ export default function ArticleDetail({ slug }) {
           return;
         }
         setArticle(item);
-        setRelated((list || []).filter((a) => a.slug !== slug).slice(0, 3));
         setTeam(people || []);
         setStatus('ready');
       } catch (err) {
@@ -110,7 +107,7 @@ export default function ArticleDetail({ slug }) {
               ? "We couldn't find the article you were looking for. It may have been moved or removed."
               : "We couldn't load this article right now. Please try again shortly."}
           </p>
-          <Link className="article-related__cta" to="/insights">
+          <Link className="article-back" to="/insights">
             Back to Insights
           </Link>
         </div>
@@ -142,6 +139,12 @@ export default function ArticleDetail({ slug }) {
         <div className="article-hero__panel">
           <div className="article-hero__panel-inner">
             <h1 className="article-hero__title">{article.title}</h1>
+            {/* Date | category | read time | byline.
+
+                The byline used to sit on its own rule under the hero, at the
+                top of the body. It is the same kind of fact as the date and the
+                read time — who, when, how long — so it belongs on the same line
+                as them rather than a band lower on its own. */}
             <p className="article-hero__meta">
               {date && <span>{date}</span>}
               {date && <span className="article-hero__sep">|</span>}
@@ -150,6 +153,21 @@ export default function ArticleDetail({ slug }) {
                 <>
                   <span className="article-hero__sep">|</span>
                   <span>{article.readingMinutes} min read</span>
+                </>
+              )}
+              {name && (
+                <>
+                  <span className="article-hero__sep">|</span>
+                  <span className="article-hero__byline">
+                    By{' '}
+                    {authorHref ? (
+                      <Link className="article-hero__byline-link" to={authorHref}>
+                        {name}
+                      </Link>
+                    ) : (
+                      <span className="article-hero__byline-name">{name}</span>
+                    )}
+                  </span>
                 </>
               )}
             </p>
@@ -163,26 +181,11 @@ export default function ArticleDetail({ slug }) {
       </header>
 
       {/* The progress bar measures this element, not the page: the hero above
-          and the related grid below are not the article. */}
+          it is not the article. */}
       <section className="article-body" ref={bodyRef}>
-        <div className="article-byline">
-          {name && (
-            <p className="article-byline__author">
-              By{' '}
-              {authorHref ? (
-                <Link className="article-byline__link" to={authorHref}>
-                  {name}
-                </Link>
-              ) : (
-                <span className="article-byline__name">{name}</span>
-              )}
-            </p>
-          )}
-          {/* The share row that used to sit here has moved into ArticleBar,
-              which stays with the reader. Keeping both would put the same
-              actions on the page twice. */}
-        </div>
-
+        {/* The byline that used to open this section has moved up into the
+            hero's meta line, beside the read time. The share row that sat
+            beside it moved into ArticleBar, which stays with the reader. */}
         {article.overview && <p className="article-overview">{article.overview}</p>}
 
         {/* Body is authored HTML from the CMS. */}
@@ -193,29 +196,6 @@ export default function ArticleDetail({ slug }) {
         />
       </section>
 
-      {related.length > 0 && (
-        <section className="article-related">
-          <div className="article-related__inner">
-            <h2 className="article-related__title">Related insights</h2>
-            <ul className="article-related__grid">
-              {related.map((item) => (
-                <li key={item._id} className="article-related__card">
-                  <Link to={`/insights/${item.slug}`} className="article-related__link">
-                    <div className="article-related__meta">
-                      {item.category?.name && (
-                        <span className="article-related__topic">{item.category.name}</span>
-                      )}
-                      <span className="article-related__date">{formatDate(item.publishedAt)}</span>
-                    </div>
-                    <h3 className="article-related__card-title">{item.title}</h3>
-                    <span className="article-related__cta">Read article</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

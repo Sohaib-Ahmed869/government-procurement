@@ -16,8 +16,12 @@ import mongoose from 'mongoose';
 // they are still government, so they belong above 'other', and they are a tier
 // below the states, so they belong under 'australian'.
 //
-// 'local' carries the same destination fields as 'australian' (open tenders,
-// upcoming, create account) rather than 'other's single paywalled login.
+// 'local' carries a SINGLE destination: the council's own website, stored in
+// `openTendersUrl` and labelled "Website Link" on the page and in the CMS. It
+// used to carry the same three fields as 'australian', but a council publishes
+// neither a forecast pipeline nor a supplier registration, so two of the three
+// were blank on every entry. The field is reused rather than replaced so the
+// entries already filed under this section keep their address.
 export const TENDER_SITE_GROUPS = ['australian', 'local', 'other'];
 
 const tenderSiteSchema = new mongoose.Schema(

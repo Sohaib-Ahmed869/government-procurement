@@ -15,11 +15,16 @@ const GROUPS = [
   { value: 'other', label: 'Other tender website' },
 ];
 
-// Note on the branching below: everything that isn't 'other' is a government
-// tier, and both carry the same three destination links and the same
-// login-required tick. So the form and the save payload test for 'other' and
-// treat the rest as government — which is what makes 'local' work without a
-// third branch.
+// Note on the branching below: each section carries its own destinations, so
+// the form and the save payload both switch on `group`.
+//
+//   australian  three links (open / upcoming / account) + the login tick
+//   local       one link, the council's own website
+//   other       one paid sign-in link + the disclaimer note
+//
+// 'local' stores its single link in `openTendersUrl`, which is the field those
+// entries already hold their address in — so switching the section over needed
+// no migration and no new column on the model.
 
 // Short labels for the table, where the full option text is too long.
 const GROUP_LABEL = {
@@ -142,7 +147,7 @@ export default function TendersAdminPage() {
       order: Number(form.order) || 0,
       active: Boolean(form.active),
       // Only the selected section's fields are kept, so an entry moved between
-      // the two doesn't hold on to links the page no longer draws.
+      // sections doesn't hold on to links the page no longer draws.
       ...(group === 'other'
         ? {
             loginUrl: form.loginUrl,
@@ -152,14 +157,24 @@ export default function TendersAdminPage() {
             upcomingTendersUrl: '',
             createAccountUrl: '',
           }
-        : {
-            openTendersUrl: form.openTendersUrl,
-            upcomingTendersUrl: form.upcomingTendersUrl,
-            createAccountUrl: form.createAccountUrl,
-            loginRequired: Boolean(form.loginRequired),
-            loginUrl: '',
-            note: '',
-          }),
+        : group === 'local'
+          ? {
+              // The council's website, in the field the page reads for it.
+              openTendersUrl: form.openTendersUrl,
+              upcomingTendersUrl: '',
+              createAccountUrl: '',
+              loginRequired: false,
+              loginUrl: '',
+              note: '',
+            }
+          : {
+              openTendersUrl: form.openTendersUrl,
+              upcomingTendersUrl: form.upcomingTendersUrl,
+              createAccountUrl: form.createAccountUrl,
+              loginRequired: Boolean(form.loginRequired),
+              loginUrl: '',
+              note: '',
+            }),
     };
     try {
       if (editingId) {
@@ -207,11 +222,13 @@ export default function TendersAdminPage() {
   const linkSummary = (r) =>
     (r.group === 'other'
       ? [r.loginUrl ? 'Login' : null]
-      : [
-          r.openTendersUrl ? 'Open' : null,
-          r.upcomingTendersUrl ? 'Upcoming' : null,
-          r.createAccountUrl ? 'Account' : null,
-        ]
+      : r.group === 'local'
+        ? [r.openTendersUrl ? 'Website' : null]
+        : [
+            r.openTendersUrl ? 'Open' : null,
+            r.upcomingTendersUrl ? 'Upcoming' : null,
+            r.createAccountUrl ? 'Account' : null,
+          ]
     )
       .filter(Boolean)
       .join(', ') || '—';
@@ -272,7 +289,7 @@ export default function TendersAdminPage() {
     <div>
       <div className="admin-page__head">
         <div className="admin-page__heading">
-          <h2 className="admin-page__title">Tenders</h2>
+          <h2 className="admin-page__title">Tender Websites</h2>
           <p className="admin-page__subtitle">
             The portals listed on the Tender Websites page, in the order shown.
           </p>
@@ -349,8 +366,8 @@ export default function TendersAdminPage() {
             options={GROUPS}
             hint="Which list on the Tender Websites page this appears under."
           />
-          {/* The two sections list different destinations, so each shows only
-              its own links. */}
+          {/* Each section lists different destinations, so each shows only its
+              own links. */}
           {form.group === 'other' ? (
             <>
               <FormField
@@ -370,6 +387,18 @@ export default function TendersAdminPage() {
                 hint="Printed under the Login button. Name the operator this entry links to."
               />
             </>
+          ) : form.group === 'local' ? (
+            /* One destination, not three. A council has a website; it does not
+               run a forecast pipeline or a supplier registration of its own, so
+               the other two fields were always left blank on these entries and
+               drew nothing on the card. */
+            <FormField
+              label="Website Link"
+              name="openTendersUrl"
+              value={form.openTendersUrl}
+              onChange={onChange}
+              hint="Link to the council's own tenders page. Leave empty to hide the button."
+            />
           ) : (
             <>
               <FormField

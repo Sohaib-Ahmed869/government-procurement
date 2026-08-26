@@ -59,20 +59,23 @@ const NAV = [
     // those are the API's own words.
     group: 'Pages',
     items: [
+      // Homepage first — it is not a nav item, it is what the nav sits on.
       { to: '/admin/home-hero', label: 'Homepage', icon: 'page' },
+      // From here down, one entry per nav item in NAV_LINKS order
+      // (components/layout/Header.jsx), carrying the nav's own label.
       { to: '/admin/service-offering', label: 'Service Offering', icon: 'page' },
-      { to: '/admin/advisory-rules', label: 'Advisory Rules', icon: 'rails' },
-      { to: '/admin/team', label: 'Meeting the Team', icon: 'users' },
+      { to: '/admin/team', label: 'Our Team', icon: 'users' },
       { to: '/admin/courses', label: 'Courses', icon: 'book' },
       { to: '/admin/articles', label: 'Insights', icon: 'doc' },
       { to: '/admin/moderation', label: 'Q&A', icon: 'chat' },
-      { to: '/admin/tenders', label: 'Tenders', icon: 'link' },
-      { to: '/admin/careers', label: 'Careers', icon: 'hand' },
+      { to: '/admin/tenders', label: 'Tender Websites', icon: 'link' },
+      { to: '/admin/advisory-rules', label: 'Sourcing Advisor', icon: 'rails' },
       { to: '/admin/rules', label: 'Jurisdictional Links', icon: 'rails' },
       { to: '/admin/panels', label: 'How to Engage Us', icon: 'link' },
-      { to: '/admin/prompts', label: 'Prompt Library', icon: 'doc' },
+      { to: '/admin/prompts', label: 'AI Prompt Library', icon: 'doc' },
       { to: '/admin/templates', label: 'Templates', icon: 'media' },
       { to: '/admin/bid-writers', label: 'Find a Bid Writer', icon: 'hand' },
+      { to: '/admin/careers', label: 'Careers', icon: 'hand' },
     ],
   },
   {

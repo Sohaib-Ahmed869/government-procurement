@@ -53,8 +53,9 @@
 }
 
 .eng__copy {
+  /* Fills the row's copy column rather than stopping at a 62ch measure, which
+     left the right of every box empty well before the action beside it. */
   margin: 6px 0 0;
-  max-width: 62ch;
   font-size: 14px;
   line-height: 1.6;
   color: var(--gp-muted);
@@ -109,26 +110,10 @@
   border-color: var(--gp-brand-lift);
 }
 
-.eng__note {
-  margin: clamp(18px, 2vw, 26px) 0 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--gp-muted);
-}
-
-.eng__note a {
-  color: var(--gp-ink);
-  font-weight: 600;
-  text-underline-offset: 2px;
-}
-
-.eng[data-audience='award'] .eng__note a { color: var(--gp-green-600); }
-
 
 /* --- reveal on scroll-in, matching the panels list ------------------------ */
 @media (prefers-reduced-motion: no-preference) {
-  .eng__row,
-  .eng__note {
+  .eng__row {
     opacity: 0;
     translate: 0 var(--gp-reveal-shift);
     transition:
@@ -136,8 +121,7 @@
       translate var(--gp-reveal-dur) var(--gp-ease);
   }
 
-  .eng.is-in .eng__row,
-  .eng.is-in .eng__note {
+  .eng.is-in .eng__row {
     opacity: 1;
     translate: none;
     /* Capped at four steps: a per-row stagger down six rows ends on a delay

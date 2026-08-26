@@ -12,6 +12,9 @@
 /* The page-heading band's shared height and centring, so every page's title
    sits at the same place. */
 @import './styles/head.css';
+/* The boxed notice, shared by the Sourcing Advisor's disclaimer and the Service
+   Offering page's. */
+@import './styles/notice.css';
 
 *,
 *::before,

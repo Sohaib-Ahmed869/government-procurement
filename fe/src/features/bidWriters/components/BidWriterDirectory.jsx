@@ -24,7 +24,10 @@ function FilterGroup({ heading, name, options, value, onChange }) {
       <h3 className="browse-filter__heading">{heading}</h3>
       <div className="browse-filter__options">
         {options.map((opt) => (
-          <label key={opt.value} className="browse-radio">
+          <label
+            key={opt.value}
+            className={`browse-radio${value === opt.value ? ' is-active' : ''}`}
+          >
             <input
               type="radio"
               name={name}

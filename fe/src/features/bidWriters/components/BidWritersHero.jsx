@@ -1,9 +1,16 @@
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
-import { BID_WRITERS } from '../../../config/features.js';
 import './BidWritersHero.css';
 
 // B7 — the Find a Bid Writer hero.
+//
+// The title alone, like every other page's heading band. Three things have gone
+// from under it: the "Preview only" flag, the lede describing the directory that
+// starts immediately below, and the paid-placement note. The flag is the one
+// worth recording — it was drawn whenever BID_WRITERS was 'preview', which is
+// what local and staging run, so anyone reviewing the page saw a badge across
+// the top of it. The page is still marked noindex on that setting; the page
+// simply no longer says so on itself (see FindBidWriterPage.jsx).
 export default function BidWritersHero() {
   const { audience } = useAudience();
   const mounted = useMountReveal();
@@ -11,25 +18,7 @@ export default function BidWritersHero() {
   return (
     <section className={`bw-hero${mounted ? ' is-in' : ''}`} data-audience={audience}>
       <div className="bw-hero__inner">
-        {/* Only ever rendered on the preview setting, and only visible to
-            whoever is looking at staging. It is here so nobody reviewing the
-            page mistakes it for something the public can reach. */}
-        {BID_WRITERS === 'preview' && (
-          <p className="bw-hero__flag">
-            Preview only — this page is not live and is marked noindex
-          </p>
-        )}
-
         <h1 className="bw-hero__title">Find a Bid Writer</h1>
-        <p className="bw-hero__sub">
-          Bid management companies that write and manage tender responses, listed by
-          where their office is and the categories they work across. Filter to your
-          state and the kind of work, then contact them directly.
-        </p>
-        <p className="bw-hero__note">
-          These are paid placements. We do not endorse or recommend any company listed,
-          and we take no commission on work you engage them for.
-        </p>
       </div>
     </section>
   );

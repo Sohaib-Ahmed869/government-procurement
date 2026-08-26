@@ -95,7 +95,7 @@ const FLAT_ROWS = [
   ],
   [
     { label: 'Service Offering', href: '/service-offering' },
-    { label: 'Meeting the Team', href: '/our-team' },
+    { label: 'Our Team', href: '/our-team' },
     { label: 'Courses', href: '/courses' },
     { label: 'Insights', href: '/insights' },
   ],

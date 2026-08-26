@@ -192,8 +192,11 @@
 }
 
 /* Filled to match the team cards, the Q&A answer cards and the careers role
-   cards: --gp-brand-lift is #4a4a4a on Win and #2f7d45 on Award, so one
-   declaration covers both segments.
+   cards: --gp-brand is the site header's own ground — #1a1a1a on Win and
+   #0a3114 on Award (tokens.css calls the pair --gp-win-900 / --gp-award-900,
+   and Header.css reaches for the same two) — so one declaration covers both
+   segments and the card is the same green, or the same black, as the bar at the
+   top of the page. It was --gp-brand-lift, a step lighter than that.
 
    That makes the card a dark island on a paper page, so it carries the DARK
    band's text roles instead of the section's.
@@ -207,7 +210,7 @@
   display: flex;
   flex-direction: column;
   padding: 22px;
-  background: var(--gp-brand-lift);
+  background: var(--gp-brand);
   color: #fff;
 
   --band-ink: #fff;
@@ -239,7 +242,7 @@
   font-size: 12.5px;
   font-weight: 600;
   color: var(--band-on-accent);
-  background: var(--band-accent);
+  background: var(--gp-head-bg);
   border-radius: 999px;
 }
 
@@ -306,7 +309,7 @@
   height: 26px;
   font-size: 12px;
   color: var(--band-on-accent);
-  background: var(--band-accent);
+  background: var(--gp-head-bg);
   border-radius: 50%;
 }
 

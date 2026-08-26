@@ -91,7 +91,10 @@
 }
 
 .careers__copy {
-  max-width: 720px;
+  /* Full width of the shell, so the copy runs to the same right edge the
+     header's last nav item (Careers) ends on. It was held to a 720px measure,
+     which stopped it halfway across the band and left the right half of both
+     blocks empty. */
   margin: 0 0 12px;
   font-size: 16px;
   line-height: 1.7;

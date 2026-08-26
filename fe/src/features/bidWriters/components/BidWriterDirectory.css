@@ -8,6 +8,20 @@
    anybody has bought is featured-above-standard. */
 
 
+/* The accent, on this page only.
+
+   Everywhere else --gp-accent-ink is the segment's WARM ink — a deep mint on
+   Win, a deep clay on Win's opposite — and it is what every link, arrow and
+   hover colour resolves to. On this page that put the contact links in green on
+   the Win side and in orange on the Award side, which is the wrong way round:
+   the segment's own colour is what the rest of the page is set in.
+
+   --gp-brand is that colour, and it is one declaration for both: near-black on
+   Win, deep green on Award. Scoped to `.bw` so nothing else moves. */
+.bw {
+  --gp-accent-ink: var(--gp-brand);
+}
+
 .bw-list {
   display: grid;
   gap: 16px;

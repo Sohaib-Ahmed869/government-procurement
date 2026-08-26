@@ -127,6 +127,23 @@
 
 .browse-radio:hover { background: var(--gp-paper); }
 
+/* The selected row, marked by its ground rather than by its type.
+
+   It used to be `font-weight: 600` on the label, and that is what made the rail
+   resize when an option was picked: the label's BOX is a fixed width (it is the
+   flex item between the dot and the count), so bolding the text does not widen
+   the box — it widens the text inside it. A label that fitted on one line at
+   400 no longer fits at 600, wraps to two, and the row, the group and the whole
+   filter panel grow by a line. "Planning a procurement" sat right on that
+   boundary, so clicking it moved everything below it.
+
+   Nothing here changes a glyph's metrics, so the rail is the same height
+   whatever is selected. The state is still unmistakable: the dot beside it
+   fills solid with --gp-brand at the same time. */
+.browse-radio.is-active {
+  background: var(--gp-paper);
+}
+
 .browse-radio input {
   position: absolute;
   width: 1px;
@@ -162,8 +179,6 @@
   flex: 1;
   min-width: 0;
 }
-
-.browse-radio input:checked ~ .browse-radio__label { font-weight: 600; }
 
 .browse-radio__count {
   flex: none;

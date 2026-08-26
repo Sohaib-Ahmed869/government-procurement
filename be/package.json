@@ -13,6 +13,7 @@
     "seed:careers": "node src/seed/seed-careers.js",
     "seed:tenders": "node src/seed/seed-tenders.js",
     "seed:panels": "node src/seed/seed-panels.js",
+    "seed:engage-services": "node src/seed/seed-engage-services.js",
     "seed:prompts": "node src/seed/seed-prompts.js",
     "seed:templates": "node src/seed/seed-templates.js",
     "seed:capabilities": "node src/seed/seed-capabilities.js",

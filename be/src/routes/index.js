@@ -15,6 +15,7 @@ import teamRoutes from '../modules/team/team.routes.js';
 import careerRoutes from '../modules/careers/careers.routes.js';
 import ruleRoutes from '../modules/rules/rules.routes.js';
 import panelRoutes from '../modules/panels/panels.routes.js';
+import engageServiceRoutes from '../modules/engageServices/engageServices.routes.js';
 import promptRoutes from '../modules/prompts/prompts.routes.js';
 import templateRoutes from '../modules/templates/templates.routes.js';
 import bidWriterRoutes from '../modules/bidWriters/bidWriters.routes.js';
@@ -54,8 +55,11 @@ router.use('/pages', pageRoutes);
 router.use('/team', teamRoutes);
 router.use('/careers', careerRoutes);
 router.use('/rules', ruleRoutes);
-// B2 — government panels and prequalification schemes, by jurisdiction.
+// B2 — government panels and prequalification schemes, by jurisdiction. This
+// is the AWARD side of How to Engage Us; the WIN side is its own list below,
+// rather than the Service Offering cards it used to borrow.
 router.use('/panels', panelRoutes);
+router.use('/engage-services', engageServiceRoutes);
 // B4 — the AI Prompt Library: master prompts by topic, use case and tool.
 router.use('/prompts', promptRoutes);
 // B6 — the Templates library: sourced, licence-checked, downloadable documents.

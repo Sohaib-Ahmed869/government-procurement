@@ -5,8 +5,9 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
-import { keepScrollOnNextNavigation } from '../../../components/shared/ScrollToTop.jsx';
 import { TOPICS, TOOLS, TOOL_BY_VALUE } from '../data.js';
+import ToolMark from '../toolMarks.jsx';
+import { unwrapPrompt, promptTeaser } from '../promptText.js';
 import './PromptsBrowser.css';
 
 // B4 — the prompt library, laid out on the Courses page's structure: a filter
@@ -27,7 +28,10 @@ function FilterGroup({ heading, name, options, value, onChange }) {
       <h3 className="browse-filter__heading">{heading}</h3>
       <div className="browse-filter__options">
         {options.map((opt) => (
-          <label key={opt.value} className="browse-radio">
+          <label
+            key={opt.value}
+            className={`browse-radio${value === opt.value ? ' is-active' : ''}`}
+          >
             <input
               type="radio"
               name={name}
@@ -36,7 +40,13 @@ function FilterGroup({ heading, name, options, value, onChange }) {
               onChange={() => onChange(opt.value)}
             />
             <span className="browse-radio__dot" aria-hidden="true" />
-            <span className="browse-radio__label">{opt.label}</span>
+            <span className="browse-radio__label">
+              {/* The assistants carry their mark beside the name here. The name
+                  stays: this is a radio, and a row of three unlabelled logos is
+                  a guessing game rather than a filter. */}
+              {opt.tool && <ToolMark tool={opt.tool} size={15} />}
+              {opt.label}
+            </span>
             {opt.count !== undefined && <span className="browse-radio__count">{opt.count}</span>}
           </label>
         ))}
@@ -70,24 +80,13 @@ export default function PromptsBrowser() {
     // Replace rather than push: dragging down a radio list would otherwise
     // stack a history entry per option and bury the page the visitor came from.
     //
-    // Without the line below, this navigation is like any other and throws the
-    // visitor back to the top of the page — from a rail they had scrolled
-    // halfway down to reach. See components/shared/ScrollToTop.jsx.
-    keepScrollOnNextNavigation();
+    // Choosing a filter is a navigation, and ScrollToTop takes every
+    // navigation to the top of the page — which is exactly what a filter should
+    // do here, heading band included. It used to be suppressed (with
+    // keepScrollOnNextNavigation) and replaced by a scroll to the top of the
+    // browse section, which parked the rail under the sticky chrome and left
+    // the page's own title off screen.
     setParams(next, { replace: true });
-    // And then put the results back under the site header. Two behaviours were
-    // tried here and neither is this one: landing at the top of the DOCUMENT,
-    // which is what happens with no handling at all and throws you above the
-    // page's heading band; and staying exactly where you were, which leaves you
-    // looking at the middle of a list that has just been replaced. This scrolls
-    // to the top of the browse section — the rail and the first result, with the
-    // heading band scrolled past — so a filter always answers in the same place.
-    //
-    // The offset comes from `scroll-margin-top` on `.browse` (styles/browse.css)
-    // rather than from arithmetic here, which is what makes it right above
-    // 1441px too: the header is scaled there, and a scroll margin set inside the
-    // scaled subtree scales with it.
-    topRef.current?.scrollIntoView({ block: 'start' });
   };
 
   // What the RESULTS are filtered by. Behind the rail by the length of the
@@ -149,9 +148,20 @@ export default function PromptsBrowser() {
     ];
   }, [prompts, useCase, tool]);
 
-  // The middle level is whatever the CMS holds, in the order the API returned
-  // (topic, then useCaseOrder, then name) — so the sidebar lists use cases in
-  // the same order the results below print them.
+  // The middle level. Unlike the other two rails, this one lists EVERY use case
+  // the library holds, whatever is selected above and below it. It used to drop
+  // any option with nothing left under the other filters, which made the rail
+  // itself move: picking a topic or a tool shortened the use-case list, so the
+  // option a visitor was reaching for jumped or vanished under the pointer, and
+  // there was no way to see the library's full middle level at all.
+  //
+  // The counts still answer to the other filters, so a number is what clicking
+  // that option actually yields — a zero is the honest answer for a combination
+  // that holds nothing, and the results column says so in words.
+  //
+  // The order is the one the API returned (topic, then useCaseOrder, then
+  // name), so the rail lists use cases in the order the results below print
+  // them.
   const useCaseOptions = useMemo(() => {
     const matches = (p) =>
       (topic === ALL || p.mainTopic === topic) && (tool === ALL || p.tool === tool);
@@ -161,17 +171,13 @@ export default function PromptsBrowser() {
     }
     return [
       { value: ALL, label: 'All use cases', count: prompts.filter(matches).length },
-      ...seen
-        .map((name) => ({
-          value: name,
-          label: name,
-          count: prompts.filter((p) => p.useCase === name && matches(p)).length,
-        }))
-        // A use case with nothing left under the other filters is dropped
-        // rather than shown at zero — the list is long enough already.
-        .filter((o) => o.count > 0 || o.value === useCase),
+      ...seen.map((name) => ({
+        value: name,
+        label: name,
+        count: prompts.filter((p) => p.useCase === name && matches(p)).length,
+      })),
     ];
-  }, [prompts, topic, tool, useCase]);
+  }, [prompts, topic, tool]);
 
   const toolOptions = useMemo(() => {
     const matches = (p) =>
@@ -181,6 +187,7 @@ export default function PromptsBrowser() {
       ...TOOLS.map((t) => ({
         value: t.value,
         label: t.label,
+        tool: t.value,
         count: prompts.filter((p) => p.tool === t.value && matches(p)).length,
       })),
     ];
@@ -270,9 +277,7 @@ export default function PromptsBrowser() {
                 type="button"
                 className="browse-filters__reset"
                 onClick={() => {
-                  keepScrollOnNextNavigation();
                   setParams(new URLSearchParams(), { replace: true });
-                  topRef.current?.scrollIntoView({ block: 'start' });
                 }}
               >
                 Reset filters
@@ -356,7 +361,9 @@ function useCopyPrompt(prompt) {
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const copy = useCallback(async () => {
-    const text = prompt?.body || '';
+    // Un-hard-wrapped, so the card's Copy and the detail page's put the same
+    // string on the clipboard — see features/prompts/promptText.js.
+    const text = unwrapPrompt(prompt?.body);
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -399,18 +406,6 @@ function CopyIcon({ copied }) {
   );
 }
 
-// The opening line of the prompt, for the card's teaser: enough to tell two
-// prompts apart at a glance without reprinting either of them.
-function teaserFor(prompt) {
-  if (prompt.summary) return prompt.summary;
-  const firstLine = String(prompt.body || '')
-    .split(/\r?\n/)
-    .map((l) => l.trim())
-    .find(Boolean);
-  if (!firstLine) return '';
-  return firstLine.length > 150 ? firstLine.slice(0, 150).trimEnd() + '…' : firstLine;
-}
-
 /* B4.6 / B4.7 — one card, one prompt.
 
    A SUMMARY, not the prompt. Every card used to print its prompt in full, so a
@@ -426,7 +421,7 @@ function teaserFor(prompt) {
 function PromptCard({ prompt }) {
   const { copied, copy } = useCopyPrompt(prompt);
   const tool = TOOL_BY_VALUE[prompt.tool];
-  const teaser = teaserFor(prompt);
+  const teaser = promptTeaser(prompt);
 
   return (
     <li className="pl-card">
@@ -438,7 +433,17 @@ function PromptCard({ prompt }) {
       <Link className="pl-card__open" to={`/prompt-library/${prompt._id || prompt.id}`}>
         <span className="pl-card__head">
           <span className="pl-card__title">{prompt.title}</span>
-          <span className={`pl-tool pl-tool--${prompt.tool}`}>{tool?.label || prompt.tool}</span>
+          {/* The assistant's mark, not its name. The name is still the
+              accessible one — the mark is decorative to a screen reader and the
+              text below it is what gets read — and `title` puts it back for a
+              pointer that hovers the pill. */}
+          <span
+            className={`pl-tool pl-tool--${prompt.tool}`}
+            title={tool?.label || prompt.tool}
+          >
+            <ToolMark tool={prompt.tool} />
+            <span className="pl-tool__name">{tool?.label || prompt.tool}</span>
+          </span>
         </span>
         {teaser ? <span className="pl-card__teaser">{teaser}</span> : null}
       </Link>

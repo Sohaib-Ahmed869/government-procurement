@@ -9,9 +9,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .bw-hero__title,
-  .bw-hero__sub,
-  .bw-hero__note {
+  .bw-hero__title {
     opacity: 0;
     transform: translateY(var(--gp-reveal-shift));
     transition:
@@ -20,8 +18,6 @@
   }
 
   .bw-hero.is-in .bw-hero__title { opacity: 1; transform: none; transition-delay: var(--gp-reveal-step); }
-  .bw-hero.is-in .bw-hero__sub   { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 2); }
-  .bw-hero.is-in .bw-hero__note  { opacity: 1; transform: none; transition-delay: calc(var(--gp-reveal-step) * 3); }
 }
 
 .bw-hero__inner {
@@ -34,38 +30,3 @@
   margin: 0;
 }
 
-.bw-hero__sub {
-  max-width: 68ch;
-  margin: 20px 0 0;
-  font-size: clamp(15px, 1.25vw, 17px);
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-/* The caveat. Quieter than the lede but not hidden — it is the line that keeps
-   the page honest about what a prompt can and cannot do. */
-.bw-hero__note {
-  max-width: 62ch;
-  margin: 14px 0 0;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-/* The preview banner. Loud, because its whole job is to stop somebody mistaking
-   a staging page for a live one. */
-.bw-hero__flag {
-  display: inline-block;
-  margin: 0 0 16px;
-  padding: 6px 12px;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--gp-brand-deep);
-  background: var(--gp-accent);
-  border-radius: 999px;
-}
-
-@media (max-width: 760px) {
-  .bw-hero__sub { max-width: none; font-size: 16px; }
-}

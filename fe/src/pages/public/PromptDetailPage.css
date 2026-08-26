@@ -50,31 +50,51 @@
 }
 .pd__head .pd__back:hover { color: #fff; text-decoration: none; }
 
-.pd > .pd__inner .pd__title { max-width: 30ch; }
+/* In the heading band, the size, weight, line-height and tracking come from
+   styles/head.css, which sets them once for every page-heading band on the site
+   — this title is in that set now, so it is the same heading as Insights',
+   Careers' and the rest. That rule is `.pd__head .pd__title`, which outweighs
+   the one below, so what is here is what the not-found and error states get:
+   the same face, on paper, with no band around it.
 
+   No max-width either way. It was capped at 24ch (30ch on the error states),
+   which wrapped a prompt's name into a narrow column two or three lines deep
+   while every other page ran its title across the container. */
 .pd__title {
   margin: 0;
-  max-width: 24ch;
+  font-family: 'Geist Variable', system-ui, sans-serif;
   font-size: var(--gp-page-title);
   font-weight: 400;
-  line-height: 1.1;
+  line-height: 1.05;
   letter-spacing: -0.015em;
 }
 
+@media (max-width: 860px) {
+  .pd__title {
+    font-size: var(--gp-page-title-phone);
+  }
+}
+
+/* On paper now, under the strip rather than in it, so it takes the page's own
+   muted ink instead of a white at 72%. */
 .pd__meta {
   display: flex;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin: 14px 0 0;
+  margin: 0 0 12px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--gp-muted);
 }
 
 /* --- the body ------------------------------------------------------------- */
 
+/* Tight at both ends. It was clamp(24px, 3vw, 40px), which on a desktop put
+   40px of empty paper between the heading band and the filing line under it,
+   and another 40 under the prompt box before the footer — on a page whose whole
+   content is one box. */
 .pd__body .pd__inner {
-  padding-block: clamp(24px, 3vw, 40px);
+  padding-block: clamp(10px, 1.2vw, 16px);
 }
 
 /* The loading / not-found / error states are the page's only content, so they
@@ -96,7 +116,7 @@
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .pd__label {
@@ -105,8 +125,6 @@
   font-size: 15px;
   font-weight: 600;
 }
-
-.pd__label--notes { margin-top: 28px; margin-bottom: 10px; }
 
 .pd__copy {
   display: inline-flex;
@@ -142,35 +160,24 @@
   border: 0;
 }
 
+/* Full width of the container, like the cards in the library it came from. The
+   100ch cap stopped it well short of the column on a wide screen and made the
+   prompt look like a pull-quote rather than the page's subject. */
 .pd__prompt {
   margin: 0;
-  padding: clamp(16px, 2vw, 24px);
-  max-width: 100ch;
+  padding: clamp(14px, 1.6vw, 18px);
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-line);
   border-radius: 14px;
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 13.5px;
-  line-height: 1.7;
+  /* Set to fit rather than to be admired. A prompt is a block of instructions
+     somebody reads once and copies, and at 13.5/1.7 in 24px of padding a
+     middling one ran past the fold — so the thing the page exists to show could
+     not be seen at once. 13/1.5 in 18px is around a fifth shorter for the same
+     text, which is the difference between scrolling and not. */
+  font-size: 13px;
+  line-height: 1.5;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   color: var(--gp-ink);
 }
-
-.pd__notes {
-  margin: 0;
-  max-width: 70ch;
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--gp-muted);
-}
-
-.pd__more {
-  display: inline-block;
-  margin-top: clamp(24px, 3vw, 36px);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--gp-accent-ink);
-  text-decoration: none;
-}
-.pd__more:hover { text-decoration: underline; }

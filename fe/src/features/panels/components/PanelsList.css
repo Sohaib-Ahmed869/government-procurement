@@ -19,9 +19,15 @@
 .gp-list__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  /* Even top and bottom, and both well under what they were: the list is short
-     and 60px above it with 88px below left it floating in the page. */
-  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
+  padding-inline: clamp(20px, 4vw, 60px);
+  /* Tight, and equal at both ends. --gp-body-pad (up to 16px) is the site's
+     general figure for a content band, and it is too much here: the first thing
+     in this section is a 34px heading whose line box carries its own leading on
+     top, and the last is a row that already has 9px under it, so the visible
+     gap under the dark band and above the footer came out around half again
+     what the number says. Halved, and stated as its own value rather than
+     borrowed, so changing it cannot move every other band on the site. */
+  padding-block: clamp(4px, 0.6vw, 8px);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -51,7 +57,10 @@
   margin: 0 0 4px;
   font-size: clamp(24px, 3vw, 34px);
   font-weight: 500;
-  line-height: 1.2;
+  /* 1.15 rather than 1.2: at this size every extra tenth is another 3px of
+     leading above the caps, and it is that space — not the padding — that made
+     the heading look like it was floating below the band. */
+  line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--gp-brand);
   transition: var(--gp-fade);
