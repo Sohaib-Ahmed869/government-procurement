@@ -95,6 +95,7 @@
    24px corner, rather than the gradient and tight 10px radius this used to
    carry. */
 .forum-card {
+  position: relative;
   display: block;
   width: 100%;
   padding: 18px 20px;
@@ -134,16 +135,31 @@
      the list at all and the hover lift jumped instead of easing. */
   transition:
     transform 240ms var(--gp-ease),
-    box-shadow 240ms var(--gp-ease),
     var(--gp-fade);
 }
 
-.forum-card:hover {
-  transform: translateY(-4px);
+/* The lift animates a transform and nothing else; the deeper shadow is an
+   overlay that fades in over it. Animating `box-shadow` directly repaints the
+   card AND re-rasterises its blur on every frame — work the compositor cannot
+   take on — which is what made these hovers stutter on a laptop in some
+   browsers while a phone, which never hovers at all, stayed smooth. Above
+   1441px the page is `zoom`-scaled too, so that repaint is over an even larger
+   raster. Opacity on a pseudo-element is composited and costs none of it. */
+.forum-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 22px 44px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transition: opacity 240ms var(--gp-ease);
 }
+
+.forum-card:hover { transform: translateY(-4px); }
+.forum-card:hover::after { opacity: 1; }
 
 /* Reserves two lines whether or not the question needs them, so the tag and
    date underneath start at the same height in every card in a row. */
@@ -215,7 +231,11 @@
 @media (max-width: 720px) {
 
   .forum-answers__inner {
-    padding: 86px 16px 40px;
+    /* 24px, not 86. The 86 dated from when the search row floated over the top
+       of this section and had to be cleared; the row sits in the flow above it
+       now, so all that was left was an empty white band between the search
+       field and "Recent Answers". */
+    padding: 24px 16px 40px;
   }
 
   /* A quiet label above the cards rather than a display heading. */

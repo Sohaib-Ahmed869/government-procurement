@@ -17,6 +17,14 @@
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
 
+/* On Award the buy button takes the heading strip's own green (--gp-head-bg,
+   i.e. --gp-brand-soft) rather than the deeper --gp-brand, so the button and
+   the band at the top of the page are the same colour. Win keeps --gp-brand:
+   its strip and its brand are the same ramp already. */
+.cd[data-audience='award'] {
+  --cd-cta: var(--gp-head-bg);
+}
+
 .cd__inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 470px;
@@ -488,9 +496,14 @@
     display: none;
   }
 
-  /* Room so the bar never covers the end of the content. */
+  /* Room so the bar never covers the end of the content. 104px was set as if
+     this were the foot of the page; it is not — the newsletter band and the
+     footer follow, so there is always more page to scroll and the last of this
+     section never has to sit under the bar. What is left is the bar's own
+     height as a courtesy, and it was showing as a screen-third of empty white
+     between the last box and the band below. */
   .cd__inner {
-    padding-bottom: 104px;
+    padding-bottom: 28px;
   }
 
   /* Instructor name on its own line, tags beneath it. */
@@ -512,8 +525,19 @@
     right: 0;
     bottom: 0;
     z-index: 60;
-    padding: 12px 16px;
+    /* Clears the phone's home indicator / browser chrome, so the CTA is not
+       half under it. */
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
     background: var(--gp-ink-900);
+
+    /* A dark island on a paper page, so it carries the DARK band's text roles
+       rather than the page's — the same redefinition .forum-card makes. Its
+       title, price and CTA label all read `var(--band-ink)`, which on this page
+       resolves to the paper ramp's near-black: the bar WAS drawn, in black text
+       on a near-black fill, which is why it looked like it wasn't there. */
+    --band-ink: #fff;
+    --band-muted: rgba(255, 255, 255, 0.72);
+    --band-line: rgba(255, 255, 255, 0.14);
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
   }
 
@@ -532,15 +556,21 @@
     color: var(--band-ink);
   }
 
+  /* The accent, not --cd-cta. That token is --gp-brand, which is the right fill
+     for the sidebar's button on paper but is the same near-black as this bar —
+     the button had no edge to it at all and read as a bare underlined link. The
+     accent is the token tuned for dark grounds. */
   .cd-bar__cta {
     flex: none;
     padding: 12px 16px;
     font-family: inherit;
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--band-ink);
+    color: var(--gp-brand-deep);
+    /* It is a <Link>, so the underline has to be taken off — it is a button. */
+    text-decoration: none;
     cursor: pointer;
-    background: var(--cd-cta);
+    background: var(--gp-accent);
     border: 0;
     border-radius: 10px;
   }

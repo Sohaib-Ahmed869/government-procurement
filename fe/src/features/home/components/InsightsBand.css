@@ -17,6 +17,7 @@
 /* --- cards ---------------------------------------------------------------- */
 
 .ib__card {
+  position: relative;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -24,17 +25,33 @@
   background: var(--band-surface);
   border: 1px solid var(--band-line);
   border-radius: 6px;
-  overflow: hidden;
+  /* NOT `overflow: hidden`. The picture is the only thing that overflows the
+     rounded corner and it clips itself (.ib__media below); a clipped card would
+     also cut off the hover shadow, which is now drawn by a pseudo-element that
+     falls outside the box. */
   transition:
     var(--gp-fade),
-    transform 260ms var(--gp-ease),
-    box-shadow 260ms var(--gp-ease);
+    transform 260ms var(--gp-ease);
 }
 
-.ib__card:hover {
-  transform: translateY(-4px);
+/* The lift animates a transform and nothing else; the shadow is an overlay that
+   fades in over it. Animating `box-shadow` repaints the card and re-rasterises
+   its blur every frame — work the compositor cannot take on, and the reason
+   these hovers stuttered on a laptop in some browsers while a phone, which
+   never hovers, stayed smooth. */
+.ib__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transition: opacity 260ms var(--gp-ease);
 }
+
+.ib__card:hover { transform: translateY(-4px); }
+.ib__card:hover::after { opacity: 1; }
 
 /* The lead takes two of the three columns and lays its two halves side by
    side, which is what makes it read as the story to start with. */
@@ -46,6 +63,8 @@
 .ib__card--lead .ib__media {
   flex: 1 1 50%;
   aspect-ratio: auto;
+  /* Side by side on the lead, so it is the left pair of corners here. */
+  border-radius: 6px 0 0 6px;
 }
 
 .ib__card--lead .ib__text {
@@ -66,6 +85,10 @@
   display: block;
   aspect-ratio: 16 / 10;
   overflow: hidden;
+  /* The card's own 6px on the corners the picture actually meets — the two at
+     the top on a stacked card, the two on the left of the lead (below). The
+     card used to clip this; it no longer does. */
+  border-radius: 6px 6px 0 0;
   background: var(--band-surface-hover);
 }
 
@@ -154,6 +177,10 @@
     grid-column: span 1;
     flex-direction: column;
   }
-  .ib__card--lead .ib__media { aspect-ratio: 16 / 10; }
+  /* Stacked here, so the picture is back to the top pair of corners. */
+  .ib__card--lead .ib__media {
+    aspect-ratio: 16 / 10;
+    border-radius: 6px 6px 0 0;
+  }
   .ib__card--lead .ib__text { padding: 22px 24px 26px; }
 }

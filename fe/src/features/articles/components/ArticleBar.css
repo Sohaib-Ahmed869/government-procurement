@@ -89,6 +89,11 @@
 
 .article-bar__share { position: relative; }
 
+/* Anchored to the button's right edge, which is correct while the bar's actions
+   sit at the right of a wide row. On a phone the actions start near the LEFT of
+   the row, so 190px measured leftwards from the Share button put most of the
+   menu off the side of the screen — see the phone rule at the end of this
+   file. */
 .article-bar__menu {
   position: absolute;
   top: calc(100% + 6px);
@@ -194,6 +199,16 @@
   .article-bar__inner {
     gap: 10px;
     padding: 4px clamp(16px, 4vw, 24px);
+  }
+
+  /* Opens rightwards from the button rather than leftwards, and never wider
+     than the screen. Anchored to the button's right edge (the desktop rule) the
+     190px menu was measured leftwards from a Share button that sits near the
+     left of the row here, so it started off the side of the screen. */
+  .article-bar__menu {
+    right: auto;
+    left: 0;
+    max-width: calc(100vw - 32px);
   }
 
   /* The title gives way rather than the actions: the actions are the reason the

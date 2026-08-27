@@ -220,20 +220,27 @@
 
    The rail is outside this on purpose: a radio has to answer the click that
    selected it immediately, whatever the results are doing. */
-.browse-results {
+/* `.gp-swap` is the same movement for the filtered lists that are NOT on this
+   shell — the Courses grid, the Insights grid and the Jurisdictional Links
+   grid. Each pairs it with hooks/useFadeSwap.js exactly as the browse pages do,
+   so changing a filter reads the same on every page that has one. */
+.browse-results,
+.gp-swap {
   transition:
     opacity 640ms var(--gp-ease),
     transform 640ms var(--gp-ease);
 }
 
-.browse-results.is-swapping {
+.browse-results.is-swapping,
+.gp-swap.is-swapping {
   opacity: 0;
   transform: translateY(-6px);
   transition-duration: 380ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .browse-results {
+  .browse-results,
+  .gp-swap {
     transition: none;
   }
 }

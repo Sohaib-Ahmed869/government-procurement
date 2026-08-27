@@ -157,7 +157,7 @@
 
 @media (max-width: 720px) {
   .forum-article__inner {
-    padding: 24px 16px 40px;
+    padding: 24px 16px 24px;
   }
 
   /* Shared with the forum hero and submit page headings. */
@@ -172,10 +172,17 @@
     display: none;
   }
 
+  /* 18px under the title, and 14 between the Question box and the Answer box.
+     At 40 the two boxes read as two separate things on the page when they are a
+     pair — the answer belongs to the question directly above it. */
   .forum-article__box {
-    margin-top: 40px;
+    margin-top: 18px;
     padding: 22px 20px 26px;
     border-radius: 22px;
+  }
+
+  .forum-article__box + .forum-article__box {
+    margin-top: 14px;
   }
 
   .forum-article__box-heading {

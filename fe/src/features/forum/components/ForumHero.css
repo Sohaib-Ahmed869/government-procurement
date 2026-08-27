@@ -66,7 +66,14 @@
 
 @media (max-width: 1024px) {
   .forum-tools__inner {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr), not 1fr. A grid track's automatic minimum is its content's
+       min-content width, so the row inside — search field + submit + categories
+       — could not be squeezed below what those three want, and on a phone it
+       simply overflowed: the categories button was drawn past the right edge of
+       the screen, where .page-layout's `overflow-x: clip` hid it. With the floor
+       at 0 the track takes the column's width and the search field shrinks, as
+       its own `flex: 1; min-width: 0` always intended. */
+    grid-template-columns: minmax(0, 1fr);
     gap: 0;
   }
 }
@@ -305,6 +312,18 @@
 @media (max-width: 1024px) {
   /* Panel holding the categories + featured questions. */
   .forum-hero__panel {
+    /* A dark panel over a paper page, so it carries the DARK band's roles. The
+       categories inside are .forum-cat, drawn in `var(--band-ink)` on
+       `var(--band-surface)`; inheriting the page's paper roles painted them in
+       near-black ink on a near-black panel, which is why the open panel looked
+       empty. */
+    --band-ink: #fff;
+    --band-muted: rgba(255, 255, 255, 0.72);
+    --band-line: rgba(255, 255, 255, 0.16);
+    --band-surface: rgba(255, 255, 255, 0.08);
+    --band-surface-hover: rgba(255, 255, 255, 0.16);
+    --band-accent: var(--gp-accent);
+
     display: block;
     position: fixed;
     /* Starts below the site header. `.forum-hero` is a stacking context

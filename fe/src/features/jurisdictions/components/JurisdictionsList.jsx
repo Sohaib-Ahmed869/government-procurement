@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FaMagnifyingGlass, FaChevronDown, FaArrowUpRightFromSquare } from 'react-icons/fa6';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import { useInView } from '../../../hooks/useInView.js';
 import { rulesApi } from '../../../api';
 import {
@@ -87,6 +88,15 @@ export default function JurisdictionsList() {
   const [category, setCategory] = useState('all');
   const [query, setQuery] = useState('');
 
+  // What the CARDS are filtered by, a fade-out behind the controls — the same
+  // hook and the same movement the Prompt Library's filters use
+  // (hooks/useFadeSwap.js). The two dropdowns only: the search field filters as
+  // it is typed, and a 380ms fade on every keystroke would be a stutter, not a
+  // transition. The controls themselves read the live values, so a dropdown
+  // answers the selection straight away while the grid it replaces fades out. */
+  const [appliedKey, fading] = useFadeSwap(JSON.stringify([state, category]));
+  const [shownState, shownCategory] = JSON.parse(appliedKey);
+
   // Rules come from the CMS (Content → Rules), ordered there.
   const [rules, setRules] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -111,8 +121,8 @@ export default function JurisdictionsList() {
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const matched = rules.filter((rule) => {
-      if (state !== 'all' && rule.state !== state) return false;
-      if (category !== 'all' && rule.category !== category) return false;
+      if (shownState !== 'all' && rule.state !== shownState) return false;
+      if (shownCategory !== 'all' && rule.category !== shownCategory) return false;
       if (!needle) return true;
       return (
         (rule.title || '').toLowerCase().includes(needle) ||
@@ -135,7 +145,7 @@ export default function JurisdictionsList() {
         rank(CATEGORIES, a.category) - rank(CATEGORIES, b.category) ||
         (a.title || '').localeCompare(b.title || ''),
     );
-  }, [rules, state, category, query]);
+  }, [rules, shownState, shownCategory, query]);
 
   const filtered = state !== 'all' || category !== 'all' || query.trim();
 
@@ -192,6 +202,8 @@ export default function JurisdictionsList() {
           </div>
         </div>
 
+        {/* The results, and only the results — the filter row above stays live. */}
+        <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
         {status === 'loading' && <p className="jl__empty">Loading rules…</p>}
         {status === 'error' && (
           <p className="jl__empty">
@@ -246,6 +258,7 @@ export default function JurisdictionsList() {
             })}
           </ul>
         )}
+        </div>
       </div>
     </section>
   );
