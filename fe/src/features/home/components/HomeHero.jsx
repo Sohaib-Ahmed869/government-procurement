@@ -24,11 +24,14 @@ import './HomeHero.css';
 // rather than a close-up on one person: the whole table is the point, which is
 // also why it is cut from the head of the clip, before the camera pushes in.
 //
-// It runs at 1.5x. At native speed the meeting barely moved over the length of
-// the loop and the hero read as a still that happened to breathe; the faster
-// cut also fits 21 seconds of the source into the same 14, so the loop comes
-// back round to the same frame less often. Every source frame is kept rather
-// than dropped to hit 25fps, hence the 37.5fps stream.
+// It runs at native speed, 14 seconds of a 15.6-second source at 25fps. The
+// clip it replaced needed a 1.5x cut because the meeting barely moved and the
+// hero read as a still that happened to breathe; this one carries its own
+// motion — the camera pushes in across the take and the table is mid-argument
+// — so speeding it up only made the loop turn over faster for nothing.
+//
+// Downscaled from 1440p rather than cropped: the source is already 16:9, so
+// the frame the grade was made on is the frame that ships.
 //
 // The poster is its own first frame, so the still and the footage are the same
 // shot and the swap from one to the other is invisible.
