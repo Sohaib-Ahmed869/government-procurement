@@ -43,6 +43,26 @@
   border-color: var(--band-accent);
 }
 
+/* The hover edge is the segment's own colour: green on Award Contracts, black
+   on Win. Written per segment rather than off one token, because no single
+   token is both — --gp-brand is #0a3114 on Award, which is green by name and
+   near-black to look at in a 1px line. --gp-brand-lift is the green that still
+   reads as green at that weight. */
+.forum-page[data-audience='award'] .forum-cat:hover {
+  border-color: var(--gp-brand-lift);
+}
+
+.forum-page[data-audience='win'] .forum-cat:hover {
+  border-color: var(--gp-ink-900);
+}
+
+/* …except inside the phone's slide-up categories panel, which is a dark ground:
+   a near-black edge on it is no edge at all, so there the accent keeps the job.
+   One class more specific than the two rules above, so it wins on both. */
+.forum-page[data-audience] .forum-hero__panel .forum-cat:hover {
+  border-color: var(--band-accent);
+}
+
 .forum-cat.is-active {
   color: var(--gp-paper);
   background: var(--gp-brand);

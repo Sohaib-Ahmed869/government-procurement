@@ -38,6 +38,7 @@
    plain divs, so there is nothing to click and nothing to tab to: a disabled
    control a keyboard user can still reach is a promise the page can't keep. */
 .pa-card {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -57,14 +58,12 @@
   border-radius: 8px;
   transition:
     var(--gp-fade),
-    transform 240ms var(--gp-ease),
-    box-shadow 240ms var(--gp-ease);
+    transform 240ms var(--gp-ease);
 }
 
 .pa-card:has(.pa-card__logo) {
   /* Room at the right edge for the crest, so a two-line jurisdiction name
      stops beside the chip rather than running under it. */
-  position: relative;
   padding-right: 88px;
 }
 
@@ -104,12 +103,28 @@
     0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
-.pa-card.is-live:hover {
-  transform: translateY(-4px);
+/* The lift animates a transform and nothing else; the deeper shadow is an
+   overlay that fades in over it. Animating `box-shadow` directly repaints the
+   card AND re-rasterises its blur on every frame — work the compositor cannot
+   take on — which is what made these hovers stutter on a laptop in some
+   browsers while a phone, which never hovers at all, stayed smooth. Above
+   1441px the page is `zoom`-scaled too, so that repaint is over an even larger
+   raster. Opacity on a pseudo-element is composited and costs none of it. */
+.pa-card.is-live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 22px 44px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transition: opacity 240ms var(--gp-ease);
 }
+
+.pa-card.is-live:hover { transform: translateY(-4px); }
+.pa-card.is-live:hover::after { opacity: 1; }
 
 .pa-card.is-live:focus-visible {
   outline: 2px solid var(--gp-accent-ink);

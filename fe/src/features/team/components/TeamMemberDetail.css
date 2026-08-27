@@ -499,12 +499,17 @@
      than a sliver of one. */
   display: grid;
   grid-template-rows: minmax(120px, 1fr) 1fr;
+  /* Positioned at rest, not only while hovered: the hover shadow is drawn by an
+     absolutely positioned ::after that needs this as its containing block. */
+  position: relative;
   width: 100%;
   height: 100%;
   /* No side padding: the image meets the box edge on three sides. The text
      below carries its own gutters. */
   padding: 0 0 16px;
-  overflow: hidden;
+  /* NOT `overflow: hidden` — the clip is on the picture instead (see
+     .tm__work-art). A clipped card cannot cast the hover shadow from a
+     pseudo-element, and that is what keeps the hover composited. */
   color: inherit;
   text-decoration: none;
   /* Same card as the Insights grid: the hardcoded #2a2a2a was the same bug,
@@ -538,7 +543,8 @@
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: 0;
+  /* The card's own 14px on the two top corners; the card no longer clips it. */
+  border-radius: 14px 14px 0 0;
   background: var(--gp-paper);
 }
 
@@ -587,33 +593,50 @@
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   /* Two-speed hover so sweeping across the grid doesn't leave two cards raised
      at once. Leaving is quick and immediate — the card drops back in 0.2s. */
+  /* The lift animates a transform and nothing else; the deeper shadow is an
+     overlay that fades in over it (below). Animating `box-shadow` directly
+     repaints the card AND re-rasterises a 50px blur on every frame — work the
+     compositor cannot take on — which is what made this grid's hover stutter on
+     a laptop in some browsers while a phone, which never hovers, stayed
+     smooth. Above 1441px the page is `zoom`-scaled too, so that repaint covers
+     an even larger raster. */
   .tm__work-card {
     transition:
       transform 0.2s ease-out,
-      box-shadow 0.2s ease-out,
-      border-color 0.2s ease-out,
-      background-color 0.2s ease-out;
+      border-color 0.2s ease-out;
+  }
+
+  .tm__work-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
   }
 
   /* Arriving is slower and held back by 0.18s, so the card you just left has
      settled before this one starts to rise. */
-  .tm__work-card:hover {
+  .tm__work-card:hover,
+  .tm__work-card:hover::after {
     transition:
       transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
-      box-shadow 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
-      border-color 0.45s ease-out 0.18s,
-      background-color 0.45s ease-out 0.18s;
+      opacity 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) 0.18s,
+      border-color 0.45s ease-out 0.18s;
   }
 
   .tm__work-card:hover {
     /* Above the neighbouring cards so the shadow falls on them, not under. */
-    position: relative;
     z-index: 1;
     transform: translateY(-10px) scale(1.04);
-    background-color: var(--band-surface);
+    /* The background-color it used to set here was the --band-surface the card
+       already rests on: no change to look at, one more thing to repaint. */
     border-color: var(--band-muted);
-    box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
   }
+
+  .tm__work-card:hover::after { opacity: 1; }
 
   .tm__work-card:hover .tm__work-title {
     text-decoration: underline;

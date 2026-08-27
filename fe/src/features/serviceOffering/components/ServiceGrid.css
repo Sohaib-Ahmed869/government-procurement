@@ -46,17 +46,32 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transition:
     var(--gp-fade),
-    transform 260ms var(--gp-ease),
-    box-shadow 260ms var(--gp-ease);
+    transform 260ms var(--gp-ease);
 }
 
-.sg__card:hover {
-  transform: translateY(-5px);
+/* The lift animates a transform and nothing else; the deeper shadow is an
+   overlay that fades in over it. Animating `box-shadow` directly repaints the
+   card AND re-rasterises its blur on every frame — work the compositor cannot
+   take on — which is what made these hovers stutter on a laptop in some
+   browsers while a phone, which never hovers at all, stayed smooth. Above
+   1441px the page is `zoom`-scaled too, so that repaint is over an even larger
+   raster. Opacity on a pseudo-element is composited and costs none of it. */
+.sg__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     0 22px 46px rgba(0, 0, 0, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transition: opacity 260ms var(--gp-ease);
 }
+
+.sg__card:hover { transform: translateY(-5px); }
+.sg__card:hover::after { opacity: 1; }
 
 .sg__head {
   display: flex;

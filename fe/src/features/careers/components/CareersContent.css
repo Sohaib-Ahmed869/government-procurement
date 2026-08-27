@@ -225,16 +225,30 @@
 /* Hover polish — matches the subscribe button: lift + shadow. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .careers__cta-btn {
+    position: relative;
     transition:
       background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out;
+      transform 0.2s ease-out;
   }
 
-  .careers__cta-btn:hover {
-    transform: translateY(-3px);
+  /* The lift animates a transform and nothing else; the deeper shadow is an
+     overlay that fades in over it. Animating `box-shadow` directly repaints the
+     button and re-rasterises its blur on every frame — work the compositor
+     cannot take on — which is what made these hovers stutter on a laptop in some
+     browsers while a phone, which never hovers, stayed smooth. */
+  .careers__cta-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
   }
+
+  .careers__cta-btn:hover { transform: translateY(-3px); }
+  .careers__cta-btn:hover::after { opacity: 1; }
 }
 
 .careers :is(a):focus-visible {
@@ -253,12 +267,17 @@
   .careers__inner {
     /* Block only. The gutter is the site column's, matching the heading band
        above and every other page. */
-    padding-block: 24px;
+    padding-block: 16px;
   }
 
+  /* One gap between blocks, not three stacked. This was 24 of margin on top of
+     24 of padding, with 24 of the inner's own padding at each end of the join —
+     nearly 100px of empty page between the end of one block and the heading of
+     the next. The blocks are told apart by their ground, so the space only has
+     to be enough to read as a change of block. */
   .careers__block + .careers__block {
-    margin-top: 24px;
-    padding-top: 24px;
+    margin-top: 0;
+    padding-top: 16px;
   }
 
   .careers__heading {

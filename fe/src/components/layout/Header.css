@@ -35,11 +35,13 @@
   --control-line: 18px;
   --control-hint-font: 13.5px;
   --control-edge: rgba(255, 255, 255, 0.28);
-  /* Outer edge of both controls: the glass edge the tender cards carry — lit
-     from the top left, fading to the bottom right — rather than an even ring. */
-  --control-edge-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
+  /* Outer edge of both controls: one even 1px ring, the same weight on all four
+     sides. It used to be a lit glass edge — a bright inset on the top left
+     fading to a dim one on the bottom right — which is a nice effect on a card
+     but wrong on two controls that sit side by side: the toggle's left edge
+     came out heavier than the CTA's, so the two read as different sizes and
+     looked off-line even though they are built to the same metrics. */
+  --control-edge-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
   /* The toggle track's own fill. The chosen segment is NOT just --control-active
      over the header — it is --control-active over this, because the segment sits
      inside the track. The CTA lays the same two coats in the same order, so the
@@ -347,8 +349,6 @@
     var(--control-track, rgba(241, 238, 234, 0.05));
   border-radius: var(--control-radius);
   box-shadow: var(--control-edge-shadow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .site-header__cta-arrow {
@@ -377,12 +377,6 @@
   .site-header__cta:hover,
   .site-header__cta:focus-visible {
     transform: translateY(-2px);
-  }
-
-  .site-header__cta {
-    transition:
-      transform 0.18s ease-out,
-      box-shadow 0.18s ease-out;
   }
 
   .site-header__cta:hover {
@@ -416,15 +410,21 @@
   padding: 0;
   overflow: hidden;
   border-radius: var(--control-radius, 4px);
-  /* Same glass edge and fill as the tender cards. */
+  /* Same edge and fill as the CTA beside it.
+
+     NO backdrop-filter, here or on the CTA. Both controls sit directly on the
+     header's own opaque fill, so a blur had nothing translucent behind it to
+     blur — it was invisible, and it cost: a backdrop filter inside a `position:
+     sticky` bar makes the browser re-snapshot what is behind it on every frame
+     the page scrolls, which is why the bar and everything transitioning near it
+     stuttered on desktop while a phone (where these controls are laid out
+     differently) stayed smooth. */
   box-shadow: var(
     --control-edge-shadow,
     inset 1px 1px 1px rgba(255, 255, 255, 0.3),
     inset -1px -1px 1px rgba(255, 255, 255, 0.12)
   );
   background: var(--control-track, rgba(241, 238, 234, 0.05));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .audience-toggle__option {

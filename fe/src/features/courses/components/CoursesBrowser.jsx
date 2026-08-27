@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
+import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { bundlesApi, coursesApi } from '../../../api';
 import './CoursesBrowser.css';
@@ -82,6 +83,13 @@ export default function CoursesBrowser() {
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
 
+  // What the RESULTS are filtered by, a fade-out behind the rail — the same
+  // hook and the same movement the Prompt Library uses (hooks/useFadeSwap.js).
+  // The controls read the live values above, so a filter answers the click that
+  // set it straight away while the grid it replaces fades out first.
+  const [appliedKey, fading] = useFadeSwap(JSON.stringify([category, level]));
+  const [shownCategory, shownLevel] = JSON.parse(appliedKey);
+
   const [courses, setCourses] = useState([]);
   const [bundles, setBundles] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -135,7 +143,7 @@ export default function CoursesBrowser() {
   //
   // The order is fixed at featured-first, then newest — what the "Popular" sort
   // did, and the only order left now that the sort control has gone.
-  const showingBundles = category === 'bundles';
+  const showingBundles = shownCategory === 'bundles';
 
   const visible = useMemo(() => {
     const byNewest = (a, b) =>
@@ -147,21 +155,22 @@ export default function CoursesBrowser() {
     if (showingBundles) return [...bundles].sort(byNewest);
 
     const filtered = courses.filter((c) => {
-      if (category !== 'all' && (c.segment || 'general') !== category) return false;
-      if (level !== 'all' && (c.level || 'beginner') !== level) return false;
+      if (shownCategory !== 'all' && (c.segment || 'general') !== shownCategory) return false;
+      if (shownLevel !== 'all' && (c.level || 'beginner') !== shownLevel) return false;
       return true;
     });
 
     return [...filtered].sort(
       (a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || byNewest(a, b),
     );
-  }, [courses, bundles, showingBundles, category, level]);
+  }, [courses, bundles, showingBundles, shownCategory, shownLevel]);
 
-  // Changing a filter starts the count again. Keeping the old one would show
-  // four rows of a two-item result, or hide the top of a longer one.
+  // Changing a filter starts the count again. Keyed to the APPLIED filter, not
+  // the live one: reset while the old list is still fading out and it loses
+  // every row past the first page mid-fade.
   useEffect(() => {
     setShown(PAGE_SIZE);
-  }, [category, level]);
+  }, [shownCategory, shownLevel]);
 
   const onScreen = visible.slice(0, shown);
 
@@ -229,6 +238,8 @@ export default function CoursesBrowser() {
             </span>
           </button>
 
+          {/* The results, and only the results — see useFadeSwap above. */}
+          <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
           {status === 'loading' && <p className="courses-main__title">Loading courses…</p>}
           {status === 'error' && (
             <p className="courses-main__title">
@@ -327,6 +338,7 @@ export default function CoursesBrowser() {
               View more
             </button>
           )}
+          </div>
         </div>
       </div>
     </section>

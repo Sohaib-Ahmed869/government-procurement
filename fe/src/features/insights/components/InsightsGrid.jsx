@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
+import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import { articlesApi, categoriesApi } from '../../../api';
 import './InsightsGrid.css';
 
@@ -105,6 +106,12 @@ export default function InsightsGrid() {
   // The selected category id, or 'all'.
   const [category, setCategory] = useState('all');
 
+  // What the GRID is filtered by, a fade-out behind the pill — the same hook and
+  // the same movement the Prompt Library's filters use (hooks/useFadeSwap.js).
+  // The dropdown reads `category` and answers the click immediately; the cards
+  // it replaces fade out first.
+  const [shownCategory, fading] = useFadeSwap(category);
+
   const [articles, setArticles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
@@ -150,16 +157,21 @@ export default function InsightsGrid() {
   }, [articles, categories]);
 
   const visible = useMemo(
-    () => (category === 'all' ? articles : articles.filter((a) => a.category?._id === category)),
-    [articles, category],
+    () =>
+      shownCategory === 'all'
+        ? articles
+        : articles.filter((a) => a.category?._id === shownCategory),
+    [articles, shownCategory],
   );
 
   // How many of the filtered articles are on screen. Reset whenever the filter
   // changes, so a new selection starts from the first page again.
   const [shown, setShown] = useState(PAGE_SIZE);
+  // Keyed to the APPLIED category: resetting while the old list is still fading
+  // out would drop every card past the first page mid-fade.
   useEffect(() => {
     setShown(PAGE_SIZE);
-  }, [category]);
+  }, [shownCategory]);
 
   const onScreen = visible.slice(0, shown);
 
@@ -187,6 +199,8 @@ export default function InsightsGrid() {
           </div>
         )}
 
+        {/* The results, and only the results — the pill above stays live. */}
+        <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
         {status === 'loading' && <p className="insights__empty">Loading insights…</p>}
         {status === 'error' && (
           <p className="insights__empty">
@@ -277,6 +291,7 @@ export default function InsightsGrid() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </section>
   );

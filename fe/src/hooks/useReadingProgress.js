@@ -73,7 +73,15 @@ export function useReadingProgress({ offset = 0 } = {}) {
         return;
       }
 
-      setProgress(Math.min(1, Math.max(0, (scrolled - begin) / span)));
+      // Quantised to half a percent before it goes into state. The raw fraction
+      // changes on every scroll frame, and every change re-rendered the whole
+      // article — a React render per frame, competing with the reveal
+      // animations for the same frame budget. Half a percent is finer than the
+      // bar can draw (it is a few hundred pixels wide at most), so the bar is
+      // pixel-identical and the renders drop from one per frame to at most two
+      // hundred over the length of the article.
+      const next = Math.min(1, Math.max(0, (scrolled - begin) / span));
+      setProgress((prev) => (Math.abs(next - prev) < 0.005 && next > 0 && next < 1 ? prev : next));
     };
 
     // Coalesced to one measurement per frame — scroll fires far more often than

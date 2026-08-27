@@ -190,6 +190,22 @@ body {
 /* The hero's media layer is excluded: the footage is the same in both segments,
    so fading it out and back is motion with nothing behind it — and the tint
    above it already recolours on its own. */
+/* `will-change` for the length of the swap and no longer.
+
+   This is the heaviest transition on the site — every band's contents fade and
+   lift at once — and without the hint each element is animated on the main
+   thread, which is what made the swap stutter on a laptop in some browsers
+   while a phone stayed smooth. Declared on the two swap states rather than on
+   the elements themselves, so the promotion exists only while the swap is
+   running: `will-change` left on permanently is its own performance bug, since
+   every element it names keeps a compositing layer for the life of the page. */
+html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > *,
+html[data-audience-swap='out'] .page-layout > .site-footer > *,
+html[data-audience-swap='in'] .page-layout__main :is(section, header, article) > *,
+html[data-audience-swap='in'] .page-layout > .site-footer > * {
+  will-change: opacity, transform;
+}
+
 html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > *:not(.home-hero__media),
 html[data-audience-swap='out'] .page-layout > .site-footer > * {
   opacity: 0;

@@ -247,18 +247,32 @@
 /* Hover polish — matches the subscribe button: lift + shadow. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .consult__submit {
+    position: relative;
     transition:
       background-color 0.2s ease-out,
-      transform 0.2s ease-out,
-      box-shadow 0.2s ease-out;
+      transform 0.2s ease-out;
   }
 
-  .consult__submit:hover {
-    transform: translateY(-3px);
+  /* The lift animates a transform and nothing else; the deeper shadow is an
+     overlay that fades in over it. Animating `box-shadow` directly repaints the
+     button and re-rasterises its blur on every frame — work the compositor
+     cannot take on — which is what made these hovers stutter on a laptop in some
+     browsers while a phone, which never hovers, stayed smooth. */
+  .consult__submit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
     box-shadow:
       0 10px 24px rgba(0, 0, 0, 0.28),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
   }
+
+  .consult__submit:hover { transform: translateY(-3px); }
+  .consult__submit:hover::after { opacity: 1; }
 }
 
 .consult :is(a, button, input, textarea, select):focus-visible {

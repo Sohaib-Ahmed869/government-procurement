@@ -631,10 +631,20 @@
     width: 230px;
   }
 
+  /* The gap between one group's list and the next group's heading. 48px was a
+     desktop-sized gap on a phone, where the cards it separates are already
+     full-width and a band apart. */
   .tp__group-title {
-    margin-top: 48px;
+    margin-top: 24px;
     font-family: 'Geist Variable', system-ui, sans-serif;
     font-size: clamp(26px, 7.5vw, 34px);
+  }
+
+  /* …but the first group heads the band directly under the page title, where
+     there is no list above it to be separated from — that 48px was simply an
+     empty white strip under the heading band. */
+  .tp__band--head + .tp__band .tp__group-title {
+    margin-top: 20px;
   }
 
   /* Matches the footer blurb. */
