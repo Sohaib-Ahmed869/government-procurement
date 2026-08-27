@@ -156,10 +156,16 @@
   scroll-margin-top: 96px;
 }
 
-.pol-section + .pol-section { margin-top: clamp(26px, 3vw, 38px); }
+/* The gap between one section and the next. At 38px, with the heading's own
+   bottom margin and the 1.7 line-height under it, a policy read as a column of
+   widely-spaced fragments and a short clause could sit a screen apart from the
+   one before it. */
+.pol-section + .pol-section { margin-top: clamp(18px, 1.8vw, 24px); }
 
+/* Closer to the text it introduces than to the section above it, so the
+   heading reads as belonging to what follows. */
 .pol-section__heading {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   font-size: clamp(17px, 1.7vw, 21px);
   font-weight: 600;
   line-height: 1.3;
@@ -189,31 +195,33 @@
 .pol-section__list {
   max-width: 72ch;
   font-size: 15.5px;
-  line-height: 1.7;
+  /* 1.6 rather than 1.7 — still comfortable for a long read, and over a policy
+     of thirty paragraphs it is a screen and a half less scrolling. */
+  line-height: 1.6;
   color: var(--gp-ink);
 }
 
-.pol-section__p { margin: 0 0 12px; }
+.pol-section__p { margin: 0 0 10px; }
 .pol-section__p:last-child { margin-bottom: 0; }
 
 .pol-section__list {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   padding-left: 22px;
 }
 
-.pol-section__list li + li { margin-top: 6px; }
+.pol-section__list li + li { margin-top: 4px; }
 
 /* Rich text from the CMS, when a page is written as one body rather than as
    sections. Same measure and rhythm as the structured path above. */
 .pol-prose {
   max-width: 72ch;
   font-size: 15.5px;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .pol-prose h2,
 .pol-prose h3 {
-  margin: 18px 0 8px;
+  margin: 20px 0 6px;
   font-weight: 600;
   line-height: 1.3;
   color: var(--gp-brand);
@@ -221,10 +229,13 @@
 
 .pol-prose h2 { font-size: clamp(17px, 1.7vw, 21px); }
 .pol-prose h3 { font-size: 16px; }
-.pol-prose p { margin: 0 0 12px; }
+.pol-prose p { margin: 0 0 10px; }
 .pol-prose ul,
-.pol-prose ol { margin: 0 0 12px; padding-left: 22px; }
-.pol-prose li + li { margin-top: 6px; }
+.pol-prose ol { margin: 0 0 10px; padding-left: 22px; }
+.pol-prose li + li { margin-top: 4px; }
+/* No leading gap on the first heading of a body — the rule above it already
+   spaces it. */
+.pol-prose > :is(h2, h3):first-child { margin-top: 0; }
 .pol-prose a { color: var(--gp-accent-ink); }
 
 /* --- print (B5.3) ---------------------------------------------------------

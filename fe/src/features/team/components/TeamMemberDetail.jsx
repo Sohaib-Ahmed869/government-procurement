@@ -282,25 +282,32 @@ export default function TeamMemberDetail({ slug }) {
                       <span className="tm__work-art">
                         {image && <img src={image} alt="" />}
                       </span>
-                      {article.category?.name && (
-                        <span className="tm__work-type">{article.category.name}</span>
-                      )}
-                      <span className="tm__work-title">
-                        {article.title}
-                        <svg
-                          className="tm__work-chevron"
-                          viewBox="0 0 24 24"
-                          width="16"
-                          height="16"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.4"
-                          aria-hidden="true"
-                        >
-                          <polyline points="9 6 15 12 9 18" />
-                        </svg>
+
+                      {/* The text is wrapped as one half of the card, exactly as
+                          on the Insights grid: loose children would be sized by
+                          their own contents and the picture would always come
+                          out the taller of the two. See TeamMemberDetail.css. */}
+                      <span className="tm__work-text">
+                        {article.category?.name && (
+                          <span className="tm__work-type">{article.category.name}</span>
+                        )}
+                        <span className="tm__work-title">
+                          {article.title}
+                          <svg
+                            className="tm__work-chevron"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.4"
+                            aria-hidden="true"
+                          >
+                            <polyline points="9 6 15 12 9 18" />
+                          </svg>
+                        </span>
+                        {date && <span className="tm__work-date">{date}</span>}
                       </span>
-                      {date && <span className="tm__work-date">{date}</span>}
                     </Link>
                   </li>
                 );

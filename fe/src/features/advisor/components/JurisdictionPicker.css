@@ -61,6 +61,41 @@
     box-shadow 240ms var(--gp-ease);
 }
 
+.pa-card:has(.pa-card__logo) {
+  /* Room at the right edge for the crest, so a two-line jurisdiction name
+     stops beside the chip rather than running under it. */
+  position: relative;
+  padding-right: 88px;
+}
+
+/* The jurisdiction's crest, drawn the way the tender portals draw theirs: a
+   white chip with the artwork fitted inside it whole, so the rounded corners
+   cut white on all four sides instead of only where the artwork reaches the
+   edge. Sat against the right edge and centred against the card's own height,
+   which the grid has already equalised across the row. */
+.pa-card__logo {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: #fff;
+  border: 1px solid var(--gp-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pa-card__logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .pa-card.is-live {
   cursor: pointer;
   color: var(--gp-ink);
@@ -154,4 +189,13 @@
 
 @media (max-width: 860px) {
   .pa-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  .pa-card:has(.pa-card__logo) { padding-right: 72px; }
+  .pa-card__logo {
+    width: 52px;
+    height: 52px;
+    right: 12px;
+  }
 }

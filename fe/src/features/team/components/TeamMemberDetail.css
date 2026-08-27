@@ -472,18 +472,34 @@
 .tm__work-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 28px;
+  /* 24px, the Insights grid's gutter, not the 28 this had — the cards are the
+     same card, so they sit at the same width in a 4-up row. */
+  gap: 24px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* The <li> is only a wrapper; the card inside it is what fills the cell. Same
+   as .insights-card. */
+.tm__work-grid > li { display: flex; }
+
 /* Boxed, the same way the Insights cards are: a panel with the image running
    full width across its top, the text inset below it. The grey fill and
    hairline are the Win treatment; Award swaps in the glass box further down. */
 .tm__work-card {
-  display: flex;
-  flex-direction: column;
+  /* Two rows — picture half, text half — rather than a flex column, which is
+     what the Insights cards do. In an auto-height grid a pair of `1fr` tracks
+     both resolve to the taller one's content, so the halves come out equal
+     without either being pinned to a guessed height, and because every card in
+     a row is stretched to the row's height the split lands at the same y in all
+     of them. The TEXT sets that height: the image is taken out of flow inside
+     its half (below), so it contributes none of its own. `minmax(120px, …)` is
+     the floor, so a card with a one-line title still shows a picture rather
+     than a sliver of one. */
+  display: grid;
+  grid-template-rows: minmax(120px, 1fr) 1fr;
+  width: 100%;
   height: 100%;
   /* No side padding: the image meets the box edge on three sides. The text
      below carries its own gutters. */
@@ -504,19 +520,32 @@
   padding-right: 16px;
 }
 
-/* Fixed ratio so the row of titles starts at the same height whether or not a
-   given article has a hero image. Square-cornered — the box's own 14px radius
-   and overflow clip the two top corners, so the image sits in the corner rather
-   than floating inside it. */
+/* The text half. A column so the date can be pushed to its foot; min-height 0
+   so it can be shorter than its content asks for when the row is. */
+.tm__work-text {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The picture takes the height its row is given and asks for none of its own —
+   the 16/10 ratio it used to carry made it the taller of the two halves in
+   every card. `position: relative` is what the image inside it is measured
+   against. Square-cornered — the box's own 14px radius and overflow clip the
+   two top corners, so the image sits in the corner rather than floating inside
+   it. */
 .tm__work-art {
+  position: relative;
   display: block;
-  aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: 0;
   background: var(--gp-paper);
 }
 
+/* Out of flow, so its natural height cannot push the row open. */
 .tm__work-art img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -528,16 +557,17 @@
   color: var(--band-muted);
 }
 
+/* Sized as the Insights card title, not a step down from it. */
 .tm__work-title {
   margin-top: 6px;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--band-ink);
 }
 
 .tm__work-chevron {
-  margin-left: 4px;
+  margin-left: 6px;
   vertical-align: -2px;
   color: var(--tm-accent);
 }
@@ -547,7 +577,8 @@
 .tm__work-date {
   margin-top: auto;
   padding-top: 14px;
-  font-size: 13.5px;
+  font-size: 14.5px;
+  line-height: 1.6;
   color: var(--band-muted);
 }
 
@@ -763,6 +794,11 @@
   .tm__work-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+
+  /* One step down on phones, as on the Insights grid. */
+  .tm__work-title {
+    font-size: 18px;
   }
 
   .tm__work-more {

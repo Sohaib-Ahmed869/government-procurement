@@ -1,4 +1,5 @@
 import { rulePacksApi } from '../../api';
+import nswLogo from '../../assets/images/NSW-Government-official-logo.jpg';
 
 /* A6 — every jurisdiction the advisor covers, and how a rule pack is assembled.
 
@@ -23,6 +24,10 @@ export const JURISDICTIONS = [
     name: 'New South Wales',
     note: 'Available Now',
     live: true,
+    // The jurisdiction's own crest, shown on the card the way the tender
+    // portals carry theirs. Optional: a jurisdiction without one simply
+    // renders no chip.
+    logo: nswLogo,
   },
   {
     slug: 'federal',

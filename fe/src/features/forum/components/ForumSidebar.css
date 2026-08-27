@@ -1,23 +1,29 @@
 .forum-sidebar__heading {
-  margin: 0 0 18px;
+  margin: 0 0 12px;
   font-size: 18px;
   font-weight: 600;
   color: var(--band-ink);
 }
 
+/* One category per line, in order — All categories, then Award, Win, Other.
+   Close together: at the 14px gap this used to carry, four stacked boxes made
+   the sidebar taller than the answer cards beside it, so the section ended in a
+   column of dead space and everything below it was pushed down the page. */
 .forum-sidebar__cats {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
+  gap: 6px;
 }
 
 /* Filled, softly-rounded category boxes. */
 .forum-cat {
   display: inline-flex;
   align-items: center;
-  padding: 10px 18px;
-  font-size: 15px;
+  /* Tighter than the 10px/18px this carried — the four boxes sit as a close
+     stack rather than four widely-spaced rows. */
+  padding: 8px 14px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--band-ink);
   text-decoration: none;
@@ -46,7 +52,7 @@
 /* Separators above and below the Featured Questions list. */
 .forum-sidebar__divider {
   height: 0;
-  margin: 28px 0;
+  margin: 20px 0 0;
   border: 0;
   border-top: 2px solid var(--band-line);
 }

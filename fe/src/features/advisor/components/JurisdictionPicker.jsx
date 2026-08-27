@@ -17,12 +17,15 @@ import './JurisdictionPicker.css';
 // a visitor than an unnamed placeholder — they can see their own jurisdiction
 // on the list and know it is coming.
 
-export default function JurisdictionPicker({ itemClassName = '' }) {
+// `showLogos` is off by default. The jurisdiction crest belongs to the tool's
+// own picker, where the boxes are the page; the homepage band renders the same
+// component at a glance and stays as it was.
+export default function JurisdictionPicker({ itemClassName = '', showLogos = false }) {
   const item = `pa-grid__item${itemClassName ? ` ${itemClassName}` : ''}`;
 
   return (
     <ul className="pa-grid">
-      {JURISDICTIONS.map(({ slug, code, name, note, live }) => (
+      {JURISDICTIONS.map(({ slug, code, name, note, live, logo }) => (
         <li className={item} key={slug}>
           {live ? (
             /* A real link, so it can be opened in a new tab and read by
@@ -36,6 +39,13 @@ export default function JurisdictionPicker({ itemClassName = '' }) {
                 Start
                 <Arrow className="pa-card__arrow" />
               </span>
+              {/* Decorative: the name is already written beside it, so the
+                  crest carries an empty alt rather than repeating it. */}
+              {showLogos && logo && (
+                <span className="pa-card__logo">
+                  <img src={logo} alt="" loading="lazy" />
+                </span>
+              )}
             </Link>
           ) : (
             <div className="pa-card pa-card--soon" aria-disabled="true">

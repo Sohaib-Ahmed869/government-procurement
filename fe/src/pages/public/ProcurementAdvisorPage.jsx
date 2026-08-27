@@ -93,7 +93,7 @@ export default function ProcurementAdvisorPage() {
                     general information rather than legal advice.{' '}
                     <Link to="/policies/privacy">Read our privacy policy</Link>.
                   </p>
-                  <JurisdictionPicker />
+                  <JurisdictionPicker showLogos />
                 </>
               )}
             </div>
