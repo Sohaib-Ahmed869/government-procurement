@@ -63,9 +63,16 @@ export function commerceStatus() {
 export async function createCheckoutSession({ order, successUrl, cancelUrl, customerEmail }) {
   return stripe().checkout.sessions.create({
     mode: 'payment',
-    // Card only for now. Adding Apple/Google Pay is a dashboard setting rather
-    // than a code change once the account is verified.
-    payment_method_types: ['card'],
+    /* `payment_method_types` is deliberately NOT sent.
+
+       Accounts with Managed Payments enabled — the default on newer Stripe
+       accounts — reject it outright: "Unsupported parameter:
+       payment_method_types … Managed Payments handles this parameter for you."
+
+       Leaving it out is also the better behaviour. Stripe then shows whichever
+       methods are enabled in the dashboard for the buyer's country and device,
+       so Apple Pay and Google Pay appear without a code change. Pinning it to
+       ['card'] would have quietly excluded them. */
     client_reference_id: String(order._id),
     metadata: { orderId: String(order._id), reference: order.reference },
     customer_email: customerEmail || undefined,
