@@ -4,7 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
    Every LMS screen needs the same four things, and hand-rolling them per hook
    is how one of them ends up without an error state. */
 export function useApi(fetcher, deps = [], { skip = false } = {}) {
-  const [state, setState] = useState({ data: null, status: skip ? 'idle' : 'loading', error: null });
+  const [state, setState] = useState({
+    data: null,
+    status: skip ? 'idle' : 'loading',
+    error: null,
+    // True while re-fetching data we ALREADY have. Distinct from `loading`,
+    // which means "there is nothing to show yet".
+    refreshing: false,
+  });
   // Guards against a slow first response landing after a fast second one and
   // overwriting it. The classic out-of-order fetch bug.
   const seq = useRef(0);
@@ -12,13 +19,35 @@ export function useApi(fetcher, deps = [], { skip = false } = {}) {
   const run = useCallback(async () => {
     if (skip) return;
     const mine = ++seq.current;
-    setState((s) => ({ ...s, status: 'loading', error: null }));
+    /* A RELOAD MUST NOT LOOK LIKE A FIRST LOAD.
+
+       This used to set status:'loading' unconditionally, and screens render a
+       skeleton for that — so every reload() replaced a working page with a
+       placeholder and rebuilt it. In the course builder, where adding a lesson
+       or reordering one calls reload(), that read as the whole page reloading
+       after every click, and cost the reader their scroll position each time.
+
+       So: keep showing what we have, and flag `refreshing` for anything that
+       wants to show a quiet spinner. `loading` now means only "nothing to show
+       yet", which is when a skeleton is the honest answer. */
+    setState((s) =>
+      s.data == null
+        ? { ...s, status: 'loading', error: null }
+        : { ...s, refreshing: true, error: null },
+    );
     try {
       const data = await fetcher();
-      if (mine === seq.current) setState({ data, status: 'ready', error: null });
+      if (mine === seq.current) setState({ data, status: 'ready', error: null, refreshing: false });
     } catch (err) {
       if (mine === seq.current) {
-        setState({ data: null, status: 'error', error: err?.message ?? 'Something went wrong' });
+        setState((s) => ({
+          // A failed REFRESH keeps the data it already had. Throwing away a
+          // working page because one refetch failed is the worse outcome.
+          data: s.data,
+          status: s.data == null ? 'error' : 'ready',
+          error: err?.message ?? 'Something went wrong',
+          refreshing: false,
+        }));
       }
     }
     // fetcher is intentionally not a dep: callers pass an inline arrow, which

@@ -27,7 +27,7 @@ const TABS = [
 export default function CourseBuilderPage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { course, modules, status, error, reload, applyLesson } = useAuthoredCourse(courseId);
+  const { course, modules, status, error, refreshing, reload, applyLesson } = useAuthoredCourse(courseId);
   const { toast } = useToast();
 
   const [tab, setTab] = useState('curriculum');
@@ -112,7 +112,9 @@ export default function CourseBuilderPage() {
     [reload],
   );
 
-  if (status === 'loading') {
+  // Only when there is nothing on screen yet. A refetch after adding a lesson
+  // keeps the builder in place — see the note in useApi.
+  if (status === 'loading' && !course) {
     return (
       <div className="lms-card">
         <span className="lms-skel lms-skel--line" style={{ width: '46%', height: 22 }} />
@@ -281,7 +283,7 @@ export default function CourseBuilderPage() {
       </div>
 
       {tab === 'curriculum' ? (
-        <div className={`lms-builder__panes${busy ? ' is-busy' : ''}`}>
+        <div className={`lms-builder__panes${busy || refreshing ? ' is-busy' : ''}`}>
           <div className="lms-builder__outline">
             <ModuleEditor
               modules={mergedModules}

@@ -6057,3 +6057,18 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
    and friends) inject a toolbar into the bottom-right corner and sit on top of
    the last line of text. */
 .lms-textarea { min-height: 96px; resize: vertical; }
+
+/* Saving in the course builder.
+
+   `is-busy` was being applied and styled by nothing, so a structural save had
+   no feedback at all — the only signal was the page tearing itself down and
+   rebuilding, which is the bug this replaces. A brief dim plus a blocked
+   pointer says "working" without taking the work off screen. */
+.lms-builder__panes.is-busy {
+  opacity: .6;
+  pointer-events: none;
+  transition: opacity .12s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lms-builder__panes.is-busy { transition: none; }
+}
