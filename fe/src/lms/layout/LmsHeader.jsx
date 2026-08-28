@@ -2,18 +2,17 @@ import { Link } from 'react-router-dom';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
 import NotificationsMenu from '../components/NotificationsMenu.jsx';
 
-// Up-to-two-letter initials for the avatar chip.
-function initials(name) {
-  if (!name) return '?';
-  const parts = name.trim().split(/\s+/);
-  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
-}
+/* Top bar: mobile drawer toggle, breadcrumb trail, course search and
+   notifications.
 
-// Top bar: mobile drawer toggle, breadcrumb trail, course search, notifications
-// and the signed-in student. The desktop collapse control lives in the sidebar,
-// so it is not repeated here.
+   Who is signed in is NOT here. It used to be, as an inert chip beside the
+   bell, at the same time as the sidebar's foot carried a Log out button and
+   the nav carried Profile and Settings — the same account, stated in three
+   places, actionable in none of them. It is the sidebar's identity card now,
+   which is where an app with a sidebar puts it. The desktop collapse control
+   lives there too, so neither is repeated here. */
 export default function LmsHeader({ crumbs = [], onOpenMobile }) {
-  const { user, isAuthenticated } = useStudentAuth();
+  const { isAuthenticated } = useStudentAuth();
   const current = crumbs[crumbs.length - 1];
   const trail = crumbs.slice(0, -1);
 
@@ -73,15 +72,7 @@ export default function LmsHeader({ crumbs = [], onOpenMobile }) {
         {/* Signed out only happens on the public screens now. The catalogue and
             a course's page. "Guest / Signed out" states a fact and offers
             nothing; the way back in is the useful thing to show. */}
-        {isAuthenticated ? (
-          <span className="lms-header__chip">
-            <span className="lms-header__avatar">{initials(user?.name)}</span>
-            <span className="lms-header__chip-text">
-              <span className="lms-header__chip-name">{user.name}</span>
-              <span className="lms-header__chip-role">{user.role ?? 'student'}</span>
-            </span>
-          </span>
-        ) : (
+        {isAuthenticated ? null : (
           <Link className="lms-btn lms-btn--sm lms-btn--primary" to="/learn/login">
             Sign in
           </Link>

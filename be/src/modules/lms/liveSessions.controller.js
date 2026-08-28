@@ -116,12 +116,16 @@ export const join = asyncHandler(async (req, res) => {
     );
   }
 
-  // The host may open the room early to set up; a learner may not. Everyone
-  // else waits for the window the model defines, so the screen's disabled
-  // button and this refusal are the same arithmetic.
+  /* canJoinAt() already answers "has the host started?" as well as the clock,
+     so this stays one check rather than two that could disagree. The message
+     only has to cover the not-yet-open case, because that is the only way a
+     learner reaches it before the room has closed. */
   if (!isHost && !isStaff && !session.canJoinAt()) {
+    const closed = new Date() > session.joinWindow().closesAt;
     throw ApiError.forbidden(
-      `The room opens ${JOIN_OPENS_MINUTES_BEFORE} minutes before the session starts`,
+      closed
+        ? 'This session has finished'
+        : `The room opens ${JOIN_OPENS_MINUTES_BEFORE} minutes before the session starts, or as soon as your instructor starts it`,
     );
   }
 
@@ -296,5 +300,18 @@ export const hostUrl = asyncHandler(async (req, res) => {
   const session = await loadOwnSession(req);
   const url = session.providerRef?.hostUrl ?? '';
   if (!url) throw ApiError.notFound('This session has no meeting yet');
-  return ok(res, { url });
+
+  /* Asking for this URL IS starting the session — it is the only way to open
+     the room, and it is a deliberate click. Stamping it here opens the door for
+     learners immediately, rather than making them wait out a schedule the host
+     has already overtaken.
+
+     Only the first time: a host who reopens the tab has not restarted anything,
+     and moving the timestamp would extend the room's closing time with it. */
+  if (!session.hostStartedAt) {
+    session.hostStartedAt = new Date();
+    await session.save();
+  }
+
+  return ok(res, { url, startedAt: session.hostStartedAt });
 });

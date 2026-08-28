@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import CatalogFilters from '../../components/catalog/CatalogFilters.jsx';
 import CatalogCourseCard from '../../components/catalog/CatalogCourseCard.jsx';
+import BundleCard from '../../components/commerce/BundleCard.jsx';
 import { useCatalog } from '../../hooks/useCatalog.js';
 
 // Segments mirror the existing Course model's own taxonomy (level / segment /
@@ -39,7 +40,7 @@ function Skeletons({ count = 6 }) {
 // Browse Catalogue (C2). Everything on offer, including courses the learner is
 // already enrolled in, marked as such rather than hidden.
 export default function CatalogPage() {
-  const { courses, status, error } = useCatalog();
+  const { courses, bundles, status, error } = useCatalog();
   const [level, setLevel] = useState('all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('popular');
@@ -138,6 +139,24 @@ export default function CatalogPage() {
           )}
         </div>
       )}
+
+      {/* Bundles below the courses, in their own band. Mixed into the same grid
+          they would be filtered and sorted by controls that mean nothing for a
+          bundle — there is no level to filter a bundle by, and "free only"
+          would silently hide every one of them. */}
+      {status === 'ready' && bundles.length ? (
+        <section className="lms-bundles">
+          <div className="lms-bundles__head">
+            <h2 className="lms-section-title">Bundles</h2>
+            <p className="lms-bundles__note">
+              Several courses at one price, cheaper than buying them separately.
+            </p>
+          </div>
+          <div className="lms-bundles__grid">
+            {bundles.map((bundle) => <BundleCard key={bundle.id} bundle={bundle} />)}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

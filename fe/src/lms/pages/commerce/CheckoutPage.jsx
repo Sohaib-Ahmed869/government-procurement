@@ -16,10 +16,15 @@ export default function CheckoutPage() {
   const { items, add, remove } = useCart();
   const checkout = useCheckout(items);
 
-  const wanted = params.get('course');
+  /* `?course=` and `?bundle=` both drop straight into the basket, so a card
+     anywhere can link here without a separate add-to-cart step. The kind
+     matters: the server prices and fulfils the two differently. */
+  const wantedCourse = params.get('course');
+  const wantedBundle = params.get('bundle');
   useEffect(() => {
-    if (wanted) add(wanted);
-  }, [wanted, add]);
+    if (wantedCourse) add(wantedCourse, 'course');
+    if (wantedBundle) add(wantedBundle, 'bundle');
+  }, [wantedCourse, wantedBundle, add]);
 
   /* Hands off to Stripe's hosted page. There is no local success state and
      nothing to clear here: on success the browser leaves this app entirely, and

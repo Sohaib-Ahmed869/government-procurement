@@ -37,11 +37,19 @@ export const ORDER_STATUS = {
 
 const orderLineSchema = new mongoose.Schema(
   {
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+    /* One of `course` or `bundle`, never both — `kind` says which.
+
+       A bundle is a commercial grouping, not a course, so it cannot be squeezed
+       into the course field. `grants` is the courses it hands over, COPIED at
+       purchase like the title and the price: re-editing a bundle next month
+       must not change what somebody already bought. */
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+    bundle: { type: mongoose.Schema.Types.ObjectId, ref: 'Bundle' },
+    grants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
     // Copied at purchase. See the note above about renames.
     title: { type: String, required: true },
     slug: { type: String, default: '' },
-    kind: { type: String, default: 'course' },
+    kind: { type: String, enum: ['course', 'bundle'], default: 'course' },
     // Tax-inclusive, in cents.
     amount: { type: Number, required: true, min: 0 },
   },
@@ -113,6 +121,8 @@ orderSchema.methods.toJSONSafe = function toJSONSafe() {
     status: this.status,
     lines: this.lines.map((l) => ({
       course: l.course,
+      bundle: l.bundle,
+      grants: l.grants,
       title: l.title,
       slug: l.slug,
       kind: l.kind,

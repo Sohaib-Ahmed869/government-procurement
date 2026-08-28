@@ -55,7 +55,10 @@ export function useCheckout(items) {
     setStatus('processing');
     setError('');
     try {
-      const { checkoutUrl } = await commerceApi.createOrder(items.map((i) => i.courseId));
+      const { checkoutUrl } = await commerceApi.createOrder({
+        courseIds: items.filter((i) => i.kind !== 'bundle').map((i) => i.courseId),
+        bundleIds: items.filter((i) => i.kind === 'bundle').map((i) => i.bundleId),
+      });
       if (!checkoutUrl) throw new Error('The payment page could not be opened.');
       window.location.assign(checkoutUrl);
       // Left in `processing` on purpose. The page is on its way out; flipping

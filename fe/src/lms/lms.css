@@ -29,7 +29,16 @@
   --lms-text-2: #3d4a43;
   --lms-muted: #6b776f;
 
-  /* On the dark sidebar the ink runs the other way. */
+  /* The navigation rail. A panel a shade lighter than the canvas rather than a
+     block of brand green: fifteen rows of white-on-green is a lot of saturated
+     colour to look at all day, and it left the green with nothing to mark. It
+     marks the current page now, and only that. */
+  --lms-rail: #fbfcfb;
+  --lms-rail-line: #e4e9e5;
+  --lms-rail-ink: #26332c;
+  --lms-rail-ink-2: #7b877f;
+
+  /* Still used by the player's dark chrome and the marketing hero. */
   --lms-on-dark: rgba(255, 255, 255, 0.92);
   --lms-on-dark-2: rgba(255, 255, 255, 0.66);
   --lms-on-dark-3: rgba(255, 255, 255, 0.42);
@@ -107,50 +116,51 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 14px 12px 14px;
+  padding: 12px 10px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: linear-gradient(200deg, var(--lms-green-800) 0%, var(--lms-green) 62%, #071f0d 100%);
-  color: var(--lms-on-dark);
+  background: var(--lms-rail);
+  border-right: 1px solid var(--lms-rail-line);
+  color: var(--lms-rail-ink);
 }
 
 .lms-sidebar::-webkit-scrollbar { width: 8px; }
 .lms-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.16);
+  background: #d9e0db;
   border-radius: 999px;
 }
 
 .lms-sidebar__head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 4px 14px;
+  gap: 4px;
+  padding: 2px 2px 12px;
   margin-bottom: 4px;
-  border-bottom: 1px solid var(--lms-on-dark-line);
+  border-bottom: 1px solid var(--lms-rail-line);
 }
 
 .lms-sidebar__brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
-  padding: 6px;
-  border-radius: 10px;
-  color: var(--lms-on-dark);
+  padding: 5px 6px;
+  border-radius: 9px;
+  color: var(--lms-green);
   text-decoration: none;
   transition: background 0.16s var(--lms-ease);
 }
-.lms-sidebar__brand:hover { background: rgba(255, 255, 255, 0.07); }
+.lms-sidebar__brand:hover { background: var(--lms-surface-3); }
 .lms-sidebar__brand:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--lms-mint);
+  box-shadow: var(--lms-ring);
 }
 
-/* The mark is a light artwork, so on the dark sidebar it needs no chip behind
-   it. Unlike the CMS, where it sits on a green tile to stay visible. */
+/* gp-02-dark.svg, not gp-02.svg: the white artwork was drawn for a dark ground
+   and is invisible on this one. Same file the auth pages use. */
 .lms-sidebar__logo {
-  height: 30px;
+  height: 26px;
   width: auto;
   flex-shrink: 0;
   object-fit: contain;
@@ -166,41 +176,41 @@
   transition: opacity 0.16s var(--lms-ease);
 }
 .lms-sidebar__wordmark strong {
-  font-size: 14.5px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
 }
 .lms-sidebar__wordmark span {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--lms-mint);
+  color: var(--lms-green-600);
 }
 
 .lms-sidebar__toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   padding: 0;
-  border: 1px solid var(--lms-on-dark-line);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--lms-on-dark-2);
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--lms-rail-ink-2);
   cursor: pointer;
   transition: background 0.16s var(--lms-ease), color 0.16s var(--lms-ease),
     border-color 0.16s var(--lms-ease);
 }
 .lms-sidebar__toggle:hover {
-  background: rgba(126, 226, 168, 0.16);
-  border-color: var(--lms-mint);
-  color: var(--lms-mint);
+  background: var(--lms-surface-3);
+  color: var(--lms-rail-ink);
 }
-.lms-sidebar__toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--lms-mint); }
-.lms-sidebar__toggle svg { width: 17px; height: 17px; }
+.lms-sidebar__toggle:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-sidebar__toggle svg { width: 16px; height: 16px; }
 
 /* The nav scrolls; the footer (logout) stays pinned to the bottom. */
 .lms-sidebar__nav {
@@ -213,18 +223,17 @@
 .lms-sidebar__section { display: flex; flex-direction: column; gap: 2px; }
 
 .lms-sidebar__group {
-  margin-top: 18px;
-  padding: 0 12px 8px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--lms-on-dark-3);
+  margin-top: 15px;
+  padding: 0 11px 5px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--lms-rail-ink-2);
   white-space: nowrap;
   overflow: hidden;
   transition: opacity 0.16s var(--lms-ease);
 }
-.lms-sidebar__section:first-child .lms-sidebar__group { margin-top: 8px; }
+.lms-sidebar__section:first-child .lms-sidebar__group { margin-top: 6px; }
 
 .lms-sidebar__link {
   position: relative;
@@ -232,10 +241,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 10px;
-  color: var(--lms-on-dark-2);
-  font-size: 14px;
+  padding: 7px 11px;
+  border-radius: 8px;
+  color: var(--lms-rail-ink);
+  font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -244,7 +253,7 @@
 .lms-sidebar__link-label {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   min-width: 0;
 }
 .lms-sidebar__link-label span {
@@ -253,89 +262,187 @@
   white-space: nowrap;
 }
 .lms-sidebar__icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
-  opacity: 0.85;
-  transition: opacity 0.16s var(--lms-ease);
+  opacity: 1;
+  color: var(--lms-rail-ink-2);
+  transition: color 0.16s var(--lms-ease);
 }
 
 .lms-sidebar__link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--lms-on-dark);
+  background: var(--lms-surface-3);
+  color: var(--lms-text);
 }
-.lms-sidebar__link:hover .lms-sidebar__icon { opacity: 1; }
-.lms-sidebar__link:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--lms-mint); }
+.lms-sidebar__link:hover .lms-sidebar__icon { color: var(--lms-rail-ink); }
+.lms-sidebar__link:focus-visible { outline: none; box-shadow: var(--lms-ring); }
 
-/* Active item: a mint wash with a mint rail down the left edge. The CMS uses a
-   raised white pill for this; on a dark rail that reads as a hole, so the
-   emphasis is carried by the accent instead. */
-.lms-sidebar__link.is-active {
-  background: rgba(126, 226, 168, 0.14);
+/* Active item: one solid block of brand green.
+
+   It was a faint mint wash PLUS a mint rail down the left edge — two devices
+   marking the same thing, neither of them confidently, and the wash sat close
+   enough to the hover state to be mistaken for it. One saturated block says
+   "you are here" at a glance and needs no second marker, so there is no
+   ::before. Now that the rail is light, this is the only place the brand green
+   appears in it, which is the whole argument for the rail being light. */
+.lms-sidebar__link.is-active,
+.lms-sidebar__link.is-active:hover {
+  background: var(--lms-green);
   color: #fff;
   font-weight: 600;
 }
-.lms-sidebar__link.is-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 20px;
-  border-radius: 0 3px 3px 0;
-  background: var(--lms-mint);
-}
-.lms-sidebar__link.is-active .lms-sidebar__icon { opacity: 1; color: var(--lms-mint); }
+.lms-sidebar__link.is-active .lms-sidebar__icon { color: var(--lms-mint); }
 
 .lms-sidebar__badge {
   min-width: 20px;
   padding: 1px 7px;
   border-radius: 999px;
-  background: var(--lms-mint);
-  color: var(--lms-green);
+  background: var(--lms-surface-3);
+  color: var(--lms-text-2);
   font-size: 11.5px;
   font-weight: 700;
   text-align: center;
 }
-
-/* Footer: logout, pinned below the nav. */
-.lms-sidebar__foot {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--lms-on-dark-line);
+.lms-sidebar__link.is-active .lms-sidebar__badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
-.lms-sidebar__logout {
+
+/* Footer: the identity card, pinned below the nav, with its menu above it. */
+.lms-sidebar__foot {
+  position: relative;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--lms-rail-line);
+}
+
+/* The card. Avatar, name, role, chevron — a button, because it opens the menu
+   rather than going anywhere. */
+.lms-sidebar__me {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(224, 122, 108, 0.3);
+  padding: 7px 9px;
+  border: 0;
   border-radius: 10px;
-  background: rgba(192, 57, 43, 0.14);
-  color: #f3a9a0;
+  background: none;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
   text-align: left;
   cursor: pointer;
+  transition: background 0.16s var(--lms-ease);
+}
+.lms-sidebar__me:hover,
+.lms-sidebar__me.is-open { background: var(--lms-surface-3); }
+.lms-sidebar__me:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+
+.lms-sidebar__me-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: linear-gradient(155deg, var(--lms-green-600), var(--lms-green));
+  color: var(--lms-mint);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lms-sidebar__me-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.2;
+}
+.lms-sidebar__me-text strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lms-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  transition: background 0.16s var(--lms-ease), color 0.16s var(--lms-ease),
-    border-color 0.16s var(--lms-ease);
 }
-.lms-sidebar__logout:hover {
-  background: rgba(192, 57, 43, 0.26);
-  border-color: rgba(224, 122, 108, 0.55);
-  color: #ffd9d4;
+.lms-sidebar__me-text > span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--lms-green-600);
 }
-.lms-sidebar__logout:focus-visible { outline: none; box-shadow: 0 0 0 2px #f3a9a0; }
-.lms-sidebar__logout svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Points up when closed, because that is where the menu opens. */
+.lms-sidebar__me-chev {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--lms-rail-ink-2);
+  transform: rotate(-90deg);
+  transition: transform 0.18s var(--lms-ease);
+}
+.lms-sidebar__me.is-open .lms-sidebar__me-chev { transform: rotate(90deg); }
+
+/* The menu. Sits above the card rather than below it — the card is already at
+   the bottom of the viewport, so there is nowhere below to open into. */
+.lms-sidebar__menu {
+  position: absolute;
+  bottom: calc(100% - 4px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface);
+  box-shadow: var(--lms-shadow-md);
+}
+.lms-sidebar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--lms-text-2);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.14s var(--lms-ease), color 0.14s var(--lms-ease);
+}
+.lms-sidebar__menu-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+.lms-sidebar__menu-item:hover { background: var(--lms-surface-3); color: var(--lms-text); }
+.lms-sidebar__menu-item:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-sidebar__menu-item.active { color: var(--lms-green-600); font-weight: 600; }
+
+/* Logging out is routine, not destructive — it does not get danger styling
+   sitting in the rail all day. It turns red under the pointer, at the moment
+   it is about to happen. Separated because it is the one item here that ends
+   the session rather than opening a page. */
+.lms-sidebar__menu-item--out {
+  margin-top: 5px;
+  padding-top: 11px;
+  border-top: 1px solid var(--lms-border);
+  border-radius: 0 0 7px 7px;
+}
+.lms-sidebar__menu-item--out:hover { background: var(--lms-danger-soft); color: var(--lms-danger); }
 
 /* Collapsed (icon-rail) sidebar ------------------------------------------- */
 .lms-shell.is-collapsed .lms-sidebar__wordmark,
 .lms-shell.is-collapsed .lms-sidebar__link-label span,
-.lms-shell.is-collapsed .lms-sidebar__logout span,
+.lms-shell.is-collapsed .lms-sidebar__me-text,
+.lms-shell.is-collapsed .lms-sidebar__me-chev,
 .lms-shell.is-collapsed .lms-sidebar__badge {
   opacity: 0;
   width: 0;
@@ -356,7 +463,7 @@
   margin-top: 4px;
 }
 .lms-shell.is-collapsed .lms-sidebar__link { justify-content: center; padding: 10px; }
-.lms-shell.is-collapsed .lms-sidebar__logout { justify-content: center; padding: 10px; }
+.lms-shell.is-collapsed .lms-sidebar__me { justify-content: center; padding: 7px; }
 
 /* Mobile drawer ----------------------------------------------------------- */
 .lms-sidebar__backdrop {
@@ -695,41 +802,6 @@
 }
 .lms-notif__foot a { color: var(--lms-muted); }
 .lms-notif__foot a:hover { color: var(--lms-green); }
-
-/* Signed-in user chip */
-.lms-header__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 4px 14px 4px 5px;
-  border: 1px solid var(--lms-border);
-  border-radius: 999px;
-  background: var(--lms-surface-2);
-  font-size: 13.5px;
-}
-.lms-header__chip-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
-.lms-header__chip-name { color: var(--lms-text); font-weight: 600; }
-.lms-header__chip-role {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--lms-green-600);
-}
-.lms-header__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 999px;
-  background: linear-gradient(155deg, var(--lms-green-600), var(--lms-green));
-  color: var(--lms-mint);
-  font-size: 12.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
 
 /* Buttons ----------------------------------------------------------------- */
 .lms-btn {
@@ -3323,6 +3395,11 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 100%;
   margin: 0 auto;
 }
+/* Centred over the form rather than tucked into its top-left corner. It is the
+   only thing above the heading, and one small lockup pinned to the left of a
+   wide column read as dropped there rather than placed.
+   `align-self` is the property that does it — the column is a flex parent, so
+   the earlier flex-start here outranked any text-align on the ancestor. */
 .lms-auth__brand {
   display: inline-flex;
   align-items: center;
@@ -3330,19 +3407,16 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin-bottom: 34px;
   color: var(--lms-text);
   text-decoration: none;
-  align-self: flex-start;
+  align-self: center;
 }
+/* The artwork on its own — no tile. gp-02-dark.svg is the green variant, so it
+   needs no ground to stand on and nothing competes with it. */
 .lms-auth__brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  background: linear-gradient(155deg, var(--lms-green-600), var(--lms-green));
-  color: var(--lms-mint);
-  font-weight: 700;
-  font-size: 16px;
+  display: block;
+  width: 40px;
+  height: auto;
+  background: none;
+  border-radius: 0;
 }
 .lms-auth__brand strong { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .lms-auth__brand span span { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lms-green-600); }
@@ -5047,8 +5121,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 @media (max-width: 620px) {
   .lms-dash-stats { grid-template-columns: 1fr; }
   .lms-greeting { padding: 22px 20px; }
-  .lms-header__chip { padding: 4px; }
-  .lms-header__chip-text { display: none; }
   .lms-crumbs__sep,
   .lms-crumbs a span { display: none; }
 }
@@ -6331,4 +6403,232 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 @media (max-width: 1080px) {
   .lms-builder__panes { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .lms-builder__toc { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Bundles in the catalogue (C2)
+   ------------------------------------------------------------------------ */
+
+.lms-bundles { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--lms-border-strong); }
+.lms-bundles__head { margin-bottom: 16px; }
+.lms-bundles__note { margin: 4px 0 0; font-size: 13.5px; color: var(--lms-muted); }
+.lms-bundles__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.lms-bundlecard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+}
+.lms-bundlecard__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lms-bundlecard__tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface-3); color: var(--lms-green);
+}
+.lms-bundlecard__tag svg { width: 13px; height: 13px; }
+/* The saving is the reason a bundle exists, so it is the loudest thing on the
+   card after the price. */
+.lms-bundlecard__save {
+  font-size: 12px; font-weight: 600;
+  padding: 3px 8px; border-radius: var(--lms-radius-sm);
+  background: var(--lms-mint-soft); color: var(--lms-green);
+}
+.lms-bundlecard__title { margin: 2px 0 0; font-size: 16px; font-weight: 600; line-height: 1.35; color: var(--lms-text); }
+.lms-bundlecard__summary {
+  margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--lms-text-2);
+  /* Two lines, so cards in a row keep their footers aligned. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lms-bundlecard__meta {
+  display: flex; align-items: center; gap: 6px;
+  margin: 2px 0 0; font-size: 12.5px; color: var(--lms-muted);
+}
+.lms-bundlecard__meta svg { width: 14px; height: 14px; }
+.lms-bundlecard__foot {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  margin-top: auto; padding-top: 12px; border-top: 1px solid var(--lms-border);
+}
+.lms-bundlecard__price { display: flex; flex-direction: column; }
+.lms-bundlecard__amount { font-size: 19px; font-weight: 700; color: var(--lms-text); }
+.lms-bundlecard__gst { font-size: 11.5px; color: var(--lms-muted); }
+
+/* ---------------------------------------------------------------------------
+   Sign in / sign up — refreshed
+
+   The old aside was a flat green block with one sentence in it. This gives the
+   panel a job (say what an account is for) and the form column a proper type
+   scale, without turning either into decoration.
+   ------------------------------------------------------------------------ */
+
+/* Form first on the reading order and wider than the panel: it is the thing
+   somebody came here to use. */
+.lms-auth { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+.lms-auth__panel { padding: clamp(32px, 5vw, 64px) clamp(24px, 5vw, 72px); }
+.lms-auth__title { font-size: clamp(28px, 3.6vw, 36px); letter-spacing: -0.025em; }
+.lms-auth__sub { margin-bottom: 30px; }
+.lms-auth__submit { margin-top: 14px; }
+
+.lms-authside {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  /* A column, not a centred block: the copy takes the top and the animation
+     sits on the floor under it. They used to be absolutely positioned over one
+     another, which put the illustration straight through the proof points. */
+  display: flex;
+  flex-direction: column;
+  /* Centred as one group. `space-between` pinned the copy to the ceiling and
+     the illustration to the floor, which on a tall window left a corridor of
+     empty green between them. */
+  justify-content: center;
+  gap: clamp(24px, 6vh, 64px);
+  padding: clamp(36px, 5vw, 60px) clamp(32px, 5vw, 56px) 0;
+  /* Two greens rather than one flat fill — the panel reads as lit rather than
+     printed, and the motif has something to sit against. */
+  /* A long fade rather than one flat green.
+
+     Three layers: a soft light source top-left, a wide mint bloom low on the
+     right where the illustration sits, and a base ramp with enough stops to
+     travel slowly — a two-stop gradient over this much area reads as a solid
+     colour with a seam in it. */
+  background:
+    radial-gradient(90% 70% at 12% -5%, rgba(255, 255, 255, 0.13) 0%, transparent 62%),
+    radial-gradient(70% 55% at 88% 92%, rgba(126, 226, 168, 0.16) 0%, transparent 70%),
+    linear-gradient(
+      160deg,
+      #135c2c 0%,
+      #0f4a20 26%,
+      #0a3114 58%,
+      #072414 82%,
+      #04170d 100%
+    );
+  color: #fff;
+}
+
+
+/* Copy first, animation under it. AuthLottie is rendered before the body in
+   the JSX (so it can sit behind the motif in the stacking order), and `order`
+   is what puts the reading order right without moving the markup. */
+.lms-authside__body { position: relative; max-width: 42ch; flex-shrink: 0; order: 1; }
+.lms-authside__eyebrow {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lms-mint);
+}
+.lms-authside__lede {
+  margin: 0;
+  font-size: clamp(27px, 3.1vw, 38px);
+  line-height: 1.28;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.lms-authside__sub {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.lms-authside__proof {
+  list-style: none;
+  margin: 34px 0 0;
+  padding: 26px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lms-authside__proof li { display: flex; align-items: flex-start; gap: 13px; }
+.lms-authside__proof strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.lms-authside__proof span span { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.66); }
+.lms-authside__icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--lms-mint);
+}
+.lms-authside__icon svg { width: 16px; height: 16px; }
+
+/* Below this the panel would be a header nobody scrolls past to reach the
+   form, so it goes rather than stacking. */
+@media (max-width: 900px) {
+  .lms-auth { grid-template-columns: minmax(0, 1fr); }
+  .lms-authside { display: none; }
+}
+
+/* The sign-in animation.
+
+   Sits above the motif and below the copy. It fades in only once lottie-web
+   reports it mounted (`is-ready`), so a slow chunk shows the static motif
+   rather than an empty gap that then jumps. */
+.lms-authside__anim {
+  position: relative;
+  order: 2;
+  align-self: flex-end;
+  /* Sized so the three proof points always clear the fold — the copy is the
+     part that has to be readable, the illustration is the part that can go. */
+  width: min(460px, 92%);
+  margin-right: clamp(-40px, -2vw, 0px);
+  opacity: 0;
+  transition: opacity .5s ease-out;
+  pointer-events: none;
+}
+/* Shorter viewports lose the animation before they lose the copy — the proof
+   points are the part doing the work. */
+@media (max-height: 800px) {
+  .lms-authside__anim { display: none; }
+}
+.lms-authside__anim.is-ready { opacity: 1; }
+/* Once the animation is up the motif is redundant behind it — keep it faint so
+   it reads as ground rather than competing line work. */
+@media (prefers-reduced-motion: reduce) {
+  .lms-authside__anim { transition: none; }
+}
+
+/* The trimmed proof row: three short claims on one line where there is room,
+   wrapping to two where there is not. Replaces three stacked two-line items
+   that read as a brochure beside the form. */
+.lms-authside__proof {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 26px;
+  padding-top: 22px;
+}
+.lms-authside__proof li {
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+.lms-authside__proof li svg {
+  width: 17px;
+  height: 17px;
+  color: var(--lms-mint);
+  flex-shrink: 0;
 }

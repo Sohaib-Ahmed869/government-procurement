@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { catalogApi, enrollmentsApi } from '../../api/lms.js';
+import { catalogApi, enrollmentsApi, bundlesApi } from '../../api/lms.js';
 import { toCatalogCourse } from '../utils/courseShape.js';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
 
@@ -14,6 +14,7 @@ import { useStudentAuth } from '../context/StudentAuthContext.jsx';
 export function useCatalog() {
   const { isAuthenticated, loading: authLoading } = useStudentAuth();
   const [courses, setCourses] = useState([]);
+  const [bundles, setBundles] = useState([]);
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [error, setError] = useState('');
 
@@ -30,6 +31,10 @@ export function useCatalog() {
         // limit is explicit: the endpoint pages at 10 by default, which would
         // silently truncate the catalogue to its first page.
         const list = await catalogApi.list({ limit: 100, sort: '-createdAt' });
+        /* Bundles sit in the same catalogue: a learner browsing what to buy
+           should see both. A failure here must not take the courses with it —
+           a catalogue missing its bundles is far better than no catalogue. */
+        const bundleList = await bundlesApi.list({ limit: 50 }).catch(() => []);
 
         // A failure here must not lose the catalogue. A learner who can't be
         // told which courses they own can still browse.
@@ -50,6 +55,24 @@ export function useCatalog() {
             enrolled: enrolledSlugs.has(c.slug),
           })),
         );
+        setBundles(
+          (bundleList ?? [])
+            .filter((bd) => (bd.courses?.length ?? 0) > 0)
+            .map((bd) => ({
+              id: bd._id,
+              slug: bd.slug,
+              title: bd.title,
+              summary: bd.summary ?? '',
+              price: bd.price ?? 0,
+              currency: bd.currency ?? 'AUD',
+              accent: bd.accent ?? 0,
+              image: bd.image,
+              courseCount: bd.courses?.length ?? 0,
+              // What the courses would cost bought one at a time, so the card
+              // can show the saving rather than asserting one.
+              listPrice: (bd.courses ?? []).reduce((sum, c) => sum + (c?.price ?? 0), 0),
+            })),
+        );
         setStatus('ready');
       } catch (err) {
         if (!alive) return;
@@ -63,5 +86,5 @@ export function useCatalog() {
     };
   }, [isAuthenticated, authLoading]);
 
-  return { courses, status, error };
+  return { courses, bundles, status, error };
 }

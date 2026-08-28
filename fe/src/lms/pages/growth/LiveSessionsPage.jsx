@@ -22,7 +22,7 @@ const STATE_LABEL = {
 };
 
 function SessionCard({ session, onJoin, joining, error }) {
-  const { state, joinable, hasMeeting } = session;
+  const { state, joinable, hasMeeting, hostStarted } = session;
 
   // Why the button is off, in the words the learner needs. An inert button with
   // no explanation is the thing this whole block exists to avoid.
@@ -31,6 +31,8 @@ function SessionCard({ session, onJoin, joining, error }) {
     if (state === 'ended') return 'This session has finished.';
     if (!hasMeeting) return 'No meeting link yet — your instructor has been told.';
     if (!joinable) return `Opens ${formatSessionTime(session.joinOpensAt, session.timezone)}`;
+    // Explain an early open, or it looks like the countdown is wrong.
+    if (hostStarted) return 'Your instructor has started this session.';
     return '';
   })();
 
@@ -39,7 +41,7 @@ function SessionCard({ session, onJoin, joining, error }) {
       <div className="lms-live-card__when">
         <span className={`lms-live-badge lms-live-badge--${state}`}>
           {state === 'live' ? <span className="lms-live-dot" aria-hidden="true" /> : null}
-          {STATE_LABEL[state]}
+          {state === 'live' && hostStarted ? 'Started' : STATE_LABEL[state]}
         </span>
         <time dateTime={session.startsAt} className="lms-live-card__time">
           {formatSessionTime(session.startsAt, session.timezone)}
