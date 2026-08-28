@@ -25,7 +25,7 @@ function putToS3(url, file, onProgress) {
       reject(
         new Error(
           xhr.status === 0
-            ? 'Storage refused the upload. Two things cause this: the S3 bucket has no CORS rule allowing PUT from this site, or S3 rejected the request itself — a rejection carries no CORS headers, so the browser reports both the same way. Check the bucket CORS rule first, then the API logs.'
+            ? 'Storage refused the upload. Check the S3 bucket has a CORS rule allowing PUT from this site — see docs/S3-CORS.md.'
             : `The upload failed (${xhr.status}).`,
         ),
       );

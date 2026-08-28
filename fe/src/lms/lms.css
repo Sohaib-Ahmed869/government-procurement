@@ -6072,3 +6072,19 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 @media (prefers-reduced-motion: reduce) {
   .lms-builder__panes.is-busy { transition: none; }
 }
+
+
+/* An upload error belongs on its own line.
+
+   .lms-upload is a flex row of icon | body | actions, and the error was a
+   fourth item in it — so a long message took the width the filename needed and
+   squeezed it to one character per line. Wrapping the row and forcing the error
+   to a full-width basis puts it underneath, where it can be read. */
+.lms-upload { flex-wrap: wrap; }
+.lms-upload .lms-field__error {
+  flex: 0 0 100%;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+/* Never let the filename collapse below its content, whatever shares the row. */
+.lms-upload__body { flex: 1 1 220px; min-width: 0; }
