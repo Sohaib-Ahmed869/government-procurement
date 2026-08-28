@@ -21,6 +21,26 @@ export const s3 = new S3Client({
         secretAccessKey: env.s3.secretAccessKey,
       }
     : undefined,
+
+  /* THIS LINE IS WHAT MAKES BROWSER UPLOADS WORK.
+
+     Since v3.729 the AWS SDK defaults to `WHEN_SUPPORTED`, which adds a
+     checksum to every request. On a PRESIGNED URL that is computed at signing
+     time, when there is no body — so the URL carries
+     `x-amz-checksum-crc32=AAAAAA==`, the CRC32 of nothing.
+
+     The browser then PUTs a real video against a URL that promises an empty
+     one. S3 rejects it, and because the rejection carries no CORS headers the
+     browser reports it as a CORS failure — which sends you off configuring the
+     bucket for a problem that was never there.
+
+     `WHEN_REQUIRED` adds a checksum only where the API demands one, which is
+     what presigned uploads need. Note package.json pins ^3.658.0 but resolves
+     far past it, so this is not something a lockfile refresh will undo. */
+  requestChecksumCalculation: 'WHEN_REQUIRED',
+  // The same default applies to reads: a GET presigned with a response
+  // checksum expectation can fail the same way.
+  responseChecksumValidation: 'WHEN_REQUIRED',
 });
 
 function assertS3() {

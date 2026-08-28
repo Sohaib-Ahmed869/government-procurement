@@ -20,15 +20,23 @@ export function putToS3(url, file, onProgress = () => {}) {
       (xhr.status >= 200 && xhr.status < 300
         ? resolve()
         : reject(new Error(`Storage rejected the upload (${xhr.status})`)));
-    // status 0 on a cross-origin PUT means the response was blocked, not that
-    // the request failed. S3 may well have stored the file. Saying "check your
-    // connection" sends whoever hits this to look in the wrong place, so it
-    // names the actual cause.
+    /* status 0 on a cross-origin PUT means the browser blocked the RESPONSE.
+       It cannot tell us why, and the two causes need different fixes:
+
+         - the bucket has no CORS rule allowing PUT from this origin;
+         - S3 rejected the request on its merits — a bad signature, an expired
+           URL, a checksum mismatch — and that rejection carries no CORS
+           headers either, so it arrives looking identical.
+
+       The second is what a presigned URL carrying `x-amz-checksum-crc32` does
+       (see requestChecksumCalculation in be/src/config/s3.js). Naming only CORS
+       here sent a real debugging session to the wrong place, so the message now
+       names both and says which to check first. */
     xhr.onerror = () =>
       reject(
         new Error(
           xhr.status === 0
-            ? 'The browser was blocked from uploading to storage. The S3 bucket needs a CORS rule allowing PUT from this site.'
+            ? 'Storage refused the upload. Two things cause this: the S3 bucket has no CORS rule allowing PUT from this site, or S3 rejected the request itself — a rejection carries no CORS headers, so the browser reports both the same way. Check the bucket CORS rule first, then the API logs.'
             : `The upload failed (${xhr.status}).`,
         ),
       );
