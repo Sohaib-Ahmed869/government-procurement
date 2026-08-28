@@ -107,10 +107,10 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 14px 12px 14px;
+  padding: 12px 10px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: linear-gradient(200deg, var(--lms-green-800) 0%, var(--lms-green) 62%, #071f0d 100%);
+  background: linear-gradient(178deg, var(--lms-green-800) 0%, var(--lms-green) 100%);
   color: var(--lms-on-dark);
 }
 
@@ -123,8 +123,8 @@
 .lms-sidebar__head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 4px 14px;
+  gap: 4px;
+  padding: 2px 2px 12px;
   margin-bottom: 4px;
   border-bottom: 1px solid var(--lms-on-dark-line);
 }
@@ -132,11 +132,11 @@
 .lms-sidebar__brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
-  padding: 6px;
-  border-radius: 10px;
+  padding: 5px 6px;
+  border-radius: 9px;
   color: var(--lms-on-dark);
   text-decoration: none;
   transition: background 0.16s var(--lms-ease);
@@ -150,7 +150,7 @@
 /* The mark is a light artwork, so on the dark sidebar it needs no chip behind
    it. Unlike the CMS, where it sits on a green tile to stay visible. */
 .lms-sidebar__logo {
-  height: 30px;
+  height: 26px;
   width: auto;
   flex-shrink: 0;
   object-fit: contain;
@@ -166,14 +166,15 @@
   transition: opacity 0.16s var(--lms-ease);
 }
 .lms-sidebar__wordmark strong {
-  font-size: 14.5px;
+  font-size: 13px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
 }
 .lms-sidebar__wordmark span {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--lms-mint);
 }
@@ -182,25 +183,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   padding: 0;
-  border: 1px solid var(--lms-on-dark-line);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--lms-on-dark-2);
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--lms-on-dark-3);
   cursor: pointer;
   transition: background 0.16s var(--lms-ease), color 0.16s var(--lms-ease),
     border-color 0.16s var(--lms-ease);
 }
 .lms-sidebar__toggle:hover {
-  background: rgba(126, 226, 168, 0.16);
-  border-color: var(--lms-mint);
-  color: var(--lms-mint);
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--lms-on-dark);
 }
 .lms-sidebar__toggle:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--lms-mint); }
-.lms-sidebar__toggle svg { width: 17px; height: 17px; }
+.lms-sidebar__toggle svg { width: 16px; height: 16px; }
 
 /* The nav scrolls; the footer (logout) stays pinned to the bottom. */
 .lms-sidebar__nav {
@@ -213,18 +213,18 @@
 .lms-sidebar__section { display: flex; flex-direction: column; gap: 2px; }
 
 .lms-sidebar__group {
-  margin-top: 18px;
-  padding: 0 12px 8px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  margin-top: 15px;
+  padding: 0 11px 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--lms-on-dark-3);
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   overflow: hidden;
   transition: opacity 0.16s var(--lms-ease);
 }
-.lms-sidebar__section:first-child .lms-sidebar__group { margin-top: 8px; }
+.lms-sidebar__section:first-child .lms-sidebar__group { margin-top: 6px; }
 
 .lms-sidebar__link {
   position: relative;
@@ -232,10 +232,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 10px;
+  padding: 7px 11px;
+  border-radius: 8px;
   color: var(--lms-on-dark-2);
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
@@ -244,7 +244,7 @@
 .lms-sidebar__link-label {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   min-width: 0;
 }
 .lms-sidebar__link-label span {
@@ -253,8 +253,8 @@
   white-space: nowrap;
 }
 .lms-sidebar__icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
   opacity: 0.85;
   transition: opacity 0.16s var(--lms-ease);
@@ -267,26 +267,26 @@
 .lms-sidebar__link:hover .lms-sidebar__icon { opacity: 1; }
 .lms-sidebar__link:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--lms-mint); }
 
-/* Active item: a mint wash with a mint rail down the left edge. The CMS uses a
-   raised white pill for this; on a dark rail that reads as a hole, so the
-   emphasis is carried by the accent instead. */
+/* Active item: one solid mint block, deep green on top of it.
+
+   It was a faint mint wash PLUS a mint rail down the left edge — two devices
+   marking the same thing, neither of them confidently. The wash was close
+   enough to the hover state to be mistaken for it, and the rail is the tell of
+   a nav that could not decide. One saturated block says "you are here" at a
+   glance and needs no second marker, so the ::before is gone. */
 .lms-sidebar__link.is-active {
-  background: rgba(126, 226, 168, 0.14);
-  color: #fff;
+  background: var(--lms-mint);
+  color: var(--lms-green-800);
   font-weight: 600;
 }
-.lms-sidebar__link.is-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 20px;
-  border-radius: 0 3px 3px 0;
+.lms-sidebar__link.is-active:hover {
   background: var(--lms-mint);
+  color: var(--lms-green-800);
 }
-.lms-sidebar__link.is-active .lms-sidebar__icon { opacity: 1; color: var(--lms-mint); }
+.lms-sidebar__link.is-active .lms-sidebar__icon {
+  opacity: 1;
+  color: var(--lms-green-800);
+}
 
 .lms-sidebar__badge {
   min-width: 20px;
@@ -301,23 +301,23 @@
 
 /* Footer: logout, pinned below the nav. */
 .lms-sidebar__foot {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--lms-on-dark-line);
 }
 .lms-sidebar__logout {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(224, 122, 108, 0.3);
-  border-radius: 10px;
-  background: rgba(192, 57, 43, 0.14);
-  color: #f3a9a0;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--lms-on-dark-2);
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13.5px;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
   white-space: nowrap;
@@ -325,12 +325,11 @@
     border-color 0.16s var(--lms-ease);
 }
 .lms-sidebar__logout:hover {
-  background: rgba(192, 57, 43, 0.26);
-  border-color: rgba(224, 122, 108, 0.55);
-  color: #ffd9d4;
+  background: rgba(192, 57, 43, 0.22);
+  color: #ffc9c2;
 }
 .lms-sidebar__logout:focus-visible { outline: none; box-shadow: 0 0 0 2px #f3a9a0; }
-.lms-sidebar__logout svg { width: 18px; height: 18px; flex-shrink: 0; }
+.lms-sidebar__logout svg { width: 17px; height: 17px; flex-shrink: 0; }
 
 /* Collapsed (icon-rail) sidebar ------------------------------------------- */
 .lms-shell.is-collapsed .lms-sidebar__wordmark,
