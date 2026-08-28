@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import OrderRow from '../../components/commerce/OrderRow.jsx';
-import { MEMBERSHIP, money, useOrders } from '../../hooks/useOrders.js';
+import { formatCents } from '../../utils/money.js';
+import { useOrders } from '../../hooks/useOrders.js';
 
 const TABS = [
   { value: 'all', label: 'All' },
@@ -10,18 +11,12 @@ const TABS = [
   { value: 'refunded', label: 'Refunded' },
 ];
 
-function on(iso) {
-  return new Date(iso).toLocaleDateString('en-AU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Australia/Sydney',
-  });
-}
-
 // Purchases, invoices and the active membership (C1/C2).
 export default function OrdersPage() {
-  const orders = useOrders();
+  const { orders, spentCents, status, error } = useOrders();
+  // Surfaced rather than swallowed: an orders page that renders "no orders"
+  // while a request is still in flight tells the reader something untrue.
+
   const [tab, setTab] = useState('all');
 
   const visible = useMemo(
@@ -31,9 +26,22 @@ export default function OrdersPage() {
 
   // Refunds are excluded. "spent" should mean money the customer is actually
   // out of pocket, not gross transaction volume.
-  const spent = orders
-    .filter((o) => o.status === 'paid')
-    .reduce((s, o) => s + o.total, 0);
+  const spent = spentCents;
+
+  if (status === 'error') {
+    return (
+      <div>
+        <div className="lms-page__head">
+          <div>
+            <h1 className="lms-page__title">Orders</h1>
+          </div>
+        </div>
+        <div className="lms-card">
+          <p className="lms-empty">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -41,37 +49,13 @@ export default function OrdersPage() {
         <div>
           <h1 className="lms-page__title">Orders</h1>
           <p className="lms-page__subtitle">
-            {orders.length} order{orders.length === 1 ? '' : 's'} · {money(spent)} spent
+            {orders.length} order{orders.length === 1 ? '' : 's'} · {formatCents(spent)} spent
             {' '}(including GST).
           </p>
         </div>
       </div>
 
-      {MEMBERSHIP.status === 'active' ? (
-        <section className="lms-membership">
-          <div className="lms-membership__main">
-            <span className="lms-membership__icon">
-              <LmsIcon name="badge" />
-            </span>
-            <div>
-              <p className="lms-membership__eyebrow">Active membership</p>
-              <p className="lms-membership__name">{MEMBERSHIP.name}</p>
-              <p className="lms-membership__meta">
-                {money(MEMBERSHIP.amount, MEMBERSHIP.currency)} per {MEMBERSHIP.interval} ·
-                renews {on(MEMBERSHIP.renewsAt)}
-              </p>
-            </div>
-          </div>
-          <ul className="lms-membership__includes">
-            {MEMBERSHIP.includes.map((i) => (
-              <li key={i}>
-                <LmsIcon name="check" />
-                {i}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      
 
       <div className="lms-filters">
         <div className="lms-segmented">

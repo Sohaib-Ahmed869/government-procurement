@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
-import { money, useOrder } from '../../hooks/useOrders.js';
+import { formatCents } from '../../utils/money.js';
+import { useOrder } from '../../hooks/useOrders.js';
+import { useCart } from '../../context/CartContext.jsx';
 
 function on(iso) {
   return new Date(iso).toLocaleDateString('en-AU', {
@@ -16,7 +19,18 @@ function on(iso) {
 // the moment someone is most motivated to start.
 export default function OrderConfirmationPage() {
   const { orderId } = useParams();
-  const order = useOrder(orderId);
+  const { order } = useOrder(orderId);
+  const { clear } = useCart();
+
+  /* Empty the basket only once the SERVER says the order is paid.
+
+     Not at checkout: someone who reaches Stripe and changes their mind should
+     come back to the basket they had. Not on arriving here either, because this
+     page is reachable with an unpaid order — Stripe redirects on cancel too,
+     and a webhook can lag a second or two behind the browser. */
+  useEffect(() => {
+    if (order?.status === 'paid') clear();
+  }, [order?.status, clear]);
 
   if (!order) {
     return (
@@ -36,7 +50,7 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  const first = order.items.find((i) => i.slug);
+  const first = order.lines.find((i) => i.slug);
 
   return (
     <div className="lms-confirm">
@@ -49,7 +63,7 @@ export default function OrderConfirmationPage() {
         </h1>
         <p className="lms-confirm__sub">
           {order.total > 0
-            ? `${money(order.total, order.currency)} charged. A receipt is on its way to your email.`
+            ? `${formatCents(order.total, order.currency)} charged. A receipt is on its way to your email.`
             : 'Your enrolment is confirmed and your course is ready.'}
         </p>
 
@@ -77,7 +91,7 @@ export default function OrderConfirmationPage() {
           </div>
 
           <ul className="lms-order__items" style={{ padding: 0 }}>
-            {order.items.map((item) => (
+            {order.lines.map((item) => (
               <li key={item.title}>
                 <span className="lms-order__item-icon">
                   <LmsIcon name={item.kind === 'membership' ? 'badge' : 'book'} />
@@ -90,7 +104,7 @@ export default function OrderConfirmationPage() {
                   )}
                 </span>
                 <span className="lms-order__item-amount">
-                  {item.amount ? money(item.amount, order.currency) : 'Free'}
+                  {item.amount ? formatCents(item.amount, order.currency) : 'Free'}
                 </span>
               </li>
             ))}
@@ -98,27 +112,21 @@ export default function OrderConfirmationPage() {
 
           <dl className="lms-totals" style={{ marginTop: 4 }}>
             <div>
-              <dt>Subtotal</dt>
-              <dd>{money(order.subtotal, order.currency)}</dd>
+              <dt>Price before GST</dt>
+              <dd>{formatCents(order.net, order.currency)}</dd>
             </div>
-            {order.discount > 0 ? (
-              <div className="lms-totals__discount">
-                <dt>Discount {order.coupon ? `(${order.coupon})` : ''}</dt>
-                <dd>−{money(order.discount, order.currency)}</dd>
-              </div>
-            ) : null}
             <div>
-              <dt>GST (10%)</dt>
-              <dd>{money(order.gst, order.currency)}</dd>
+              <dt>Includes GST (10%)</dt>
+              <dd>{formatCents(order.gst, order.currency)}</dd>
             </div>
             <div className="lms-totals__grand">
               <dt>Total paid</dt>
-              <dd>{money(order.total, order.currency)}</dd>
+              <dd>{formatCents(order.total, order.currency)}</dd>
             </div>
           </dl>
 
           {order.total > 0 ? (
-            <Link className="lms-btn lms-btn--sm" to={`/learn/orders/${order.id}/invoice`} style={{ marginTop: 16 }}>
+            <Link className="lms-btn lms-btn--sm" to={`/learn/orders/${order._id}/invoice`} style={{ marginTop: 16 }}>
               <LmsIcon name="doc" />
               View tax invoice
             </Link>

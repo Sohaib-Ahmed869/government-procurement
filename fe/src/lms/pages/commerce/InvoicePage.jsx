@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
-import { money, useOrder } from '../../hooks/useOrders.js';
+import { formatCents } from '../../utils/money.js';
+import { useOrder } from '../../hooks/useOrders.js';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { useProfile } from '../../hooks/useProfile.js';
 
@@ -23,7 +24,7 @@ function on(iso) {
 // settings on the server, not hardcoded here.
 export default function InvoicePage() {
   const { orderId } = useParams();
-  const order = useOrder(orderId);
+  const { order } = useOrder(orderId);
   const { user } = useStudentAuth();
   const profile = useProfile();
 
@@ -105,25 +106,25 @@ export default function InvoicePage() {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((item) => (
+            {order.lines.map((item) => (
               <tr key={item.title}>
                 <td>{item.title}</td>
-                <td className="lms-invoice__num">{money(item.amount, order.currency)}</td>
+                <td className="lms-invoice__num">{formatCents(item.amount, order.currency)}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr>
               <td>Subtotal</td>
-              <td className="lms-invoice__num">{money(order.subtotal, order.currency)}</td>
+              <td className="lms-invoice__num">{formatCents(order.net, order.currency)}</td>
             </tr>
             <tr>
               <td>GST (10%)</td>
-              <td className="lms-invoice__num">{money(order.gst, order.currency)}</td>
+              <td className="lms-invoice__num">{formatCents(order.gst, order.currency)}</td>
             </tr>
             <tr className="lms-invoice__total">
               <td>Total {order.currency}</td>
-              <td className="lms-invoice__num">{money(order.total, order.currency)}</td>
+              <td className="lms-invoice__num">{formatCents(order.total, order.currency)}</td>
             </tr>
           </tfoot>
         </table>

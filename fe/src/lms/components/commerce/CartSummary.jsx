@@ -1,20 +1,16 @@
 import LmsIcon from '../LmsIcon.jsx';
 import CartLineItem from './CartLineItem.jsx';
-import CouponField from './CouponField.jsx';
 import GstBreakdown from './GstBreakdown.jsx';
 
 // The order summary beside the checkout form (C1/C2). Sticky on desktop so the
 // total stays visible while the buyer fills in their details. A total that
 // scrolls away is a total people stop trusting.
-export default function CartSummary({
-  items,
-  totals,
-  coupon,
-  couponError,
-  onApplyCoupon,
-  onRemoveCoupon,
-  onRemoveItem,
-}) {
+/* Coupons are NOT rendered here. There is no server-side discount — the order
+   endpoint prices from the Course record and ignores anything else — so a
+   promotion-code box would be a field that silently does nothing. Coupons and
+   promotions are C2 in the scope; the input comes back when the server can
+   honour it. */
+export default function CartSummary({ items, totals, onRemoveItem }) {
   return (
     <aside className="lms-summary">
       <div className="lms-card">
@@ -34,14 +30,7 @@ export default function CartSummary({
           ))}
         </ul>
 
-        <CouponField
-          coupon={coupon}
-          error={couponError}
-          onApply={onApplyCoupon}
-          onRemove={onRemoveCoupon}
-        />
-
-        <GstBreakdown totals={totals} coupon={coupon} />
+        <GstBreakdown totals={totals} />
 
         <ul className="lms-assurance">
           <li>

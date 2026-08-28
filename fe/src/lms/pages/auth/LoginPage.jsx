@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
 
 // Sign in (L6).
@@ -17,7 +18,21 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  // The OAuth callback bounces failures back here as ?error=<reason>. Each one
+  // is a different thing for the reader to do about it, so they are not
+  // collapsed into "sign-in failed".
+  const OAUTH_ERRORS = {
+    cancelled: 'Sign-in was cancelled.',
+    expired: 'That sign-in link expired. Please try again.',
+    unavailable: 'That sign-in method is currently unavailable.',
+    inactive: 'That account has been deactivated. Contact an administrator.',
+    'unverified-email':
+      'Your provider did not confirm your email address, so we cannot match it to an account. Sign in with your email and password instead.',
+    failed: 'We could not complete that sign-in. Please try again.',
+  };
+  const [error, setError] = useState(
+    () => OAUTH_ERRORS[new URLSearchParams(window.location.search).get('error')] ?? '',
+  );
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -105,6 +120,8 @@ export default function LoginPage() {
             Staff accounts sign in here too. You’ll be taken to the CMS.
           </p>
         </form>
+
+        <OAuthButtons next={location.state?.from?.pathname ?? ''} />
       </div>
 
       <aside className="lms-auth__aside" aria-hidden="true">

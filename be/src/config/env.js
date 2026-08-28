@@ -78,6 +78,67 @@ export const env = {
     ffmpegPath: process.env.FFMPEG_PATH || '',
   },
 
+  /* Live teaching sessions (LMS 17.0).
+
+     `provider` names an adapter in src/modules/lms/live/providers/. Only `zoom`
+     ships today. `enabled` is the kill switch that turns scheduling off with
+     credentials left in place — the same shape as the coach, and for the same
+     reason: switching a feature off should not mean deleting the keys.
+
+     With no credentials the feature does not pretend. Sessions can still be
+     scheduled as records, and each one says plainly that it has no meeting link
+     yet, rather than showing a Join button that goes nowhere. */
+  live: {
+    enabled: process.env.LIVE_SESSIONS_ENABLED !== 'false',
+    provider: process.env.LIVE_PROVIDER || 'zoom',
+  },
+
+  /* Federated sign-in (L6). Each provider is switched on independently by the
+     presence of its own credentials; with none set, the sign-in screen shows
+     only email and password, exactly as before.
+
+     `enabled` is the kill switch that turns them all off with credentials left
+     in place — same shape as the coach and live sessions. */
+  /* Payments (C1). Prices in this system are TAX-INCLUSIVE — see
+     src/utils/gst.js — so Stripe is sent the full amount the customer pays with
+     tax_behavior 'inclusive', and the GST component is computed here at a flat
+     Australian 10%.
+
+     With no secret key, the commerce endpoints report themselves unavailable
+     and nothing can be bought. The webhook secret is separate and just as
+     required: without it a webhook cannot be verified, and an unverified
+     webhook is an open "mark this order paid" endpoint. */
+  stripe: {
+    enabled: process.env.STRIPE_ENABLED !== 'false',
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  },
+
+  oauth: {
+    enabled: process.env.OAUTH_ENABLED !== 'false',
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    },
+    microsoft: {
+      clientId: process.env.MICROSOFT_CLIENT_ID || '',
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || '',
+      // common | organizations | consumers | <tenant guid>. See the note in
+      // providers/microsoft.js before narrowing this.
+      tenant: process.env.MICROSOFT_TENANT || 'common',
+    },
+  },
+
+  zoom: {
+    accountId: process.env.ZOOM_ACCOUNT_ID || '',
+    clientId: process.env.ZOOM_CLIENT_ID || '',
+    clientSecret: process.env.ZOOM_CLIENT_SECRET || '',
+    // Whose Zoom calendar the meetings are created on. 'me' is the user the
+    // Server-to-Server app belongs to; an email or user id puts them on a
+    // different licensed host.
+    userId: process.env.ZOOM_USER_ID || 'me',
+  },
+
   /* Course Coach (LMS 18.0) — the AI study assistant inside the student LMS.
 
      THREE SEPARATE KNOBS, on purpose, because "change the AI" means three

@@ -70,12 +70,18 @@ export function CartProvider({ children }) {
           const course = catalogue.find((c) => c.slug === line.slug);
           if (!course) return null;
           return {
+            // The id is what the order endpoint prices against — slugs are for
+            // links, ids are for money.
+            courseId: course.id,
             slug: course.slug,
             kind: line.kind,
             title: course.title,
-            // `instructor` is a byline string on a catalogue row, not an
-            // object — the hardcoded records nested a name inside it.
-            instructor: course.instructor,
+            // The byline as a STRING. toCatalogCourse() resolves `instructor`
+            // to {name, role, avatarUrl}, and a line renders it as one piece of
+            // text — handing the object straight through crashed the basket
+            // with "Objects are not valid as a React child". Every other
+            // consumer of a catalogue row reads `.name` for the same reason.
+            instructor: course.instructor?.name ?? '',
             levelLabel: course.levelLabel,
             durationLabel: course.durationLabel,
             accent: course.accent,

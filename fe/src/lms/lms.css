@@ -5736,3 +5736,265 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   .lms-coach__picker { max-width: none; }
   .lms-coach__turn.is-user .lms-coach__bubble { max-width: 100%; }
 }
+
+/* ---------------------------------------------------------------------------
+   Live teaching sessions (LMS 17.0b)
+
+   Reuses the existing form (.lms-field / .lms-input) and table (.lms-dtable)
+   conventions. What is genuinely new here is the session card and the state
+   badge; the rest is small helpers those two shared surfaces were missing.
+   ------------------------------------------------------------------------ */
+
+.lms-live-list { display: flex; flex-direction: column; gap: 12px; }
+.lms-live-list--past { margin-top: 28px; }
+.lms-live-list--past .lms-live-card { opacity: .72; }
+
+.lms-section-title {
+  font-size: 12.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--lms-muted); margin: 0 0 10px;
+}
+
+.lms-live-card {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 20px;
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border);
+  border-left: 3px solid var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+}
+/* The stripe carries the state, readable before any text is. */
+.lms-live-card--live { border-left-color: var(--lms-danger); }
+.lms-live-card--upcoming { border-left-color: var(--lms-green); }
+.lms-live-card--cancelled { border-left-color: var(--lms-muted); }
+.lms-live-card--cancelled .lms-live-card__title { text-decoration: line-through; }
+
+.lms-live-card__when { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.lms-live-card__time { font-size: 13.5px; font-weight: 600; color: var(--lms-text); }
+.lms-live-card__rel { font-size: 12.5px; color: var(--lms-muted); }
+
+.lms-live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface-3); color: var(--lms-text-2); white-space: nowrap;
+}
+.lms-live-badge--live { background: var(--lms-danger-soft); color: var(--lms-danger); }
+.lms-live-badge--upcoming { background: var(--lms-surface-3); color: var(--lms-green); }
+.lms-live-badge--cancelled { background: var(--lms-surface-3); color: var(--lms-muted); }
+.lms-live-badge--ended { background: var(--lms-surface-3); color: var(--lms-muted); }
+
+.lms-live-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: currentColor;
+  animation: lms-live-pulse 1.8s ease-in-out infinite;
+}
+@keyframes lms-live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+/* A blinking dot is an attention cue, never the only signal — and it stops for
+   anyone who asked for less motion. */
+@media (prefers-reduced-motion: reduce) { .lms-live-dot { animation: none; } }
+
+.lms-live-card__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.lms-live-card__title { margin: 0; font-size: 15.5px; font-weight: 600; color: var(--lms-text); }
+.lms-live-card__course { font-size: 13px; color: var(--lms-green-600); text-decoration: none; }
+.lms-live-card__course:hover { text-decoration: underline; }
+.lms-live-card__desc { margin: 2px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--lms-text-2); }
+.lms-live-card__meta {
+  display: flex; align-items: center; gap: 6px;
+  margin: 4px 0 0; font-size: 12.5px; color: var(--lms-muted);
+}
+.lms-live-card__meta svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.lms-live-card__action {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  text-align: right; max-width: 220px;
+}
+.lms-live-card__note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--lms-muted); }
+.lms-live-card__error { margin: 0; font-size: 12px; line-height: 1.45; color: var(--lms-danger); }
+
+/* ---- Instructor scheduling ---- */
+
+.lms-live-form { margin-bottom: 20px; }
+.lms-live-form__actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Small helpers the shared table did not have a name for yet. */
+.lms-dtable__strong { display: block; font-weight: 600; color: var(--lms-text); margin-bottom: 5px; }
+.lms-dtable__muted { color: var(--lms-muted); }
+.lms-dtable__ok { display: inline-flex; align-items: center; gap: 5px; color: var(--lms-green-600); }
+.lms-dtable__ok svg { width: 14px; height: 14px; flex-shrink: 0; }
+.lms-dtable__warn { color: var(--lms-warning); }
+.lms-dtable__actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+
+/* A destructive action that still sits among ordinary ghost buttons — colour
+   alone, no fill, so it reads as available rather than alarming. */
+.lms-btn--danger { color: var(--lms-danger); }
+.lms-btn--danger:hover { background: var(--lms-danger-soft); border-color: var(--lms-danger-soft); }
+
+@media (max-width: 860px) {
+  .lms-live-card { grid-template-columns: 1fr; gap: 12px; align-items: start; }
+  .lms-live-card__action { align-items: flex-start; text-align: left; max-width: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Toasts (replacing window.alert)
+   ------------------------------------------------------------------------ */
+
+.lms-toasts {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* The container spans the corner but must not swallow clicks on the page
+     behind it; each toast turns pointer events back on for itself. */
+  pointer-events: none;
+  max-width: min(420px, calc(100vw - 40px));
+}
+.lms-toasts__region { display: flex; flex-direction: column; gap: 10px; }
+
+.lms-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: var(--lms-radius);
+  border: 1px solid var(--lms-border);
+  border-left: 3px solid var(--lms-muted);
+  background: var(--lms-surface);
+  box-shadow: 0 10px 30px -12px rgba(10, 49, 20, .35), 0 2px 6px -2px rgba(10, 49, 20, .15);
+  animation: lms-toast-in .22s ease-out;
+}
+.lms-toast--success { border-left-color: var(--lms-green); }
+.lms-toast--error { border-left-color: var(--lms-danger); }
+.lms-toast--info { border-left-color: var(--lms-warning); }
+
+@keyframes lms-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .lms-toast { animation: none; } }
+
+.lms-toast__icon { display: inline-flex; flex-shrink: 0; margin-top: 1px; }
+.lms-toast__icon svg { width: 17px; height: 17px; }
+.lms-toast--success .lms-toast__icon { color: var(--lms-green-600); }
+.lms-toast--error .lms-toast__icon { color: var(--lms-danger); }
+.lms-toast--info .lms-toast__icon { color: var(--lms-warning); }
+
+.lms-toast__body { flex: 1; min-width: 0; }
+.lms-toast__title { margin: 0 0 2px; font-size: 13.5px; font-weight: 600; color: var(--lms-text); }
+.lms-toast__message { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--lms-text-2); }
+
+.lms-toast__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--lms-radius-sm);
+  background: transparent;
+  color: var(--lms-muted);
+  cursor: pointer;
+  /* The plus glyph rotated is a close cross — no second icon needed. */
+  transform: rotate(45deg);
+}
+.lms-toast__close:hover { background: var(--lms-surface-3); color: var(--lms-text); }
+.lms-toast__close:focus-visible { outline: 2px solid var(--lms-green-600); outline-offset: 1px; }
+.lms-toast__close svg { width: 15px; height: 15px; }
+
+/* Full width at the bottom on a phone, where a floating card looks stranded. */
+@media (max-width: 560px) {
+  .lms-toasts { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Federated sign-in buttons (L6)
+   ------------------------------------------------------------------------ */
+
+.lms-oauth { margin-top: 20px; }
+
+/* A rule with the label sitting in a gap in it, rather than a line and a
+   caption stacked — the divider IS the separation, so it should read as one
+   thing. */
+.lms-oauth__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--lms-muted);
+  font-size: 12.5px;
+}
+.lms-oauth__divider::before,
+.lms-oauth__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--lms-border-strong);
+}
+
+.lms-oauth__buttons { display: flex; flex-direction: column; gap: 10px; }
+
+.lms-oauth__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  /* Deliberately quieter than the primary Sign in button. These are an
+     alternative route, not the recommended one, and two equally loud buttons
+     make the reader choose before they have read either. */
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border-strong);
+  color: var(--lms-text);
+  font-weight: 500;
+}
+.lms-oauth__btn:hover { background: var(--lms-surface-2); border-color: var(--lms-muted); }
+.lms-oauth__btn:focus-visible { outline: none; border-color: var(--lms-mint); box-shadow: var(--lms-ring); }
+
+/* Brand marks keep their own colours — a recoloured Google mark is both wrong
+   and against their brand terms. */
+.lms-oauth__mark { display: inline-flex; align-items: center; flex-shrink: 0; }
+
+/* ---------------------------------------------------------------------------
+   Checkout payment panel and inclusive-GST totals (C1)
+   ------------------------------------------------------------------------ */
+
+.lms-paypanel { display: flex; flex-direction: column; gap: 14px; }
+.lms-paypanel__title { margin: 0; font-size: 17px; font-weight: 600; color: var(--lms-text); }
+.lms-paypanel__text { margin: 0; font-size: 14px; line-height: 1.6; color: var(--lms-text-2); }
+
+/* Test mode has to be unmissable. A test key quietly left in production means
+   customers who are never charged and orders that never complete. */
+.lms-paypanel__mode {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-warning-soft);
+  color: var(--lms-warning);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* Total first, components under it — these prices already include the tax, so
+   leading with a subtotal nobody pays would misread. */
+.lms-totals__grand {
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--lms-border-strong);
+}
+.lms-totals__grand dt { font-size: 15px; font-weight: 600; color: var(--lms-text); }
+.lms-totals__grand dd { font-size: 19px; font-weight: 700; color: var(--lms-text); }
+.lms-totals__note dt,
+.lms-totals__note dd { font-size: 13px; color: var(--lms-muted); }
+.lms-totals__inclusive {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--lms-muted);
+}

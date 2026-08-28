@@ -13,6 +13,7 @@ import * as coach from './coach.controller.js';
 import * as reviews from './reviews.controller.js';
 import * as programs from './programs.controller.js';
 import * as study from './study.controller.js';
+import * as live from './liveSessions.controller.js';
 
 const router = Router();
 
@@ -31,6 +32,13 @@ router.post('/enrollments', protect, learning.enrol);
 router.get('/enrollments', protect, learning.myEnrollments);
 
 router.get('/progress', protect, learning.myProgress);
+
+/* ---- Live sessions (LMS 17.0b) --------------------------------------------
+   `/join` is the gate, and the only way a join URL ever leaves the server. The
+   listing above it carries no link at all — see forLearner() on the model. */
+router.get('/live/status', protect, live.status);
+router.get('/live-sessions', protect, live.myUpcoming);
+router.get('/live-sessions/:id/join', protect, live.join);
 
 /* ---- A learner's own study record ----------------------------------------
    Notes, bookmarks and the day-by-day activity the dashboard and My Progress
@@ -147,6 +155,16 @@ router.get('/authoring/profile', ...teach, authoring.instructorProfileSummary);
 // loads; the per-quiz route takes a LESSON id, so it checks ownership itself
 // rather than going through `owns`, which works on a course id.
 // The questions inbox: the same threads, filtered to the courses they wrote.
+/* Live sessions. Ownership is checked inside the controller rather than by
+   `owns`, because the id in the path is a SESSION's, not a course's — the
+   course it belongs to is looked up first and its author is the test. */
+router.get('/authoring/live-sessions', ...teach, live.mySessions);
+router.post('/authoring/live-sessions', ...teach, live.createSession);
+router.patch('/authoring/live-sessions/:id', ...teach, live.updateSession);
+router.delete('/authoring/live-sessions/:id', ...teach, live.cancelSession);
+router.post('/authoring/live-sessions/:id/retry', ...teach, live.retryMeeting);
+router.get('/authoring/live-sessions/:id/host', ...teach, live.hostUrl);
+
 router.get('/authoring/discussions', ...teach, discussions.instructorQuestions);
 // The same reviews their learners wrote, filtered to the courses they authored.
 router.get('/authoring/reviews', ...teach, reviews.instructorReviews);

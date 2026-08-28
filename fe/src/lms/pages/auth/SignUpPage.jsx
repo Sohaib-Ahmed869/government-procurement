@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
@@ -197,6 +198,8 @@ export default function SignUpPage() {
             <a href="/privacy">privacy policy</a>.
           </p>
         </form>
+
+        <OAuthButtons label="Or sign up with" />
       </div>
 
       <aside className="lms-auth__aside" aria-hidden="true">

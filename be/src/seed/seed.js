@@ -20,6 +20,7 @@ import { Question } from '../models/Question.js';
 import { Link } from '../models/Link.js';
 import { Announcement } from '../models/Announcement.js';
 import { toSlug } from '../utils/slugify.js';
+import { FEATURED_COURSE } from './course-data.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ASSETS = resolve(__dirname, '../../../fe/src/assets/images');

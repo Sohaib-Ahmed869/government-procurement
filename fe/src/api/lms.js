@@ -289,3 +289,41 @@ export const certificatesApi = {
   verify: (credentialId) =>
     api.get(`/lms/certificates/verify/${credentialId}`, undefined, { auth: false }),
 };
+
+// ---- R3 · Live teaching sessions (LMS 17.0) ---------------------------------
+// The listing endpoints carry NO join link — see forLearner() on the model. A
+// URL is fetched one click at a time from `join`, which re-checks the enrolment
+// on every request. Never cache what it returns.
+export const liveApi = {
+  // Whether sessions can be scheduled, and if not, why in words a screen shows.
+  status: () => api.get('/lms/live/status'),
+  // Upcoming sessions across everything this learner is enrolled in.
+  mine: () => api.get('/lms/live-sessions'),
+  // The gate. Returns { url, passcode } for this click only.
+  join: (id) => api.get(`/lms/live-sessions/${id}/join`),
+
+  // Instructor side.
+  authored: () => api.get('/lms/authoring/live-sessions'),
+  create: (body) => api.post('/lms/authoring/live-sessions', body),
+  update: (id, body) => api.patch(`/lms/authoring/live-sessions/${id}`, body),
+  // `del` takes request options, not a body — the reason rides in `body`.
+  cancel: (id, reason) => api.del(`/lms/authoring/live-sessions/${id}`, { body: { reason } }),
+  // For a session whose provider call failed — credentials added since, or the
+  // vendor having had a bad afternoon.
+  retry: (id) => api.post(`/lms/authoring/live-sessions/${id}/retry`),
+  // The start-as-host URL, served on a deliberate click and never listed.
+  hostUrl: (id) => api.get(`/lms/authoring/live-sessions/${id}/host`),
+};
+
+// ---- C1 · Payments and orders -----------------------------------------------
+// The server prices every order from the Course record: `createOrder` sends
+// course IDS and no amounts at all. Enrolment is granted by the Stripe webhook
+// when payment settles, never by the browser returning to the success page.
+export const commerceApi = {
+  // Whether payments are switched on, and in test or live mode.
+  status: () => api.get('/lms/commerce/status'),
+  // -> { order, checkoutUrl }. Send the browser to checkoutUrl.
+  createOrder: (courseIds) => api.post('/lms/orders', { courseIds }),
+  mine: () => api.get('/lms/orders'),
+  get: (id) => api.get(`/lms/orders/${id}`),
+};

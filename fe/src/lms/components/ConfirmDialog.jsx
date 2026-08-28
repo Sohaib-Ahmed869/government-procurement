@@ -20,17 +20,25 @@ export default function ConfirmDialog({
   cancelLabel = 'Cancel',
   tone = 'danger',
   requireText,
+  // An optional free-text note collected with the confirmation and handed to
+  // onConfirm. Added for cancelling a live session, where the learners who
+  // planned around it deserve a reason rather than a row that just changes
+  // colour. Callers that don't pass a label get the old behaviour exactly.
+  reasonLabel,
+  reasonPlaceholder = '',
   onConfirm,
   onCancel,
 }) {
   const ref = useRef(null);
   const [typed, setTyped] = useState('');
+  const [reason, setReason] = useState('');
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (open && !el.open) {
       setTyped('');
+      setReason('');
       el.showModal();
     } else if (!open && el.open) {
       el.close();
@@ -76,6 +84,22 @@ export default function ConfirmDialog({
         <p className="lms-dialog__message">{message}</p>
         {detail ? <p className="lms-dialog__detail">{detail}</p> : null}
 
+        {reasonLabel ? (
+          <label className="lms-field lms-dialog__field">
+            <span className="lms-field__label">
+              {reasonLabel} <span className="lms-field__optional">optional</span>
+            </span>
+            <textarea
+              className="lms-input"
+              rows={2}
+              value={reason}
+              placeholder={reasonPlaceholder}
+              onChange={(e) => setReason(e.target.value)}
+              autoFocus
+            />
+          </label>
+        ) : null}
+
         {requireText ? (
           <label className="lms-field lms-dialog__field">
             <span className="lms-field__label">
@@ -99,7 +123,7 @@ export default function ConfirmDialog({
           <button
             type="button"
             className={`lms-btn ${tone === 'danger' ? 'lms-btn--danger' : 'lms-btn--primary'}`}
-            onClick={onConfirm}
+            onClick={() => onConfirm(reason.trim())}
             disabled={!ready}
           >
             {confirmLabel}

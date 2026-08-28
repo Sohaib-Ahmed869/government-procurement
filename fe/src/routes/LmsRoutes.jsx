@@ -1,6 +1,8 @@
 import { Navigate, Routes, Route, useParams } from 'react-router-dom';
 import { StudentAuthProvider, useStudentAuth } from '../lms/context/StudentAuthContext.jsx';
 import { CartProvider } from '../lms/context/CartContext.jsx';
+import { ToastProvider } from '../lms/context/ToastContext.jsx';
+import Toasts from '../lms/components/Toasts.jsx';
 import InstructorRoute from './InstructorRoute.jsx';
 import StudentRoute from './StudentRoute.jsx';
 import AuthLayout from '../lms/layout/AuthLayout.jsx';
@@ -8,6 +10,7 @@ import SignUpPage from '../lms/pages/auth/SignUpPage.jsx';
 import LoginPage from '../lms/pages/auth/LoginPage.jsx';
 import ForgotPasswordPage from '../lms/pages/auth/ForgotPasswordPage.jsx';
 import ResetPasswordPage from '../lms/pages/auth/ResetPasswordPage.jsx';
+import AuthCallbackPage from '../lms/pages/auth/AuthCallbackPage.jsx';
 import InstructorDashboardPage from '../lms/pages/instructor/InstructorDashboardPage.jsx';
 import InstructorCoursesPage from '../lms/pages/instructor/InstructorCoursesPage.jsx';
 import InstructorPathsPage from '../lms/pages/instructor/InstructorPathsPage.jsx';
@@ -19,11 +22,13 @@ import EnrolmentsPage from '../lms/pages/instructor/EnrolmentsPage.jsx';
 import CohortProgressPage from '../lms/pages/instructor/CohortProgressPage.jsx';
 import QuestionsPage from '../lms/pages/instructor/QuestionsPage.jsx';
 import InstructorReviewsPage from '../lms/pages/instructor/InstructorReviewsPage.jsx';
+import InstructorLiveSessionsPage from '../lms/pages/instructor/InstructorLiveSessionsPage.jsx';
 import QuizAnalyticsPage from '../lms/pages/instructor/QuizAnalyticsPage.jsx';
 import StudentRosterPage from '../lms/pages/instructor/StudentRosterPage.jsx';
 import LmsLayout from '../lms/layout/LmsLayout.jsx';
 import DashboardPage from '../lms/pages/dashboard/DashboardPage.jsx';
 import CoachPage from '../lms/pages/coach/CoachPage.jsx';
+import LiveSessionsPage from '../lms/pages/growth/LiveSessionsPage.jsx';
 import MyCoursesPage from '../lms/pages/dashboard/MyCoursesPage.jsx';
 import CatalogPage from '../lms/pages/catalog/CatalogPage.jsx';
 import CourseOverviewPage from '../lms/pages/catalog/CourseOverviewPage.jsx';
@@ -113,6 +118,10 @@ export default function LmsRoutes() {
   return (
     <StudentAuthProvider>
       <CartProvider>
+      {/* Toasts sit above the router, so a message raised on one screen is not
+          torn down by navigating away from it. */}
+      <ToastProvider>
+      <Toasts />
       <Routes>
         {/* Auth. Full-page, no app chrome. This is the single sign-in for
             everyone; the role decides where they land. AuthLayout carries the
@@ -123,6 +132,10 @@ export default function LmsRoutes() {
           <Route path="signup" element={<SignUpPage />} />
           <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="reset-password" element={<ResetPasswordPage />} />
+          {/* Where the OAuth round trip lands. Public by necessity — the whole
+              job of this screen is to turn the provider's redirect into a
+              session, so it runs before one exists. */}
+          <Route path="auth/callback" element={<AuthCallbackPage />} />
         </Route>
 
         {/* In-course screens use the distraction-free player shell instead of
@@ -172,6 +185,9 @@ export default function LmsRoutes() {
           <Route path="instructor/progress/quizzes/:lessonId" element={<InstructorRoute><QuizAnalyticsPage /></InstructorRoute>} />
           <Route path="instructor/discussions" element={<InstructorRoute><QuestionsPage /></InstructorRoute>} />
           <Route path="instructor/reviews" element={<InstructorRoute><InstructorReviewsPage /></InstructorRoute>} />
+          {/* Live sessions (LMS 17.0b). Scheduling sits with the teaching tabs;
+              the learner's view of the same sessions is under Learning. */}
+          <Route path="instructor/live" element={<InstructorRoute><InstructorLiveSessionsPage /></InstructorRoute>} />
 
           {/* Learning. The catalogue and a course's page are the shop window,
               public. "My courses" is not. */}
@@ -195,6 +211,10 @@ export default function LmsRoutes() {
               without an account. */}
           <Route path="coach" element={me(<CoachPage />)} />
 
+          {/* Live sessions. me(), because the list is built from the reader's
+              own enrolments and there is nothing to show without them. */}
+          <Route path="live" element={me(<LiveSessionsPage />)} />
+
           {/* Community */}
           <Route path="discussions" element={me(<CourseDiscussionPage />)} />
           <Route path="discussions/:threadId" element={me(<DiscussionThreadPage />)} />
@@ -212,6 +232,7 @@ export default function LmsRoutes() {
           <Route path="*" element={<Soon title="Not found" note="That page doesn't exist in the LMS." />} />
         </Route>
       </Routes>
+      </ToastProvider>
       </CartProvider>
     </StudentAuthProvider>
   );
