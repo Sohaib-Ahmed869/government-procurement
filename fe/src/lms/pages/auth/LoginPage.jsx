@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
-import gpLogo from '../../../assets/icons/gp-02.svg';
+import gpLogo from '../../../assets/icons/gp-02-dark.svg';
 import AuthAside from '../../components/auth/AuthAside.jsx';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
@@ -63,13 +63,11 @@ export default function LoginPage() {
     <div className="lms-auth">
       <div className="lms-auth__panel">
         <Link className="lms-auth__brand" to="/">
-          {/* The real mark on the brand tile, not the letters "GP" set in a
-              box. gp-02.svg is the LIGHT artwork — it is drawn for the dark
-              header and sidebar — so it needs the dark tile behind it to be
-              visible at all on this page. */}
-          <span className="lms-auth__brand-mark">
-            <img src={gpLogo} alt="" width="1153" height="1000" />
-          </span>
+                    {/* The DARK artwork. gp-02.svg is white — drawn for the dark header
+              and sidebar — so on this pale page it needed either a tile behind
+              it or its own colour. Its own colour is the better answer: the
+              mark stands on its own and no green square competes with it. */}
+          <img className="lms-auth__brand-mark" src={gpLogo} alt="" width="1153" height="1000" />
           <span>
             <strong>Government Procurement</strong>
             <span>Learning</span>

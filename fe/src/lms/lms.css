@@ -3323,6 +3323,11 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 100%;
   margin: 0 auto;
 }
+/* Centred over the form rather than tucked into its top-left corner. It is the
+   only thing above the heading, and one small lockup pinned to the left of a
+   wide column read as dropped there rather than placed.
+   `align-self` is the property that does it — the column is a flex parent, so
+   the earlier flex-start here outranked any text-align on the ancestor. */
 .lms-auth__brand {
   display: inline-flex;
   align-items: center;
@@ -3330,21 +3335,17 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin-bottom: 34px;
   color: var(--lms-text);
   text-decoration: none;
-  align-self: flex-start;
+  align-self: center;
 }
-/* The tile stays; what changed is what sits in it. gp-02.svg is the light
-   artwork, drawn for the dark header and sidebar, so on this pale page it needs
-   the dark ground behind it or it disappears. */
+/* The artwork on its own — no tile. gp-02-dark.svg is the green variant, so it
+   needs no ground to stand on and nothing competes with it. */
 .lms-auth__brand-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  background: linear-gradient(155deg, var(--lms-green-600), var(--lms-green));
+  display: block;
+  width: 40px;
+  height: auto;
+  background: none;
+  border-radius: 0;
 }
-.lms-auth__brand-mark img { width: 23px; height: 20px; display: block; }
 .lms-auth__brand strong { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .lms-auth__brand span span { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lms-green-600); }
 .lms-auth__title { margin: 0 0 6px; font-size: clamp(26px, 3.4vw, 32px); font-weight: 600; letter-spacing: -0.02em; }
@@ -6443,17 +6444,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   color: #fff;
 }
 
-/* Bleeds off two edges deliberately: a motif fully inside the panel reads as a
-   picture placed there, one that runs off reads as pattern. */
-.lms-authside__motif {
-  position: absolute;
-  right: -18%;
-  top: -12%;
-  width: min(520px, 76%);
-  color: var(--lms-mint);
-  opacity: 0.22;
-  pointer-events: none;
-}
 
 /* Copy first, animation under it. AuthLottie is rendered before the body in
    the JSX (so it can sit behind the motif in the stacking order), and `order`
@@ -6461,7 +6451,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__body { position: relative; max-width: 42ch; flex-shrink: 0; order: 1; }
 .lms-authside__eyebrow {
   margin: 0 0 18px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -6469,7 +6459,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-authside__lede {
   margin: 0;
-  font-size: clamp(23px, 2.7vw, 31px);
+  font-size: clamp(27px, 3.1vw, 38px);
   line-height: 1.28;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -6545,7 +6535,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__anim.is-ready { opacity: 1; }
 /* Once the animation is up the motif is redundant behind it — keep it faint so
    it reads as ground rather than competing line work. */
-.lms-authside__anim.is-ready ~ .lms-authside__motif { opacity: 0.14; }
 @media (prefers-reduced-motion: reduce) {
   .lms-authside__anim { transition: none; }
 }
@@ -6563,13 +6552,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__proof li {
   align-items: center;
   gap: 8px;
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9);
 }
 .lms-authside__proof li svg {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   color: var(--lms-mint);
   flex-shrink: 0;
 }
