@@ -116,7 +116,22 @@ export const createOrder = asyncHandler(async (req, res) => {
     buyerName: req.user.name,
   });
 
-  const site = env.clientOrigins[0] ?? 'http://localhost:5173';
+  /* Where to send the buyer back to.
+
+     The BROWSER says where it came from, because this app is served on more
+     than one origin — a staging domain, a Vercel preview, production — and
+     they do not share localStorage. Returning everyone to whichever origin
+     happens to be first in CLIENT_ORIGINS drops a buyer who paid on the
+     staging domain onto a different host, where they have no session and land
+     on the sign-in page holding a receipt.
+
+     Validated against the allowlist rather than trusted: an unchecked origin
+     from a request body is an open redirect, and this one would carry a paying
+     customer to it. Anything not on the list falls back to the first entry. */
+  const claimed = String(req.body?.origin ?? '').replace(/\/$/, '');
+  const site = env.clientOrigins.includes(claimed)
+    ? claimed
+    : (env.clientOrigins[0] ?? 'http://localhost:5173');
   let session;
   try {
     session = await createCheckoutSession({
