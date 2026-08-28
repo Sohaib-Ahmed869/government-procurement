@@ -109,6 +109,12 @@ export function useAutosave(save, delay = 800) {
   const [error, setError] = useState('');
   const timer = useRef(null);
   const pendingPatch = useRef({});
+  /* Whether anything is waiting to be written.
+
+     A ref alone cannot drive the UI — nothing re-renders when it changes — so
+     the same fact is mirrored into state. "Save now" needs it: with an empty
+     queue flush() returns immediately and the click looks broken. */
+  const [dirty, setDirty] = useState(false);
   const saveRef = useRef(save);
   saveRef.current = save;
 
@@ -122,20 +128,26 @@ export function useAutosave(save, delay = 800) {
       await saveRef.current(patch);
       setError('');
       // Only clear to "saved" if nothing new arrived while we were in flight.
-      setStatus(Object.keys(pendingPatch.current).length ? 'saving' : 'saved');
+      const stillPending = Object.keys(pendingPatch.current).length > 0;
+      setDirty(stillPending);
+      setStatus(stillPending ? 'saving' : 'saved');
+      return true;
     } catch (err) {
       // The patch goes BACK on the queue. Dropping it is how a failed save
       // silently loses work: the field still shows the new value, so the author
       // has no way to know the server never took it.
       pendingPatch.current = { ...patch, ...pendingPatch.current };
+      setDirty(true);
       setError(err?.message ?? 'Could not save');
       setStatus('error');
+      return false;
     }
   }, []);
 
   const queue = useCallback(
     (patch) => {
       pendingPatch.current = { ...pendingPatch.current, ...patch };
+      setDirty(true);
       setStatus('saving');
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(flush, delay);
@@ -159,5 +171,5 @@ export function useAutosave(save, delay = 800) {
     return flush();
   }, [flush]);
 
-  return { queue, flush, retry, status, error };
+  return { queue, flush, retry, status, error, dirty };
 }

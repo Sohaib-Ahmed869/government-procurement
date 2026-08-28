@@ -47,7 +47,7 @@ export default function ModuleEditor({
         </p>
       ) : (
         modules.map((m, mi) => (
-          <section className="lms-cmod" key={m._id}>
+          <section className="lms-cmod" key={m._id} id={`section-${m._id}`}>
             <header className="lms-cmod__head">
               <span className="lms-cmod__order">{mi + 1}</span>
 
