@@ -4,7 +4,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { ok, created } from '../../utils/apiResponse.js';
 import { env } from '../../config/env.js';
 import { GST_RATE, splitInclusive, toCents } from '../../utils/gst.js';
-import { CONTENT_STATUS } from '../../constants/statuses.js';
+import { CONTENT_STATUS, COURSE_STATE } from '../../constants/statuses.js';
 import { Course } from '../../models/Course.js';
 import { Enrollment } from '../../models/Enrollment.js';
 import { Order, ORDER_STATUS } from '../../models/Order.js';
@@ -48,8 +48,11 @@ async function priceOrder(courseIds) {
   if (!unique.length) throw ApiError.badRequest('Your basket is empty');
   if (unique.length > 20) throw ApiError.badRequest('That is more than one order can hold');
 
+  // `availability` is in this projection because the check below reads it. A
+  // field left out of a select is `undefined`, not its stored value — and an
+  // `undefined !== OPEN` comparison refuses every course, including open ones.
   const courses = await Course.find({ _id: { $in: unique } }).select(
-    'title slug price currency status',
+    'title slug price currency status availability',
   );
   if (courses.length !== unique.length) {
     throw ApiError.badRequest('One of those courses is no longer available');
@@ -60,6 +63,17 @@ async function priceOrder(courseIds) {
     // basket in somebody's browser still remembers about it.
     if (course.status !== CONTENT_STATUS.PUBLISHED) {
       throw ApiError.badRequest(`"${course.title}" is not available to buy`);
+    }
+    /* Published but not OPEN — coming soon, or closed to new enrolments. The
+       sales page is deliberately still readable in that state, so the basket
+       has to be the thing that refuses; otherwise a course an instructor has
+       marked "coming soon" can be paid for today. */
+    if (course.availability !== COURSE_STATE.OPEN) {
+      throw ApiError.badRequest(
+        course.availability === COURSE_STATE.COMING_SOON
+          ? `"${course.title}" is not on sale yet`
+          : `"${course.title}" is closed to new enrolments`,
+      );
     }
     const amount = toCents(course.price);
     if (amount <= 0) {

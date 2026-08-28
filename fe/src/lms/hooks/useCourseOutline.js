@@ -57,6 +57,9 @@ export function useCourseOutline(slug) {
         // Taken off the site. Only reachable here because this learner is
         // already enrolled (or wrote it). See mayViewUnpublished on the server.
         offline: Boolean(res.offline),
+        // 'open' | 'coming_soon' | 'closed'. Distinct from `offline`, which is
+        // about the course being on the site at all.
+        availability: res.availability ?? 'open',
         modules: toOutlineModules(res.modules ?? [], res.enrolment?.next?.id),
         // Marketing copy lives on the Course record itself. The same fields
         // the public site renders, so the two pages describe a course

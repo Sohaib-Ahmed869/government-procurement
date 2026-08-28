@@ -35,6 +35,19 @@ export default function EnrollButton({ course, size = 'md', block = false, onEnr
     );
   }
 
+  /* A course can be published — sales page readable, previews playing — while
+     not taking enrolments. Both the enrol and the order endpoints refuse a
+     course that is not `open`, so offering the button would only produce an
+     error the reader can do nothing about. */
+  const availability = course.availability ?? 'open';
+  if (availability !== 'open') {
+    return (
+      <button type="button" className={cls} disabled>
+        {availability === 'coming_soon' ? 'Coming soon' : 'Closed to new enrolments'}
+      </button>
+    );
+  }
+
   if (course.price) {
     return (
       <Link className={cls} to={`/learn/checkout?course=${course.slug}`}>
