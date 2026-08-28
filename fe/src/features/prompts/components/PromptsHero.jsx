@@ -12,11 +12,15 @@ import './PromptsHero.css';
 // what tells you a prompt was written for Claude or ChatGPT, which is the part
 // of that copy a visitor actually needed.
 //
-// A title per segment. Win keeps the plain name of the page it is on; Award
-// names what the library is FOR an agency — prompts that come with the
-// engagement and are there to get work off a desk faster.
+// One title, both segments. It used to differ — the plain name of the page on
+// one side, what the library is FOR on the other — but what it is for is the
+// same thing either way: prompts that come with the engagement and are there to
+// get work off a desk faster. Both keys are still listed rather than collapsed
+// to a string, because SegmentTitle takes a map and because a title per segment
+// is a change of one word here if it is ever wanted again. Identical values
+// draw no ghost, so the band is measured by the one title — see SegmentTitle.
 const TITLES = {
-  win: 'AI Prompt Library',
+  win: 'Complementary Master Prompts to Uplift Productivity',
   award: 'Complementary Master Prompts to Uplift Productivity',
 };
 

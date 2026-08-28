@@ -51,62 +51,10 @@
   color: var(--gp-muted);
 }
 
-/* The disclaimer is meant to be read, so it gets a surface of its own rather
-   than small print at the bottom of the page. */
-.pa-disclaimer {
-  max-width: 72ch;
-  padding: 20px 24px;
-  background: var(--gp-paper-alt);
-  border: 1px solid var(--gp-line);
-  border-left: 3px solid var(--gp-accent);
-  border-radius: 4px;
-  transition: var(--gp-fade);
-}
-
-.pa-disclaimer p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--gp-ink);
-}
-
-.pa-disclaimer p + p {
-  margin-top: 10px;
-  color: var(--gp-muted);
-}
-
-/* The disclaimer above the picker. Quiet — it is a statement of fact about how
-   the tool works, not a warning, so it is set as a note rather than as an
-   alert. */
-.pa-disclaimer {
-  /* Full width of the column, in line with the picker under it. It was capped
-     at 78ch, which on this page is a little over half the shell — so the note
-     ended in mid-air with the grid below it running on another 400px, and the
-     two read as belonging to different pages. A measure cap is right for a
-     paragraph you sit and read; this is three lines above the thing they are
-     about. */
-  max-width: none;
-  margin: 0 0 var(--gp-body-pad);
-  padding: 14px 18px;
-  border: 1px solid var(--gp-line);
-  border-radius: 12px;
-  background: var(--gp-paper-alt);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--gp-muted);
-}
-
-/* Black on Win, green on Award — set explicitly rather than through
-   --gp-accent-ink, which is a deep clay on Award and a deep mint on Win. That
-   token is tuned for contrast on paper, not for carrying the segment's own
-   colour, so it gave the link the wrong hue in both. */
-.pa-disclaimer a {
-  color: var(--gp-ink);
-  font-weight: 600;
-  text-underline-offset: 2px;
-  transition: var(--gp-fade);
-}
-
-.pa-page[data-audience='award'] .pa-disclaimer a {
-  color: var(--gp-green-600);
-}
+/* The disclaimer above the picker is .gp-notice now (styles/notice.css), drawn
+   by AdvisorDisclaimer with variant="intro" — the same component the result
+   carries. The .pa-disclaimer rules that used to be here were a second box that
+   had quietly drifted from the shared one: a 12px radius and no accent bar
+   against the shared box's 6px and 3px left rule. The shared box took THIS
+   shape when the two were merged, so nothing about how it looks has changed —
+   only how many places define it. */

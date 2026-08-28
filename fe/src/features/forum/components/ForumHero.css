@@ -78,13 +78,10 @@
   }
 }
 
-/* `.forum-answers` is also `z-index: 1` and comes later in the DOM, so it would
-   paint over the panel. Lift this block while the panel is open — above the site
-   header (z-index 100 on mobile) so the header's floating audience toggle can't
-   paint in front of the open categories panel. */
-.forum-tools.is-panel-open {
-  z-index: 150;
-}
+/* The `.forum-tools.is-panel-open { z-index: 150 }` lift that used to be here is
+   gone with the reason for it: the panel is rendered through a portal to <body>
+   (ForumCategories.jsx), so it is no longer a fixed child trapped inside this
+   block's stacking context and has nothing left to escape. */
 
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
@@ -222,6 +219,11 @@
 .forum-hero__search-input::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
+
+/* Nothing here for the submit page any more. It used to hide the pill and
+   collapse this strip's padding; ForumHero now simply does not render the strip
+   when there is no search in it, and the categories button that was the only
+   other thing in it has moved into that page's heading row. */
 
 /* --- submit-a-question pill --- */
 /* The same pill: same height, same radius, same white disc holding the glyph,

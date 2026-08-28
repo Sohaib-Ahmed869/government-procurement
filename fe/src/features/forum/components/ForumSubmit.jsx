@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { questionsApi } from '../../../api';
+import ForumCategories from './ForumCategories.jsx';
 import ForumSidebar from './ForumSidebar.jsx';
 import arrowIcon from '../../../assets/icons/Arrow outward.png';
 import './ForumSubmit.css';
@@ -82,7 +83,7 @@ function Select({ id, options, value, onChange, placeholder }) {
 }
 
 export default function ForumSubmit() {
-  const { audience } = useAudience();
+  const { audience, isWin } = useAudience();
   const { ref, inView } = useInView();
   const [sent, setSent] = useState(false);
   const [category, setCategory] = useState('');
@@ -121,9 +122,38 @@ export default function ForumSubmit() {
     <section ref={ref} className={`forum-submit hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="forum-submit__inner">
         <div className="forum-submit__main">
-          <h1 className="forum-submit__heading">Submit a Question</h1>
+          {/* Win only, and above the heading rather than under it — the same
+              place, and the same drop from the heading strip, as the Sourcing
+              Advisor's notice above its picker. It is a rule about what may be
+              asked, so it is read before the question is written. */}
+          {isWin && (
+            <aside
+              className="gp-notice forum-submit__notice"
+              aria-label="Important information"
+            >
+              <p className="gp-notice__lead">
+                I do not answer questions related to specific bids.
+              </p>
+            </aside>
+          )}
+
+          {/* The categories button shares the heading's line. Below 1024px the
+              sidebar at the end of this section is out of the flow, so the
+              button is the only way into the categories — and on the one page
+              with no search row above it, a row of its own for one circle is a
+              line of screen the form needs. Hidden on desktop, where the
+              sidebar is simply there. */}
+          <div className="forum-submit__head">
+            <h1 className="forum-submit__heading">Submit a Question</h1>
+            <ForumCategories className="forum-submit__categories" />
+          </div>
 
           <form className="forum-submit__form" onSubmit={handleSubmit}>
+            {/* One field to a row, full width. They were paired two to a row to
+                buy height; the height comes out of the fields themselves now —
+                shorter boxes, tighter labels, smaller gaps — so each question
+                gets a line of its own and the form still reaches Send now
+                without a scroll on a laptop. */}
             <div className="forum-submit__field" style={{ '--i': 0 }}>
               <label className="forum-submit__label" htmlFor="fq-name">
                 Name
@@ -189,7 +219,7 @@ export default function ForumSubmit() {
                 name="message"
                 className="forum-submit__input forum-submit__textarea"
                 placeholder="Enter your Message"
-                rows={8}
+                rows={2}
                 required
               />
             </div>
