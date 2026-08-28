@@ -47,10 +47,11 @@ const NAV = [
       { to: '/learn/my-courses', label: 'My Courses', icon: 'book' },
       { to: '/learn/courses', label: 'Browse Catalogue', icon: 'grid' },
       { to: '/learn/paths', label: 'Learning Paths', icon: 'path' },
-      // The AI study assistant (LMS 18.0). Sits under Learning because that is
-      // what it is for, and deliberately NOT next to Discussions — one is
-      // people, the other is a model, and the sidebar should not blur that.
-      { to: '/learn/coach', label: 'Course Coach', icon: 'sparkle' },
+      /* Course Coach (LMS 18.0) is deliberately NOT in the nav. The screen and
+         its route still exist at /learn/coach — nothing was deleted — but it
+         has no credentials and reports itself unavailable, and a nav item that
+         only ever leads to "this isn't switched on" is worse than no item.
+         Restore this line when ANTHROPIC_API_KEY is set. */
       // Sessions taught by a person, at a time — next to the courses they
       // belong to rather than in Community, which is asynchronous by nature.
       { to: '/learn/live', label: 'Live Sessions', icon: 'video' },
