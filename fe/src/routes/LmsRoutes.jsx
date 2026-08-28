@@ -32,6 +32,7 @@ import LiveSessionsPage from '../lms/pages/growth/LiveSessionsPage.jsx';
 import MyCoursesPage from '../lms/pages/dashboard/MyCoursesPage.jsx';
 import CatalogPage from '../lms/pages/catalog/CatalogPage.jsx';
 import CourseOverviewPage from '../lms/pages/catalog/CourseOverviewPage.jsx';
+import CourseStartPage from '../lms/pages/catalog/CourseStartPage.jsx';
 import PlayerLayout from '../lms/layout/PlayerLayout.jsx';
 import LessonPage from '../lms/pages/learn/LessonPage.jsx';
 import VideoLessonPage from '../lms/pages/learn/VideoLessonPage.jsx';
@@ -194,6 +195,10 @@ export default function LmsRoutes() {
           <Route path="my-courses" element={me(<MyCoursesPage />)} />
           <Route path="courses" element={<CatalogPage />} />
           <Route path="courses/:slug" element={<CourseOverviewPage />} />
+          {/* Where a course link from the public website lands. me(), so a
+              signed-out visitor signs in first and is returned here — which is
+              the point: what to show next depends on who they are. */}
+          <Route path="courses/:slug/start" element={me(<CourseStartPage />)} />
           <Route path="paths" element={<PathsPage />} />
           <Route path="paths/:slug" element={<PathDetailPage />} />
 

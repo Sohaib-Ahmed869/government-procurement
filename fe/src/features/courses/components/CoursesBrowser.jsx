@@ -295,7 +295,10 @@ export default function CoursesBrowser() {
                   </li>
                 ) : (
                   <li key={item._id || item.id} className="courses-card" style={{ '--i': i % PAGE_SIZE }}>
-                    <Link className="courses-card__link" to={`/courses/${item.slug}`}>
+                    {/* Into the LMS, not the marketing detail page. `/start`
+                        signs the visitor in and then decides for them: the
+                        checkout if they don't own it, the course if they do. */}
+                    <Link className="courses-card__link" to={`/learn/courses/${item.slug}/start`}>
                       <div
                         className="courses-card__art"
                         style={
