@@ -6408,9 +6408,15 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside {
   position: relative;
   overflow: hidden;
+  min-height: 100vh;
+  /* A column, not a centred block: the copy takes the top and the animation
+     sits on the floor under it. They used to be absolutely positioned over one
+     another, which put the illustration straight through the proof points. */
   display: flex;
-  align-items: center;
-  padding: clamp(32px, 5vw, 64px);
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(36px, 5vw, 60px) clamp(32px, 5vw, 56px) 0;
   /* Two greens rather than one flat fill — the panel reads as lit rather than
      printed, and the motif has something to sit against. */
   background:
@@ -6423,15 +6429,18 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
    picture placed there, one that runs off reads as pattern. */
 .lms-authside__motif {
   position: absolute;
-  right: -14%;
-  bottom: -18%;
-  width: min(560px, 82%);
+  right: -18%;
+  top: -12%;
+  width: min(520px, 76%);
   color: var(--lms-mint);
-  opacity: 0.5;
+  opacity: 0.22;
   pointer-events: none;
 }
 
-.lms-authside__body { position: relative; max-width: 42ch; }
+/* Copy first, animation under it. AuthLottie is rendered before the body in
+   the JSX (so it can sit behind the motif in the stacking order), and `order`
+   is what puts the reading order right without moving the markup. */
+.lms-authside__body { position: relative; max-width: 42ch; flex-shrink: 0; order: 1; }
 .lms-authside__eyebrow {
   margin: 0 0 18px;
   font-size: 11px;
@@ -6491,4 +6500,34 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 @media (max-width: 900px) {
   .lms-auth { grid-template-columns: minmax(0, 1fr); }
   .lms-authside { display: none; }
+}
+
+/* The sign-in animation.
+
+   Sits above the motif and below the copy. It fades in only once lottie-web
+   reports it mounted (`is-ready`), so a slow chunk shows the static motif
+   rather than an empty gap that then jumps. */
+.lms-authside__anim {
+  position: relative;
+  order: 2;
+  align-self: flex-end;
+  /* Sized so the three proof points always clear the fold — the copy is the
+     part that has to be readable, the illustration is the part that can go. */
+  width: min(460px, 92%);
+  margin-right: clamp(-40px, -2vw, 0px);
+  opacity: 0;
+  transition: opacity .5s ease-out;
+  pointer-events: none;
+}
+/* Shorter viewports lose the animation before they lose the copy — the proof
+   points are the part doing the work. */
+@media (max-height: 800px) {
+  .lms-authside__anim { display: none; }
+}
+.lms-authside__anim.is-ready { opacity: 1; }
+/* Once the animation is up the motif is redundant behind it — keep it faint so
+   it reads as ground rather than competing line work. */
+.lms-authside__anim.is-ready ~ .lms-authside__motif { opacity: 0.14; }
+@media (prefers-reduced-motion: reduce) {
+  .lms-authside__anim { transition: none; }
 }

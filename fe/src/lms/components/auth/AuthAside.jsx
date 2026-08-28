@@ -1,16 +1,21 @@
 import LmsIcon from '../LmsIcon.jsx';
+import AuthLottie from './AuthLottie.jsx';
 
 /* The panel beside the sign-in and sign-up forms.
 
    It replaces a flat green rectangle with one sentence in it, which used half
    the screen to say nothing a visitor could act on.
 
-   No stock illustration of smiling people at a laptop: the audience is
-   procurement officers and bid teams, and a drawing of somebody else's office
-   is decoration. The motif below is drawn from the subject instead — a set of
-   nested procurement thresholds, the shape of the thing being taught — and the
-   panel's real job is the three proof points, which answer "what do I get" at
-   the moment somebody is deciding whether to bother creating an account. */
+   Three layers, back to front: a geometric motif drawn from the subject
+   (nested procurement thresholds), a Lottie animation of an online course, and
+   the copy. The animation carries the warmth; the proof points do the work,
+   answering "what do I get" at the moment somebody decides whether creating an
+   account is worth it.
+
+   The animation is from LottieFiles, recoloured onto the brand palette by
+   scripts/recolour-lottie.mjs rather than hand-edited across 57 layers. That
+   script deliberately leaves skin tones and neutrals alone — turning a person's
+   face green is the failure mode of every automated palette swap. */
 
 const PROOF = [
   { icon: 'video', title: 'Recorded lectures', text: 'Watch at your own pace, on any device.' },
@@ -21,6 +26,10 @@ const PROOF = [
 export default function AuthAside() {
   return (
     <aside className="lms-authside">
+      {/* The animation. If its chunk fails to load, the motif beneath it is
+          what the panel falls back to — see AuthLottie. */}
+      <AuthLottie className="lms-authside__anim" />
+
       {/* Decorative, and marked as such: it carries no information the panel
           does not also say in words. */}
       <svg className="lms-authside__motif" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
