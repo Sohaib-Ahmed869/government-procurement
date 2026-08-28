@@ -7,10 +7,17 @@
    `.adv-disclaimer__lead` went with the box too — it is `.gp-notice__lead`
    now, and no longer needs `!important` to beat a rule in its own file. */
 
-/* The `intro` variant is no longer rendered — the stepper carried it above the
-   questions and it repeated what the picker screen already says before anyone
-   reaches this. The default is kept so the component still has one; only the
-   `result` variant is in use, on the printed answer. */
+/* The `intro` variant is the one above the jurisdiction picker, at the top of
+   the page. It was dropped from the STEPPER, where it repeated what the picker
+   screen had already said a click earlier — but the picker screen's own notice
+   was then written out longhand in ProcurementAdvisorPage.jsx as a `.pa-disclaimer`
+   paragraph, so the page ended up with two copies of the same statement in two
+   different boxes, and only one of them got updated when the client sent new
+   wording. This variant is that notice again, and the words come from the same
+   component as the result's. */
+.adv-disclaimer--intro {
+  margin: 0 0 var(--gp-body-pad);
+}
 
 .adv-disclaimer--result {
   margin-top: clamp(28px, 3vw, 40px);

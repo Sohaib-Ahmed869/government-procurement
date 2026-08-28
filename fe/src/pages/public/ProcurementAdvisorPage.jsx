@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import PageLayout from '../../components/layout/PageLayout.jsx';
 import { useMountReveal } from '../../hooks/useMountReveal.js';
+import AdvisorDisclaimer from '../../features/advisor/components/AdvisorDisclaimer.jsx';
 import AdvisorStepper from '../../features/advisor/components/AdvisorStepper.jsx';
 import JurisdictionPicker from '../../features/advisor/components/JurisdictionPicker.jsx';
 import { JURISDICTIONS, getRulePack } from '../../features/advisor/jurisdictions.js';
@@ -82,17 +83,11 @@ export default function ProcurementAdvisorPage() {
                 <p className="pa-note">Loading the {live.name} rules…</p>
               ) : (
                 <>
-                  {/* PLACEHOLDER COPY — the client is supplying the real
-                      wording. Keep the shape: what the tool is not (no AI, no
-                      data collected), what it is (published rules, applied as
-                      written), and the link to the privacy policy. */}
-                  <p className="pa-disclaimer">
-                    This tool is not AI-powered and collects no data about you or
-                    what you enter. It applies the published procurement rules
-                    for the jurisdiction you choose, as they are written, and is
-                    general information rather than legal advice.{' '}
-                    <Link to="/policies/privacy">Read our privacy policy</Link>.
-                  </p>
+                  {/* The same component the result carries, so the wording is
+                      in one place. It used to be typed out again here, which is
+                      how this box was still showing the old placeholder copy
+                      after the client's wording landed on the other one. */}
+                  <AdvisorDisclaimer variant="intro" />
                   <JurisdictionPicker showLogos />
                 </>
               )}

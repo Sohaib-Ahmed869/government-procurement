@@ -10,7 +10,10 @@ export default function ForumSubmitPage() {
     <div className="forum-scale">
       <PageLayout>
         <ForumLayout>
-          <ForumHero compact />
+          {/* No search here: the page you are on is for writing a question,
+              not finding one, and the row it sat in was height the form needed
+              to put Send now on screen without a scroll. */}
+          <ForumHero compact showSearch={false} />
           <ForumSubmit />
         </ForumLayout>
       </PageLayout>

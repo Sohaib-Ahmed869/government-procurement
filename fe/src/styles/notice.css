@@ -12,28 +12,64 @@
    the foot of a printed answer, and hard-coding either here would make the
    other override it. */
 
+/* The shape is the Sourcing Advisor's, which is the one every notice on the
+   site now takes: a hairline all the way round and a 12px radius, on the paper
+   step above the page. It used to be a 6px box with a 3px accent bar down the
+   left, which read as an alert — and the Advisor's own intro notice was drawn
+   by a second, separate rule that had already moved on from it, so the two
+   boxes the client saw side by side were different boxes. One rule now. */
+/* 12px of vertical padding rather than 14. The box is a statement to be read
+   once on the way past, not a passage to sit in, and on a phone it was the
+   tallest thing between the heading and the page itself. */
 .gp-notice {
-  padding: 18px 22px;
+  padding: 12px 18px;
   background: var(--gp-paper-alt);
   border: 1px solid var(--gp-line);
-  border-left: 3px solid var(--gp-accent-ink);
-  border-radius: 6px;
+  border-radius: 12px;
   transition: var(--gp-fade);
 }
 
+/* 1.45, down from 1.6. Leading is what sizes this box: the text is fixed, so
+   every line it sets is height the page below it does not get, and the Sourcing
+   Advisor's notice wraps to eight lines on a phone. Still open enough to read a
+   paragraph in — 1.6 is a measure for body copy you sit down with, which this
+   is not. */
 .gp-notice p {
   margin: 0;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.45;
   color: var(--gp-muted);
 }
 
 .gp-notice p + p {
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-/* The opening sentence, in the page's full ink — what the box is actually
-   there to say, with anything qualifying it stepped back below. */
-.gp-notice__lead {
+/* `.gp-notice__lead` marks the opening sentence and carries NO colour of its
+   own. The Sourcing Advisor's notice is one muted block of text — that is the
+   box every notice on the site is matched to — so a lead drawn in full ink
+   would be this one box disagreeing with the page it was copied from. Anything
+   inside it that needs to carry is emphasised with <strong>, which is weight
+   rather than colour and reads the same in both segments.
+
+   The class stays because the components name it and because the opening
+   sentence is worth marking; it is simply not a colour change. */
+
+/* Links: the page's own ink on Win, the segment's green on Award. Set
+   explicitly rather than through --gp-accent-ink, which is a deep clay on Award
+   and a deep mint on Win — that token is tuned for contrast on paper, not for
+   carrying the segment's own colour, and it gave the link the wrong hue in
+   both. Weight, not just colour, is what separates a link from the muted text
+   around it here. */
+.gp-notice a {
   color: var(--gp-ink);
+  font-weight: 600;
+  text-underline-offset: 2px;
+  transition: var(--gp-fade);
+}
+
+/* Matches wherever the segment is stamped — AudienceContext puts it on <html>,
+   so this reaches every page that carries a notice, not only the Advisor's. */
+[data-audience='award'] .gp-notice a {
+  color: var(--gp-green-600);
 }

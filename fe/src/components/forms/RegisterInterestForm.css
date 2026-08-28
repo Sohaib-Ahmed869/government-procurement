@@ -1,6 +1,17 @@
-/* Register-interest form for Coming-soon courses. Styled to sit inside the
-   dark-green course-detail sidebar (or below the body), matching the glass
-   fields used on the contact form. */
+/* Register-interest form for Coming-soon courses.
+
+   Drawn for PAPER. It was built for the dark-green course-detail sidebar this
+   page used to have — white text, and fields that were a translucent white fill
+   with two white inset edges. That is a box you can only see because the ground
+   behind it is dark. The course page is `var(--gp-paper)` now (see the notes on
+   --cd-cta and --cd-accent in CourseDetail.css, which were converted at the
+   time), so every one of those was white on white: the whole form was on the
+   page and none of it was legible.
+
+   Everything here goes through the `--band-*` roles instead, the same set the
+   rest of the course page and the Q&A forms are written against, so it follows
+   the audience toggle without naming a colour and cannot be left behind by the
+   next ground change. */
 .rif {
   display: flex;
   flex-direction: column;
@@ -8,12 +19,14 @@
   margin-top: 20px;
   padding: 24px 28px;
   font-family: 'Geist Variable', system-ui, sans-serif;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--band-ink);
+  /* A step off the page with a hairline round it — the same way every other
+     raised panel on a paper ground is drawn here. The inset white edges that
+     used to do this job only read on a dark ground. */
+  background: var(--gp-paper-alt);
+  border: 1px solid var(--gp-line);
   border-radius: 20px;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.16),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.06);
+  transition: var(--gp-fade);
 }
 
 .rif__title {
@@ -21,13 +34,14 @@
   font-size: 22px;
   font-weight: 700;
   line-height: 1.15;
+  color: var(--band-ink);
 }
 
 .rif__blurb {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--band-muted);
 }
 
 .rif__field {
@@ -38,12 +52,12 @@
 
 .rif__label {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--band-ink);
 }
 
 .rif__optional {
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--band-muted);
 }
 
 .rif__input {
@@ -51,35 +65,38 @@
   padding: 14px 16px;
   font-family: inherit;
   font-size: 15px;
-  color: #fff;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border: none;
+  color: var(--band-ink);
+  /* The page's own paper, which is a step LIGHTER than the card these sit on.
+     --band-surface is the raised step for a card on the page; inside a card
+     that is already that colour it made the fields and their container the same
+     tone, separated by a hairline and nothing else. */
+  background: var(--gp-paper);
+  border: 1px solid var(--band-line);
   border-radius: 10px;
   outline: none;
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  transition: box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .rif__input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--band-muted);
 }
 
+/* Focus in the segment's own colour, matching the Q&A submit form: --gp-brand
+   is the deep green on Award and near-black on Win. The shadow sits on the
+   border's line so the edge reads as 2px without moving the text inside. */
 .rif__input:focus {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.6),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+  border-color: var(--gp-brand);
+  box-shadow: 0 0 0 1px var(--gp-brand);
 }
 
-.rif__input.is-invalid {
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 120, 110, 0.9),
-    inset 1px 1px 1px rgba(255, 255, 255, 0.18);
+/* The invalid red the Advisor's stepper uses — the pale #ff786e it carried was
+   picked to carry on a dark panel and is nearly invisible on paper. */
+.rif__input.is-invalid,
+.rif__input.is-invalid:focus {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 1px #b3261e;
 }
 
 .rif__textarea {
@@ -90,19 +107,19 @@
 .rif__error {
   font-size: 12.5px;
   line-height: 1.35;
-  color: #ffb4ac;
+  color: #b3261e;
 }
 
 .rif__submit-error {
   margin: 0;
   font-size: 13px;
   line-height: 1.4;
-  color: #ffb4ac;
+  color: #b3261e;
 }
 
 /* Takes the course page's own CTA fill, so it follows the audience toggle the
-   way the Buy / Register button in the sidebar does — green on Award, grey on
-   Win. The literal is the fallback for anywhere this form is used outside a
+   way the Buy / Register button in the sidebar does — green on Award, near-black
+   on Win. The literal is the fallback for anywhere this form is used outside a
    .cd section, where --cd-cta isn't defined. */
 .rif__submit {
   width: 100%;
@@ -134,7 +151,9 @@
   cursor: default;
 }
 
-.rif :is(input, textarea, button):focus-visible {
-  outline: 2px solid #fff;
+/* The submit button keeps a ring; the fields do not — their own edge carries
+   the state. On paper the ring is the page's accent ink, not white. */
+.rif :is(button):focus-visible {
+  outline: 2px solid var(--band-accent, var(--gp-accent-ink));
   outline-offset: 2px;
 }

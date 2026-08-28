@@ -11,12 +11,21 @@
   gap: 64px;
   max-width: var(--gp-shell);
   margin: 0 auto;
+  /* --gp-body-pad at the top, which is what .pa-page__body takes on the
+     Sourcing Advisor — so the notice here starts the same distance below the
+     heading strip as the notice above that page's picker does.
+
+     Every other measurement in this file is spent on one thing: Send now being
+     on screen when the page opens, without a scroll, on a laptop. Pages wider
+     than 1440px are magnified (--gp-scale in index.css), so a pixel here costs
+     a third more there. */
   padding: var(--gp-body-pad) clamp(20px, 4vw, 60px);
 }
 
 /* --- reveal on scroll-in --- */
 @media (prefers-reduced-motion: no-preference) {
-  .forum-submit__heading,
+  .forum-submit__head,
+  .forum-submit__notice,
   .forum-submit__field,
   .forum-submit__send,
   .forum-submit .forum-sidebar {
@@ -27,10 +36,16 @@
       translate var(--gp-reveal-dur) var(--gp-ease);
   }
 
-  .forum-submit.is-in .forum-submit__heading {
+  /* The notice is above the heading, so it leads the stagger. */
+  .forum-submit.is-in .forum-submit__notice {
     opacity: 1;
     translate: none;
     transition-delay: var(--gp-reveal-step);
+  }
+  .forum-submit.is-in .forum-submit__head {
+    opacity: 1;
+    translate: none;
+    transition-delay: calc(var(--gp-reveal-step) * 1.5);
   }
   /* Fields stagger via their --i index. */
   .forum-submit.is-in .forum-submit__field {
@@ -62,37 +77,90 @@
   }
 }
 
+/* Heading and categories button on one line. The button is display:none above
+   1024px (ForumHero.css), so on desktop this row is the heading and nothing
+   else and the flex box costs nothing. */
+.forum-submit__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* The reveal targets the heading itself, so the row it now sits in must not
+   introduce a second, un-revealed box around it. */
+.forum-submit__head .forum-submit__heading {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Two steps under --gp-section-title, which is what every other section heading
+   takes. This one is the second heading on the page — the band above already
+   carries the forum's — and the height it gives back is height the form needs. */
 .forum-submit__heading {
-  margin: 0 0 16px;
+  margin: 0;
   font-family: 'Geist Variable', system-ui, sans-serif;
-  font-size: var(--gp-section-title);
+  font-size: clamp(20px, 1.8vw, 24px);
   font-weight: 400;
   line-height: 1.05;
   letter-spacing: -0.01em;
 }
 
+/* Enough to read as a heading over the form rather than as a label above the
+   first field — at 6px "Name" sat close enough to "Submit a Question" to look
+   like part of it. Paid for out of the textarea below. */
+.forum-submit__head {
+  margin: 0 0 12px;
+}
+
+/* The box itself is .gp-notice (styles/notice.css); this is only the spacing
+   around it here, which is the caller's — see that file. It runs the width of
+   the form below it, so its right edge lands on the fields'.
+
+   Same value as .adv-disclaimer--intro, so the gap between this notice and the
+   heading under it matches the Sourcing Advisor's. */
+.forum-submit__notice {
+  margin: 0 0 var(--gp-body-pad);
+}
+
+/* The select's chevron centres on the box, and the box is shorter now. */
+.forum-submit__select {
+  min-height: 0;
+}
+
+/* No max-width. It was held to 620px, which left the form ending a third of the
+   way short of the categories column beside it with the rest of the row empty —
+   the fields now run the full width of their grid track, so they finish on the
+   same line the sidebar starts. */
 .forum-submit__form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 620px;
+  gap: 7px;
 }
 
+/* One field to a row. The height that pairing used to buy comes out of the
+   fields themselves instead: a 4px label-to-box gap, a label set at its own
+   line rather than the body's, and a box with 8px of padding rather than 12.
+   Together those take about 15px off every row — five rows plus the message,
+   which is roughly what the two extra rows cost. */
 .forum-submit__field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
 .forum-submit__label {
-  font-size: 18px;
+  font-size: 14px;
+  /* Its own line-height. Inheriting the body's 1.5 put 7px of leading around a
+     one-line label, above and below, on every field on the page. */
+  line-height: 1.15;
   color: var(--band-ink);
 }
 
 /* Glass field boxes — same edge treatment as the Contact page fields. */
 .forum-submit__input {
   width: 100%;
-  padding: 16px 18px;
+  padding: 8px 16px;
   font-family: inherit;
   font-size: 15px;
   color: var(--band-ink);
@@ -103,22 +171,46 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--band-line);
-  transition: box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .forum-submit__input::placeholder {
   color: var(--band-ink);
 }
 
+/* Focus is the segment's own colour on the field's edge: --gp-brand resolves to
+   the deep green on Award and to near-black on Win, so the field a visitor is
+   typing in is marked in the colour that page is already built from.
+
+   The box-shadow is a second ring drawn on the same line as the border, so the
+   edge reads as 2px without the 1px→2px border change nudging the text inside
+   it. It used to restate the resting border and therefore did nothing at all —
+   there was no way to see which field had focus.
+
+   `:focus`, not `:focus-visible`: this is a text field, and someone who clicked
+   into it wants to see which one they are in as much as someone who tabbed. */
 .forum-submit__input:focus {
-  border: 1px solid var(--band-line);
+  border-color: var(--gp-brand);
+  box-shadow: 0 0 0 1px var(--gp-brand);
 }
 
-/* Taller than the 130px it used to stand at — a question here is usually a
-   scenario with a paragraph or two of context, and the old box showed about
-   three lines of it at a time. Still resizable from the corner. */
+/* A question here is usually a scenario with a paragraph or two of context, and
+   this box still holds one — what changed is that it is now the full width of
+   the column rather than 620px of it, so 120px of height carries about the text
+   220px did before. And 220px was a quarter of a laptop viewport on its own,
+   which is most of why Send now was off the bottom of the page. Still resizable
+   from the corner for anyone who wants the room back.
+
+   This number is the one that decides the box: the element carries rows={2},
+   the HTML default, which is under every min-height set here so the stylesheet
+   always wins. It has twice been the other way round — rows={8} originally, and
+   rows={4} once the box came down to 110px — and both times the attribute was
+   quietly taller than the rule and the stylesheet appeared to have no effect on
+   the one field whose height mattered most. Leave it at the default. */
 .forum-submit__textarea {
-  min-height: 220px;
+  min-height: 72px;
   resize: vertical;
 }
 
@@ -200,8 +292,8 @@
   align-items: center;
   gap: 10px;
   align-self: flex-start;
-  margin-top: 6px;
-  padding: 8px 8px 8px 24px;
+  margin-top: 2px;
+  padding: 5px 5px 5px 22px;
   font-family: inherit;
   font-size: 15.5px;
   font-weight: 600;
@@ -257,7 +349,13 @@
   color: var(--band-ink);
 }
 
-.forum-submit :is(a, button, input, textarea, select):focus-visible {
+/* Links and the Send button keep a ring; the fields do not — their own edge
+   carries the state (above). Without the exclusion a click into a field lit
+   both, and the control appeared to glow. The category picker is a <button>
+   that wears .forum-submit__input, so it is covered by the class rather than by
+   the element name. */
+.forum-submit
+  :is(a, button, input, textarea, select):not(.forum-submit__input):focus-visible {
   outline: 2px solid var(--band-accent);
   outline-offset: 3px;
 }
@@ -277,37 +375,56 @@
 
 @media (max-width: 720px) {
   .forum-submit__inner {
-    padding: 24px 16px 40px;
+    padding: var(--gp-body-pad) 16px 40px;
+  }
+
+  .forum-submit__head {
+    margin-bottom: 18px;
   }
 
   .forum-submit__heading {
-    margin-bottom: 32px;
     font-family: 'Geist Variable', system-ui, sans-serif;
-    /* Shared with the forum hero and article headings. */
-    font-size: clamp(34px, 10vw, 46px);
+    /* A step down from the clamp(34px, 10vw, 46px) the forum hero and article
+       headings take. This one shares its line with the categories button, so it
+       has ~62px less width to sit in — and the 32px that used to follow it was
+       the largest single gap on a screen where the whole form has to be
+       reachable with one thumb. */
+    font-size: clamp(28px, 8vw, 36px);
     line-height: 1.12;
   }
 
+  /* A little more air than the desktop form takes. Nothing here is above the
+     fold on a phone whatever these are set to, and a thumb wants a bigger
+     target than a pointer does. */
   .forum-submit__form {
-    gap: 20px;
-    max-width: none;
+    gap: 12px;
   }
 
   .forum-submit__field {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .forum-submit__label {
+    font-size: 15px;
+  }
+
+  .forum-submit__notice {
+    margin-bottom: 16px;
   }
 
   /* Field text matches the contact page (15px). */
   .forum-submit__input {
-    padding: 16px;
+    padding: 12px 16px;
     font-size: 15px;
     border-radius: 8px;
   }
 
-  /* Held shorter than the desktop box on phones — the full height would fill
-     most of the viewport and push the Send button off screen. */
+  /* Taller than the desktop box, not shorter: the column here is a phone's
+     width, so the same question needs more lines to sit in. Held to 140px
+     rather than the 180px it stood at — the rest of the form gave up its gaps,
+     and the one field that can be dragged taller should give up something too. */
   .forum-submit__textarea {
-    min-height: 180px;
+    min-height: 140px;
   }
 
   .forum-submit__send {

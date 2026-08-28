@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
-import ForumSidebar from './ForumSidebar.jsx';
+import ForumCategories from './ForumCategories.jsx';
+import SegmentTitle from '../../../components/shared/SegmentTitle.jsx';
 import './ForumHero.css';
 
 // `compact` drops the hero title/intro on small screens — used on the article
@@ -15,7 +16,22 @@ import './ForumHero.css';
 // band is now the same title-only strip the rest of the site has, and the row is
 // the top of the page under it — same field, same pill, same order, drawn for a
 // paper ground instead of a dark one.
-export default function ForumHero({ compact = false }) {
+//
+// `showSearch` drops the search field from that row. The submit page turns it
+// off: you are already writing a question there, and offering to search for one
+// instead is the page arguing with itself — and the row it sat in is height the
+// form needs to reach the Send button without a scroll.
+//
+// A title per segment. Win asks about the bid it is writing; Award reads the
+// same question from the other side of the table, so it keeps the broader word.
+// Both are laid out and the longer one sizes the band, so the strip doesn't
+// change height when the toggle is pressed — see SegmentTitle.
+const TITLES = {
+  win: 'Real Bid Questions, Answered Complementary',
+  award: 'Real Procurement Questions, Answered Complementary',
+};
+
+export default function ForumHero({ compact = false, showSearch = true }) {
   const { audience } = useAudience();
 
   // Reveal on mount, and again each time the audience toggle changes.
@@ -41,25 +57,6 @@ export default function ForumHero({ compact = false }) {
     navigate(term ? `/q-and-a?q=${encodeURIComponent(term)}` : '/q-and-a');
   };
 
-  // On phones the sidebar isn't in the flow — the categories button opens it as
-  // a full-screen panel instead.
-  const [panelOpen, setPanelOpen] = useState(false);
-
-  // Lock background scroll while the panel is open, and let Escape close it.
-  useEffect(() => {
-    if (!panelOpen) return undefined;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const onKey = (e) => {
-      if (e.key === 'Escape') setPanelOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [panelOpen]);
-
   return (
     <>
     <section
@@ -67,15 +64,23 @@ export default function ForumHero({ compact = false }) {
       data-audience={audience}
     >
       <div className="forum-hero__inner">
-        <h1 className="forum-hero__title">
-          Real Procurement Questions, Answered Complementary
-        </h1>
+        <SegmentTitle
+          className="forum-hero__title"
+          titles={TITLES}
+          audience={audience}
+          fallback="win"
+        />
       </div>
     </section>
 
+    {/* No strip at all when the search is gone: the submit pill in it points at
+        the page you would already be on, and the categories button has moved
+        into that page's own heading row — see ForumSubmit. What was left was an
+        empty row taking the height above the form. */}
+    {showSearch && (
     <div
-      className={`forum-tools${compact ? ' forum-tools--compact' : ''}${mounted ? ' is-in' : ''}${
-        panelOpen ? ' is-panel-open' : ''
+      className={`forum-tools${compact ? ' forum-tools--compact' : ''}${
+        mounted ? ' is-in' : ''
       }`}
       data-audience={audience}
     >
@@ -110,50 +115,11 @@ export default function ForumHero({ compact = false }) {
           </Link>
 
           {/* Mobile-only: opens the categories panel. */}
-          <button
-            type="button"
-            className="forum-hero__categories"
-            aria-label="Browse categories"
-            aria-expanded={panelOpen}
-            aria-controls="forum-category-panel"
-            onClick={() => setPanelOpen(true)}
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <line x1="4" y1="7" x2="20" y2="7" />
-              <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="17" x2="20" y2="17" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div
-        id="forum-category-panel"
-        className={`forum-hero__panel${panelOpen ? ' is-open' : ''}`}
-      >
-        <button
-          type="button"
-          className="forum-hero__panel-close"
-          aria-label="Close"
-          onClick={() => setPanelOpen(false)}
-        >
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <line x1="6" y1="6" x2="18" y2="18" />
-            <line x1="18" y1="6" x2="6" y2="18" />
-          </svg>
-        </button>
-
-        {/* Any link inside navigates away, so close the panel with it. */}
-        <div
-          className="forum-hero__panel-body"
-          onClick={(e) => {
-            if (e.target.closest('a')) setPanelOpen(false);
-          }}
-        >
-          <ForumSidebar />
+          <ForumCategories />
         </div>
       </div>
     </div>
+    )}
     </>
   );
 }
