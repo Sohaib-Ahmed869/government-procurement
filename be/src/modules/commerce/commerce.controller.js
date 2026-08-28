@@ -6,6 +6,7 @@ import { env } from '../../config/env.js';
 import { GST_RATE, splitInclusive, toCents } from '../../utils/gst.js';
 import { CONTENT_STATUS, COURSE_STATE } from '../../constants/statuses.js';
 import { Course } from '../../models/Course.js';
+import { Bundle } from '../../models/Bundle.js';
 import { Enrollment } from '../../models/Enrollment.js';
 import { Order, ORDER_STATUS } from '../../models/Order.js';
 import { recordAudit } from '../../models/AuditLog.js';
@@ -43,17 +44,22 @@ function makeReference() {
 
 /* Turns a list of course ids into priced lines, reading every amount from the
    database. Returns the lines and the totals, all in cents, all tax-inclusive. */
-async function priceOrder(courseIds) {
+async function priceOrder({ courseIds = [], bundleIds = [] }) {
   const unique = [...new Set(courseIds.map(String))];
-  if (!unique.length) throw ApiError.badRequest('Your basket is empty');
-  if (unique.length > 20) throw ApiError.badRequest('That is more than one order can hold');
+  const uniqueBundles = [...new Set(bundleIds.map(String))];
+  if (!unique.length && !uniqueBundles.length) throw ApiError.badRequest('Your basket is empty');
+  if (unique.length + uniqueBundles.length > 20) {
+    throw ApiError.badRequest('That is more than one order can hold');
+  }
 
   // `availability` is in this projection because the check below reads it. A
   // field left out of a select is `undefined`, not its stored value — and an
   // `undefined !== OPEN` comparison refuses every course, including open ones.
-  const courses = await Course.find({ _id: { $in: unique } }).select(
-    'title slug price currency status availability',
-  );
+  const courses = unique.length
+    ? await Course.find({ _id: { $in: unique } }).select(
+      'title slug price currency status availability',
+    )
+    : [];
   if (courses.length !== unique.length) {
     throw ApiError.badRequest('One of those courses is no longer available');
   }
@@ -90,9 +96,40 @@ async function priceOrder(courseIds) {
     };
   });
 
+  /* Bundles. A bundle is priced as ONE line at its own price — not the sum of
+     its courses, which is the whole point of selling one. `grants` records
+     which courses it hands over, copied now so that re-editing the bundle later
+     cannot change what this customer bought. */
+  const bundles = uniqueBundles.length
+    ? await Bundle.find({ _id: { $in: uniqueBundles } }).select('title slug price currency status courses')
+    : [];
+  if (bundles.length !== uniqueBundles.length) {
+    throw ApiError.badRequest('One of those bundles is no longer available');
+  }
+
+  for (const bundle of bundles) {
+    if (bundle.status !== CONTENT_STATUS.PUBLISHED) {
+      throw ApiError.badRequest(`"${bundle.title}" is not available to buy`);
+    }
+    const amount = toCents(bundle.price);
+    if (amount <= 0) throw ApiError.badRequest(`"${bundle.title}" has no price set`);
+    if (!bundle.courses?.length) {
+      throw ApiError.badRequest(`"${bundle.title}" has no courses in it yet`);
+    }
+    lines.push({
+      bundle: bundle._id,
+      grants: bundle.courses,
+      title: bundle.title,
+      slug: bundle.slug,
+      kind: 'bundle',
+      amount,
+    });
+  }
+
   const totalCents = lines.reduce((sum, l) => sum + l.amount, 0);
   const { total, gst, net } = splitInclusive(totalCents);
-  return { lines, total, gst, net, currency: courses[0].currency || 'AUD' };
+  const currency = courses[0]?.currency || bundles[0]?.currency || 'AUD';
+  return { lines, total, gst, net, currency };
 }
 
 /* POST /lms/orders
@@ -103,13 +140,18 @@ export const createOrder = asyncHandler(async (req, res) => {
     throw ApiError.unavailable('Payments are not available yet');
   }
 
-  const ids = Array.isArray(req.body?.courseIds) ? req.body.courseIds : [];
-  const { lines, total, gst, net, currency } = await priceOrder(ids);
+  const courseIds = Array.isArray(req.body?.courseIds) ? req.body.courseIds : [];
+  const bundleIds = Array.isArray(req.body?.bundleIds) ? req.body.bundleIds : [];
+  const { lines, total, gst, net, currency } = await priceOrder({ courseIds, bundleIds });
 
-  // Buying something you already have is a refund request waiting to happen.
+  /* Buying something you already have is a refund request waiting to happen.
+     Checked against everything the order would GRANT, so a bundle whose courses
+     the learner already owns is caught too — otherwise they would pay for a
+     bundle and receive nothing new. */
+  const granted = lines.flatMap((l) => (l.kind === 'bundle' ? l.grants : [l.course])).filter(Boolean);
   const already = await Enrollment.find({
     user: req.user._id,
-    course: { $in: lines.map((l) => l.course) },
+    course: { $in: granted },
     revokedAt: null,
   }).select('course');
   if (already.length) {
@@ -210,14 +252,24 @@ async function fulfil(order, { paymentIntent, brand, last4, email } = {}) {
   if (email) order.buyerEmail = email;
   await order.save();
 
-  // One enrolment per line. `updateOne` with upsert rather than create, so a
-  // replayed webhook cannot produce a second enrolment for the same course.
+  /* One enrolment per course GRANTED, which for a bundle is several. `updateOne`
+     with upsert rather than create, so a replayed webhook cannot produce a
+     second enrolment for the same course — and so a course appearing in both a
+     bundle and a separate line resolves to one enrolment, not two. */
+  const grantedCourses = [
+    ...new Set(
+      order.lines
+        .flatMap((l) => (l.kind === 'bundle' ? l.grants ?? [] : [l.course]))
+        .filter(Boolean)
+        .map(String),
+    ),
+  ];
   await Promise.all(
-    order.lines.map((line) =>
+    grantedCourses.map((courseId) =>
       Enrollment.updateOne(
-        { user: order.user, course: line.course },
+        { user: order.user, course: courseId },
         {
-          $setOnInsert: { user: order.user, course: line.course, enrolledAt: new Date() },
+          $setOnInsert: { user: order.user, course: courseId, enrolledAt: new Date() },
           $set: { revokedAt: null },
         },
         { upsert: true },
@@ -283,7 +335,14 @@ export const webhook = asyncHandler(async (req, res) => {
          already checks, so this needs no new concept — the learner's next click
          on a lesson, a live session or the coach is refused. */
       await Enrollment.updateMany(
-        { user: order.user, course: { $in: order.lines.map((l) => l.course) } },
+        {
+          user: order.user,
+          course: {
+            $in: order.lines
+              .flatMap((l) => (l.kind === 'bundle' ? l.grants ?? [] : [l.course]))
+              .filter(Boolean),
+          },
+        },
         { $set: { revokedAt: new Date() } },
       );
     }

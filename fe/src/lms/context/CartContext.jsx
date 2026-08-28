@@ -2,7 +2,7 @@ import {
   createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore,
 } from 'react';
 import { createStore } from '../utils/localStore.js';
-import { catalogApi } from '../../api/lms.js';
+import { bundlesApi, catalogApi } from '../../api/lms.js';
 import { toCatalogCourse } from '../utils/courseShape.js';
 
 /* ---------------------------------------------------------------------------
@@ -33,12 +33,16 @@ export function CartProvider({ children }) {
   // burst on every basket render; a request per basket change would refetch the
   // same list to remove one row from it.
   const [catalogue, setCatalogue] = useState([]);
+  // Bundles are priced from their own record, not from the sum of their
+  // courses — selling below that sum is the point of a bundle.
+  const [bundles, setBundles] = useState([]);
   useEffect(() => {
     let alive = true;
-    catalogApi
-      .list()
-      .then((rows) => {
-        if (alive) setCatalogue((rows ?? []).map(toCatalogCourse));
+    Promise.all([catalogApi.list(), bundlesApi.list({ limit: 50 }).catch(() => [])])
+      .then(([rows, bundleRows]) => {
+        if (!alive) return;
+        setCatalogue((rows ?? []).map(toCatalogCourse));
+        setBundles(bundleRows ?? []);
       })
       .catch(() => {
         // A basket that cannot price itself shows nothing rather than showing
@@ -67,6 +71,25 @@ export function CartProvider({ children }) {
     () =>
       lines
         .map((line) => {
+          if (line.kind === 'bundle') {
+            const bundle = bundles.find((b) => b.slug === line.slug);
+            if (!bundle) return null;
+            return {
+              bundleId: bundle._id,
+              slug: bundle.slug,
+              kind: 'bundle',
+              title: bundle.title,
+              // What it contains, said plainly — a price with no contents is
+              // not something anyone should be asked to pay.
+              instructor: `${bundle.courses?.length ?? 0} courses`,
+              levelLabel: 'Bundle',
+              durationLabel: '',
+              accent: bundle.accent ?? 0,
+              amount: bundle.price ?? 0,
+              currency: bundle.currency ?? 'AUD',
+            };
+          }
+
           const course = catalogue.find((c) => c.slug === line.slug);
           if (!course) return null;
           return {
@@ -90,7 +113,7 @@ export function CartProvider({ children }) {
           };
         })
         .filter(Boolean),
-    [lines, catalogue],
+    [lines, catalogue, bundles],
   );
 
   const value = useMemo(() => ({ items, add, remove, clear }), [items, add, remove, clear]);

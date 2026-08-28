@@ -124,6 +124,13 @@ export const pathsApi = {
 // ---- L1 · Catalogue and outline ---------------------------------------------
 // The catalogue itself is the site's existing published-courses endpoint,
 // there was never a reason for the LMS to have a second one.
+// Bundles are sold from the same catalogue as courses. Public, like the
+// course list — the shop window works signed out.
+export const bundlesApi = {
+  list: (params) => api.get('/bundles', params, { auth: false }),
+  get: (slug) => api.get(`/bundles/slug/${slug}`, undefined, { auth: false }),
+};
+
 export const catalogApi = {
   list: (params) => api.get('/courses', params, { auth: false }),
   // Outline is optional-auth: anyone sees the structure, a signed-in learner
@@ -332,8 +339,8 @@ export const commerceApi = {
   // This app runs on several origins (staging, previews, production) and they
   // do not share a session, so returning to the wrong one signs the buyer out
   // at the worst possible moment. The server validates it against its allowlist.
-  createOrder: (courseIds) =>
-    api.post('/lms/orders', { courseIds, origin: window.location.origin }),
+  createOrder: ({ courseIds = [], bundleIds = [] }) =>
+    api.post('/lms/orders', { courseIds, bundleIds, origin: window.location.origin }),
   mine: () => api.get('/lms/orders'),
   get: (id) => api.get(`/lms/orders/${id}`),
 };

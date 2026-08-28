@@ -6332,3 +6332,59 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   .lms-builder__panes { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .lms-builder__toc { display: none; }
 }
+
+/* ---------------------------------------------------------------------------
+   Bundles in the catalogue (C2)
+   ------------------------------------------------------------------------ */
+
+.lms-bundles { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--lms-border-strong); }
+.lms-bundles__head { margin-bottom: 16px; }
+.lms-bundles__note { margin: 4px 0 0; font-size: 13.5px; color: var(--lms-muted); }
+.lms-bundles__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.lms-bundlecard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+}
+.lms-bundlecard__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lms-bundlecard__tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface-3); color: var(--lms-green);
+}
+.lms-bundlecard__tag svg { width: 13px; height: 13px; }
+/* The saving is the reason a bundle exists, so it is the loudest thing on the
+   card after the price. */
+.lms-bundlecard__save {
+  font-size: 12px; font-weight: 600;
+  padding: 3px 8px; border-radius: var(--lms-radius-sm);
+  background: var(--lms-mint-soft); color: var(--lms-green);
+}
+.lms-bundlecard__title { margin: 2px 0 0; font-size: 16px; font-weight: 600; line-height: 1.35; color: var(--lms-text); }
+.lms-bundlecard__summary {
+  margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--lms-text-2);
+  /* Two lines, so cards in a row keep their footers aligned. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lms-bundlecard__meta {
+  display: flex; align-items: center; gap: 6px;
+  margin: 2px 0 0; font-size: 12.5px; color: var(--lms-muted);
+}
+.lms-bundlecard__meta svg { width: 14px; height: 14px; }
+.lms-bundlecard__foot {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  margin-top: auto; padding-top: 12px; border-top: 1px solid var(--lms-border);
+}
+.lms-bundlecard__price { display: flex; flex-direction: column; }
+.lms-bundlecard__amount { font-size: 19px; font-weight: 700; color: var(--lms-text); }
+.lms-bundlecard__gst { font-size: 11.5px; color: var(--lms-muted); }
