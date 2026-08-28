@@ -17,11 +17,10 @@ import AuthLottie from './AuthLottie.jsx';
    script deliberately leaves skin tones and neutrals alone — turning a person's
    face green is the failure mode of every automated palette swap. */
 
-const PROOF = [
-  { icon: 'video', title: 'Recorded lectures', text: 'Watch at your own pace, on any device.' },
-  { icon: 'quiz', title: 'Scenario assessments', text: 'Marked instantly, with the reasoning for every answer.' },
-  { icon: 'award', title: 'Certificates', text: 'Issued on completion, with a verifiable credential ID.' },
-];
+/* Three words each. This panel is read in a glance on the way to the form, not
+   studied — the earlier two-line descriptions were a brochure competing with
+   the thing the visitor actually came to do. */
+const PROOF = ['Recorded lectures', 'Marked assessments', 'Certificates'];
 
 export default function AuthAside() {
   return (
@@ -70,21 +69,11 @@ export default function AuthAside() {
         <h2 className="lms-authside__lede">
           The rules, the practice, and the record that stands up to review.
         </h2>
-        <p className="lms-authside__sub">
-          Structured courses on Australian government procurement, written by people who
-          have run the process from both sides of the table.
-        </p>
-
         <ul className="lms-authside__proof">
           {PROOF.map((item) => (
-            <li key={item.title}>
-              <span className="lms-authside__icon">
-                <LmsIcon name={item.icon} />
-              </span>
-              <span>
-                <strong>{item.title}</strong>
-                <span>{item.text}</span>
-              </span>
+            <li key={item}>
+              <LmsIcon name="check" />
+              {item}
             </li>
           ))}
         </ul>

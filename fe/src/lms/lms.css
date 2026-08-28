@@ -3332,6 +3332,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   text-decoration: none;
   align-self: flex-start;
 }
+/* The tile stays; what changed is what sits in it. gp-02.svg is the light
+   artwork, drawn for the dark header and sidebar, so on this pale page it needs
+   the dark ground behind it or it disappears. */
 .lms-auth__brand-mark {
   display: inline-flex;
   align-items: center;
@@ -3340,10 +3343,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 42px;
   border-radius: 11px;
   background: linear-gradient(155deg, var(--lms-green-600), var(--lms-green));
-  color: var(--lms-mint);
-  font-weight: 700;
-  font-size: 16px;
 }
+.lms-auth__brand-mark img { width: 23px; height: 20px; display: block; }
 .lms-auth__brand strong { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .lms-auth__brand span span { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lms-green-600); }
 .lms-auth__title { margin: 0 0 6px; font-size: clamp(26px, 3.4vw, 32px); font-weight: 600; letter-spacing: -0.02em; }
@@ -6414,14 +6415,31 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
      another, which put the illustration straight through the proof points. */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
+  /* Centred as one group. `space-between` pinned the copy to the ceiling and
+     the illustration to the floor, which on a tall window left a corridor of
+     empty green between them. */
+  justify-content: center;
+  gap: clamp(24px, 6vh, 64px);
   padding: clamp(36px, 5vw, 60px) clamp(32px, 5vw, 56px) 0;
   /* Two greens rather than one flat fill — the panel reads as lit rather than
      printed, and the motif has something to sit against. */
+  /* A long fade rather than one flat green.
+
+     Three layers: a soft light source top-left, a wide mint bloom low on the
+     right where the illustration sits, and a base ramp with enough stops to
+     travel slowly — a two-stop gradient over this much area reads as a solid
+     colour with a seam in it. */
   background:
-    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.10) 0%, transparent 60%),
-    linear-gradient(155deg, var(--lms-green-600) 0%, var(--lms-green) 55%, #061c0c 100%);
+    radial-gradient(90% 70% at 12% -5%, rgba(255, 255, 255, 0.13) 0%, transparent 62%),
+    radial-gradient(70% 55% at 88% 92%, rgba(126, 226, 168, 0.16) 0%, transparent 70%),
+    linear-gradient(
+      160deg,
+      #135c2c 0%,
+      #0f4a20 26%,
+      #0a3114 58%,
+      #072414 82%,
+      #04170d 100%
+    );
   color: #fff;
 }
 
@@ -6530,4 +6548,28 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__anim.is-ready ~ .lms-authside__motif { opacity: 0.14; }
 @media (prefers-reduced-motion: reduce) {
   .lms-authside__anim { transition: none; }
+}
+
+/* The trimmed proof row: three short claims on one line where there is room,
+   wrapping to two where there is not. Replaces three stacked two-line items
+   that read as a brochure beside the form. */
+.lms-authside__proof {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 26px;
+  padding-top: 22px;
+}
+.lms-authside__proof li {
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+.lms-authside__proof li svg {
+  width: 15px;
+  height: 15px;
+  color: var(--lms-mint);
+  flex-shrink: 0;
 }

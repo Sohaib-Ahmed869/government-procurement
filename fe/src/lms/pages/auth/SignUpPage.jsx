@@ -2,6 +2,7 @@ import { useState } from 'react';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import gpLogo from '../../../assets/icons/gp-02.svg';
 import AuthAside from '../../components/auth/AuthAside.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
 import { returnToFrom } from '../../utils/returnTo.js';
@@ -71,7 +72,13 @@ export default function SignUpPage() {
     <div className="lms-auth">
       <div className="lms-auth__panel">
         <Link className="lms-auth__brand" to="/">
-          <span className="lms-auth__brand-mark">GP</span>
+          {/* The real mark on the brand tile, not the letters "GP" set in a
+              box. gp-02.svg is the LIGHT artwork — it is drawn for the dark
+              header and sidebar — so it needs the dark tile behind it to be
+              visible at all on this page. */}
+          <span className="lms-auth__brand-mark">
+            <img src={gpLogo} alt="" width="1153" height="1000" />
+          </span>
           <span>
             <strong>Government Procurement</strong>
             <span>Learning</span>
