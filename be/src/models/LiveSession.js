@@ -79,6 +79,15 @@ const liveSessionSchema = new mongoose.Schema(
     // to be created by hand — but it carries the reason it has no link.
     providerError: { type: String, default: '' },
 
+    /* When the host actually opened the room.
+
+       The scheduled window is a guess about when a session will run; this is
+       the fact of it. A host who starts early — because the previous meeting
+       finished, or because they want to let people in and settle — should not
+       leave their learners staring at a disabled button, which is exactly what
+       a purely clock-based window did. */
+    hostStartedAt: { type: Date },
+
     cancelledAt: { type: Date },
     cancelReason: { type: String, default: '' },
   },
@@ -105,6 +114,9 @@ liveSessionSchema.methods.joinWindow = function joinWindow() {
 // the top of this file.
 liveSessionSchema.methods.state = function state(now = new Date()) {
   if (this.status === SESSION_STATUS.CANCELLED) return 'cancelled';
+  // The host having opened the room outranks the clock: if it is running, it is
+  // live, whatever the schedule said.
+  if (this.hostStartedAt && now <= this.joinWindow().closesAt) return 'live';
   if (now < this.startsAt) return 'upcoming';
   if (now <= this.endsAt()) return 'live';
   return 'ended';
@@ -113,7 +125,11 @@ liveSessionSchema.methods.state = function state(now = new Date()) {
 liveSessionSchema.methods.canJoinAt = function canJoinAt(now = new Date()) {
   if (this.status === SESSION_STATUS.CANCELLED) return false;
   const { opensAt, closesAt } = this.joinWindow();
-  return now >= opensAt && now <= closesAt;
+  // Never after the room has closed, whatever happened earlier.
+  if (now > closesAt) return false;
+  // Started by the host, so it is open — even ahead of the scheduled window.
+  if (this.hostStartedAt) return true;
+  return now >= opensAt;
 };
 
 /* The learner-facing shape. What is REMOVED is the point of it:
@@ -142,6 +158,9 @@ liveSessionSchema.methods.forLearner = function forLearner(now = new Date()) {
     // whose provider call failed should read as "no link yet", not as a dead
     // Join button.
     hasMeeting: Boolean(this.providerRef?.joinUrl),
+    // So the screen can say "your instructor has started" rather than just
+    // enabling a button and leaving the reason to be guessed at.
+    hostStarted: Boolean(this.hostStartedAt),
     cancelReason: this.status === SESSION_STATUS.CANCELLED ? this.cancelReason : '',
   };
 };
