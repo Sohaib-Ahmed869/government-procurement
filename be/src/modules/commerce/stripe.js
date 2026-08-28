@@ -85,6 +85,25 @@ export async function createCheckoutSession({ order, successUrl, cancelUrl, cust
         tax_behavior: 'inclusive',
         product_data: {
           name: line.title,
+          /* REQUIRED by Managed Payments, which is on by default for newer
+             Stripe accounts. Without it: "Invalid line_items[0]: the product
+             tax code is missing."
+
+             Not every code is accepted — Stripe keeps an eligibility list, and
+             several obvious candidates are refused. Verified against the live
+             API: `txcd_20060044` (Training), `txcd_20060052` (Educational
+             Services) and `txcd_20060045` (Training Services - Live Virtual)
+             are all INELIGIBLE. These are eligible:
+
+               txcd_20060058  Training Services - Self-study Web-based  ← default
+               txcd_20060158  On demand Online Courses - streamed AV
+               txcd_20060258  On demand Online Courses - streamed + downloadable
+               txcd_20060358  On demand Online Courses - written material
+
+             The default fits self-paced courses of mixed video and text, which
+             is what this catalogue sells. It is configurable because the right
+             answer is a question for an accountant, not a deploy. */
+          tax_code: env.stripe.taxCode,
           metadata: { courseId: String(line.course) },
         },
       },

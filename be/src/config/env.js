@@ -112,6 +112,10 @@ export const env = {
     enabled: process.env.STRIPE_ENABLED !== 'false',
     secretKey: process.env.STRIPE_SECRET_KEY || '',
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+    /* Stripe product tax code. Required by Managed Payments and restricted to
+       an eligibility list — see the note in modules/commerce/stripe.js for the
+       codes verified as accepted and the obvious ones that are refused. */
+    taxCode: process.env.STRIPE_TAX_CODE || 'txcd_20060058',
   },
 
   oauth: {
