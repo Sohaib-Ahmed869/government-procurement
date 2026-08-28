@@ -96,6 +96,7 @@ export default function QuizPage() {
         {started ? (
           <QuizRunner
             quiz={quiz}
+            ticket={ticket}
             lessonId={quizId}
             slug={slug}
             onSubmitted={reloadAttempts}

@@ -99,10 +99,14 @@ export default function CourseDetail({ course, status = 'ready' }) {
 
   // Purchase CTA. Coming-soon courses collect interest; open courses buy/enrol.
   const ctaLabel = isComingSoon ? 'Register interest' : 'Buy course';
+  /* "Buy course" used to link to a consultation booking, from before there was
+     a checkout. It now enters the LMS: sign in, then the checkout or the course
+     depending on what they already own. Coming-soon still collects interest —
+     there is nothing to sell yet. */
   const PrimaryCta = isComingSoon ? (
     <a className="cd-buy__cta" href="#register-interest">{ctaLabel}</a>
   ) : (
-    <Link className="cd-buy__cta" to="/book-a-consultation">{ctaLabel}</Link>
+    <Link className="cd-buy__cta" to={`/learn/courses/${course.slug}/start`}>{ctaLabel}</Link>
   );
 
   return (
@@ -255,7 +259,7 @@ export default function CourseDetail({ course, status = 'ready' }) {
         {isComingSoon ? (
           <a className="cd-bar__cta" href="#register-interest">{ctaLabel}</a>
         ) : (
-          <Link className="cd-bar__cta" to="/book-a-consultation">{ctaLabel}</Link>
+          <Link className="cd-bar__cta" to={`/learn/courses/${course.slug}/start`}>{ctaLabel}</Link>
         )}
       </div>
     </section>

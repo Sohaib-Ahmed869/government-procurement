@@ -68,7 +68,10 @@ export default function LoginPage() {
 
         <h1 className="lms-auth__title">Sign in</h1>
         <p className="lms-auth__sub">
-          New here? <Link to="/learn/signup">Create an account</Link>
+          New here?{' '}
+          {/* `state` is carried across, so choosing "create an account" from a
+              course link does not lose the course. */}
+          <Link to="/learn/signup" state={location.state}>Create an account</Link>
         </p>
 
         <form onSubmit={submit} noValidate>

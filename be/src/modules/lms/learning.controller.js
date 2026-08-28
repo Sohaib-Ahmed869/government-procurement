@@ -15,6 +15,7 @@ import { Program, PROGRAM_CERTIFICATE_DEFAULTS } from '../../models/Program.js';
 import { resolveForLearner } from './programs.controller.js';
 import { localDay } from './study.controller.js';
 import { markAttempt, reviewFor } from '../../utils/grading.js';
+import { issueQuizTicket, checkQuizTiming, GRACE_SECONDS } from '../../utils/quizTicket.js';
 import { getObject, presignGet } from '../../config/s3.js';
 import { env } from '../../config/env.js';
 import { deriveKey, issuePlaybackToken, readPlaybackToken } from './hlsKeys.js';
@@ -42,9 +43,69 @@ const VIDEO_URL_TTL_SECONDS = 300;
    and both shapes are handled. */
 const grantsAccess = (enrolment) => Boolean(enrolment) && !enrolment.revokedAt;
 
-function gateFor({ lesson, module: mod, enrolment, now = new Date() }) {
+/* ---- Learning-path prerequisites (L4) -------------------------------------
+
+   A path step can declare `requires`: other courses that must be finished
+   first. That was computed only for the path SCREEN, which meant "locked" was a
+   label rather than a rule — a learner looking at a locked step could open the
+   course directly and work straight through it.
+
+   This is the same question asked where it is actually enforced. The definition
+   of "finished" is deliberately identical to resolveForLearner()'s doneFor():
+   every lesson in the course completed. If the two ever disagree, a learner is
+   told a step is open and then refused, or the reverse.
+
+   One query per request, not per lesson: the caller resolves this once for the
+   course and hands the result to gateFor(). */
+async function prereqLockFor({ user, courseId }) {
+  if (!user || !courseId) return null;
+
+  const programs = await Program.find({
+    status: CONTENT_STATUS.PUBLISHED,
+    'steps.course': courseId,
+  }).select('title steps').lean();
+  if (!programs.length) return null;
+
+  // Every course this one is gated behind, across whichever paths contain it.
+  const requiredIds = new Set();
+  for (const program of programs) {
+    for (const step of program.steps ?? []) {
+      if (String(step.course) !== String(courseId)) continue;
+      (step.requires ?? []).forEach((r) => requiredIds.add(String(r)));
+    }
+  }
+  if (!requiredIds.size) return null;
+
+  const ids = [...requiredIds];
+  const [lessons, progresses, courses] = await Promise.all([
+    Lesson.find({ course: { $in: ids } }).select('course').lean(),
+    Progress.find({ user: user._id, course: { $in: ids } }).select('course completedLessons').lean(),
+    Course.find({ _id: { $in: ids } }).select('title slug').lean(),
+  ]);
+
+  const totals = new Map();
+  lessons.forEach((l) => totals.set(String(l.course), (totals.get(String(l.course)) ?? 0) + 1));
+  const doneCount = new Map(progresses.map((p) => [String(p.course), p.completedLessons?.length ?? 0]));
+
+  const unmet = ids.filter((id) => {
+    const total = totals.get(id) ?? 0;
+    // A prerequisite course with no lessons yet cannot be "finished", and
+    // blocking on it would be an authoring mistake nobody could work around.
+    if (total === 0) return false;
+    return (doneCount.get(id) ?? 0) < total;
+  });
+  if (!unmet.length) return null;
+
+  const byId = new Map(courses.map((c) => [String(c._id), c]));
+  return { needs: unmet.map((id) => ({ title: byId.get(id)?.title ?? 'another course', slug: byId.get(id)?.slug ?? '' })) };
+}
+
+function gateFor({ lesson, module: mod, enrolment, prereq = null, now = new Date() }) {
   if (lesson.preview) return { reason: 'preview' };
   if (!grantsAccess(enrolment)) return { reason: 'locked-enrolment' };
+  /* After enrolment, before drip: being enrolled is not the same as having
+     earned your way to this course through a path. */
+  if (prereq) return { reason: 'locked-prereq', needs: prereq.needs };
 
   // Drip (L4): an absolute date, or days after this learner enrolled.
   if (mod?.releaseAt && now < mod.releaseAt) {
@@ -143,6 +204,11 @@ export const outline = asyncHandler(async (req, res) => {
       })
     : null;
 
+  /* Resolved ONCE for the whole outline rather than per lesson: it is a
+     database question about the course, and every lesson in it gets the same
+     answer. */
+  const prereq = await prereqLockFor({ user: req.user, courseId: course._id });
+
   return ok(res, {
     course,
     enrolled: Boolean(enrolment?.isActive()),
@@ -165,7 +231,7 @@ export const outline = asyncHandler(async (req, res) => {
       lessons: lessons
         .filter((l) => String(l.module) === String(m._id))
         .map((l) => {
-          const gate = gateFor({ lesson: l, module: m, enrolment });
+          const gate = gateFor({ lesson: l, module: m, enrolment, prereq });
           return {
             _id: l._id,
             title: l.title,
@@ -228,7 +294,12 @@ export const getLesson = asyncHandler(async (req, res) => {
   // published, which is the thing they are checking before submitting it.
   const gate = mayBypassGate({ user: req.user, course })
     ? { reason: 'open' }
-    : gateFor({ lesson, module: mod, enrolment });
+    : gateFor({
+        lesson,
+        module: mod,
+        enrolment,
+        prereq: await prereqLockFor({ user: req.user, courseId: lesson.course }),
+      });
 
   if (isLocked(gate)) {
     // The gate reason is safe to return. It tells the learner what to do next
@@ -260,7 +331,8 @@ export const videoUrl = asyncHandler(async (req, res) => {
   const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
-    const gate = gateFor({ lesson, module: mod, enrolment });
+    const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
+  const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to watch this');
   }
 
@@ -290,7 +362,8 @@ export const documentUrl = asyncHandler(async (req, res) => {
   const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
-    const gate = gateFor({ lesson, module: mod, enrolment });
+    const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
+  const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to open this');
   }
 
@@ -322,7 +395,8 @@ export const resourceUrl = asyncHandler(async (req, res) => {
   const enrolment = await enrolmentFor(req.user, lesson.course);
 
   if (!mayBypassGate({ user: req.user, course })) {
-    const gate = gateFor({ lesson, module: mod, enrolment });
+    const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
+  const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to download this');
   }
 
@@ -398,7 +472,8 @@ async function openLessonOr403(req, { message }) {
 
   if (!mayBypassGate({ user, course })) {
     const enrolment = await enrolmentFor(user, lesson.course);
-    const gate = gateFor({ lesson, module: mod, enrolment });
+    const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
+  const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden(message);
   }
   return { lesson, user };
@@ -539,7 +614,8 @@ export const transcript = asyncHandler(async (req, res) => {
 
   if (!mayBypassGate({ user: req.user, course })) {
     const enrolment = await enrolmentFor(req.user, lesson.course);
-    const gate = gateFor({ lesson, module: mod, enrolment });
+    const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
+  const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to read this');
   }
 
@@ -623,7 +699,15 @@ async function rollupFor({
   let next = null;
   if (first) {
     const mod = modules.find((m) => String(m._id) === String(first.module));
-    const gate = gateFor({ lesson: first, module: mod, enrolment });
+    // Resume must not hand back a lesson the gate would then refuse.
+    const gate = gateFor({
+      lesson: first,
+      module: mod,
+      enrolment,
+      // rollupFor takes a userId, not the request — it is called from several
+      // places, not all of which have one. courseId is already its own param.
+      prereq: await prereqLockFor({ user: { _id: userId }, courseId }),
+    });
     next = {
       id: first._id,
       title: first.title,
@@ -719,6 +803,22 @@ export const completeLesson = asyncHandler(async (req, res) => {
 
   const enrolment = await Enrollment.findOne({ user: req.user._id, course: lesson.course });
   if (!enrolment?.isActive()) throw ApiError.forbidden('You need to be enrolled in this course');
+
+  /* Completion runs the SAME gate that opening the lesson does.
+
+     It checked only the enrolment, so a lesson the learner could not open —
+     locked behind a drip date, or behind a path prerequisite — could still be
+     marked complete by posting straight here. Completion drives course progress
+     and issues the certificate, which made this the shortest route to a
+     credential for a course you had not been let into. */
+  const gateMod = await Module.findById(lesson.module);
+  const completeGate = gateFor({
+    lesson,
+    module: gateMod,
+    enrolment,
+    prereq: await prereqLockFor({ user: req.user, courseId: lesson.course }),
+  });
+  if (isLocked(completeGate)) throw ApiError.forbidden(JSON.stringify(completeGate));
 
   const progress =
     (await Progress.findOne({ user: req.user._id, course: lesson.course })) ??
@@ -828,7 +928,13 @@ export const getQuiz = asyncHandler(async (req, res) => {
 
   // forLearner() strips `correct`, `accept` and `explanation`.
   const safe = lesson.forLearner();
-  return ok(res, { lesson: safe, attemptsUsed: attempts, maxAttempts: max });
+  /* The ticket is what makes the time limit real — it is the only record of
+     when this attempt began, and it is signed so the browser cannot move it.
+     Issued only for a timed quiz; an untimed one has nothing to prove. */
+  const ticket = lesson.quiz.timeLimitMins > 0
+    ? issueQuizTicket({ lessonId: String(lesson._id), userId: String(req.user._id) })
+    : undefined;
+  return ok(res, { lesson: safe, attemptsUsed: attempts, maxAttempts: max, ticket });
 });
 
 // POST /lms/quizzes/:lessonId/submit. The server marks it.
@@ -855,6 +961,33 @@ export const submitQuiz = asyncHandler(async (req, res) => {
     if (used >= max) throw ApiError.forbidden(`You have used all ${max} attempts`);
   }
 
+  /* THE TIME LIMIT, enforced here rather than trusted from the browser.
+
+     `durationSeconds` in the body is the client's own stopwatch and is kept
+     only for the activity chart — it is not evidence of anything, because the
+     client that reports it is the client being limited. The ticket issued by
+     getQuiz is. An author or reviewer sitting their own quiz is exempt, the
+     same as they are for the attempt cap. */
+  const timing = bypass
+    ? { ok: true, elapsedSeconds: null }
+    : checkQuizTiming({
+        ticket: req.body.ticket,
+        lessonId: String(lesson._id),
+        userId: String(req.user._id),
+        limitMins: lesson.quiz.timeLimitMins,
+      });
+
+  if (!timing.ok) {
+    if (timing.reason === 'expired') {
+      throw ApiError.forbidden(
+        `Time is up. This quiz allows ${lesson.quiz.timeLimitMins} minutes and this attempt ran ${Math.floor(timing.elapsedSeconds / 60)}.`,
+      );
+    }
+    // Missing, mismatched, or for someone else. All mean the same thing to the
+    // learner — we cannot tell when they started — and the fix is the same.
+    throw ApiError.badRequest('We could not verify when this attempt started. Please open the quiz again.');
+  }
+
   // Note what is NOT read from the body: any score, percent or passed flag.
   const marked = markAttempt(lesson.quiz, req.body.answers ?? []);
 
@@ -863,7 +996,13 @@ export const submitQuiz = asyncHandler(async (req, res) => {
     course: lesson.course,
     lesson: lesson._id,
     ...marked,
-    durationSeconds: Number(req.body.durationSeconds) || 0,
+    /* The server's own measurement when it has one. The client's stopwatch is
+       the fallback for an untimed quiz, where nothing was issued to measure
+       against and the number is only ever used for a chart. */
+    durationSeconds: timing.elapsedSeconds ?? (Number(req.body.durationSeconds) || 0),
+    startedAt: timing.elapsedSeconds != null
+      ? new Date(Date.now() - timing.elapsedSeconds * 1000)
+      : undefined,
     submittedAt: new Date(),
   });
 

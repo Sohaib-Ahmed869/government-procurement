@@ -18,7 +18,9 @@ import { formatTime } from '../../utils/transcript.js';
 // to. The marked result rides along in router state so the result screen can
 // paint immediately; it can also fetch the attempt by id, which is what makes
 // that link work tomorrow.
-export default function QuizRunner({ quiz, lessonId, slug, onSubmitted }) {
+export default function QuizRunner({ quiz, lessonId, slug, onSubmitted,
+  ticket,
+}) {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [i, setI] = useState(0);
@@ -63,6 +65,7 @@ export default function QuizRunner({ quiz, lessonId, slug, onSubmitted }) {
         lessonId,
         payload,
         Math.round((Date.now() - startedAt.current) / 1000),
+        ticket,
       );
       onSubmitted?.();
       navigate(
@@ -77,7 +80,7 @@ export default function QuizRunner({ quiz, lessonId, slug, onSubmitted }) {
       setError(err?.message ?? 'Your attempt didn’t reach us. Try submitting again.');
       setSubmitting(false);
     }
-  }, [answers, quiz.questions, lessonId, slug, navigate, onSubmitted]);
+  }, [answers, quiz.questions, lessonId, slug, navigate, onSubmitted, ticket]);
 
   // Countdown. Submits whatever is answered when it hits zero rather than
   // discarding the attempt.

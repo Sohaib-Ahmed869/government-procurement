@@ -35,10 +35,12 @@ export function useQuiz(lessonId) {
     if (!lessonId) return;
     setState((s) => ({ ...s, status: 'loading', error: '' }));
     try {
-      const { lesson, attemptsUsed, maxAttempts } = await quizzesApi.get(lessonId);
+      const { lesson, attemptsUsed, maxAttempts, ticket } = await quizzesApi.get(lessonId);
       setState({
         status: 'ready',
         lesson,
+        // Held, never inspected. It goes back with the submission unchanged.
+        ticket,
         quiz: { ...(lesson.quiz ?? {}), questions: toQuestions(lesson.quiz?.questions) },
         attemptsUsed: attemptsUsed ?? 0,
         maxAttempts: maxAttempts ?? 0,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
 
@@ -28,6 +28,7 @@ export default function SignUpPage() {
   const [params] = useSearchParams();
   const { signup } = useStudentAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [role, setRole] = useState(params.get('as') === 'instructor' ? 'instructor' : 'student');
   const [form, setForm] = useState({ name: '', email: '', password: '', organisation: '', headline: '' });
@@ -51,7 +52,13 @@ export default function SignUpPage() {
     setError('');
     try {
       const user = await signup({ ...form, role });
-      navigate(homeFor(user.role), { replace: true });
+      /* Same rule as sign-in: go where they were headed, unless that belongs to
+         a different app. Signing up used to always land on the dashboard, so
+         somebody who clicked a course on the website and chose "create an
+         account" lost the course they came for. */
+      const from = location.state?.from?.pathname;
+      const home = homeFor(user.role);
+      navigate(from && from.startsWith(home) ? from : home, { replace: true });
     } catch (err) {
       setError(err?.message ?? 'We couldn’t create your account. Try again.');
       setBusy(false);
@@ -71,7 +78,8 @@ export default function SignUpPage() {
 
         <h1 className="lms-auth__title">Create your account</h1>
         <p className="lms-auth__sub">
-          Already have one? <Link to="/learn/login">Sign in</Link>
+          Already have one?{' '}
+          <Link to="/learn/login" state={location.state}>Sign in</Link>
         </p>
 
         <form onSubmit={submit} noValidate>
@@ -199,7 +207,7 @@ export default function SignUpPage() {
           </p>
         </form>
 
-        <OAuthButtons label="Or sign up with" />
+        <OAuthButtons label="Or sign up with" next={location.state?.from?.pathname ?? ''} />
       </div>
 
       <aside className="lms-auth__aside" aria-hidden="true">

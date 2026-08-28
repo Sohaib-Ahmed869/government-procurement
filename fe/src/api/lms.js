@@ -193,10 +193,15 @@ export const quizzesApi = {
   get: (lessonId) => api.get(`/lms/quizzes/${lessonId}`),
   // Only answers are sent. The server marks and returns the score; a score in
   // this body would be ignored.
-  submit: (lessonId, answers, durationSeconds) =>
+  // `ticket` is the signed proof of when this attempt was opened, issued by
+  // `get` for a timed quiz. The server measures elapsed time from it — the
+  // browser's own stopwatch is not evidence, since the browser is the thing
+  // being limited.
+  submit: (lessonId, answers, durationSeconds, ticket) =>
     api.post(`/lms/quizzes/${lessonId}/submit`, {
       answers,
       durationSeconds,
+      ticket,
       tzOffset: tzOffset(),
     }),
   attempts: (lessonId) => api.get(`/lms/quizzes/${lessonId}/attempts`),
