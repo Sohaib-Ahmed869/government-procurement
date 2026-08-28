@@ -161,6 +161,7 @@ export default function ModuleEditor({
                 right form, instead of defaulting to text and being switched. */}
             {adding === m._id ? (
               <div className="lms-addlesson">
+                <p className="lms-addlesson__label">What kind of lesson?</p>
                 {[
                   { kind: 'text', label: 'Text', icon: 'text' },
                   { kind: 'video', label: 'Video', icon: 'video' },
@@ -181,7 +182,11 @@ export default function ModuleEditor({
                     {k.label}
                   </button>
                 ))}
-                <button type="button" className="lms-btn lms-btn--sm lms-btn--ghost" onClick={() => setAdding(null)}>
+                <button
+                  type="button"
+                  className="lms-btn lms-btn--sm lms-btn--ghost lms-addlesson__cancel"
+                  onClick={() => setAdding(null)}
+                >
                   Cancel
                 </button>
               </div>

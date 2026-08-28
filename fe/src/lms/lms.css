@@ -6210,3 +6210,40 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-clesson__editor { flex: 0 0 100%; }
 /* Nothing inside the editor may force the column wider than the card. */
 .lms-clesson__editor > * { max-width: 100%; }
+
+/* The section's add controls sit OUTSIDE the padded lesson list, as direct
+   children of the card — so they were flush against its edges with nothing
+   between them and the border. The card has overflow:hidden, which made it
+   read as a rendering fault rather than tight spacing. */
+/* An explicit width, not `auto`: a <button> shrinks to fit its content even as
+   a block-level flex container, so `auto` left it a stub against the left edge
+   rather than spanning the section. */
+.lms-cmod > .lms-addbtn {
+  width: calc(100% - 24px);
+  margin: 2px 12px 12px;
+  justify-content: center;
+}
+
+/* Picking the kind is a MODE, not a row of loose buttons. Giving it a ground
+   and a label makes it obvious the next click chooses a type rather than
+   doing five different things. */
+.lms-cmod > .lms-addlesson {
+  margin: 2px 12px 12px;
+  padding: 12px;
+  gap: 8px;
+  align-items: center;
+  background: var(--lms-surface-2);
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+}
+.lms-addlesson__label {
+  flex: 0 0 100%;
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+}
+/* Cancel last, and set apart, so it does not read as a sixth lesson type. */
+.lms-addlesson__cancel { margin-left: auto; }
