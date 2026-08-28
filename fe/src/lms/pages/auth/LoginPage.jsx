@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
+import authImage from '../../../assets/images/EnhanceExpImage.png';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
 
 // Sign in (L6).
@@ -124,14 +125,8 @@ export default function LoginPage() {
         <OAuthButtons next={location.state?.from?.pathname ?? ''} />
       </div>
 
-      <aside className="lms-auth__aside" aria-hidden="true">
-        <div>
-          <p className="lms-auth__quote">
-            Structured courses on Australian government procurement: the rules, the
-            practice, and the record that stands up to review.
-          </p>
-          <p className="lms-auth__cite">Government Procurement Learning</p>
-        </div>
+      <aside className="lms-auth__aside lms-auth__aside--image" aria-hidden="true">
+        <img className="lms-auth__image" src={authImage} alt="" />
       </aside>
     </div>
   );

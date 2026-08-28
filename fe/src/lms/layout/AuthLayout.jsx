@@ -10,7 +10,7 @@ import '../lms.css';
 // inputs lose their borders and the whole page comes out unstyled.
 export default function AuthLayout() {
   return (
-    <div className="lms">
+    <div className="lms lms-scale">
       <Outlet />
     </div>
   );
