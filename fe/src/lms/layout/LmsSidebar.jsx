@@ -1,7 +1,29 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
-import logo from '../../assets/icons/gp-02.svg';
+import logo from '../../assets/icons/gp-02-dark.svg';
 import LmsIcon from '../components/LmsIcon.jsx';
+
+// Up-to-two-letter initials for the identity card's avatar.
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
+}
+
+/* The account menu, above the identity card at the foot of the rail.
+
+   Profile, Settings and Orders used to be a fourth nav group. They are the
+   three things you reach for ABOUT your account rather than ON your way
+   through the course material, and putting them behind the card that already
+   says who you are is where people look for them. It also buys back four rows
+   of a rail that had run out of height. */
+const ACCOUNT_MENU = [
+  { to: '/learn/orders', label: 'Orders', icon: 'cart' },
+  { to: '/learn/profile', label: 'Profile', icon: 'user' },
+  { to: '/learn/settings', label: 'Settings', icon: 'gear' },
+];
+const INSTRUCTOR_MENU = ACCOUNT_MENU.filter((i) => i.to !== '/learn/orders');
 
 // Instructor navigation. The same shell as the student's. Same layout, same
 // header, same styling, with the tabs swapped for the teaching side. An
@@ -25,13 +47,6 @@ const INSTRUCTOR_NAV = [
       { to: '/learn/instructor/progress', label: 'Progress', icon: 'chart' },
       { to: '/learn/instructor/discussions', label: 'Questions', icon: 'chat' },
       { to: '/learn/instructor/reviews', label: 'Reviews', icon: 'star' },
-    ],
-  },
-  {
-    group: 'Account',
-    items: [
-      { to: '/learn/profile', label: 'Profile', icon: 'user' },
-      { to: '/learn/settings', label: 'Settings', icon: 'gear' },
     ],
   },
 ];
@@ -74,14 +89,6 @@ const NAV = [
       { to: '/learn/badges', label: 'Badges', icon: 'badge' },
     ],
   },
-  {
-    group: 'Account',
-    items: [
-      { to: '/learn/orders', label: 'Orders', icon: 'cart' },
-      { to: '/learn/profile', label: 'Profile', icon: 'user' },
-      { to: '/learn/settings', label: 'Settings', icon: 'gear' },
-    ],
-  },
 ];
 
 // What a visitor can actually open. Every other link now bounces to the login
@@ -102,8 +109,37 @@ export default function LmsSidebar({
   onToggleCollapsed,
   onCloseMobile,
 }) {
-  const { logout, isAuthenticated, isInstructor } = useStudentAuth();
+  const { user, logout, isAuthenticated, isInstructor } = useStudentAuth();
   const nav = !isAuthenticated ? PUBLIC_NAV : isInstructor ? INSTRUCTOR_NAV : NAV;
+  const menu = isInstructor ? INSTRUCTOR_MENU : ACCOUNT_MENU;
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const footRef = useRef(null);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  // Same dismissal contract as NotificationsMenu: a click anywhere outside, or
+  // Escape. Bound only while open so a closed menu costs nothing.
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const onDown = (e) => {
+      if (!footRef.current?.contains(e.target)) closeMenu();
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen, closeMenu]);
+
+  // A collapsed rail has no room for the menu, and the card is the only thing
+  // it could hang off. Closing on collapse stops it stranding mid-air.
+  useEffect(() => {
+    if (collapsed) setMenuOpen(false);
+  }, [collapsed]);
 
   return (
     <aside className={`lms-sidebar${mobileOpen ? ' is-open' : ''}`}>
@@ -171,25 +207,68 @@ export default function LmsSidebar({
         ))}
       </nav>
 
-      {/* Pinned below the nav, as in the reference layout. Hidden when signed
-          out. There is nothing to log out of. */}
+      {/* The identity card, pinned to the foot of the rail.
+
+         It replaces a lone red Log out button, and it replaces the dead chip
+         that used to sit in the header — the same three facts (who, which
+         role, how to leave) said once, in the place a sidebar app puts them.
+         The menu above it carries what used to be the Account nav group. */}
       {isAuthenticated ? (
-        <div className="lms-sidebar__foot">
+        <div className="lms-sidebar__foot" ref={footRef}>
+          {menuOpen ? (
+            <div className="lms-sidebar__menu" role="menu">
+              {menu.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  role="menuitem"
+                  className="lms-sidebar__menu-item"
+                  onClick={() => {
+                    closeMenu();
+                    onCloseMobile?.();
+                  }}
+                >
+                  <LmsIcon name={item.icon} className="lms-sidebar__icon" />
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+              <button
+                type="button"
+                role="menuitem"
+                className="lms-sidebar__menu-item lms-sidebar__menu-item--out"
+                onClick={logout}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
+                  strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M15 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v2" />
+                  <path d="M10 12h11M18 9l3 3-3 3" />
+                </svg>
+                <span>Log out</span>
+              </button>
+            </div>
+          ) : null}
+
           <button
             type="button"
-            className="lms-sidebar__logout"
-            onClick={logout}
-            title="Log out"
+            className={`lms-sidebar__me${menuOpen ? ' is-open' : ''}`}
+            onClick={() => setMenuOpen((was) => !was)}
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            title={collapsed ? `${user?.name ?? 'Account'} — account menu` : 'Account menu'}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M15 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v2" />
-              <path d="M10 12h11M18 9l3 3-3 3" />
+            <span className="lms-sidebar__me-avatar" aria-hidden="true">{initials(user?.name)}</span>
+            <span className="lms-sidebar__me-text">
+              <strong>{user?.name ?? 'Account'}</strong>
+              <span>{user?.role ?? 'student'}</span>
+            </span>
+            <svg className="lms-sidebar__me-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m9 6 6 6-6 6" />
             </svg>
-            <span>Log out</span>
           </button>
         </div>
       ) : null}
+
     </aside>
   );
 }
