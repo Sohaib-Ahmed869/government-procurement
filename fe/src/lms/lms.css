@@ -6088,3 +6088,24 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 /* Never let the filename collapse below its content, whatever shares the row. */
 .lms-upload__body { flex: 1 1 220px; min-width: 0; }
+
+/* Video preview in the lesson builder.
+
+   Full width above the file details, because the point of a preview is to
+   confirm you uploaded the right file — a thumbnail beside the name would not
+   settle that. The row already wraps (see the upload error note above), so this
+   takes its own line by claiming the full basis. */
+.lms-upload__preview {
+  flex: 0 0 100%;
+  order: -1;
+  margin-bottom: 12px;
+}
+.lms-upload__video {
+  display: block;
+  width: 100%;
+  /* Caps the height on a portrait clip, which would otherwise push the file
+     details and the Replace button off the bottom of the panel. */
+  max-height: 340px;
+  border-radius: var(--lms-radius-sm);
+  background: #000;
+}
