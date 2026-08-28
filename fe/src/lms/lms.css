@@ -6478,9 +6478,22 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-auth__submit { margin-top: 14px; }
 
 .lms-authside {
-  position: relative;
+  /* Pinned, not stretched.
+
+     The two columns are grid tracks, so the row grows to whatever the TALLER
+     one needs — and on sign-up that is the form. The panel then became taller
+     than the window, and because its contents are centred within it, the
+     illustration was centred somewhere below the fold. Sticking it to the top
+     at exactly one viewport tall keeps the panel a fixed frame that the form
+     scrolls against, which is what a split sign-in screen wants anyway.
+
+     `align-self: start` is what gives sticky something to do: a stretched grid
+     item fills the row and has nowhere to stick to. */
+  position: sticky;
+  top: 0;
+  align-self: start;
   overflow: hidden;
-  min-height: 100vh;
+  height: 100vh;
   /* A column, not a centred block: the copy takes the top and the animation
      sits on the floor under it. They used to be absolutely positioned over one
      another, which put the illustration straight through the proof points. */
@@ -6589,17 +6602,47 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   position: relative;
   order: 2;
   align-self: flex-end;
-  /* Sized so the three proof points always clear the fold — the copy is the
-     part that has to be readable, the illustration is the part that can go. */
-  width: min(460px, 92%);
+  /* SIZED FROM HEIGHT, not width, and this is the whole point.
+
+     It used to be `width: min(460px, 92%)` with a `@media (max-height: 800px)`
+     rule that set `display: none`. Browser zoom divides the CSS viewport, so a
+     laptop window with ~820px of usable height loses the illustration entirely
+     at 110% zoom — 820/1.1 = 745 — and a shorter window loses it at 100%. It
+     read as the animation being broken.
+
+     The rule it replaces was protecting the right thing: the three proof points
+     have to stay readable, and they lose to a fixed-height illustration below
+     them. But scaling protects them just as well as deleting does. Driving the
+     height off the viewport and letting `aspect-ratio` derive the width means
+     the art shrinks with the space instead of falling off a cliff.
+
+     Sized from what is LEFT, not from a flat percentage. The copy above it is
+     a fixed ~277px whatever the window does, plus the panel's padding and gap;
+     390px covers that. A plain `38vh` ignored it and so overflowed the panel's
+     floor on a short window — clipping the bottom of the illustration, which
+     is the one thing this rule exists to stop. */
+  height: min(320px, calc(100vh - 390px));
+  aspect-ratio: 3 / 2;
+  width: auto;
+  max-width: 92%;
+  /* Nothing here should shrink past the ratio; the height formula above is
+     what responds to a short viewport. */
+  flex: 0 0 auto;
   margin-right: clamp(-40px, -2vw, 0px);
   opacity: 0;
   transition: opacity .5s ease-out;
   pointer-events: none;
 }
-/* Shorter viewports lose the animation before they lose the copy — the proof
-   points are the part doing the work. */
-@media (max-height: 800px) {
+/* lottie-web sizes its <svg> to the container, and the animation is authored
+   750x500 — the same 3:2 the container is locked to, so it fills it exactly
+   rather than letterboxing inside it. */
+.lms-authside__anim svg { display: block; width: 100%; height: 100%; }
+
+/* Below this the leftover is under ~70px and the art is a smear rather than an
+   illustration, so it goes and the copy takes the room. Deliberately lower than
+   the width breakpoint reaches: on any window wide enough to still show this
+   panel at all, there is enough height to draw something. */
+@media (max-height: 460px) {
   .lms-authside__anim { display: none; }
 }
 .lms-authside__anim.is-ready { opacity: 1; }
