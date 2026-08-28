@@ -5998,3 +5998,62 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   line-height: 1.5;
   color: var(--lms-muted);
 }
+
+/* ---------------------------------------------------------------------------
+   Form alignment fixes
+
+   These are corrections to shared classes, so they land on every form in the
+   LMS rather than one screen.
+   ------------------------------------------------------------------------ */
+
+/* THE RAGGED-ROW BUG. .lms-formgrid had no align-items, so grid items
+   stretched to the tallest in the row. A field carrying a hint made its
+   neighbour's input grow to match, and the two controls stopped sharing a
+   baseline — the thing that reads as "nobody looked at this". `start` keeps
+   every control the same height and lets the hints hang below where they
+   belong. */
+.lms-formgrid { align-items: start; }
+
+/* A fixed two-up, for rows where auto-fit's 2 + 1 wrap looked accidental.
+   Three unequal fields in a 720px card is exactly where that happens. */
+.lms-formgrid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 620px) {
+  .lms-formgrid--2 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Money wants a short field. A price input stretched to full width reads as
+   though it expects a sentence. */
+.lms-field--price { max-width: 260px; }
+
+/* The footer of a form: helper text on the left, the action on the right,
+   separated from the fields by a rule so the form has a visible end. Replaces
+   .lms-composer__actions here, which is built for the inline reply composer and
+   left the two cramped against each other. */
+.lms-formfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid var(--lms-border);
+}
+.lms-formfoot__hint {
+  margin: 0;
+  flex: 1 1 260px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--lms-muted);
+}
+.lms-formfoot .lms-btn { flex-shrink: 0; }
+
+/* Consistent vertical rhythm inside a card-form. The fields were spaced by
+   whatever margins each control happened to carry, which is why the gaps
+   between them were not equal. */
+.lms-newcourse { display: flex; flex-direction: column; gap: 18px; max-width: 720px; }
+
+/* A textarea sized by rows still needs a floor: browser extensions (Grammarly
+   and friends) inject a toolbar into the bottom-right corner and sit on top of
+   the last line of text. */
+.lms-textarea { min-height: 96px; resize: vertical; }
