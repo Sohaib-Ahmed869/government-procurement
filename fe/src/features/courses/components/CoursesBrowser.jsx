@@ -295,10 +295,12 @@ export default function CoursesBrowser() {
                   </li>
                 ) : (
                   <li key={item._id || item.id} className="courses-card" style={{ '--i': i % PAGE_SIZE }}>
-                    {/* Into the LMS, not the marketing detail page. `/start`
-                        signs the visitor in and then decides for them: the
-                        checkout if they don't own it, the course if they do. */}
-                    <Link className="courses-card__link" to={`/learn/courses/${item.slug}/start`}>
+                    {/* The public sales page, readable without an account. The
+                        sign-in wall belongs on "Buy course" there, not here —
+                        asking someone to sign in before they have read the
+                        pitch is asking them to decide on nothing. It is also
+                        the page search engines can index. */}
+                    <Link className="courses-card__link" to={`/courses/${item.slug}`}>
                       <div
                         className="courses-card__art"
                         style={
