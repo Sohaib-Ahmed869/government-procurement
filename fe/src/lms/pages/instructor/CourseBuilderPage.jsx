@@ -284,7 +284,7 @@ export default function CourseBuilderPage() {
 
       {tab === 'curriculum' ? (
         <div className={`lms-builder__panes${busy || refreshing ? ' is-busy' : ''}`}>
-          <div className="lms-builder__outline">
+          <div className="lms-builder__curriculum">
             <ModuleEditor
               modules={mergedModules}
               selectedId={selected?.lessonId}
@@ -327,33 +327,28 @@ export default function CourseBuilderPage() {
                 [ids[i], ids[j]] = [ids[j], ids[i]];
                 act(() => authoringApi.reorderLessons(courseId, ids));
               }}
+              /* The editor is rendered by the list, directly beneath the lesson
+                 that was clicked. It used to sit in a second column, which left
+                 no visible tie between the form and the lesson it was editing,
+                 and pushed the section's own Add button into a narrow rail
+                 where it read as navigation rather than an action. */
+              renderLessonEditor={(lesson, mod) =>
+                mergedLesson && String(mergedLesson._id) === String(lesson._id) ? (
+                  <LessonEditor
+                    lesson={mergedLesson}
+                    moduleTitle={mod.title}
+                    courseId={courseId}
+                    onChange={(patch) => {
+                      setLessonDraft((d) => ({ ...d, ...patch }));
+                      lessonSave.queue(patch);
+                    }}
+                    onDelete={() =>
+                      setConfirming({ kind: 'lesson', lesson: mergedLesson, moduleId: mod._id })
+                    }
+                  />
+                ) : null
+              }
             />
-          </div>
-
-          <div className="lms-builder__editor">
-            {mergedLesson ? (
-              <LessonEditor
-                lesson={mergedLesson}
-                moduleTitle={activeModule.title}
-                courseId={courseId}
-                onChange={(patch) => {
-                  setLessonDraft((d) => ({ ...d, ...patch }));
-                  lessonSave.queue(patch);
-                }}
-                onDelete={() =>
-                  setConfirming({ kind: 'lesson', lesson: mergedLesson, moduleId: activeModule._id })
-                }
-              />
-            ) : (
-              <div className="lms-blank">
-                <LmsIcon name="lessons" className="lms-blank__icon" />
-                <h2>Pick a lesson</h2>
-                <p>
-                  Choose a lesson on the left to edit it, or add a new one. Text, video and
-                  quizzes each get their own form.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       ) : null}

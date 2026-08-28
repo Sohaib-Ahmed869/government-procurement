@@ -6109,3 +6109,104 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   border-radius: var(--lms-radius-sm);
   background: #000;
 }
+
+/* ---------------------------------------------------------------------------
+   Curriculum builder — single column, sections and lessons (R1)
+
+   Replaces a 330px sticky rail beside a detail pane. That layout made the
+   curriculum read as navigation, hid which section you were adding to, and put
+   both add buttons in a narrow column where they looked like toolbar items
+   rather than the two actions the page exists for.
+   ------------------------------------------------------------------------ */
+
+.lms-builder__panes { display: block; }
+.lms-builder__curriculum { max-width: 940px; margin: 0 auto; }
+
+/* A section is a card with a visible top and bottom, so it is obvious where
+   one ends and the next begins. */
+.lms-cmod {
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.lms-cmod__head {
+  background: var(--lms-surface-3);
+  border-bottom: 1px solid var(--lms-border-strong);
+  padding: 12px 14px;
+}
+/* "Section 1" above the title: the number is the thing people refer to, and
+   without it every section is called "Module 0". */
+.lms-cmod__eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+  margin-bottom: 2px;
+}
+.lms-cmod__title { text-align: left; }
+
+.lms-clessons { padding: 6px; }
+.lms-clesson__num {
+  flex-shrink: 0;
+  min-width: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--lms-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The editor, opened inside the section under its own lesson. Indented and
+   ruled on the left so the tie to that lesson is unmistakable. */
+/* The indent is PADDING, not margin. A left margin plus a 100% flex-basis is
+   wider than the row it sits in, which pushed Delete lesson and Remove off the
+   right edge. */
+.lms-clesson__editor {
+  box-sizing: border-box;
+  margin: 4px 0 12px;
+  padding: 16px 4px 4px 18px;
+  border-left: 2px solid var(--lms-mint);
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Both add actions are full width and say what they add. The section one sits
+   inside its section; the other sits at the very bottom, where you look after
+   finishing one. */
+.lms-addbtn { width: 100%; justify-content: center; }
+.lms-addsection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 4px;
+  border: 1px dashed var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+  background: transparent;
+  color: var(--lms-green);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lms-addsection:hover { background: var(--lms-surface-2); border-color: var(--lms-green); }
+.lms-addsection:focus-visible { outline: none; border-color: var(--lms-mint); box-shadow: var(--lms-ring); }
+.lms-addsection svg { width: 16px; height: 16px; }
+
+@media (max-width: 720px) {
+  .lms-clesson__editor { margin-left: 0; padding-left: 12px; }
+}
+
+/* The lesson row is a flex line, and the inline editor was landing in it as a
+   third item — so the row's own contents were squeezed into whatever width was
+   left. Same failure the upload error had. Let the row wrap and give the editor
+   a full-width basis so it stacks underneath instead. */
+.lms-clessons li { flex-wrap: wrap; }
+.lms-clesson__editor { flex: 0 0 100%; }
+/* Nothing inside the editor may force the column wider than the card. */
+.lms-clesson__editor > * { max-width: 100%; }
