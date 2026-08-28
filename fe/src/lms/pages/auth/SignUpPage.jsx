@@ -2,7 +2,9 @@ import { useState } from 'react';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import AuthAside from '../../components/auth/AuthAside.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
+import { returnToFrom } from '../../utils/returnTo.js';
 
 const ROLES = [
   {
@@ -56,7 +58,7 @@ export default function SignUpPage() {
          a different app. Signing up used to always land on the dashboard, so
          somebody who clicked a course on the website and chose "create an
          account" lost the course they came for. */
-      const from = location.state?.from?.pathname;
+      const from = returnToFrom({ search: location.search, state: location.state });
       const home = homeFor(user.role);
       navigate(from && from.startsWith(home) ? from : home, { replace: true });
     } catch (err) {
@@ -79,7 +81,7 @@ export default function SignUpPage() {
         <h1 className="lms-auth__title">Create your account</h1>
         <p className="lms-auth__sub">
           Already have one?{' '}
-          <Link to="/learn/login" state={location.state}>Sign in</Link>
+          <Link to={`/learn/login${location.search}`} state={location.state}>Sign in</Link>
         </p>
 
         <form onSubmit={submit} noValidate>
@@ -207,18 +209,12 @@ export default function SignUpPage() {
           </p>
         </form>
 
-        <OAuthButtons label="Or sign up with" next={location.state?.from?.pathname ?? ''} />
+        <OAuthButtons
+          label="Or sign up with"
+          next={returnToFrom({ search: location.search, state: location.state })}
+        />
       </div>
-
-      <aside className="lms-auth__aside" aria-hidden="true">
-        <div>
-          <p className="lms-auth__quote">
-            “I came in having read the rules twice and still not knowing what to actually do.
-            The worked example through an approach to market is what made it land.”
-          </p>
-          <p className="lms-auth__cite">A procurement officer, Department of Finance</p>
-        </div>
-      </aside>
+      <AuthAside />
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import AuthAside from '../../components/auth/AuthAside.jsx';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
+import { returnToFrom } from '../../utils/returnTo.js';
 
 // Sign in (L6).
 //
@@ -45,10 +47,11 @@ export default function LoginPage() {
       const user = await login(form.email.trim(), form.password);
       // Honour where they were headed, unless that was a different app's
       // territory. A student bounced off /admin shouldn't be sent back there.
-      const from = location.state?.from?.pathname;
+      const from = returnToFrom({ search: location.search, state: location.state });
       const home = homeFor(user.role);
-      const target = from && from.startsWith(home) ? from : home;
-      navigate(target, { replace: true });
+      // A learner bounced off /admin should not be sent back there, and vice
+      // versa — the destination has to belong to the role that just signed in.
+      navigate(from && from.startsWith(home) ? from : home, { replace: true });
     } catch (err) {
       setError(err?.status === 401 ? 'Wrong email or password.' : err?.message ?? 'Sign in failed.');
       setBusy(false);
@@ -71,7 +74,9 @@ export default function LoginPage() {
           New here?{' '}
           {/* `state` is carried across, so choosing "create an account" from a
               course link does not lose the course. */}
-          <Link to="/learn/signup" state={location.state}>Create an account</Link>
+          <Link to={`/learn/signup${location.search}`} state={location.state}>
+            Create an account
+          </Link>
         </p>
 
         <form onSubmit={submit} noValidate>
@@ -124,18 +129,9 @@ export default function LoginPage() {
           </p>
         </form>
 
-        <OAuthButtons next={location.state?.from?.pathname ?? ''} />
+        <OAuthButtons next={returnToFrom({ search: location.search, state: location.state })} />
       </div>
-
-      <aside className="lms-auth__aside" aria-hidden="true">
-        <div>
-          <p className="lms-auth__quote">
-            Structured courses on Australian government procurement: the rules, the
-            practice, and the record that stands up to review.
-          </p>
-          <p className="lms-auth__cite">Government Procurement Learning</p>
-        </div>
-      </aside>
+      <AuthAside />
     </div>
   );
 }

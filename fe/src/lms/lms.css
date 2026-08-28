@@ -6388,3 +6388,107 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-bundlecard__price { display: flex; flex-direction: column; }
 .lms-bundlecard__amount { font-size: 19px; font-weight: 700; color: var(--lms-text); }
 .lms-bundlecard__gst { font-size: 11.5px; color: var(--lms-muted); }
+
+/* ---------------------------------------------------------------------------
+   Sign in / sign up — refreshed
+
+   The old aside was a flat green block with one sentence in it. This gives the
+   panel a job (say what an account is for) and the form column a proper type
+   scale, without turning either into decoration.
+   ------------------------------------------------------------------------ */
+
+/* Form first on the reading order and wider than the panel: it is the thing
+   somebody came here to use. */
+.lms-auth { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+.lms-auth__panel { padding: clamp(32px, 5vw, 64px) clamp(24px, 5vw, 72px); }
+.lms-auth__title { font-size: clamp(28px, 3.6vw, 36px); letter-spacing: -0.025em; }
+.lms-auth__sub { margin-bottom: 30px; }
+.lms-auth__submit { margin-top: 14px; }
+
+.lms-authside {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: clamp(32px, 5vw, 64px);
+  /* Two greens rather than one flat fill — the panel reads as lit rather than
+     printed, and the motif has something to sit against. */
+  background:
+    radial-gradient(120% 90% at 15% 0%, rgba(255, 255, 255, 0.10) 0%, transparent 60%),
+    linear-gradient(155deg, var(--lms-green-600) 0%, var(--lms-green) 55%, #061c0c 100%);
+  color: #fff;
+}
+
+/* Bleeds off two edges deliberately: a motif fully inside the panel reads as a
+   picture placed there, one that runs off reads as pattern. */
+.lms-authside__motif {
+  position: absolute;
+  right: -14%;
+  bottom: -18%;
+  width: min(560px, 82%);
+  color: var(--lms-mint);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.lms-authside__body { position: relative; max-width: 42ch; }
+.lms-authside__eyebrow {
+  margin: 0 0 18px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lms-mint);
+}
+.lms-authside__lede {
+  margin: 0;
+  font-size: clamp(23px, 2.7vw, 31px);
+  line-height: 1.28;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.lms-authside__sub {
+  margin: 14px 0 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.lms-authside__proof {
+  list-style: none;
+  margin: 34px 0 0;
+  padding: 26px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lms-authside__proof li { display: flex; align-items: flex-start; gap: 13px; }
+.lms-authside__proof strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.lms-authside__proof span span { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.66); }
+.lms-authside__icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--lms-mint);
+}
+.lms-authside__icon svg { width: 16px; height: 16px; }
+
+/* Below this the panel would be a header nobody scrolls past to reach the
+   form, so it goes rather than stacking. */
+@media (max-width: 900px) {
+  .lms-auth { grid-template-columns: minmax(0, 1fr); }
+  .lms-authside { display: none; }
+}

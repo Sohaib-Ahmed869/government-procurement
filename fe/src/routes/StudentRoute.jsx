@@ -16,7 +16,21 @@ export default function StudentRoute({ children, requireEnrollment = false }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/learn/login" state={{ from: location }} replace />;
+    /* The destination goes in the URL as well as in router state.
+
+       State alone is lost the moment the sign-in page is reloaded — a refresh,
+       a password manager round trip, following a link to sign up and coming
+       back — and the learner then lands on the dashboard having asked for a
+       specific course. The query string survives all of that. State is kept as
+       well because it carries the search and hash the path alone would drop. */
+    const next = `${location.pathname}${location.search}${location.hash}`;
+    return (
+      <Navigate
+        to={`/learn/login?next=${encodeURIComponent(next)}`}
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
   if (requireEnrollment && !isEnrolled()) {
