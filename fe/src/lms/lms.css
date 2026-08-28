@@ -3353,18 +3353,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-auth__submit { margin-top: 8px; padding: 13px 20px; font-size: 15px; }
 .lms-auth__fine { margin: 16px 0 0; font-size: 12.5px; line-height: 1.55; color: var(--lms-muted); text-align: center; }
 .lms-auth__fine a { color: var(--lms-green-600); }
-.lms-auth__note {
-  display: flex;
-  gap: 10px;
-  margin: 0 0 18px;
-  padding: 12px 14px;
-  border-radius: var(--lms-radius-sm);
-  background: var(--lms-mint-soft);
-  font-size: 13px;
-  line-height: 1.55;
-  color: #1d5a30;
-}
-.lms-auth__note svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--lms-green); }
 
 .lms-field__aside { float: right; font-size: 12.5px; font-weight: 500; color: var(--lms-green-600); }
 .lms-field__optional { font-weight: 400; color: var(--lms-muted); font-size: 11.5px; }
@@ -3422,9 +3410,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-rolecard__icon svg { width: 19px; height: 19px; }
 .lms-rolecard__title { display: block; font-size: 15px; font-weight: 600; color: var(--lms-text); }
 .lms-rolecard__blurb { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.5; color: var(--lms-muted); }
-.lms-rolecard__points { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 5px; }
-.lms-rolecard__points li { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--lms-text-2); }
-.lms-rolecard__points svg { width: 13px; height: 13px; flex-shrink: 0; color: var(--lms-green-600); }
 .lms-rolecard__tick {
   position: absolute;
   top: 14px;
@@ -3454,6 +3439,37 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-auth__quote { margin: 0; max-width: 34ch; font-size: clamp(18px, 2.2vw, 23px); line-height: 1.5; font-weight: 500; letter-spacing: -0.01em; }
 .lms-auth__cite { margin: 18px 0 0; font-size: 13px; color: var(--lms-mint); }
+
+/* When the panel carries an artwork instead of a quote the image IS the panel:
+   no padding, and cover so it fills whatever shape the column ends up. */
+.lms-auth__aside--image { padding: 0; overflow: hidden; }
+.lms-auth__image { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Signup is the tallest auth screen. --tight trims the vertical rhythm so the
+   whole form fits a laptop viewport rather than making people scroll to the
+   submit button. Sign-in is short already and keeps the roomier spacing. */
+.lms-auth--tight .lms-auth__panel { padding-top: 22px; padding-bottom: 22px; }
+.lms-auth--tight .lms-auth__brand { margin-bottom: 12px; }
+.lms-auth--tight .lms-auth__title { font-size: clamp(21px, 2.4vw, 25px); }
+.lms-auth--tight .lms-auth__sub { margin-bottom: 12px; }
+.lms-auth--tight .lms-rolepick { margin-bottom: 10px; }
+.lms-auth--tight .lms-rolepick__grid { gap: 8px; margin-top: 5px; }
+/* Icon beside the text, not above it: same information, one row shorter. */
+.lms-auth--tight .lms-rolecard { flex-direction: row; align-items: flex-start; gap: 10px; padding: 10px 32px 10px 10px; }
+.lms-auth--tight .lms-rolecard__icon { width: 30px; height: 30px; flex-shrink: 0; border-radius: 9px; }
+.lms-auth--tight .lms-rolecard__icon svg { width: 16px; height: 16px; }
+.lms-auth--tight .lms-rolecard__blurb { margin-top: 2px; font-size: 12px; line-height: 1.4; }
+.lms-auth--tight .lms-rolecard__tick { top: 9px; right: 9px; width: 18px; height: 18px; }
+.lms-auth--tight .lms-field { margin-bottom: 8px; }
+.lms-auth--tight .lms-field__label { margin-bottom: 4px; }
+.lms-auth--tight .lms-field__hint { margin-top: 3px; }
+.lms-auth--tight .lms-input { padding: 9px 14px; }
+.lms-auth--tight .lms-auth__submit { margin-top: 4px; padding: 11px 20px; }
+.lms-auth--tight .lms-auth__fine { margin-top: 8px; }
+/* Two providers side by side rather than stacked: one button row, not two. */
+.lms-auth--tight .lms-oauth { margin-top: 12px; }
+.lms-auth--tight .lms-oauth__buttons { flex-direction: row; }
+.lms-auth--tight .lms-oauth__btn { flex: 1; min-width: 0; }
 
 @media (max-width: 900px) {
   .lms-auth { grid-template-columns: minmax(0, 1fr); }
@@ -6331,4 +6347,82 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 @media (max-width: 1080px) {
   .lms-builder__panes { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .lms-builder__toc { display: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Big-screen scaling, the same as the public site's and the CMS's.
+
+   /learn is laid out at the same 1440px design width the rest of the app is,
+   and until now it simply stayed there: on a 4K monitor the site and the CMS
+   scaled up to fill the window while the LMS sat as a small panel of 13px type
+   in the middle of the glass.
+
+   It reads the same two variables they do — --gp-scale and --gp-page-width,
+   both set by lib/pageScale.js on the document element before the first render
+   (see main.jsx). pageScale is deliberately measured against a baseline that
+   browser zoom does not move, so ctrl-+ still zooms /learn on top of this
+   exactly as it does on any other page; the note at the top of that file has
+   the reasoning.
+
+   Scoped to `.lms-scale`, which the three layout roots carry — AuthLayout, the
+   signed-in shell and the lesson player. NOT to `.lms` itself, because the
+   toast container is a `.lms` too and it is `position: fixed`: a zoomed fixed
+   element resolves its insets against the magnified viewport and drifts off
+   screen, which is why it is scaled separately below.
+
+   The rest of this block is the `vh` correction. Inside a `zoom`ed subtree a
+   viewport unit resolves against the REAL viewport and is then multiplied by
+   the scale, so `100vh` comes out as two or three screens tall — a sidebar
+   running far below the window, a curriculum rail that never stops scrolling.
+   Each one is divided back down. Percentages and ordinary lengths need no help:
+   they are already in the design pixels the subtree lays out in. */
+@media (min-width: 1441px) {
+  .lms-scale {
+    width: var(--gp-page-width, 1440px);
+    zoom: var(--gp-scale, 1);
+  }
+
+  .lms-scale .lms-shell,
+  .lms-scale .lms-player,
+  .lms-scale .lms-auth {
+    min-height: calc(100vh / var(--gp-scale, 1));
+  }
+
+  .lms-scale.lms-loading,
+  .lms-scale .lms-loading {
+    min-height: calc(60vh / var(--gp-scale, 1));
+  }
+
+  .lms-scale .lms-sidebar {
+    height: calc(100vh / var(--gp-scale, 1));
+  }
+
+  /* The subtracted pixels are design-pixel allowances for the chrome above each
+     panel; they scale correctly on their own and only the viewport unit needs
+     correcting. */
+  .lms-scale .lms-player__rail {
+    height: calc(100vh / var(--gp-scale, 1) - 60px);
+  }
+  .lms-scale .lms-builder__outline {
+    max-height: calc(100vh / var(--gp-scale, 1) - 110px);
+  }
+  .lms-scale .lms-builder__toc {
+    max-height: calc(100vh / var(--gp-scale, 1) - 120px);
+  }
+  .lms-scale .lms-notif__list {
+    max-height: min(420px, calc(60vh / var(--gp-scale, 1)));
+  }
+  .lms-scale .lms-coach__thread {
+    max-height: calc(58vh / var(--gp-scale, 1));
+  }
+
+  /* Toasts sit above the router and outside every `.lms-scale`, so they get no
+     zoom of their own. `transform` scales the box without touching how it is
+     positioned, and an origin in the corner it is pinned to keeps it there. */
+  .lms-toasts {
+    right: calc(20px * var(--gp-scale, 1));
+    bottom: calc(20px * var(--gp-scale, 1));
+    transform: scale(var(--gp-scale, 1));
+    transform-origin: 100% 100%;
+  }
 }

@@ -40,7 +40,7 @@ export default function Toasts() {
   const urgent = toasts.filter((t) => t.tone === 'error');
 
   return (
-    <div className="lms-toasts">
+    <div className="lms lms-toasts">
       <div aria-live="polite" aria-atomic="false" className="lms-toasts__region">
         {polite.map((t) => (
           <ToastRow key={t.id} toast={t} onDismiss={dismiss} />

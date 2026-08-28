@@ -20,12 +20,12 @@ export default function PlayerLayout() {
   const closeRail = useCallback(() => setRailOpen(false), []);
 
   if (status === 'loading') {
-    return <div className="lms lms-loading">Loading…</div>;
+    return <div className="lms lms-scale lms-loading">Loading…</div>;
   }
 
   if (status === 'notfound') {
     return (
-      <div className="lms">
+      <div className="lms lms-scale">
         <div className="lms-content">
           <h1 className="lms-page__title">Course not found</h1>
           <Link className="lms-btn lms-btn--primary" to="/learn/courses">
@@ -42,7 +42,7 @@ export default function PlayerLayout() {
     : 0;
 
   return (
-    <div className="lms">
+    <div className="lms lms-scale">
       <div className={`lms-player${railOpen ? ' is-rail-open' : ''}`}>
         <header className="lms-player__bar">
           <Link className="lms-player__back" to={`/learn/courses/${slug}`}>

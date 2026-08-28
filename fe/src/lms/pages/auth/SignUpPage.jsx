@@ -3,6 +3,7 @@ import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
+import authImage from '../../../assets/images/EnhanceExpImage.png';
 
 const ROLES = [
   {
@@ -10,14 +11,12 @@ const ROLES = [
     icon: 'book',
     title: 'I want to learn',
     blurb: 'Enrol in courses, track your progress and earn certificates.',
-    points: ['Access to the full catalogue', 'Progress, notes and bookmarks', 'Certificates on completion'],
   },
   {
     value: 'instructor',
     icon: 'users',
     title: 'I want to teach',
     blurb: 'Build courses, upload lessons and see how your students are doing.',
-    points: ['Course, module and lesson builder', 'Video, transcripts and quizzes', 'Enrolment and progress reporting'],
   },
 ];
 
@@ -59,7 +58,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="lms-auth">
+    <div className="lms-auth lms-auth--tight">
       <div className="lms-auth__panel">
         <Link className="lms-auth__brand" to="/">
           <span className="lms-auth__brand-mark">GP</span>
@@ -98,14 +97,6 @@ export default function SignUpPage() {
                   <span className="lms-rolecard__body">
                     <span className="lms-rolecard__title">{r.title}</span>
                     <span className="lms-rolecard__blurb">{r.blurb}</span>
-                    <ul className="lms-rolecard__points">
-                      {r.points.map((p) => (
-                        <li key={p}>
-                          <LmsIcon name="check" />
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
                   </span>
                   <span className="lms-rolecard__tick" aria-hidden="true">
                     <LmsIcon name="check" />
@@ -163,28 +154,18 @@ export default function SignUpPage() {
           </label>
 
           {role === 'instructor' ? (
-            <>
-              <label className="lms-field">
-                <span className="lms-field__label">
-                  Your title <span className="lms-field__optional">optional</span>
-                </span>
-                <input
-                  className="lms-input"
-                  value={form.headline}
-                  onChange={set('headline')}
-                  placeholder="e.g. Principal Advisor"
-                />
-                <span className="lms-field__hint">Shown in the byline on your courses.</span>
-              </label>
-
-              <p className="lms-auth__note">
-                <LmsIcon name="clock" />
-                <span>
-                  You can start building courses straight away. Publishing to the catalogue
-                  needs a quick review first. We’ll email you when that’s done.
-                </span>
-              </p>
-            </>
+            <label className="lms-field">
+              <span className="lms-field__label">
+                Your title <span className="lms-field__optional">optional</span>
+              </span>
+              <input
+                className="lms-input"
+                value={form.headline}
+                onChange={set('headline')}
+                placeholder="e.g. Principal Advisor"
+              />
+              <span className="lms-field__hint">Shown in the byline on your courses.</span>
+            </label>
           ) : null}
 
           {error ? <p className="lms-alert lms-alert--error">{error}</p> : null}
@@ -202,14 +183,8 @@ export default function SignUpPage() {
         <OAuthButtons label="Or sign up with" />
       </div>
 
-      <aside className="lms-auth__aside" aria-hidden="true">
-        <div>
-          <p className="lms-auth__quote">
-            “I came in having read the rules twice and still not knowing what to actually do.
-            The worked example through an approach to market is what made it land.”
-          </p>
-          <p className="lms-auth__cite">A procurement officer, Department of Finance</p>
-        </div>
+      <aside className="lms-auth__aside lms-auth__aside--image" aria-hidden="true">
+        <img className="lms-auth__image" src={authImage} alt="" />
       </aside>
     </div>
   );

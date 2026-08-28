@@ -94,7 +94,7 @@ export default function LmsLayout() {
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <div className="lms">
+    <div className="lms lms-scale">
       <div
         className={`lms-shell${collapsed ? ' is-collapsed' : ''}${
           mobileOpen ? ' is-mobile-open' : ''
