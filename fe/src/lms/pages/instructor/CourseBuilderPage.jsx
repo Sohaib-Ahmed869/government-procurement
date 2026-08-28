@@ -27,12 +27,13 @@ const TABS = [
 export default function CourseBuilderPage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { course, modules, status, error, reload, applyLesson } = useAuthoredCourse(courseId);
-  const { toast } = useToast();
+  const { course, modules, status, error, refreshing, reload, applyLesson } = useAuthoredCourse(courseId);
+
 
   const [tab, setTab] = useState('curriculum');
   const [selected, setSelected] = useState(null); // { moduleId, lessonId }
   const [confirming, setConfirming] = useState(null);
+  const { toast } = useToast();
   const [busy, setBusy] = useState(false);
   const [actError, setActError] = useState('');
 
@@ -112,7 +113,9 @@ export default function CourseBuilderPage() {
     [reload],
   );
 
-  if (status === 'loading') {
+  // Only when there is nothing on screen yet. A refetch after adding a lesson
+  // keeps the builder in place — see the note in useApi.
+  if (status === 'loading' && !course) {
     return (
       <div className="lms-card">
         <span className="lms-skel lms-skel--line" style={{ width: '46%', height: 22 }} />
@@ -176,13 +179,22 @@ export default function CourseBuilderPage() {
       ? 'error'
       : 'saved';
   const saveError = courseSave.error || lessonSave.error;
+  // Something is waiting to be written, so the button has real work to do.
+  const hasUnsaved = courseSave.dirty || lessonSave.dirty;
 
   // Runs both queues now instead of waiting out the debounce. Editing here is
   // continuous, so there is nothing to "submit", but an author who has just
   // typed something important wants to see it land rather than trust that it
   // will. The button is that reassurance, not a different way of saving.
   const saveNow = async () => {
-    await Promise.all([courseSave.retry(), lessonSave.retry()]);
+    /* flush() returns false when its queue is empty, which is the common case:
+       autosave has usually already written everything. Previously the click
+       then did nothing at all — no request, no change of state — which reads
+       as a dead button. Whether it wrote anything or there was nothing to
+       write, say so. */
+    const [a, b] = await Promise.all([courseSave.retry(), lessonSave.retry()]);
+    if (a === false && b === false) toast.success('Everything is already saved.');
+    else toast.success('Saved.');
   };
 
   return (
@@ -209,7 +221,13 @@ export default function CourseBuilderPage() {
           {/* Says what is actually happening rather than always "Saved". */}
           <span className={`lms-builder__saved is-${saveState}`}>
             <LmsIcon name={saveState === 'error' ? 'lock' : 'check'} />
-            {saveState === 'saving' ? 'Saving…' : saveState === 'error' ? 'Not saved' : 'Saved'}
+            {saveState === 'saving'
+              ? 'Saving…'
+              : saveState === 'error'
+                ? 'Not saved'
+                : hasUnsaved
+                  ? 'Unsaved changes'
+                  : 'Saved'}
           </span>
 
           {/* Editing is continuous, so this submits nothing new. It exists
@@ -281,8 +299,42 @@ export default function CourseBuilderPage() {
       </div>
 
       {tab === 'curriculum' ? (
-        <div className={`lms-builder__panes${busy ? ' is-busy' : ''}`}>
-          <div className="lms-builder__outline">
+        <div className={`lms-builder__panes${busy || refreshing ? ' is-busy' : ''}`}>
+          {/* A narrow contents rail. Headings only — jumping to a section, not
+              editing one, which is what the old 330px rail tried to do and why
+              it competed with the curriculum instead of supporting it. */}
+          <aside className="lms-builder__toc">
+            <p className="lms-toc__label">Sections</p>
+            <ol className="lms-toc__list">
+              {mergedModules.map((m, i) => (
+                <li key={m._id}>
+                  <a
+                    className={`lms-toc__item${activeModule && String(activeModule._id) === String(m._id) ? ' is-active' : ''}`}
+                    href={`#section-${m._id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document
+                        .getElementById(`section-${m._id}`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                  >
+                    <span className="lms-toc__num">{i + 1}</span>
+                    <span className="lms-toc__text">
+                      <span className="lms-toc__title">{m.title || `Section ${i + 1}`}</span>
+                      <span className="lms-toc__count">
+                        {m.lessons.length} lesson{m.lessons.length === 1 ? '' : 's'}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            {!mergedModules.length ? (
+              <p className="lms-toc__empty">No sections yet.</p>
+            ) : null}
+          </aside>
+
+          <div className="lms-builder__curriculum">
             <ModuleEditor
               modules={mergedModules}
               selectedId={selected?.lessonId}
@@ -325,33 +377,28 @@ export default function CourseBuilderPage() {
                 [ids[i], ids[j]] = [ids[j], ids[i]];
                 act(() => authoringApi.reorderLessons(courseId, ids));
               }}
+              /* The editor is rendered by the list, directly beneath the lesson
+                 that was clicked. It used to sit in a second column, which left
+                 no visible tie between the form and the lesson it was editing,
+                 and pushed the section's own Add button into a narrow rail
+                 where it read as navigation rather than an action. */
+              renderLessonEditor={(lesson, mod) =>
+                mergedLesson && String(mergedLesson._id) === String(lesson._id) ? (
+                  <LessonEditor
+                    lesson={mergedLesson}
+                    moduleTitle={mod.title}
+                    courseId={courseId}
+                    onChange={(patch) => {
+                      setLessonDraft((d) => ({ ...d, ...patch }));
+                      lessonSave.queue(patch);
+                    }}
+                    onDelete={() =>
+                      setConfirming({ kind: 'lesson', lesson: mergedLesson, moduleId: mod._id })
+                    }
+                  />
+                ) : null
+              }
             />
-          </div>
-
-          <div className="lms-builder__editor">
-            {mergedLesson ? (
-              <LessonEditor
-                lesson={mergedLesson}
-                moduleTitle={activeModule.title}
-                courseId={courseId}
-                onChange={(patch) => {
-                  setLessonDraft((d) => ({ ...d, ...patch }));
-                  lessonSave.queue(patch);
-                }}
-                onDelete={() =>
-                  setConfirming({ kind: 'lesson', lesson: mergedLesson, moduleId: activeModule._id })
-                }
-              />
-            ) : (
-              <div className="lms-blank">
-                <LmsIcon name="lessons" className="lms-blank__icon" />
-                <h2>Pick a lesson</h2>
-                <p>
-                  Choose a lesson on the left to edit it, or add a new one. Text, video and
-                  quizzes each get their own form.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       ) : null}

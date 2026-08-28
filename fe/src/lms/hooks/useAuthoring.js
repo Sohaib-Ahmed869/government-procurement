@@ -47,7 +47,7 @@ export function useAuthoredCourses() {
 
 // The full editable document: course + modules + their lessons.
 export function useAuthoredCourse(courseId) {
-  const { data, status, error, reload, setData } = useApi(
+  const { data, status, error, refreshing, reload, setData } = useApi(
     () => authoringApi.get(courseId),
     [courseId],
     { skip: !courseId },
@@ -88,6 +88,9 @@ export function useAuthoredCourse(courseId) {
     modules: data?.modules ?? [],
     status,
     error,
+    // Re-fetching content we already show. The builder uses this for a quiet
+    // saving indicator instead of tearing the page down — see useApi.
+    refreshing,
     reload,
     applyLesson,
   };

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import { formatMoney, gstInside } from '../../utils/money.js';
 import { authoringApi } from '../../../api/lms.js';
 import { LEVELS, SEGMENTS } from '../../constants/courseTaxonomy.js';
 
@@ -79,7 +80,11 @@ export default function NewCoursePage() {
           />
         </label>
 
-        <div className="lms-formgrid">
+        {/* Two per row, not three. Three fields of unequal label length wrapped
+            to 2 + 1 at this card's width, which is what made the row look
+            ragged. Price sits on its own line because it is a different kind of
+            decision from the two taxonomy pickers. */}
+        <div className="lms-formgrid lms-formgrid--2">
           <label className="lms-field">
             <span className="lms-field__label">Category</span>
             <select className="lms-select" value={form.segment} onChange={set('segment')}>
@@ -97,21 +102,29 @@ export default function NewCoursePage() {
                 <option key={l.value} value={l.value}>{l.label}</option>
               ))}
             </select>
-          </label>
-
-          <label className="lms-field">
-            <span className="lms-field__label">Price (AUD, ex GST)</span>
-            <input className="lms-input" type="number" min="0" value={form.price} onChange={set('price')} />
-            <span className="lms-field__hint">Leave at 0 to make it free.</span>
+            <span className="lms-field__hint">How much prior knowledge it assumes.</span>
           </label>
         </div>
 
+        <label className="lms-field lms-field--price">
+          {/* INCLUSIVE, not ex GST. A price here is what the learner pays; the
+              GST is the component inside it. The old label said the opposite
+              and would have had instructors pricing 10% low. */}
+          <span className="lms-field__label">Price (AUD, incl. GST)</span>
+          <input className="lms-input" type="number" min="0" step="1" value={form.price} onChange={set('price')} />
+          <span className="lms-field__hint">
+            {Number(form.price) > 0
+              ? `Learners pay ${formatMoney(Number(form.price))} — includes ${formatMoney(gstInside(Number(form.price)))} GST.`
+              : 'Leave at 0 to make it free.'}
+          </span>
+        </label>
+
         {error ? <p className="lms-alert lms-alert--error">{error}</p> : null}
 
-        <div className="lms-composer__actions">
-          <span className="lms-composer__hint">
+        <div className="lms-formfoot">
+          <p className="lms-formfoot__hint">
             It starts as a draft. Nothing is visible to learners until you publish.
-          </span>
+          </p>
           <button type="submit" className="lms-btn lms-btn--primary" disabled={!valid || busy}>
             <LmsIcon name="plus" />
             {busy ? 'Creating…' : 'Create and start building'}

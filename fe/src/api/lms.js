@@ -323,7 +323,12 @@ export const commerceApi = {
   // Whether payments are switched on, and in test or live mode.
   status: () => api.get('/lms/commerce/status'),
   // -> { order, checkoutUrl }. Send the browser to checkoutUrl.
-  createOrder: (courseIds) => api.post('/lms/orders', { courseIds }),
+  // `origin` tells the server which host to return the buyer to after paying.
+  // This app runs on several origins (staging, previews, production) and they
+  // do not share a session, so returning to the wrong one signs the buyer out
+  // at the worst possible moment. The server validates it against its allowlist.
+  createOrder: (courseIds) =>
+    api.post('/lms/orders', { courseIds, origin: window.location.origin }),
   mine: () => api.get('/lms/orders'),
   get: (id) => api.get(`/lms/orders/${id}`),
 };

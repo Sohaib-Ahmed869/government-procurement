@@ -127,6 +127,7 @@ export default function LessonEditor({ lesson, moduleTitle, courseId, onChange, 
             <span className="lms-field__label">Video</span>
             <MediaUploader
               courseId={courseId}
+              lessonId={lesson._id}
               video={lesson.video}
               onChange={(video) => set({ video })}
             />

@@ -5998,3 +5998,337 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   line-height: 1.5;
   color: var(--lms-muted);
 }
+
+/* ---------------------------------------------------------------------------
+   Form alignment fixes
+
+   These are corrections to shared classes, so they land on every form in the
+   LMS rather than one screen.
+   ------------------------------------------------------------------------ */
+
+/* THE RAGGED-ROW BUG. .lms-formgrid had no align-items, so grid items
+   stretched to the tallest in the row. A field carrying a hint made its
+   neighbour's input grow to match, and the two controls stopped sharing a
+   baseline — the thing that reads as "nobody looked at this". `start` keeps
+   every control the same height and lets the hints hang below where they
+   belong. */
+.lms-formgrid { align-items: start; }
+
+/* A fixed two-up, for rows where auto-fit's 2 + 1 wrap looked accidental.
+   Three unequal fields in a 720px card is exactly where that happens. */
+.lms-formgrid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 620px) {
+  .lms-formgrid--2 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Money wants a short field. A price input stretched to full width reads as
+   though it expects a sentence. */
+.lms-field--price { max-width: 260px; }
+
+/* The footer of a form: helper text on the left, the action on the right,
+   separated from the fields by a rule so the form has a visible end. Replaces
+   .lms-composer__actions here, which is built for the inline reply composer and
+   left the two cramped against each other. */
+.lms-formfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid var(--lms-border);
+}
+.lms-formfoot__hint {
+  margin: 0;
+  flex: 1 1 260px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--lms-muted);
+}
+.lms-formfoot .lms-btn { flex-shrink: 0; }
+
+/* Consistent vertical rhythm inside a card-form. The fields were spaced by
+   whatever margins each control happened to carry, which is why the gaps
+   between them were not equal. */
+.lms-newcourse { display: flex; flex-direction: column; gap: 18px; max-width: 720px; }
+
+/* A textarea sized by rows still needs a floor: browser extensions (Grammarly
+   and friends) inject a toolbar into the bottom-right corner and sit on top of
+   the last line of text. */
+.lms-textarea { min-height: 96px; resize: vertical; }
+
+/* Saving in the course builder.
+
+   `is-busy` was being applied and styled by nothing, so a structural save had
+   no feedback at all — the only signal was the page tearing itself down and
+   rebuilding, which is the bug this replaces. A brief dim plus a blocked
+   pointer says "working" without taking the work off screen. */
+.lms-builder__panes.is-busy {
+  opacity: .6;
+  pointer-events: none;
+  transition: opacity .12s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lms-builder__panes.is-busy { transition: none; }
+}
+
+
+/* An upload error belongs on its own line.
+
+   .lms-upload is a flex row of icon | body | actions, and the error was a
+   fourth item in it — so a long message took the width the filename needed and
+   squeezed it to one character per line. Wrapping the row and forcing the error
+   to a full-width basis puts it underneath, where it can be read. */
+.lms-upload { flex-wrap: wrap; }
+.lms-upload .lms-field__error {
+  flex: 0 0 100%;
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+/* Never let the filename collapse below its content, whatever shares the row. */
+.lms-upload__body { flex: 1 1 220px; min-width: 0; }
+
+/* Video preview in the lesson builder.
+
+   Full width above the file details, because the point of a preview is to
+   confirm you uploaded the right file — a thumbnail beside the name would not
+   settle that. The row already wraps (see the upload error note above), so this
+   takes its own line by claiming the full basis. */
+.lms-upload__preview {
+  flex: 0 0 100%;
+  order: -1;
+  margin-bottom: 12px;
+}
+.lms-upload__video {
+  display: block;
+  width: 100%;
+  /* Caps the height on a portrait clip, which would otherwise push the file
+     details and the Replace button off the bottom of the panel. */
+  max-height: 340px;
+  border-radius: var(--lms-radius-sm);
+  background: #000;
+}
+
+/* ---------------------------------------------------------------------------
+   Curriculum builder — single column, sections and lessons (R1)
+
+   Replaces a 330px sticky rail beside a detail pane. That layout made the
+   curriculum read as navigation, hid which section you were adding to, and put
+   both add buttons in a narrow column where they looked like toolbar items
+   rather than the two actions the page exists for.
+   ------------------------------------------------------------------------ */
+
+.lms-builder__panes { display: block; }
+.lms-builder__curriculum { max-width: 940px; margin: 0 auto; }
+
+/* A section is a card with a visible top and bottom, so it is obvious where
+   one ends and the next begins. */
+.lms-cmod {
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.lms-cmod__head {
+  background: var(--lms-surface-3);
+  border-bottom: 1px solid var(--lms-border-strong);
+  padding: 12px 14px;
+}
+/* "Section 1" above the title: the number is the thing people refer to, and
+   without it every section is called "Module 0". */
+.lms-cmod__eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+  margin-bottom: 2px;
+}
+.lms-cmod__title { text-align: left; }
+
+.lms-clessons { padding: 6px; }
+.lms-clesson__num {
+  flex-shrink: 0;
+  min-width: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--lms-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The editor, opened inside the section under its own lesson. Indented and
+   ruled on the left so the tie to that lesson is unmistakable. */
+/* The indent is PADDING, not margin. A left margin plus a 100% flex-basis is
+   wider than the row it sits in, which pushed Delete lesson and Remove off the
+   right edge. */
+.lms-clesson__editor {
+  box-sizing: border-box;
+  margin: 4px 0 12px;
+  padding: 16px 4px 4px 18px;
+  border-left: 2px solid var(--lms-mint);
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Both add actions are full width and say what they add. The section one sits
+   inside its section; the other sits at the very bottom, where you look after
+   finishing one. */
+.lms-addbtn { width: 100%; justify-content: center; }
+.lms-addsection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 4px;
+  border: 1px dashed var(--lms-border-strong);
+  border-radius: var(--lms-radius);
+  background: transparent;
+  color: var(--lms-green);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lms-addsection:hover { background: var(--lms-surface-2); border-color: var(--lms-green); }
+.lms-addsection:focus-visible { outline: none; border-color: var(--lms-mint); box-shadow: var(--lms-ring); }
+.lms-addsection svg { width: 16px; height: 16px; }
+
+@media (max-width: 720px) {
+  .lms-clesson__editor { margin-left: 0; padding-left: 12px; }
+}
+
+/* The lesson row is a flex line, and the inline editor was landing in it as a
+   third item — so the row's own contents were squeezed into whatever width was
+   left. Same failure the upload error had. Let the row wrap and give the editor
+   a full-width basis so it stacks underneath instead. */
+.lms-clessons li { flex-wrap: wrap; }
+.lms-clesson__editor { flex: 0 0 100%; }
+/* Nothing inside the editor may force the column wider than the card. */
+.lms-clesson__editor > * { max-width: 100%; }
+
+/* The section's add controls sit OUTSIDE the padded lesson list, as direct
+   children of the card — so they were flush against its edges with nothing
+   between them and the border. The card has overflow:hidden, which made it
+   read as a rendering fault rather than tight spacing. */
+/* An explicit width, not `auto`: a <button> shrinks to fit its content even as
+   a block-level flex container, so `auto` left it a stub against the left edge
+   rather than spanning the section. */
+.lms-cmod > .lms-addbtn {
+  width: calc(100% - 24px);
+  margin: 2px 12px 12px;
+  justify-content: center;
+}
+
+/* Picking the kind is a MODE, not a row of loose buttons. Giving it a ground
+   and a label makes it obvious the next click chooses a type rather than
+   doing five different things. */
+.lms-cmod > .lms-addlesson {
+  margin: 2px 12px 12px;
+  padding: 12px;
+  gap: 8px;
+  align-items: center;
+  background: var(--lms-surface-2);
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+}
+.lms-addlesson__label {
+  flex: 0 0 100%;
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+}
+/* Cancel last, and set apart, so it does not read as a sixth lesson type. */
+.lms-addlesson__cancel { margin-left: auto; }
+
+/* ---------------------------------------------------------------------------
+   Curriculum: contents rail + the builder itself
+
+   Two columns again, but they do different jobs now. The rail is HEADINGS
+   ONLY — where am I, jump me there. The old 330px rail held the whole tree and
+   the editing happened in a second pane, which is what left the add buttons
+   stranded in a narrow column and the form untethered from its lesson.
+   ------------------------------------------------------------------------ */
+
+.lms-builder__panes {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.lms-builder__curriculum { max-width: none; margin: 0; }
+
+.lms-builder__toc {
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding: 16px 14px;
+  background: var(--lms-surface);
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius);
+}
+.lms-toc__label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+}
+.lms-toc__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+
+.lms-toc__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: var(--lms-radius-sm);
+  text-decoration: none;
+  color: var(--lms-text-2);
+}
+.lms-toc__item:hover { background: var(--lms-surface-2); }
+.lms-toc__item.is-active { background: var(--lms-mint-soft); color: var(--lms-text); }
+.lms-toc__item.is-active .lms-toc__title { font-weight: 600; }
+
+.lms-toc__num {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--lms-surface-3);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--lms-text-2);
+  font-variant-numeric: tabular-nums;
+}
+.lms-toc__item.is-active .lms-toc__num { background: var(--lms-green); color: #fff; }
+
+/* min-width:0 so a long section title truncates instead of widening the rail. */
+.lms-toc__text { display: flex; flex-direction: column; min-width: 0; }
+.lms-toc__title {
+  font-size: 13px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lms-toc__count { font-size: 11.5px; color: var(--lms-muted); }
+.lms-toc__empty { margin: 0; font-size: 12.5px; color: var(--lms-muted); }
+
+/* Below this the rail is more in the way than it is useful — the curriculum
+   is already a list of headings. */
+@media (max-width: 1080px) {
+  .lms-builder__panes { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .lms-builder__toc { display: none; }
+}

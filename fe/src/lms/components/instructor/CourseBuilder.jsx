@@ -343,7 +343,7 @@ export default function CourseBuilder({
 
         <div className="lms-formgrid">
           <label className="lms-field">
-            <span className="lms-field__label">Price (ex GST)</span>
+            <span className="lms-field__label">Price (AUD, incl. GST)</span>
             <input
               className="lms-input"
               type="number"

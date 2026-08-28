@@ -19,7 +19,7 @@ import { getObject, presignGet } from '../../config/s3.js';
 import { env } from '../../config/env.js';
 import { deriveKey, issuePlaybackToken, readPlaybackToken } from './hlsKeys.js';
 import { resolvePlaylist } from './hlsPackage.js';
-import { CONTENT_STATUS } from '../../constants/statuses.js';
+import { CONTENT_STATUS, COURSE_STATE } from '../../constants/statuses.js';
 import { STAFF_ROLES } from '../../constants/roles.js';
 
 const VIDEO_URL_TTL_SECONDS = 300;
@@ -151,6 +151,10 @@ export const outline = asyncHandler(async (req, res) => {
     // seeing something the site no longer offers, and the page says so instead
     // of showing an enrol button for a course nobody can enrol in.
     offline: !published,
+    /* Whether the course is taking enrolments, which is separate from whether
+       it is on the site. Sent so the page can offer the right thing rather
+       than a button the server will refuse. */
+    availability: course.availability,
     // Counts a visitor sees before enrolling. The course page shows "12
     // lessons across 4 modules" whether or not anyone is signed in.
     moduleCount: modules.length,
@@ -554,6 +558,20 @@ export const enrol = asyncHandler(async (req, res) => {
   if (!course || course.status !== CONTENT_STATUS.PUBLISHED) {
     throw ApiError.notFound('Course not found');
   }
+  /* `availability` is a separate decision from `status`, and both have to hold.
+     `status` is whether the course is on the site at all; `availability` is
+     whether it is taking enrolments right now. A course can be published and
+     visible — its sales page working, its previews playing — while still being
+     `coming_soon` or `closed`. Only `status` was checked, so an instructor
+     could mark a course coming soon and learners could still enrol in it. */
+  if (course.availability !== COURSE_STATE.OPEN) {
+    throw ApiError.badRequest(
+      course.availability === COURSE_STATE.COMING_SOON
+        ? 'This course is not open for enrolment yet'
+        : 'This course is closed to new enrolments',
+    );
+  }
+
   if (course.price > 0) {
     throw ApiError.badRequest('This course must be purchased');
   }

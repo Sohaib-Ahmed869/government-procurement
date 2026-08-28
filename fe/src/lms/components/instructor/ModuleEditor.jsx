@@ -19,6 +19,10 @@ export default function ModuleEditor({
   onAddLesson,
   onMoveLesson,
   onScheduleModule,
+  // Renders the lesson editor INLINE, under the row that was clicked — the
+  // accordion shape Udemy uses. Passed as a slot rather than imported here so
+  // this component stays a list and knows nothing about lesson forms.
+  renderLessonEditor,
 }) {
   const [renaming, setRenaming] = useState(null);
   const [draft, setDraft] = useState('');
@@ -43,7 +47,7 @@ export default function ModuleEditor({
         </p>
       ) : (
         modules.map((m, mi) => (
-          <section className="lms-cmod" key={m._id}>
+          <section className="lms-cmod" key={m._id} id={`section-${m._id}`}>
             <header className="lms-cmod__head">
               <span className="lms-cmod__order">{mi + 1}</span>
 
@@ -61,6 +65,7 @@ export default function ModuleEditor({
                 />
               ) : (
                 <button type="button" className="lms-cmod__title" onClick={() => startRename(m)}>
+                  <span className="lms-cmod__eyebrow">Section {mi + 1}</span>
                   {m.title}
                   <span className="lms-cmod__count">{m.lessons.length}</span>
                 </button>
@@ -126,6 +131,7 @@ export default function ModuleEditor({
                     onClick={() => onSelect(m._id, l._id)}
                   >
                     <LmsIcon name={KIND_ICON[l.kind] ?? 'text'} className="lms-clesson__icon" />
+                    <span className="lms-clesson__num">{li + 1}</span>
                     <span className="lms-clesson__title">{l.title || 'Untitled lesson'}</span>
                     {l.preview ? <span className="lms-clesson__flag">Preview</span> : null}
                     <span className="lms-clesson__time">{l.minutes}m</span>
@@ -140,6 +146,13 @@ export default function ModuleEditor({
                       <LmsIcon name="chevron" />
                     </button>
                   </span>
+
+                  {/* The editor opens here, under the lesson it belongs to, so
+                      it is obvious which lesson is being edited and which
+                      section it sits in. */}
+                  {selectedId === l._id && renderLessonEditor ? (
+                    <div className="lms-clesson__editor">{renderLessonEditor(l, m)}</div>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -148,6 +161,7 @@ export default function ModuleEditor({
                 right form, instead of defaulting to text and being switched. */}
             {adding === m._id ? (
               <div className="lms-addlesson">
+                <p className="lms-addlesson__label">What kind of lesson?</p>
                 {[
                   { kind: 'text', label: 'Text', icon: 'text' },
                   { kind: 'video', label: 'Video', icon: 'video' },
@@ -168,23 +182,30 @@ export default function ModuleEditor({
                     {k.label}
                   </button>
                 ))}
-                <button type="button" className="lms-btn lms-btn--sm lms-btn--ghost" onClick={() => setAdding(null)}>
+                <button
+                  type="button"
+                  className="lms-btn lms-btn--sm lms-btn--ghost lms-addlesson__cancel"
+                  onClick={() => setAdding(null)}
+                >
                   Cancel
                 </button>
               </div>
             ) : (
               <button type="button" className="lms-addbtn" onClick={() => setAdding(m._id)}>
                 <LmsIcon name="plus" />
-                Add lesson
+                Add a lesson to this section
               </button>
             )}
           </section>
         ))
       )}
 
-      <button type="button" className="lms-btn lms-btn--sm lms-curriculum__addmod" onClick={onAddModule}>
+      {/* Full width and at the very bottom, which is where someone looks after
+          finishing a section. It reads as the end of the curriculum rather than
+          one more control in a toolbar. */}
+      <button type="button" className="lms-addsection" onClick={onAddModule}>
         <LmsIcon name="plus" />
-        Add module
+        Add a new section
       </button>
     </div>
   );
