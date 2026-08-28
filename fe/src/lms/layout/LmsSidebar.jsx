@@ -15,6 +15,7 @@ const INSTRUCTOR_NAV = [
       { to: '/learn/instructor/courses', label: 'My Courses', icon: 'book' },
       { to: '/learn/instructor/quizzes', label: 'Quizzes', icon: 'quiz' },
       { to: '/learn/instructor/paths', label: 'Learning Paths', icon: 'path' },
+      { to: '/learn/instructor/live', label: 'Live Sessions', icon: 'video' },
     ],
   },
   {
@@ -50,6 +51,9 @@ const NAV = [
       // what it is for, and deliberately NOT next to Discussions — one is
       // people, the other is a model, and the sidebar should not blur that.
       { to: '/learn/coach', label: 'Course Coach', icon: 'sparkle' },
+      // Sessions taught by a person, at a time — next to the courses they
+      // belong to rather than in Community, which is asynchronous by nature.
+      { to: '/learn/live', label: 'Live Sessions', icon: 'video' },
     ],
   },
   {

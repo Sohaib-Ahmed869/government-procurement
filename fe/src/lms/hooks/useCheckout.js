@@ -1,78 +1,72 @@
-import { useCallback, useMemo, useState } from 'react';
-import { COUPONS, grantEnrolment } from './placeholderData.js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { commerceApi } from '../../api/lms.js';
 import { priceBasket } from '../utils/money.js';
-import { createOrder } from './useOrders.js';
 
 /* ---------------------------------------------------------------------------
-   Checkout (C1).
+   Checkout (C1). Now a real one.
 
-   Holds the coupon, the billing details and the submission state, and turns a
-   basket into an order.
+   What this hook does NOT do, on purpose:
 
-   TODO: `POST /api/lms/checkout` should create a Stripe PaymentIntent from the
-   server-side basket and return its client secret. Two rules that cannot live
-   here: the server prices the order (never trust a total that arrived from the
-   browser), and enrolment is granted on the webhook when payment settles, not
-   when this promise resolves. A client that closes its tab mid-redirect must
-   still get the course it paid for.
+     · price the order — it sends course ids and nothing else. The server reads
+       every amount from the Course record. A total that arrives from a browser
+       is a total anyone can edit;
+     · grant the course — enrolment is created by the Stripe webhook when the
+       payment settles. A learner who closes the tab mid-redirect still gets
+       what they paid for, and somebody who types the success URL gets nothing.
+
+   The totals below are a DISPLAY of what the basket should come to, shown
+   before the server has been asked. They are tax-inclusive, so the figure here
+   is the figure Stripe will show.
+
+   Coupons are gone from this flow. There is no server-side discount yet, so a
+   working-looking coupon box would have been a field that silently did nothing
+   — see C2 in the scope.
    ------------------------------------------------------------------------ */
 export function useCheckout(items) {
-  const [coupon, setCoupon] = useState(null);
-  const [couponError, setCouponError] = useState('');
   const [status, setStatus] = useState('idle'); // idle | processing | error
   const [error, setError] = useState('');
+  const [commerce, setCommerce] = useState({ ready: false });
 
-  const totals = useMemo(() => priceBasket(items, coupon), [items, coupon]);
+  const totals = useMemo(() => priceBasket(items), [items]);
 
-  const applyCoupon = useCallback((raw) => {
-    const code = raw.trim().toUpperCase();
-    if (!code) return;
-    const found = COUPONS[code];
-    if (!found) {
-      setCoupon(null);
-      setCouponError('That code isn’t valid, or it has expired.');
-      return;
+  // Whether payments are switched on at all, so the button can say why not
+  // rather than failing when it is pressed.
+  useEffect(() => {
+    let cancelled = false;
+    commerceApi
+      .status()
+      .then((s) => {
+        if (!cancelled) setCommerce(s ?? { ready: false });
+      })
+      .catch(() => {
+        if (!cancelled) setCommerce({ ready: false, message: 'Payments are unavailable.' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /* Creates the order and hands the browser to Stripe.
+
+     There is deliberately no local "success" state: the next thing that should
+     happen is a full navigation away from this app to Stripe's hosted page. If
+     this resolves without navigating, something went wrong. */
+  const submit = useCallback(async () => {
+    setStatus('processing');
+    setError('');
+    try {
+      const { checkoutUrl } = await commerceApi.createOrder(items.map((i) => i.courseId));
+      if (!checkoutUrl) throw new Error('The payment page could not be opened.');
+      window.location.assign(checkoutUrl);
+      // Left in `processing` on purpose. The page is on its way out; flipping
+      // back to idle would flash an enabled button at somebody mid-redirect.
+      return true;
+    } catch (err) {
+      setStatus('error');
+      setError(err?.message ?? 'We could not start the payment. Please try again.');
+      return false;
     }
-    setCoupon(found);
-    setCouponError('');
-  }, []);
+  }, [items]);
 
-  const removeCoupon = useCallback(() => {
-    setCoupon(null);
-    setCouponError('');
-  }, []);
-
-  const submit = useCallback(
-    async (billing) => {
-      setStatus('processing');
-      setError('');
-      try {
-        // Stands in for the PaymentIntent round-trip.
-        await new Promise((r) => setTimeout(r, 900));
-
-        const order = createOrder({
-          items: items.map((i) => ({
-            slug: i.slug,
-            title: i.title,
-            kind: i.kind,
-            amount: i.amount,
-          })),
-          ...totals,
-          coupon: coupon?.code ?? null,
-          billing,
-        });
-
-        items.forEach((i) => grantEnrolment(i.slug));
-        setStatus('idle');
-        return order;
-      } catch {
-        setStatus('error');
-        setError('We couldn’t complete your payment. No charge was made.');
-        return null;
-      }
-    },
-    [items, totals, coupon],
-  );
-
-  return { coupon, couponError, applyCoupon, removeCoupon, totals, submit, status, error };
+  return { totals, status, error, commerce, submit };
 }

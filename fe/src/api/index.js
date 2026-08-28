@@ -194,6 +194,9 @@ export const authApi = {
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }, { auth: false }),
   resetPassword: (token, password) =>
     api.post('/auth/reset-password', { token, password }, { auth: false }),
+  // Which federated sign-in buttons to render. Public: the sign-in screen has
+  // to draw itself before anyone has a session.
+  oauthProviders: () => api.get('/auth/oauth/providers', undefined, { auth: false }),
 };
 
 export { api, BASE_URL } from './client.js';

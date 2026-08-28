@@ -1,33 +1,36 @@
 import { formatMoney } from '../../utils/money.js';
 
-// Subtotal → discount → GST → total (C1). Shown in full rather than as one
-// number because an Australian buyer claiming the credit needs the GST line
-// itemised, and because a total that appears without its parts reads as a
-// surprise at exactly the wrong moment.
-export default function GstBreakdown({ totals, coupon, currency = 'AUD' }) {
+/* The totals block (C1).
+
+   Prices here are TAX-INCLUSIVE, so this reads top-down as: the total, then
+   what it is made of. That ordering is deliberate — the number the buyer is
+   about to be charged is the one they came to see, and burying it under a
+   subtotal they never have to pay is how a checkout loses trust.
+
+   The GST line stays itemised even though it is not an addition: an Australian
+   business claiming the input tax credit needs the component stated, and it is
+   what makes "includes GST" verifiable rather than a claim. */
+export default function GstBreakdown({ totals, currency = 'AUD' }) {
   return (
     <dl className="lms-totals">
-      <div>
-        <dt>Subtotal</dt>
-        <dd>{formatMoney(totals.subtotal, currency)}</dd>
-      </div>
-
-      {totals.discount > 0 ? (
-        <div className="lms-totals__discount">
-          <dt>Discount {coupon ? `(${coupon.code})` : ''}</dt>
-          <dd>−{formatMoney(totals.discount, currency)}</dd>
-        </div>
-      ) : null}
-
-      <div>
-        <dt>GST (10%)</dt>
-        <dd>{formatMoney(totals.gst, currency)}</dd>
-      </div>
-
       <div className="lms-totals__grand">
         <dt>Total</dt>
         <dd>{formatMoney(totals.total, currency)}</dd>
       </div>
+
+      <div className="lms-totals__note">
+        <dt>Includes GST (10%)</dt>
+        <dd>{formatMoney(totals.gst, currency)}</dd>
+      </div>
+
+      <div className="lms-totals__note">
+        <dt>Price before GST</dt>
+        <dd>{formatMoney(totals.net, currency)}</dd>
+      </div>
+
+      <p className="lms-totals__inclusive">
+        All prices include GST. There is nothing added at the payment step.
+      </p>
     </dl>
   );
 }

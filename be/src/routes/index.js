@@ -4,6 +4,7 @@ import { Router } from 'express';
 import authRoutes from '../modules/auth/auth.routes.js';
 import accountRoutes from '../modules/accounts/accounts.routes.js';
 import lmsRoutes from '../modules/lms/lms.routes.js';
+import commerceRoutes from '../modules/commerce/commerce.routes.js';
 import userRoutes from '../modules/users/users.routes.js';
 import articleRoutes from '../modules/articles/articles.routes.js';
 import categoryRoutes from '../modules/categories/categories.routes.js';
@@ -44,6 +45,9 @@ router.use('/auth', authRoutes);
 router.use('/accounts', accountRoutes);
 // LMS: authoring, learning, assessment, certificates and the review queue.
 router.use('/lms', lmsRoutes);
+// Orders and payments live under /lms too: they are bought from inside the
+// learner's app, and the screens that read them are LMS screens.
+router.use('/lms', commerceRoutes);
 router.use('/users', userRoutes);
 router.use('/articles', articleRoutes);
 router.use('/categories', categoryRoutes);

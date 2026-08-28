@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import ConfirmDialog from '../../components/ConfirmDialog.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
 import CourseBuilder from '../../components/instructor/CourseBuilder.jsx';
 import CertificateBuilder from '../../components/instructor/CertificateBuilder.jsx';
 import ModuleEditor from '../../components/instructor/ModuleEditor.jsx';
@@ -27,6 +28,7 @@ export default function CourseBuilderPage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { course, modules, status, error, reload, applyLesson } = useAuthoredCourse(courseId);
+  const { toast } = useToast();
 
   const [tab, setTab] = useState('curriculum');
   const [selected, setSelected] = useState(null); // { moduleId, lessonId }
@@ -574,7 +576,7 @@ export default function CourseBuilderPage() {
               navigate('/learn/instructor/courses');
             } catch (err) {
               // The server refuses when learners are enrolled. Say why.
-              window.alert(err?.message ?? 'Could not delete this course.');
+              toast.error(err?.message ?? 'Could not delete this course.');
             }
             return;
           }

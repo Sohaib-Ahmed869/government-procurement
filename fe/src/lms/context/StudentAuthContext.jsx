@@ -93,6 +93,23 @@ export function StudentAuthProvider({ children }) {
     [hydrate],
   );
 
+  /* Adopts a session issued by the OAuth callback (L6).
+
+     The token was minted by our own server at the end of the provider round
+     trip, so there is nothing to exchange here — only the same two steps
+     password login does: put it in the slot the ROLE belongs to, then hydrate.
+     Deriving the scope rather than assuming LEARN matters because a super admin
+     may well sign in with Microsoft, and their session belongs to the CMS. */
+  const adoptSession = useCallback(
+    async (token, role) => {
+      const scope = scopeForRole(role);
+      setToken(token, scope);
+      if (scope !== SCOPES.LEARN) return null;
+      return hydrate();
+    },
+    [hydrate],
+  );
+
   // Signup can only ever create a learner. The server rejects any other role,
   // but the scope is derived rather than assumed, so this stays correct if that
   // ever changes.
@@ -157,8 +174,9 @@ export function StudentAuthProvider({ children }) {
       saveAccount,
       // TODO (L6): back this with the enrolment record once it exists.
       isEnrolled: () => Boolean(user),
+      adoptSession,
     }),
-    [user, instructor, loading, login, signup, logout, saveInstructorProfile, saveAccount],
+    [user, instructor, loading, login, signup, logout, saveInstructorProfile, saveAccount, adoptSession],
   );
 
   return <StudentAuthContext.Provider value={value}>{children}</StudentAuthContext.Provider>;

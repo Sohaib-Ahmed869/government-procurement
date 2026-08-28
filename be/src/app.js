@@ -23,6 +23,12 @@ export function createApp() {
       credentials: true,
     }),
   );
+  /* Stripe's webhook signature is computed over the RAW request bytes, so this
+     one path must reach its handler unparsed — JSON.parse followed by a
+     re-stringify produces different bytes and every signature check fails.
+     Mounted BEFORE express.json, which would otherwise consume the stream. */
+  app.use('/api/lms/commerce/webhook', express.raw({ type: 'application/json' }));
+
   app.use(express.json({ limit: '2mb' }));
   app.use(express.urlencoded({ extended: true }));
   if (env.nodeEnv !== 'test') app.use(morgan('dev'));
