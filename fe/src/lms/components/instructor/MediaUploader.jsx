@@ -13,6 +13,15 @@ import { putToS3, sizeLabel } from '../../utils/s3Upload.js';
    Only the KEY is stored, never a readable URL: playback goes through the
    expiring signed-GET endpoint, so a lesson row must not carry a link that
    works without one. */
+// "MP4" rather than "video/mp4". Falls back to the file extension for anything
+// uploaded before mimeType was recorded.
+function formatLabel(mimeType, name = '') {
+  const fromMime = (mimeType ?? '').split('/')[1];
+  const fromName = name.includes('.') ? name.split('.').pop() : '';
+  const label = fromMime || fromName;
+  return label ? label.toUpperCase() : '';
+}
+
 export default function MediaUploader({ courseId, lessonId, video, onChange }) {
   const inputRef = useRef(null);
   const [progress, setProgress] = useState(null);
@@ -125,8 +134,15 @@ export default function MediaUploader({ courseId, lessonId, video, onChange }) {
         </span>
         <div className="lms-upload__body">
           <p className="lms-upload__name">{video.name}</p>
+          {/* The S3 key used to be printed here. It is a UUID under a course
+              id — meaningless to an instructor, and long enough to wrap onto a
+              second line and unbalance the row. Size and format are what
+              someone actually checks against the file they meant to upload;
+              the key is in the database for whoever needs it. */}
           <p className="lms-upload__meta">
-            {sizeLabel(video.sizeBytes)} · stored as <code>{video.key}</code>
+            {[sizeLabel(video.sizeBytes), formatLabel(video.mimeType, video.name)]
+              .filter(Boolean)
+              .join(' · ')}
           </p>
         </div>
         <div className="lms-upload__actions">
