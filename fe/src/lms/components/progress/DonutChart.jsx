@@ -99,7 +99,7 @@ export default function DonutChart({ data, total, totalLabel, caption }) {
             stroke="var(--lms-tint-100)"
             strokeWidth={STROKE}
           />
-          <g transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}>
+          <g className="lms-donut__segments" transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}>
             {slices.map((s) => (
               <circle
                 key={s.id}

@@ -5,8 +5,9 @@ import ProgressBar from '../../components/progress/ProgressBar.jsx';
 import { firstNameOf } from '../../utils/names.js';
 import ActivityChart from '../../components/progress/ActivityChart.jsx';
 import DonutChart from '../../components/progress/DonutChart.jsx';
+import SessionCalendar from '../../components/growth/SessionCalendar.jsx';
 import { useDashboard } from '../../hooks/useDashboard.js';
-import { useLiveSessions, formatSessionTime, relativeTo } from '../../hooks/useLiveSessions.js';
+import { useLiveSessions, formatSessionClock, relativeTo } from '../../hooks/useLiveSessions.js';
 
 /* ---------------------------------------------------------------------------
    The learner's dashboard.
@@ -150,6 +151,19 @@ export default function DashboardPage() {
   // while the rest of the page is already usable, rather than holding
   // everything back for a card most learners have nothing in.
   const live = useLiveSessions();
+
+  // The soonest session still to come — live now first, then the next by time.
+  // The list is already split by state in useLiveSessions; this only has to
+  // pick the front of it.
+  const next = useMemo(
+    () =>
+      [...live.upcoming].sort(
+        (a, b) =>
+          (b.state === 'live') - (a.state === 'live') ||
+          Date.parse(a.startsAt) - Date.parse(b.startsAt),
+      )[0] ?? null,
+    [live.upcoming],
+  );
 
   const [range, setRange] = useState(7);
   const chartData = useMemo(() => activity.slice(-range), [activity, range]);
@@ -317,7 +331,9 @@ export default function DashboardPage() {
               <ActivityChart data={chartData} caption="Minutes learned per day" />
             </section>
 
-            <section className="lms-card">
+            {/* `--centre` puts the donut in the middle of the card rather
+                than under the heading with the rest of the card empty. */}
+            <section className="lms-card lms-card--centre">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="pie" />
@@ -341,7 +357,10 @@ export default function DashboardPage() {
 
           {/* ---- what to resume, and what is scheduled ---- */}
           <div className="lms-dash-row">
-            <section className="lms-card">
+            {/* `--centre` because the row's height is set by the calendar
+                beside it, which is taller — so without this the panel hangs
+                from the heading with the rest of the card empty below it. */}
+            <section className="lms-card lms-card--centre">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="play" />
@@ -354,6 +373,15 @@ export default function DashboardPage() {
                 )}
               </div>
 
+              {/* One box around the body, so the card can centre it as a
+                  group — see .lms-card--centre. Three loose siblings give
+                  `justify-content` nothing to take hold of.
+
+                  NOT `lms-resume`: that class already exists as the mint
+                  "pick up where you left off" strip used elsewhere, and reusing
+                  the name gave this wrapper a border, a background and 32px of
+                  padding and margin it never asked for. */}
+              <div className="lms-card__body">
               {!resume ? (
                 <>
                   <p className="lms-empty">
@@ -416,6 +444,7 @@ export default function DashboardPage() {
                   </div>
                 </>
               )}
+              </div>
             </section>
 
             <section className="lms-card">
@@ -424,48 +453,52 @@ export default function DashboardPage() {
                   <Icon name="live" />
                   Live sessions
                 </h2>
+                {/* The month sits in the heading row rather than above the
+                    grid: on a card this size a line of its own is 28px the
+                    calendar needs more. */}
+                <span className="lms-card__note lms-cal__month">
+                  {now.toLocaleDateString('en-AU', { month: 'long' })}
+                </span>
                 <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/live">
                   View all
                 </Link>
               </div>
-              <div className="lms-list">
-                {live.status === 'loading' && <p className="lms-empty">Loading your sessions…</p>}
-                {live.status === 'error' && (
-                  <p className="lms-empty">We couldn’t load your sessions just now.</p>
-                )}
-                {live.status === 'ready' && live.upcoming.length === 0 && (
-                  <p className="lms-empty">
-                    Nothing scheduled. Sessions your instructor books will appear here.
-                  </p>
-                )}
-                {live.status === 'ready' &&
-                  live.upcoming.slice(0, 3).map((s) => (
-                    <Link key={s.id} to="/learn/live" className="lms-list__item">
-                      <span className="lms-list__icon">
-                        <Icon name={s.state === 'live' ? 'play' : 'calendar'} />
+              {live.status === 'loading' && <p className="lms-empty">Loading your sessions…</p>}
+              {live.status === 'error' && (
+                <p className="lms-empty">We couldn’t load your sessions just now.</p>
+              )}
+
+              {/* The month, then one line about the next thing in it.
+
+                  This was a list of the next three sessions, which for most
+                  learners is the sentence "nothing scheduled" most of the time.
+                  The calendar earns the same space either way: it says which
+                  month it is, where today sits in it, and whether anything is
+                  coming — and it says all three even when the answer to the
+                  last one is no. The full list is a click away on /learn/live,
+                  which the card already links to. */}
+              {live.status === 'ready' && (
+                <>
+                  <SessionCalendar sessions={live.sessions} />
+
+                  {next ? (
+                    <Link className="lms-cal__next" to="/learn/live">
+                      <span className={`lms-cal__next-dot${next.state === 'live' ? ' is-live' : ''}`} aria-hidden="true" />
+                      <span className="lms-cal__next-body">
+                        <strong>{next.title}</strong>
+                        <span>{formatSessionClock(next.startsAt, next.timezone)}</span>
                       </span>
-                      <span className="lms-list__body">
-                        <span className="lms-list__title">{s.title}</span>
-                        <span className="lms-list__meta">
-                          {formatSessionTime(s.startsAt, s.timezone)}
-                          {s.course?.title ? ` · ${s.course.title}` : ''}
-                        </span>
-                      </span>
-                      <span className="lms-list__trail">
-                        {/* Live now is the one state worth marking; everything
-                            else here is upcoming and says so with its time. */}
-                        {s.state === 'live' ? (
-                          <span className="lms-live-badge lms-live-badge--live">
-                            <span className="lms-live-dot" aria-hidden="true" />
-                            Live now
-                          </span>
-                        ) : (
-                          relativeTo(s.startsAt)
-                        )}
+                      <span className="lms-cal__next-when">
+                        {next.state === 'live' ? 'Live now' : relativeTo(next.startsAt)}
                       </span>
                     </Link>
-                  ))}
-              </div>
+                  ) : (
+                    <p className="lms-cal__none">
+                      Nothing scheduled. Sessions your instructor books appear here.
+                    </p>
+                  )}
+                </>
+              )}
             </section>
           </div>
         </>

@@ -88,6 +88,25 @@ export function formatSessionTime(iso, timezone) {
   }
 }
 
+/* Just the clock time, for somewhere the DATE is already on screen.
+
+   The dashboard's calendar shows which day a session falls on, so repeating
+   "Mon, 31 Aug" beside it is the same fact twice — and on a card this size the
+   second telling costs a line the calendar needs. Same timezone rule as
+   formatSessionTime: the session's own zone, not the reader's. */
+export function formatSessionClock(iso, timezone) {
+  try {
+    return new Intl.DateTimeFormat('en-AU', {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZoneName: 'short',
+      timeZone: timezone || 'Australia/Sydney',
+    }).format(new Date(iso));
+  } catch {
+    return new Date(iso).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+  }
+}
+
 // "in 3 days", "in 2 hours", "in 12 minutes". Rounded generously — a countdown
 // to the second is a distraction on a page nobody is watching a clock on.
 export function relativeTo(iso) {
