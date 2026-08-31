@@ -6,10 +6,21 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx';
 import AdminDrawer from '../components/AdminDrawer.jsx';
 import FormField from '../components/FormField.jsx';
 
+/* The three staff roles, plus Instructor.
+
+   Instructor is not staff — it cannot reach the CMS, and STAFF_ROLES on the
+   server is what keeps that true. It is here because this screen is now the
+   ONLY way an instructor account comes into existence: the LMS sign-up form
+   used to offer "I want to teach" and no longer does, so a super admin creates
+   the account here and hands over the credentials.
+
+   Listed last and set apart, so it is not mistaken for a fourth level of CMS
+   access on a screen whose other three are exactly that. */
 const ROLE_OPTIONS = [
   { value: 'superadmin', label: 'Super admin' },
   { value: 'editor', label: 'Editor' },
   { value: 'moderator', label: 'Moderator' },
+  { value: 'instructor', label: 'Instructor (LMS only)' },
 ];
 
 const BLANK_CREATE = { name: '', email: '', password: '', role: 'editor' };
@@ -194,7 +205,9 @@ export default function UsersRolesPage() {
       <div className="admin-page__head">
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Users &amp; roles</h2>
-          <p className="admin-page__subtitle">Staff accounts and their access levels.</p>
+          <p className="admin-page__subtitle">
+            Staff accounts and their access levels, and the instructor accounts for the LMS.
+          </p>
         </div>
         <div className="admin-page__actions">
           <button type="button" className="admin-btn admin-btn--primary" onClick={openCreate}>
@@ -230,7 +243,11 @@ export default function UsersRolesPage() {
       <AdminDrawer
         open={drawerOpen}
         title={editId ? 'Edit user' : 'New user'}
-        subtitle={editId ? "Update this user's role, status or password." : 'Create a staff account with a role.'}
+        subtitle={
+          editId
+            ? "Update this user's role, status or password."
+            : 'Create a staff account, or an instructor account for the LMS.'
+        }
         onClose={closeDrawer}
         busy={creating || savingEdit}
         footer={
@@ -292,6 +309,13 @@ export default function UsersRolesPage() {
               onChange={onCreateChange}
               options={ROLE_OPTIONS}
             />
+            {createForm.role === 'instructor' && (
+              <p className="admin-alert admin-alert--info">
+                Instructors sign in at <strong>/learn/login</strong> with the email and password
+                you set here. There is no self sign-up for teaching accounts, so send them these
+                credentials — they cannot create their own.
+              </p>
+            )}
           </form>
         )}
       </AdminDrawer>

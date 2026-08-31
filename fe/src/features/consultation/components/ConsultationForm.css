@@ -1,10 +1,21 @@
-.consult {
+/* Paper, like every other page.
 
+   This was the last band on the site still painting itself dark end to end:
+   --gp-head-bg is the heading strip's ground, and using it for the WHOLE page
+   meant the one page a visitor is asked to type on was also the only one where
+   the fields were glass-on-green rather than boxes on white. Everything below
+   follows from that one line — the ink, the field edges, the button fill and
+   the focus ring all take the paper equivalents the rest of the site uses.
+
+   --gp-paper resolves per audience (white on Win, a warm off-white on Award),
+   so this stays one rule rather than two hard-coded hexes. */
+.consult {
   position: relative;
   overflow: hidden;
-  background: var(--gp-head-bg);
-  color: #fff;
+  background: var(--gp-paper);
+  color: var(--gp-ink);
   font-family: 'Geist Variable', system-ui, sans-serif;
+  transition: var(--gp-fade);
 }
 
 
@@ -76,10 +87,10 @@
    which wrapped it into a narrow block with the picture running well past it on
    the right. */
 .consult__lead {
-  margin: 22px 0 0;
-  font-size: 18px;
-  line-height: 1.6;
-  color: #fff;
+  margin: 16px 0 0;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--gp-ink);
 }
 
 /* Photo at the foot of the intro column, taking ALL the space the shorter
@@ -93,8 +104,8 @@
    section's background with the corners rounded, no frame or border. */
 .consult__figure {
   flex: 1;
-  min-height: 260px;
-  margin: 40px 0 0;
+  min-height: 200px;
+  margin: 28px 0 0;
 }
 
 .consult__photo {
@@ -107,18 +118,35 @@
   object-fit: cover;
   object-position: center;
   border-radius: 22px;
-  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.3);
+  /* Lighter than it was: a 0.3 shadow that read as depth against dark green is
+     a grey smudge under a photograph on white. */
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
 }
 
-/* On a dark green band, so it is white with a soft underline rather than the
-   page's accent ink — which is a deep mint and all but invisible here. */
+/* The page's own ink on Win, the segment's green on Award — the same pair
+   .gp-notice's links take, and for the same reason.
+
+   NOT --gp-accent-ink, which is what this used when the page first moved onto
+   paper. That token is tuned for CONTRAST on a light ground rather than for
+   carrying the segment's colour: it resolves to a deep clay on Award and a deep
+   mint on Win, so the link came out orange on the green segment and green on
+   the black one — the wrong hue in both. Weight as well as colour is what marks
+   it as a link here, since on Win it is the same ink as the sentence round it. */
 .consult__lead-link {
-  color: #fff;
+  color: var(--gp-ink);
   font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.45);
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
   text-underline-offset: 3px;
-  transition: text-decoration-color 160ms var(--gp-ease);
+  transition:
+    color var(--gp-swap) var(--gp-ease),
+    text-decoration-color 160ms var(--gp-ease);
+}
+
+/* Matches wherever the segment is stamped. The section carries data-audience
+   itself, so this reaches it whether the attribute is set there or on <html>. */
+[data-audience='award'] .consult__lead-link {
+  color: var(--gp-green-600);
 }
 
 .consult__lead-link:hover,
@@ -133,7 +161,11 @@
 .consult__form {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  /* 22px between fields put nearly a field's worth of empty space into the
+     column across six of them. The label-to-box gap inside each field is 6px,
+     so 14px here still reads as a clear break between one field and the next
+     rather than as one continuous stack. */
+  gap: 14px;
 }
 
 .consult__row {
@@ -145,103 +177,104 @@
 .consult__field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
+/* 15px, down from 18. A field label is not body copy — it is the two words
+   naming the box under it, and at 18px it was set larger than the text the
+   visitor types into that box. Its own line-height, too: inheriting the body's
+   1.5 put seven points of leading around a one-line label on every row. */
 .consult__label {
-  font-size: 18px;
-  color: #fff;
+  font-size: 15px;
+  line-height: 1.15;
+  color: var(--gp-ink);
 }
 
 .consult__optional {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--gp-muted);
 }
 
 .consult__input {
   width: 100%;
-  padding: 18px 20px;
+  padding: 11px 16px;
   font-family: inherit;
   font-size: 15px;
-  color: #fff;
-  /* Glass edge with no border: a strong highlight on the top-left and a subtler
-     one on the bottom-right, matching the contact form's fields. */
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.06),
-    rgba(255, 255, 255, 0.02)
-  );
-  border: none;
+  color: var(--gp-ink);
+  /* An outlined box on paper, the same shape as the forum's submission fields.
+     The glass edge this replaces — two inset white highlights and a 12px
+     backdrop blur — only ever showed up against the dark green: on white it is
+     an invisible border and a blur with nothing behind it to blur. */
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
   border-radius: 10px;
   outline: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.3),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.12);
-  transition: box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .consult__input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--gp-muted);
 }
 
+/* The segment's own colour on the field's edge, drawn twice on the same line so
+   the border reads as 2px without the text inside it shifting. `:focus`, not
+   `:focus-visible` — somebody who clicked into a field wants to see which one
+   they are in as much as somebody who tabbed. */
 .consult__input:focus {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 255, 255, 0.6),
-    inset -1px -1px 1px rgba(255, 255, 255, 0.16);
+  border-color: var(--gp-brand);
+  box-shadow: 0 0 0 1px var(--gp-brand);
 }
 
 .consult__input[aria-invalid='true'] {
-  box-shadow:
-    inset 1px 1px 1px rgba(255, 120, 120, 0.7),
-    inset -1px -1px 1px rgba(255, 120, 120, 0.3);
+  border-color: #b3261e;
+  box-shadow: 0 0 0 1px #b3261e;
 }
 
-/* Date inputs draw their calendar glyph dark by default — brighten it. */
-.consult__input[type='date']::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.7;
-  cursor: pointer;
-}
+/* The message box is the single biggest thing on the page, and most of what put
+   the submit button off the bottom of it. 110px is about four lines — enough to
+   see the shape of what is being asked for — and it is still resizable from the
+   corner for anyone who wants the room back.
 
-/* The box grew about 30%: five rows measured ~126px with the field padding, so
-   it's now seven rows, and the floor is raised to match in case the line height
-   resolves differently. */
+   The element's `rows` came down to 4 with it. Leaving it at 7 would have made
+   the attribute taller than this floor and quietly won — the same trap the
+   forum's own textarea fell into twice, once at rows={8} and again at rows={4}
+   against a 110px rule. The two have to move together. */
 .consult__textarea {
-  min-height: 164px;
+  min-height: 110px;
   resize: vertical;
 }
 
 /* --- inline validation --- */
+/* A red that carries on white. #ffb4b4 was picked to be legible on the green. */
 .consult__error {
   margin: 2px 0 0;
   font-size: 13.5px;
-  color: #ffb4b4;
+  color: #b3261e;
 }
 
-/* --- submit: mint primary, dark-green text --- */
-/* Glass pill — matches the subscribe button. */
+/* --- submit --- */
+/* The filled pill the forum's Send and the footer's Receive updates both use.
+   The translucent-white glass it replaces was a hole punched in the green; on
+   paper it would have been a barely-there grey. */
 .consult__submit {
   align-self: flex-start;
-  margin-top: 6px;
-  padding: 16px 32px;
+  margin-top: 2px;
+  padding: 13px 28px;
   font-family: inherit;
   font-size: 15.5px;
   font-weight: 600;
   color: #fff;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--gp-brand);
   border: 0;
   border-radius: 100px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transition: background-color 0.15s ease;
 }
 
 .consult__submit:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--gp-brand-lift);
 }
 
 /* Hover polish — matches the subscribe button: lift + shadow. */
@@ -264,9 +297,7 @@
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
     opacity: 0;
     transition: opacity 0.2s ease-out;
   }
@@ -275,8 +306,12 @@
   .consult__submit:hover::after { opacity: 1; }
 }
 
-.consult :is(a, button, input, textarea, select):focus-visible {
-  outline: 2px solid #fff;
+/* Links and the button keep a ring; the fields do not — their own edge carries
+   the state (above), and without the exclusion a click into a field lit both
+   and the control appeared to glow. */
+.consult
+  :is(a, button, input, textarea, select):not(.consult__input):focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
   outline-offset: 3px;
 }
 

@@ -39,7 +39,7 @@ export default function CartSummary({ items, totals, onRemoveItem }) {
           </li>
           <li>
             <LmsIcon name="check" />
-            14-day refund if it isn’t right for you
+            7-day refund if it isn’t right for you
           </li>
           <li>
             <LmsIcon name="doc" />

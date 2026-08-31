@@ -1,40 +1,31 @@
 import { useState } from 'react';
 import OAuthButtons from '../../components/auth/OAuthButtons.jsx';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import gpLogo from '../../../assets/icons/gp-02-dark.svg';
 import AuthAside from '../../components/auth/AuthAside.jsx';
 import { useStudentAuth, homeFor } from '../../context/StudentAuthContext.jsx';
 import { returnToFrom } from '../../utils/returnTo.js';
 
-const ROLES = [
-  {
-    value: 'student',
-    icon: 'book',
-    title: 'I want to learn',
-    blurb: 'Enrol in courses, track your progress and earn certificates.',
-    points: ['Access to the full catalogue', 'Progress, notes and bookmarks', 'Certificates on completion'],
-  },
-  {
-    value: 'instructor',
-    icon: 'users',
-    title: 'I want to teach',
-    blurb: 'Build courses, upload lessons and see how your students are doing.',
-    points: ['Course, module and lesson builder', 'Video, transcripts and quizzes', 'Enrolment and progress reporting'],
-  },
-];
-
-// Signup (L6). One page, two account types. The role choice comes first
-// because it changes what the rest of the form asks for and what the person
-// gets afterwards.
+// Signup (L6). Learner accounts, and only learner accounts.
+//
+// This page used to open with two cards — "I want to learn" and "I want to
+// teach" — and the choice changed the fields below it. Teaching accounts are
+// not self-serve any more: a super admin creates them in the CMS under Users &
+// roles and hands over the credentials, and an instructor signs in rather than
+// signing up. The server enforces it (SELF_SIGNUP_ROLES, be/src/constants/
+// roles.js); this page simply no longer offers something that would be refused.
+//
+// With one account type left there is nothing to choose, so the picker is gone
+// rather than reduced to a single card, and the form opens on the first thing
+// it actually needs. AuthAside carries the way out for anyone who arrived here
+// and should have gone to the sign-in page.
 export default function SignUpPage() {
-  const [params] = useSearchParams();
   const { signup } = useStudentAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [role, setRole] = useState(params.get('as') === 'instructor' ? 'instructor' : 'student');
-  const [form, setForm] = useState({ name: '', email: '', password: '', organisation: '', headline: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', organisation: '' });
   const [show, setShow] = useState(false);
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -54,7 +45,10 @@ export default function SignUpPage() {
     setBusy(true);
     setError('');
     try {
-      const user = await signup({ ...form, role });
+      // `role` is not sent. The endpoint defaults to student and refuses
+      // anything else, so passing it would be a value the client cannot
+      // influence dressed up as one it can.
+      const user = await signup(form);
       /* Same rule as sign-in: go where they were headed, unless that belongs to
          a different app. Signing up used to always land on the dashboard, so
          somebody who clicked a course on the website and chose "create an
@@ -90,46 +84,6 @@ export default function SignUpPage() {
         </p>
 
         <form onSubmit={submit} noValidate>
-          {/* Role first. It changes the fields below it. */}
-          <fieldset className="lms-rolepick">
-            <legend className="lms-field__label">I’m signing up to…</legend>
-            <div className="lms-rolepick__grid">
-              {ROLES.map((r) => (
-                <label
-                  key={r.value}
-                  className={`lms-rolecard${role === r.value ? ' is-selected' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value={r.value}
-                    checked={role === r.value}
-                    onChange={() => setRole(r.value)}
-                    className="lms-sr-only"
-                  />
-                  <span className="lms-rolecard__icon">
-                    <LmsIcon name={r.icon} />
-                  </span>
-                  <span className="lms-rolecard__body">
-                    <span className="lms-rolecard__title">{r.title}</span>
-                    <span className="lms-rolecard__blurb">{r.blurb}</span>
-                    <ul className="lms-rolecard__points">
-                      {r.points.map((p) => (
-                        <li key={p}>
-                          <LmsIcon name="check" />
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
-                  </span>
-                  <span className="lms-rolecard__tick" aria-hidden="true">
-                    <LmsIcon name="check" />
-                  </span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
           <label className="lms-field">
             <span className="lms-field__label">Full name</span>
             <input className="lms-input" value={form.name} onChange={set('name')} autoComplete="name" />
@@ -177,35 +131,10 @@ export default function SignUpPage() {
             <input className="lms-input" value={form.organisation} onChange={set('organisation')} autoComplete="organization" />
           </label>
 
-          {role === 'instructor' ? (
-            <>
-              <label className="lms-field">
-                <span className="lms-field__label">
-                  Your title <span className="lms-field__optional">optional</span>
-                </span>
-                <input
-                  className="lms-input"
-                  value={form.headline}
-                  onChange={set('headline')}
-                  placeholder="e.g. Principal Advisor"
-                />
-                <span className="lms-field__hint">Shown in the byline on your courses.</span>
-              </label>
-
-              <p className="lms-auth__note">
-                <LmsIcon name="clock" />
-                <span>
-                  You can start building courses straight away. Publishing to the catalogue
-                  needs a quick review first. We’ll email you when that’s done.
-                </span>
-              </p>
-            </>
-          ) : null}
-
           {error ? <p className="lms-alert lms-alert--error">{error}</p> : null}
 
           <button type="submit" className="lms-btn lms-btn--primary lms-btn--block lms-auth__submit" disabled={busy}>
-            {busy ? 'Creating your account…' : `Create ${role === 'instructor' ? 'instructor' : 'student'} account`}
+            {busy ? 'Creating your account…' : 'Create your account'}
           </button>
 
           <p className="lms-auth__fine">
@@ -219,7 +148,9 @@ export default function SignUpPage() {
           next={returnToFrom({ search: location.search, state: location.state })}
         />
       </div>
-      <AuthAside />
+      {/* An instructor does not appear on this page's form, so the panel
+          beside it is where they are told where they DO go. See AuthAside. */}
+      <AuthAside showInternalSignIn />
     </div>
   );
 }

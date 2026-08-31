@@ -5,9 +5,9 @@ import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { firstNameOf } from '../../utils/names.js';
 
 function greeting(hour) {
-  if (hour < 12) return 'Good Morning';
-  if (hour < 18) return 'Good Afternoon';
-  return 'Good Evening';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
 }
 
 // The instructor's home (R1).
@@ -16,7 +16,9 @@ export default function InstructorDashboardPage() {
   const { courses } = useInstructorCourses();
   const s = useInstructorSummary();
   const now = new Date();
-  const firstName = firstNameOf(user?.name);
+  // Empty rather than firstNameOf's "there" default: the greeting is one line
+  // now, and "Good afternoon, there" is worse than "Good afternoon".
+  const firstName = firstNameOf(user?.name, '');
 
   const stats = [
     { key: 'courses', icon: 'book', value: s.courses, label: 'Courses', to: '/learn/instructor/courses' },
@@ -27,19 +29,27 @@ export default function InstructorDashboardPage() {
 
   return (
     <div>
-      <section className="lms-greeting">
-        <p className="lms-greeting__eyebrow">{greeting(now.getHours())}</p>
-        <h1 className="lms-greeting__name">{firstName} 👋</h1>
-        <p className="lms-greeting__text">
-          {s.courses
-            ? `You’re teaching ${s.courses} course${s.courses === 1 ? '' : 's'} to ${s.learners.toLocaleString('en-AU')} learners.`
-            : 'Nothing published yet. Build your first course and it’ll show up here.'}
-        </p>
-        <p className="lms-greeting__meta">
+      {/* Matches the learner dashboard, which dropped the solid green band for
+          the page head every other LMS screen uses. This page renders the same
+          component; leaving it would have been the same block on one dashboard
+          and not the other. */}
+      <div className="lms-page__head">
+        <div>
+          <h1 className="lms-page__title">
+            {greeting(now.getHours())}
+            {firstName ? `, ${firstName}` : ''}
+          </h1>
+          <p className="lms-page__subtitle">
+            {s.courses
+              ? `You’re teaching ${s.courses} course${s.courses === 1 ? '' : 's'} to ${s.learners.toLocaleString('en-AU')} learners.`
+              : 'Nothing published yet. Build your first course and it’ll show up here.'}
+          </p>
+        </div>
+        <p className="lms-page__date">
           <LmsIcon name="calendar" />
           {now.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
         </p>
-      </section>
+      </div>
 
 
       <div className="lms-dash-row" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))' }}>

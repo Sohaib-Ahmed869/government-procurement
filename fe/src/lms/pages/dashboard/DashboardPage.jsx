@@ -1,20 +1,41 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import ProgressBar from '../../components/progress/ProgressBar.jsx';
 import { firstNameOf } from '../../utils/names.js';
 import ActivityChart from '../../components/progress/ActivityChart.jsx';
-import { useDashboard, relativeTime } from '../../hooks/useDashboard.js';
+import DonutChart from '../../components/progress/DonutChart.jsx';
+import { useDashboard } from '../../hooks/useDashboard.js';
+import { useLiveSessions, formatSessionTime, relativeTo } from '../../hooks/useLiveSessions.js';
 
 /* ---------------------------------------------------------------------------
    The learner's dashboard.
 
-   Every number, name and date on it now comes from the API — see
+   Every number, name and date on it comes from the API — see
    hooks/useDashboard.js, which also records what this page used to be: a block
    of constants that showed the same three courses, two certificates and four
    lines of activity to every account, including one that had enrolled in
    nothing.
 
-   Two cards changed meaning in the swap, and deliberately:
+   THE LAYOUT fits one screen. That is the constraint everything else answers
+   to: a dashboard you have to scroll is a page of cards, and the whole point of
+   the format is seeing where you stand without moving.
+
+   A KPI row over two bands, the thing you ACT on in the wide half:
+
+     · four headline figures, the first one marked — the figure a learner opens
+       the page for should not have to be found among four identical tiles;
+     · minutes over time, beside where those minutes went;
+     · what to resume, beside what is scheduled.
+
+   NEXT UP and RECENT ACTIVITY are gone. Six cards would not sit on one screen
+   without every one of them being squeezed, and those two were the pair worth
+   losing: "next up" is the same lesson the resume panel already offers, and
+   "recent activity" is a log of what has been done on a page about what to do
+   next. My Courses and My Progress carry both in full.
+
+   Two cards changed meaning when this page moved onto real data, and
+   deliberately:
 
      · "Upcoming" is "Next up". Nothing in the model carries a due date — no
        deadlines, no cohort schedule — so the only honest version of a list of
@@ -33,12 +54,12 @@ const ICONS = {
   video: <><rect x="2" y="5" width="14" height="14" rx="2.5" /><path d="m16 10 6-3v10l-6-3z" /></>,
   doc: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></>,
   check: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>,
-  lock: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>,
-  bookmark: <><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" /></>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></>,
-  clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
   flame: <><path d="M12 3c3 3.5 5 6 5 9a5 5 0 0 1-10 0c0-1.6.6-3 1.7-4.4.4 1 1 1.7 1.8 2.1C10.3 7.6 11 5.2 12 3z" /></>,
   chart: <><path d="M3 3v18h18" /><path d="M7 15l4-5 3 3 5-7" /></>,
+  pie: <><path d="M12 3a9 9 0 1 0 9 9h-9z" /><path d="M14 2.6A9 9 0 0 1 21.4 10H14z" /></>,
+  live: <><rect x="2" y="5" width="14" height="14" rx="2.5" /><path d="m16 10 6-3v10l-6-3z" /></>,
+  trend: <><path d="M3 17 9 11l4 4 8-8" /><path d="M15 7h6v6" /></>,
 };
 
 function Icon({ name, className }) {
@@ -62,10 +83,21 @@ function duration(minutes) {
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
+/* The same, but zero is "0m" rather than "-".
+
+   "-" reads as "we don't know", which is right for a course whose remaining
+   time cannot be computed and wrong for a week in which the learner did
+   nothing — that is a known quantity and it is zero. Used wherever the figure
+   is minutes LOGGED, so the headline tile and the "This week" fact under it
+   cannot show the same number two different ways. */
+function minutesLogged(minutes) {
+  return minutes ? duration(minutes) : '0m';
+}
+
 function greeting(hour) {
-  if (hour < 12) return 'Good Morning';
-  if (hour < 18) return 'Good Afternoon';
-  return 'Good Evening';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
 }
 
 // The one line under the name. It has to read for an account that has done
@@ -80,18 +112,89 @@ function weekLine({ weekMinutes, streak, enrolled }) {
   return 'Nothing logged this week yet. Pick up where you left off, or browse the catalogue.';
 }
 
+/* This week against last, as the headline tile's supporting line.
+
+   Returns null rather than "+0%" where there is nothing to compare: a learner
+   in their first week has no prior week, and inventing a baseline of zero makes
+   every one of them infinitely up on nothing. */
+function weekDelta(now, before) {
+  if (!before) return null;
+  const change = Math.round(((now - before) / before) * 100);
+  if (change === 0) return { text: 'Level with last week', direction: 'flat' };
+  return {
+    text: `${change > 0 ? '+' : ''}${change}% vs last week`,
+    direction: change > 0 ? 'up' : 'down',
+  };
+}
+
+// The chart's range. Not a request each — useDashboard fetches thirty days once
+// and the page slices, so pressing these is a re-render.
+const RANGES = [
+  { days: 7, label: '7 days' },
+  { days: 14, label: '14 days' },
+  { days: 30, label: '30 days' },
+];
+
+// Beyond this many courses the donut's slices are thinner than its stroke and
+// the legend is longer than the card. The rest are summed into one row, which
+// is honest and readable where fourteen slivers are neither.
+const MAX_SLICES = 5;
+
 export default function DashboardPage() {
   const { user } = useStudentAuth();
   const {
-    resume, nextUp, recent, stats, activity, weekMinutes, streak, status, error,
+    resume, courseMix, stats, activity,
+    weekMinutes, priorWeekMinutes, streak, status, error,
   } = useDashboard();
+  // Its own request and its own status: the sessions card says it is loading
+  // while the rest of the page is already usable, rather than holding
+  // everything back for a card most learners have nothing in.
+  const live = useLiveSessions();
+
+  const [range, setRange] = useState(7);
+  const chartData = useMemo(() => activity.slice(-range), [activity, range]);
 
   const now = new Date();
-  // Signed out, "there" reads oddly as a heading on its own line, so the
-  // greeting falls back to a plain welcome instead of a stand-in name.
-  const firstName = user?.name ? firstNameOf(user.name) : 'Welcome back';
+  // Empty rather than a stand-in when there is no name: the greeting is one
+  // line now, and "Good afternoon, there" is worse than "Good afternoon".
+  const firstName = user?.name ? firstNameOf(user.name) : '';
 
+  const delta = weekDelta(weekMinutes, priorWeekMinutes);
+  const overall = stats.lessonsTotal
+    ? Math.round((stats.lessonsDone / stats.lessonsTotal) * 100)
+    : 0;
+
+  const mix = useMemo(() => {
+    if (courseMix.length <= MAX_SLICES) return courseMix;
+    const head = courseMix.slice(0, MAX_SLICES - 1);
+    const tail = courseMix.slice(MAX_SLICES - 1);
+    return [
+      ...head,
+      {
+        id: 'other',
+        label: `${tail.length} other courses`,
+        value: tail.reduce((n, c) => n + c.value, 0),
+      },
+    ];
+  }, [courseMix]);
+
+  /* The four headline figures, all four drawn the same.
+
+     Minutes learned leads because it is the figure that MOVES — the other three
+     change a handful of times a year, and a tile that reads the same every day
+     is not a headline. It used to be shaded a step darker to say so, which read
+     as a status on that one figure rather than as a reading order. Position
+     says it well enough. */
   const statTiles = [
+    {
+      key: 'week',
+      label: 'Learned this week',
+      value: minutesLogged(weekMinutes),
+      hint: delta?.text ?? 'Your first week',
+      direction: delta?.direction,
+      icon: 'trend',
+      to: '/learn/progress',
+    },
     {
       key: 'inProgress',
       label: 'Courses in progress',
@@ -99,6 +202,14 @@ export default function DashboardPage() {
       hint: stats.enrolled ? `${stats.enrolled} enrolled` : 'Nothing enrolled yet',
       icon: 'book',
       to: '/learn/my-courses',
+    },
+    {
+      key: 'lessons',
+      label: 'Lessons completed',
+      value: stats.lessonsDone,
+      hint: stats.lessonsTotal ? `${overall}% of everything enrolled` : 'Nothing enrolled yet',
+      icon: 'check',
+      to: '/learn/progress',
     },
     {
       key: 'certificates',
@@ -113,20 +224,35 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div>
-      <section className="lms-greeting">
-        <p className="lms-greeting__eyebrow">{greeting(now.getHours())}</p>
-        <h1 className="lms-greeting__name">{firstName} 👋</h1>
-        <p className="lms-greeting__text">
-          {status === 'loading'
-            ? 'Loading your courses…'
-            : weekLine({ weekMinutes, streak, enrolled: stats.enrolled })}
-        </p>
-        <p className="lms-greeting__meta">
+    /* `lms-dash` is what scopes the tighter card and tile metrics to this page
+       — see the note in lms.css. Badges and Certificates use the same
+       components and keep their own breathing room. */
+    <div className="lms-dash">
+      {/* The same page head every other LMS screen uses.
+
+          This was a full-width block of solid brand green with the greeting
+          reversed out of it. It said nothing the plain version does not, and it
+          put the loudest thing on the page above four tiles that are the actual
+          content — the dashboard opened on decoration. Badges, Certificates and
+          My Progress have all opened on .lms-page__head from the start; this
+          now does too, and the KPI row is the first thing with any weight. */}
+      <div className="lms-page__head">
+        <div>
+          <h1 className="lms-page__title">
+            {greeting(now.getHours())}
+            {firstName ? `, ${firstName}` : ''}
+          </h1>
+          <p className="lms-page__subtitle">
+            {status === 'loading'
+              ? 'Loading your courses…'
+              : weekLine({ weekMinutes, streak, enrolled: stats.enrolled })}
+          </p>
+        </div>
+        <p className="lms-page__date">
           <Icon name="calendar" />
           {now.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
         </p>
-      </section>
+      </div>
 
       {status === 'error' && (
         <div className="lms-card">
@@ -143,8 +269,78 @@ export default function DashboardPage() {
 
       {status === 'ready' && (
         <>
+          {/* ---- the headline row ---- */}
+          <div className="lms-kpis">
+            {statTiles.map((s) => (
+              <Link
+                key={s.key}
+                to={s.to}
+                className="lms-stat lms-kpi"
+              >
+                <span className="lms-kpi__top">
+                  <span className="lms-stat__label">{s.label}</span>
+                  <span className="lms-stat__icon"><Icon name={s.icon} /></span>
+                </span>
+                <span className="lms-stat__value">{s.value}</span>
+                <span className={`lms-stat__hint${s.direction ? ` is-${s.direction}` : ''}`}>
+                  {s.hint}
+                </span>
+              </Link>
+            ))}
+          </div>
+
+          {/* ---- minutes over time, and where they went ---- */}
           <div className="lms-dash-row">
-            {/* Continue learning */}
+            <section className="lms-card">
+              <div className="lms-card__head">
+                <h2 className="lms-card__title">
+                  <Icon name="chart" />
+                  Learning activity
+                </h2>
+                {/* Ranges as a segmented control rather than a dropdown: three
+                    options, and a select would hide two of them behind a click
+                    to save no room. */}
+                <span className="lms-segmented lms-segmented--sm" role="group" aria-label="Chart range">
+                  {RANGES.map((r) => (
+                    <button
+                      key={r.days}
+                      type="button"
+                      className={`lms-segmented__btn${range === r.days ? ' is-active' : ''}`}
+                      onClick={() => setRange(r.days)}
+                      aria-pressed={range === r.days}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </span>
+              </div>
+              <ActivityChart data={chartData} caption="Minutes learned per day" />
+            </section>
+
+            <section className="lms-card">
+              <div className="lms-card__head">
+                <h2 className="lms-card__title">
+                  <Icon name="pie" />
+                  Where the time went
+                </h2>
+              </div>
+              {mix.length === 0 ? (
+                <p className="lms-empty">
+                  Finish a lesson and this will show which courses your work is going into.
+                </p>
+              ) : (
+                <DonutChart
+                  data={mix}
+                  total={stats.lessonsDone}
+                  totalLabel={stats.lessonsDone === 1 ? 'lesson' : 'lessons'}
+                  caption="Lessons completed, by course"
+                />
+              )}
+            </section>
+          </div>
+
+          {/* ---- what to resume, and what is scheduled ---- */}
+          <div className="lms-dash-row">
             <section className="lms-card">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
@@ -182,7 +378,7 @@ export default function DashboardPage() {
                   )}
 
                   <div className="lms-resume__body">
-                    <div style={{ flex: 1, minWidth: 240 }}>
+                    <div style={{ flex: 1, minWidth: 200 }}>
                       <ProgressBar
                         percent={resume.percent}
                         left={
@@ -214,7 +410,7 @@ export default function DashboardPage() {
                         Time left <strong>{duration(resume.minutesLeft)}</strong>
                       </span>
                       <span className="lms-fact">
-                        This week <strong>{duration(weekMinutes)}</strong>
+                        This week <strong>{minutesLogged(weekMinutes)}</strong>
                       </span>
                     </div>
                   </div>
@@ -222,92 +418,53 @@ export default function DashboardPage() {
               )}
             </section>
 
-            {/* Two headline numbers, stacked beside the resume panel. */}
-            <div className="lms-dash-stats">
-              {statTiles.map((s) => (
-                <Link key={s.key} to={s.to} className="lms-stat">
-                  <span className="lms-stat__icon"><Icon name={s.icon} /></span>
-                  <span>
-                    <span className="lms-stat__label">{s.label}</span>
-                    <span className="lms-stat__value" style={{ display: 'block' }}>{s.value}</span>
-                    <span className="lms-stat__hint">{s.hint}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <section className="lms-card" style={{ marginBottom: 18 }}>
-            <div className="lms-card__head">
-              <h2 className="lms-card__title">
-                <Icon name="chart" />
-                Weekly activity
-              </h2>
-              <span className="lms-card__note">Minutes learned per day</span>
-            </div>
-            <ActivityChart data={activity} caption="Minutes learned per day" />
-          </section>
-
-          <div className="lms-dash-row" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <section className="lms-card">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
-                  <Icon name="clock" />
-                  Next up
+                  <Icon name="live" />
+                  Live sessions
                 </h2>
-                <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/my-courses">
+                <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/live">
                   View all
                 </Link>
               </div>
               <div className="lms-list">
-                {nextUp.length === 0 ? (
+                {live.status === 'loading' && <p className="lms-empty">Loading your sessions…</p>}
+                {live.status === 'error' && (
+                  <p className="lms-empty">We couldn’t load your sessions just now.</p>
+                )}
+                {live.status === 'ready' && live.upcoming.length === 0 && (
                   <p className="lms-empty">
-                    Nothing waiting. Enrol in a course to see what’s next.
+                    Nothing scheduled. Sessions your instructor books will appear here.
                   </p>
-                ) : (
-                  nextUp.map((item) => (
-                    <Link key={item.id} to={item.to} className="lms-list__item">
+                )}
+                {live.status === 'ready' &&
+                  live.upcoming.slice(0, 3).map((s) => (
+                    <Link key={s.id} to="/learn/live" className="lms-list__item">
                       <span className="lms-list__icon">
-                        <Icon name={item.locked ? 'lock' : KIND_ICON[item.kind] || 'video'} />
+                        <Icon name={s.state === 'live' ? 'play' : 'calendar'} />
                       </span>
                       <span className="lms-list__body">
-                        <span className="lms-list__title">{item.title}</span>
-                        <span className="lms-list__meta">{item.meta}</span>
+                        <span className="lms-list__title">{s.title}</span>
+                        <span className="lms-list__meta">
+                          {formatSessionTime(s.startsAt, s.timezone)}
+                          {s.course?.title ? ` · ${s.course.title}` : ''}
+                        </span>
                       </span>
-                      {item.locked && (
-                        <span className="lms-list__trail">{item.lockReason || 'Locked'}</span>
-                      )}
+                      <span className="lms-list__trail">
+                        {/* Live now is the one state worth marking; everything
+                            else here is upcoming and says so with its time. */}
+                        {s.state === 'live' ? (
+                          <span className="lms-live-badge lms-live-badge--live">
+                            <span className="lms-live-dot" aria-hidden="true" />
+                            Live now
+                          </span>
+                        ) : (
+                          relativeTo(s.startsAt)
+                        )}
+                      </span>
                     </Link>
-                  ))
-                )}
-              </div>
-            </section>
-
-            <section className="lms-card">
-              <div className="lms-card__head">
-                <h2 className="lms-card__title">
-                  <Icon name="check" />
-                  Recent activity
-                </h2>
-                <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/progress">
-                  My progress
-                </Link>
-              </div>
-              <div className="lms-list">
-                {recent.length === 0 ? (
-                  <p className="lms-empty">Your completed lessons will show up here.</p>
-                ) : (
-                  recent.map((item) => (
-                    <span key={item.id} className="lms-list__item">
-                      <span className="lms-list__icon"><Icon name={item.icon} /></span>
-                      <span className="lms-list__body">
-                        <span className="lms-list__title">{item.title}</span>
-                        <span className="lms-list__meta">{item.meta}</span>
-                      </span>
-                      <span className="lms-list__trail">{relativeTime(item.at)}</span>
-                    </span>
-                  ))
-                )}
+                  ))}
               </div>
             </section>
           </div>

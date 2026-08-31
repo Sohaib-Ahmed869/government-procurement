@@ -13,7 +13,7 @@ function meaningfulParts(name) {
 }
 
 // The name to greet someone by. Falls back rather than returning an empty
-// string, so a greeting never reads "Good morning, 👋".
+// string, so a greeting never opens on a blank where a name should be.
 export function firstNameOf(name, fallback = 'there') {
   return meaningfulParts(name)[0] || fallback;
 }

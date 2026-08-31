@@ -294,6 +294,17 @@ export const reviewsApi = {
   instructor: () => api.get('/lms/authoring/reviews'),
 };
 
+/* Cohort standings for the badges page (L5).
+
+   Only the leaderboard lives on the server. A learner's OWN badges and points
+   are still evaluated in the browser from records it has already loaded (see
+   useBadges), which costs no request and updates the instant they finish a
+   lesson. A ranking is the one part that cannot work that way — it needs
+   everyone else's record, and a client cannot be handed that. */
+export const badgesApi = {
+  leaderboard: () => api.get('/lms/badges/leaderboard', { tzOffset: tzOffset() }),
+};
+
 export const certificatesApi = {
   mine: () => api.get('/lms/certificates'),
   get: (id) => api.get(`/lms/certificates/${id}`),

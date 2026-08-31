@@ -174,23 +174,6 @@
   transition: var(--gp-fade);
 }
 
-/* Revealed on hover or focus rather than always drawn: a column of hashes down
-   the page is noise until somebody wants one. Focus makes it keyboard
-   reachable, which is why it is opacity rather than display. */
-.pol-section__anchor {
-  margin-left: 8px;
-  font-weight: 400;
-  color: var(--gp-muted);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity 140ms var(--gp-ease);
-}
-
-.pol-section__heading:hover .pol-section__anchor,
-.pol-section__anchor:focus-visible {
-  opacity: 1;
-}
-
 .pol-section__p,
 .pol-section__list {
   max-width: 72ch;
@@ -210,6 +193,152 @@
 }
 
 .pol-section__list li + li { margin-top: 4px; }
+
+/* The contact block at the foot of a policy. <address>, which browsers set in
+   italics by default — an address is not an aside, so that comes off.
+
+   Each line is a <span>, laid out as a column: the alternative is <br> between
+   them, and a run of <br>s is a line break pretending to be structure. The
+   spans give the block something a stylesheet can space. */
+.pol-section__address {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 72ch;
+  margin: 10px 0;
+  font-size: 15.5px;
+  font-style: normal;
+  line-height: 1.55;
+  color: var(--gp-ink);
+}
+
+/* An email address in the text. It is the one route these documents give for
+   exercising a right, so it is marked as a link rather than left to be spotted
+   — but quietly: it appears mid-sentence about thirty times across the four
+   policies, and a coloured run that often turns the prose into a rash. Weight
+   and an underline, in the reading ink. */
+.pol-mail {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 2px;
+  transition: text-decoration-color 140ms var(--gp-ease);
+}
+.pol-mail:hover,
+.pol-mail:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+/* A sub-heading inside a section — "Website visitors" under "What personal
+   information we collect".
+
+   A clear step below .pol-section__heading and set in the body ink rather than
+   the brand green: two greens at two sizes read as two levels of section, and
+   these are divisions WITHIN one. The space above is what actually separates
+   them, so it is larger than the space below. */
+.pol-section__sub {
+  max-width: 72ch;
+  margin: 18px 0 6px;
+  font-size: 15.5px;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--gp-ink);
+}
+.pol-section__sub:first-child { margin-top: 0; }
+
+/* The bold opening of a clause. Weight only, no colour and no size change: it
+   marks where a paragraph starts without lifting itself out of the sentence it
+   belongs to. */
+.pol-section__lead { font-weight: 650; }
+
+/* A paragraph that is emphasised end to end — the absolute prohibitions the
+   Conflict of Interest Policy states on their own line. Given the room to be
+   read as the statement it is. */
+.pol-section__p--strong {
+  margin: 14px 0;
+  font-weight: 650;
+}
+
+/* --- tables --------------------------------------------------------------
+
+   The cookie register, the retention schedule, the list of processors. Three
+   columns of prose, and there is no width at which "Purpose" and "Where data is
+   stored" both sit comfortably on a phone — so the table scrolls inside its own
+   box and the PAGE never does.
+
+   The wrapper is focusable (tabIndex on the element) because a region that
+   scrolls has to be reachable by keyboard, and a browser will not give it a
+   tab stop on its own. */
+.pol-tablewrap {
+  max-width: 72ch;
+  margin: 12px 0 16px;
+  overflow-x: auto;
+  border: 1px solid var(--gp-line);
+  border-radius: 10px;
+  transition: var(--gp-fade);
+}
+.pol-tablewrap:focus-visible {
+  outline: 2px solid var(--gp-accent-ink);
+  outline-offset: 2px;
+}
+
+.pol-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--gp-ink);
+}
+
+.pol-table th,
+.pol-table td {
+  padding: 9px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--gp-line);
+}
+
+.pol-table thead th {
+  font-weight: 650;
+  white-space: nowrap;
+  background: var(--gp-paper-alt);
+  color: var(--gp-ink);
+}
+
+/* No rule under the last row: the wrapper's own border is already there, and
+   the two together drew a double line. */
+.pol-table tbody tr:last-child td { border-bottom: 0; }
+
+/* The first column names the row — a cookie, a record type, a provider — so it
+   carries the weight that tells you where each row starts. */
+.pol-table tbody td:first-child { font-weight: 600; }
+
+/* Below this a three-column table of prose is a set of one-word columns and a
+   horizontal scroll long enough that nobody reaches the end of it. Each row
+   becomes its own stacked block instead, with the column name printed against
+   each value from `data-label` — so a cell still says what it is once the
+   header row is gone. */
+@media (max-width: 640px) {
+  .pol-tablewrap { overflow-x: visible; }
+  .pol-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .pol-table,
+  .pol-table tbody,
+  .pol-table tr,
+  .pol-table td { display: block; width: 100%; }
+  .pol-table tr { padding: 10px 14px; border-bottom: 1px solid var(--gp-line); }
+  .pol-table tbody tr:last-child { border-bottom: 0; }
+  .pol-table td { padding: 3px 0; border-bottom: 0; }
+  .pol-table td[data-label]::before {
+    content: attr(data-label) ': ';
+    font-weight: 600;
+    color: var(--gp-muted);
+  }
+  /* The naming cell is the block's heading, so it takes the line to itself
+     rather than repeating a label that says the same thing. */
+  .pol-table tbody td:first-child { font-size: 15px; }
+  .pol-table tbody td:first-child::before { content: none; }
+}
 
 /* Rich text from the CMS, when a page is written as one body rather than as
    sections. Same measure and rhythm as the structured path above. */
@@ -283,11 +412,51 @@
 
   .pol-section__p,
   .pol-section__list,
+  .pol-section__sub,
+  .pol-section__address,
   .pol-prose {
     color: #000;
     orphans: 3;
     widows: 3;
   }
 
-  .pol-section__anchor { display: none; }
+  /* On paper the address is already the text — underlining it would only
+     suggest something to click. */
+  .pol-mail {
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* A table prints as a table. The @media (max-width: 640px) rules above break
+     it into stacked blocks, and a print stylesheet is matched against the paper
+     width — so without this a policy printed from a phone, or from a narrow
+     window, comes out as a list of labelled fragments where the schedule
+     should be. */
+  .pol-tablewrap {
+    overflow-x: visible;
+    border-color: #000;
+    break-inside: avoid;
+  }
+  .pol-table,
+  .pol-table tbody,
+  .pol-table tr { display: table; width: 100%; }
+  .pol-table tbody { display: table-row-group; }
+  .pol-table tr { display: table-row; }
+  .pol-table td { display: table-cell; padding: 6px 10px; }
+  .pol-table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    overflow: visible;
+    display: table-header-group;
+  }
+  .pol-table td[data-label]::before { content: none; }
+  .pol-table th,
+  .pol-table td {
+    color: #000;
+    border-bottom: 1px solid #999;
+  }
+  .pol-table thead th { background: none; }
+
 }

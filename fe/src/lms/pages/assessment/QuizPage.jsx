@@ -18,8 +18,13 @@ export default function QuizPage() {
   const { slug, quizId } = useParams();
   // PlayerLayout has already loaded the course for the rail beside this.
   const { course } = useOutletContext() ?? {};
-  const { status, error, lesson, quiz, attempts, attemptsUsed, maxAttempts, reloadAttempts } =
-    useQuiz(quizId);
+  /* `ticket` is the signed proof of when this attempt was opened. useQuiz has
+     always returned it and this line never took it, so the reference below was
+     to nothing — pressing Start threw "ticket is not defined" and the runner
+     never mounted. Held and passed straight through, never inspected. */
+  const {
+    status, error, lesson, quiz, ticket, attempts, attemptsUsed, maxAttempts, reloadAttempts,
+  } = useQuiz(quizId);
   const [started, setStarted] = useState(false);
 
   if (status === 'loading') {

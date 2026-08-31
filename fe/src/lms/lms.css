@@ -18,8 +18,49 @@
   --lms-mint: var(--gp-mint-300);
   --lms-mint-soft: #e3f6ec;
 
-  /* Light content canvas. Matched to the CMS so the two apps feel related. */
-  --lms-bg: #f4f6f5;
+  /* THE LIGHT GREEN TINTS. One ramp, used by the canvas, the KPI tiles and the
+     donut's track, so every pale green surface in the app is the same green.
+
+     Derived from the brand's own #14572a but at hue 128 rather than its 140.
+     140 is a blue-green, and a desaturated blue-green tint reads as pale BLUE
+     — which is exactly how the dashboard's tiles were coming out. Pulling the
+     hue eight degrees toward yellow closes the gap between the red and blue
+     channels (B−R falls from +16 to +5 on the strongest of these) and the
+     colour reads as green at every step, without leaving the brand family. */
+  --lms-tint-50: #edfaef;
+  --lms-tint-100: #e7f6e9;
+  --lms-tint-200: #dcf5e0;
+  --lms-tint-300: #c6eecb;
+  --lms-tint-400: #c3e7c8;
+  --lms-tint-500: #addcb3;
+
+  /* Light content canvas. Matched to the CMS so the two apps feel related.
+
+     --lms-bg is still the flat colour, and is still what paints behind
+     everything: the gradient on .lms-shell sits ON it, so any area the
+     gradient does not reach (a very tall page, an overscroll) lands on the
+     same tone rather than on white. */
+  --lms-bg: #f4f7f5;
+
+  /* The canvas wash: green in the TOP RIGHT, falling away into white.
+
+     One source, in a corner. It began as two mint blooms plus a vertical ramp,
+     and one of those blooms sat at 4% 0% — the exact corner the first KPI tile
+     occupies — so two greens met with no edge between them and the top of the
+     page read as smeared. Then it was a plain top-to-bottom ramp, which had no
+     such collision but also barely read as green at all.
+
+     Top right is the corner with nothing in it. The KPI row starts on the left
+     and the cards below are white, so the wash is at its strongest exactly
+     where the page is emptiest, and it is white by the time it reaches
+     anything. #c6e8d6 is a real mint rather than a grey with a hint in it —
+     the point of a themed canvas is that it looks themed.
+
+     Fixed, not scrolled: a gradient that travels with the content bands as the
+     page moves. */
+  --lms-wash:
+    radial-gradient(78% 62% at 100% 0%, var(--lms-tint-300) 0%, rgba(198, 238, 203, 0.5) 34%, rgba(198, 238, 203, 0) 70%),
+    linear-gradient(200deg, var(--lms-tint-100) 0%, #f6fcf7 44%, #ffffff 78%);
   --lms-surface: #ffffff;
   --lms-surface-2: #f7f9f8;
   --lms-surface-3: #eef2f0;
@@ -33,8 +74,10 @@
      block of brand green: fifteen rows of white-on-green is a lot of saturated
      colour to look at all day, and it left the green with nothing to mark. It
      marks the current page now, and only that. */
-  --lms-rail: #fbfcfb;
-  --lms-rail-line: #e4e9e5;
+  /* A wash of its own, a shade lighter than the canvas so the rail reads as
+     in front of it rather than as a hole in it. Same mint, same restraint. */
+  --lms-rail: linear-gradient(180deg, #fbfdfc 0%, #f6fbf8 52%, #f3f9f6 100%);
+  --lms-rail-line: #e2eae5;
   --lms-rail-ink: #26332c;
   --lms-rail-ink-2: #7b877f;
 
@@ -49,9 +92,20 @@
   --lms-warning: #8a6316;
   --lms-warning-soft: #fdf1d8;
 
-  --lms-shadow-sm: 0 1px 2px rgba(16, 40, 24, 0.04);
-  --lms-shadow: 0 1px 2px rgba(16, 40, 24, 0.04), 0 2px 8px -3px rgba(16, 40, 24, 0.08);
-  --lms-shadow-md: 0 2px 4px -1px rgba(16, 40, 24, 0.05), 0 8px 24px -8px rgba(16, 40, 24, 0.12);
+  /* Green-black rather than neutral grey, so a shadow on the mint canvas reads
+     as shade rather than as soot. Three stops on the resting shadow: a hairline
+     contact edge, a short soft one, and a wide faint one — that is what makes a
+     card look placed on the surface rather than stuck to it, and it is the
+     difference between the app looking built and looking like default cards. */
+  --lms-shadow-sm: 0 1px 2px rgba(14, 46, 27, 0.05);
+  --lms-shadow:
+    0 1px 2px rgba(14, 46, 27, 0.05),
+    0 4px 10px -4px rgba(14, 46, 27, 0.09),
+    0 12px 28px -14px rgba(14, 46, 27, 0.10);
+  --lms-shadow-md:
+    0 1px 2px rgba(14, 46, 27, 0.06),
+    0 8px 18px -8px rgba(14, 46, 27, 0.14),
+    0 22px 44px -22px rgba(14, 46, 27, 0.16);
   --lms-ring: 0 0 0 3px rgba(10, 49, 20, 0.1);
 
   --lms-radius: 14px;
@@ -91,6 +145,24 @@
   background: var(--lms-bg);
   transition: grid-template-columns 0.24s var(--lms-ease);
 }
+
+/* The wash goes on the shell's ::before rather than on the shell itself, so it
+   can be fixed to the viewport while the grid above it scrolls. `background-
+   attachment: fixed` on the element would have done it too, and repaints the
+   whole gradient on every scroll frame; a fixed pseudo-element is composited
+   once and left alone. */
+.lms-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--lms-wash);
+  pointer-events: none;
+}
+
+/* Everything the shell holds sits above the wash. Without this the sidebar and
+   the content are painted underneath it and the whole app reads as tinted. */
+.lms-shell > * { position: relative; z-index: 1; }
 .lms-shell.is-collapsed {
   grid-template-columns: var(--lms-sidebar-w-collapsed) 1fr;
 }
@@ -102,7 +174,7 @@
 }
 
 .lms-content {
-  padding: 26px 28px 48px;
+  padding: 22px 28px 26px;
   min-width: 0;
   width: 100%;
   max-width: 1440px;
@@ -182,10 +254,18 @@
   white-space: nowrap;
 }
 .lms-sidebar__wordmark span {
-  font-size: 9.5px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  /* 12px, up from the 9.5 it wore as all-caps. That size was set for a caps
+     run: caps carry at a size sentence case does not, and "Instructor" at
+     9.5px read as a footnote on the wordmark rather than as the half of it
+     that says which app you are in.
+
+     One point under the name rather than the usual two, because the name
+     cannot come up to meet it — 13px is as large as "Government Procurement"
+     goes before it clips (see above). What separates the two lines here is the
+     green and the lighter weight, not the size. */
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-green-600);
 }
 
@@ -360,18 +440,26 @@
   line-height: 1.2;
 }
 .lms-sidebar__me-text strong {
-  font-size: 13px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--lms-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The signed-in role, under the name.
+
+   `capitalize`, not `uppercase`: the value comes off the user record as a bare
+   lowercase word ("student", "instructor"), so it needs SOME casing applied or
+   it reads as a typo under a properly-cased name — and STUDENT in green caps
+   shouted louder than the name it belongs to. First letter only, and the size
+   steps up to match: 10px was picked to hold caps together, and sentence case
+   at that size is smaller than it needs to be. */
 .lms-sidebar__me-text > span {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: capitalize;
   color: var(--lms-green-600);
 }
 
@@ -487,8 +575,11 @@
   gap: 16px;
   height: 64px;
   padding: 0 28px;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: saturate(180%) blur(10px);
+  /* Barely tinted and quite transparent: the wash is at its strongest in the
+     top-right corner, which is behind this bar, and a near-opaque header there
+     clipped the gradient into a lid with a hard edge under it. */
+  background: rgba(251, 254, 251, 0.72);
+  backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(10px);
   border-bottom: 1px solid var(--lms-border);
 }
@@ -875,11 +966,10 @@
   align-items: center;
   gap: 9px;
   margin: 0;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: #8a958e;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--lms-text);
 }
 .lms-card__title svg { width: 16px; height: 16px; color: var(--lms-green-600); }
 .lms-card__note { font-size: 12.5px; color: var(--lms-muted); }
@@ -902,73 +992,343 @@
 .lms-page__subtitle { margin: 6px 0 0; font-size: 14px; color: var(--lms-muted); }
 .lms-page__actions { display: flex; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
 
-/* Dashboard: greeting banner ---------------------------------------------- */
-.lms-greeting {
-  position: relative;
-  overflow: hidden;
-  padding: 26px 28px;
-  margin-bottom: 20px;
-  border-radius: var(--lms-radius-lg);
-  background: linear-gradient(115deg, var(--lms-green) 0%, var(--lms-green-800) 48%, #125228 100%);
-  color: #fff;
-}
-/* A soft mint bloom in the top-right, echoing the wave motifs on the public
-   site. Pointer-events off so it never intercepts a click. */
-.lms-greeting::after {
-  content: '';
-  position: absolute;
-  top: -140px;
-  right: -80px;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(126, 226, 168, 0.26) 0%, rgba(126, 226, 168, 0) 68%);
-  pointer-events: none;
-}
-/* Sentence-cased, not tracked-out capitals. "GOOD AFTERNOON" reads as a label
-   on a form; the greeting is meant to be read as words. */
-.lms-greeting__eyebrow {
-  margin: 0 0 6px;
-  font-size: 13.5px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--lms-mint);
-}
-.lms-greeting__name {
-  margin: 0;
-  font-size: clamp(26px, 3.4vw, 34px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.lms-greeting__text {
-  margin: 10px 0 0;
-  max-width: 62ch;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--lms-on-dark-2);
-}
-.lms-greeting__meta {
+/* The dashboards' page head.
+
+   .lms-greeting used to live here: a full-width block of solid brand green with
+   the greeting reversed out of it, on the learner dashboard and the
+   instructor's. Both use .lms-page__head now — the same head Badges,
+   Certificates and My Progress have always used — so the first thing with any
+   visual weight on a dashboard is its content rather than a coloured band
+   above it.
+
+   This is the one thing that head needed adding: the date, sitting opposite the
+   greeting on the same line. */
+.lms-page__date {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin: 0;
+  flex-shrink: 0;
   font-size: 13px;
-  color: var(--lms-on-dark-2);
+  color: var(--lms-muted);
 }
-.lms-greeting__meta svg { width: 15px; height: 15px; }
+
+.lms-page__date svg { width: 15px; height: 15px; }
 
 /* Dashboard: grids -------------------------------------------------------- */
 .lms-dash-row {
   display: grid;
   grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
+
+/* Three cells: the one you act on, and two you read.
+
+   1.7fr leaves the chart about 490px on a 1440 window, where its 3:2 viewBox
+   draws at ~115px tall — short, but it is a week of bars and not a trend line,
+   and the height it gives up is what lets the second band sit on the same
+   screen. */
+.lms-dash-row--three {
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* ---------------------------------------------------------------------------
+   THE DASHBOARD FITS ONE SCREEN.
+
+   Not a preference — a dashboard you have to scroll is a page of cards, and
+   seeing where you stand without moving is the whole format. The measurements
+   are from a 1440x900 laptop: 900 less the 64px header leaves 836, and the
+   content had to come down from 953 to fit inside it.
+
+   Most of it came from the layout (three two-column bands folded into two
+   three-column ones, worth ~190px). The rest is here: the dashboard's cards
+   and tiles run tighter than the same components do on Badges or Certificates,
+   which are lists that scroll anyway and have nothing to gain from it. Scoped
+   to .lms-dash so tightening the dashboard cannot quietly tighten them.
+   ------------------------------------------------------------------------ */
+/* Keep the resume panel's two facts BESIDE the progress bar, not under it.
+
+   The facts column is 190px wide, and next to a bar that will not go below
+   240px it needs 454px of cell to sit alongside. The dashboard's wide cell is
+   ~460px at 1440 and ~400px at 1366 — so on a 1366x768 laptop the block wrapped
+   underneath, and that wrap alone added a hundred pixels and pushed the page
+   off the screen.
+
+   Narrower here, so it fits beside the bar at both widths. The chips lose the
+   room they had for a comfortable gap between label and value; at two words and
+   a number each, they do not need it. */
+.lms-dash .lms-resume__body { gap: 14px; }
+
+.lms-dash .lms-resume__facts {
+  flex: 0 0 150px;
+  min-width: 0;
+  gap: 6px;
+}
+
+.lms-dash .lms-fact {
+  gap: 10px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   RAISED CARDS.
+
+   Every box on the dashboard, not just the four at the top: the KPI tiles, the
+   chart, the donut, the resume panel and the sessions list all sit on the page
+   the same way.
+
+   Four things together make a surface look lifted, and it is the combination
+   rather than any one of them:
+
+     1. a lit top edge — an inset white hairline, as if the light above the page
+        catches the card's leading edge. This is what reads as a physical edge
+        rather than a drawn border, and it is the piece most often left out;
+     2. a contact shadow — 1px, almost opaque, directly under the card, which is
+        what fixes it to the surface. Without it a card floats;
+     3. two spread shadows at increasing size and decreasing opacity, which is
+        how real penumbra falls off. One shadow at one size reads as a sticker;
+     4. a fill that is not flat white — a whisper of a ramp, so the card's own
+        surface has a top and a bottom.
+
+   All the shadow colours are the green-black --lms-shadow uses, so shade on the
+   mint canvas reads as shade rather than as soot.
+   ------------------------------------------------------------------------ */
+.lms-dash .lms-card,
+.lms-dash .lms-stat {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 1px rgba(14, 46, 27, 0.06),
+    0 3px 6px -2px rgba(14, 46, 27, 0.07),
+    0 10px 20px -8px rgba(14, 46, 27, 0.10),
+    0 26px 46px -22px rgba(14, 46, 27, 0.13);
+}
+
+/* The white cards get the ramp; the KPI tiles already carry their own green
+   one and must not have a second background stacked on top of it. */
+.lms-dash .lms-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%);
+  border-color: #e4ebe6;
+}
+
+/* Only the tiles lift under the pointer, because only the tiles are links. A
+   card that rises when you hover it is telling you it can be clicked, and the
+   chart cannot. */
+.lms-dash .lms-stat:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 1px rgba(14, 46, 27, 0.06),
+    0 6px 12px -4px rgba(14, 46, 27, 0.10),
+    0 16px 30px -12px rgba(14, 46, 27, 0.14),
+    0 34px 58px -26px rgba(14, 46, 27, 0.16);
+}
+
+/* The inner boxes inside those cards — the resume panel's two facts, the
+   segmented range control — are recessed rather than raised. A raised box
+   inside a raised box is two claims about the same surface. */
+.lms-dash .lms-fact {
+  border: 1px solid #e7eee9;
+  box-shadow: inset 0 1px 2px rgba(14, 46, 27, 0.04);
+}
+
+.lms-dash .lms-segmented {
+  background: linear-gradient(180deg, #f6f9f7 0%, #fdfefd 100%);
+  box-shadow: inset 0 1px 2px rgba(14, 46, 27, 0.05);
+}
+
+/* The chosen range is the one thing in that control that IS raised — it is the
+   button standing proud of its track. */
+.lms-dash .lms-segmented__btn.is-active {
+  box-shadow:
+    0 1px 1px rgba(14, 46, 27, 0.12),
+    0 3px 6px -2px rgba(14, 46, 27, 0.18);
+}
+
+.lms-dash .lms-page__head { margin-bottom: 14px; }
+.lms-dash .lms-card { padding: 15px 17px; }
+.lms-dash .lms-card__head { margin-bottom: 11px; }
+.lms-dash .lms-dash-row:last-child { margin-bottom: 0; }
 .lms-dash-stats {
   display: grid;
   grid-template-rows: repeat(2, 1fr);
   gap: 18px;
 }
+
+/* ---------------------------------------------------------------------------
+   The dashboard's headline row.
+
+   Four tiles across, and the first one filled. Four identical tiles is a row
+   with no entry point — the eye has to read all four to find the one that
+   matters — so the figure the learner opens the page for takes the brand green
+   and the other three sit quietly beside it in the same shape.
+
+   `auto-fit` with a 190px floor rather than `repeat(4, 1fr)`: the tiles wrap to
+   two-up and then one-up on their own, and the row never squeezes a number
+   narrower than it can be read at. --------------------------------------- */
+.lms-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* All four tiles carry the same green gradient, a clear step darker than the
+   canvas behind them. That is what makes the headline row read as one band of
+   figures rather than four white cards floating on a tinted page.
+
+   THE SAME, all four. The first used to be a step darker again to mark it as
+   the one to read first — but a row of four figures where one is shaded
+   differently reads as a status on that figure, not as a reading order, and it
+   put an odd-one-out at the top of the page. Order is left to right; that is
+   enough. */
+
+/* A column, not the icon-beside-text row .lms-stat uses elsewhere. The label
+   leads, the number is the thing, the supporting line closes — which is the
+   order somebody reads a figure they are being shown rather than one they are
+   looking up. */
+.lms-stat.lms-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 14px 16px 13px;
+  border-color: var(--lms-tint-400);
+  background: linear-gradient(152deg, var(--lms-tint-50) 0%, var(--lms-tint-200) 100%);
+}
+
+.lms-stat.lms-kpi:hover { border-color: var(--lms-tint-500); }
+
+.lms-stat.lms-kpi .lms-stat__label { color: var(--lms-green-600); }
+.lms-stat.lms-kpi .lms-stat__value { color: var(--lms-green); }
+
+.lms-stat.lms-kpi .lms-stat__icon {
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--lms-green-600);
+}
+
+.lms-kpi__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+/* Smaller than the 44px chip on the other stat tiles: here it sits beside the
+   label as a mark, not as the tile's leading element. */
+.lms-stat.lms-kpi .lms-stat__icon { width: 30px; height: 30px; border-radius: 9px; }
+.lms-stat.lms-kpi .lms-stat__icon svg { width: 16px; height: 16px; }
+.lms-stat.lms-kpi .lms-stat__value { margin: 0; font-size: 26px; }
+.lms-stat.lms-kpi .lms-stat__hint { margin-top: 4px; }
+
+/* The week-on-week line. Direction is stated in the words too ("+12% vs last
+   week"), so the colour is reinforcement rather than the only signal — the
+   figure still reads correctly to anyone who cannot separate the two hues.
+
+   Scoped to the KPI tiles rather than to one of them: only the first carries a
+   comparison today, and the day a second does it should look the same. */
+.lms-kpi .lms-stat__hint.is-up { color: var(--lms-green-600); font-weight: 600; }
+.lms-kpi .lms-stat__hint.is-down { color: #8a6316; font-weight: 600; }
+.lms-kpi .lms-stat__hint.is-flat { color: var(--lms-muted); }
+
+/* ---------------------------------------------------------------------------
+   The donut and its legend.
+   ------------------------------------------------------------------------ */
+.lms-donut {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 18px 22px;
+}
+
+.lms-donut__ring {
+  position: relative;
+  width: 120px;
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+
+.lms-donut__ring svg { display: block; width: 100%; height: auto; }
+
+/* The total, in the hole. This is the whole reason for a donut over a pie:
+   somewhere to put the number the slices add up to. */
+.lms-donut__centre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+
+.lms-donut__centre strong {
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--lms-text);
+}
+
+.lms-donut__centre > span { font-size: 12.5px; color: var(--lms-muted); }
+
+.lms-donut__legend {
+  list-style: none;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.lms-donut__legend li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--lms-text-2);
+}
+
+.lms-donut__swatch {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+/* The name gives up its width first: a course title can run to a line and a
+   half, and the count beside it must not be pushed off the card. */
+.lms-donut__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lms-donut__value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--lms-text);
+}
+
+.lms-donut__pct { font-size: 12px; font-weight: 500; color: var(--lms-muted); }
+
+/* The legend takes what is left of the row and wraps under the ring when that
+   would be narrower than this. `flex-wrap` decides it, not a viewport media
+   query: this card is a third of the row, so the WINDOW being 1400px wide says
+   nothing about whether 160px of ring and a course title fit inside it. */
+.lms-donut__legend { flex: 1 1 130px; }
 
 /* Continue-learning panel */
 .lms-resume__course {
@@ -1097,20 +1457,49 @@
   fill: var(--lms-muted);
   font-family: 'Geist Variable', system-ui, sans-serif;
 }
-.lms-chart__bar {
-  fill: var(--lms-green);
-  transition: fill 0.15s var(--lms-ease);
+/* The line and the wash under it.
+
+   The stroke is the mid green rather than the near-black brand one: at 2.5px
+   over a tinted fill, #0a3114 reads as a wire and #14572a reads as a series.
+   The chart was bars — see ActivityChart for why it is not any more. */
+.lms-chart__line {
+  fill: none;
+  stroke: #14572a;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.lms-chart__col:hover .lms-chart__bar,
-.lms-chart__col:focus-visible .lms-chart__bar { fill: var(--lms-green-600); }
+
+.lms-chart__area { pointer-events: none; }
+
+/* The high point, labelled without being asked for. */
+.lms-chart__peak circle { fill: #14572a; }
+
+/* The hovered day: a dot on the line and a dashed drop to its label — which is
+   what says WHICH column you are reading on a thirty-day chart whose labels are
+   thinned to every third one. */
+.lms-chart__dot {
+  fill: #fff;
+  stroke: #14572a;
+  stroke-width: 3;
+}
+
+.lms-chart__guide {
+  stroke: #9ac9ad;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+}
+
+/* The label under the hovered column, lifted out of the axis grey so the eye
+   can pair the tooltip with the day it belongs to. */
+.lms-chart__axis.is-active { fill: var(--lms-text); font-weight: 600; }
+
 .lms-chart__col:focus-visible { outline: none; }
 .lms-chart__col:focus-visible .lms-chart__hit {
   stroke: var(--lms-mint);
   stroke-width: 2;
   fill: rgba(126, 226, 168, 0.12);
 }
-.lms-chart__bar--today { fill: var(--lms-mint); }
-.lms-chart__col:hover .lms-chart__bar--today { fill: #6fd99a; }
 .lms-chart__hit { fill: transparent; }
 .lms-chart__value {
   font-size: 11.5px;
@@ -1357,10 +1746,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-green-600);
 }
 .lms-course__path svg { width: 14px; height: 14px; }
@@ -1422,10 +1810,9 @@
 .lms-course__next-body { min-width: 0; }
 .lms-course__next-label {
   display: block;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-course__next.is-locked .lms-course__next-label { color: var(--lms-warning); }
@@ -1577,10 +1964,9 @@
 .lms-module__body { flex: 1; min-width: 0; }
 .lms-module__label {
   display: block;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-module__title {
@@ -1652,29 +2038,56 @@
 .lms-pill--done svg { width: 13px; height: 13px; }
 
 /* Course detail ------------------------------------------------------------ */
+/* The course's heading band.
+
+   Six dark-green gradients, one per accent, with the title reversed out — the
+   same slab the dashboard's greeting band was, on the page a learner opens
+   most. It is a card now: white, with the accent kept as a colour bar down its
+   leading edge, which is where a course's identity can live without painting
+   the whole top of the screen.
+
+   `is-accent-N` stays and still means what it meant. Only the surface it paints
+   changed, so nothing that assigns an accent has to know about this. */
 .lms-detail__hero {
-  padding: 30px 32px;
+  position: relative;
+  overflow: hidden;
+  padding: 26px 30px 26px 34px;
   margin-bottom: 20px;
+  border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius-lg);
-  color: #fff;
+  background: var(--lms-surface);
+  box-shadow: var(--lms-shadow);
+  color: var(--lms-text);
 }
-.lms-detail__hero.is-accent-0 { background: linear-gradient(120deg, #0a3114, #14572a); }
-.lms-detail__hero.is-accent-1 { background: linear-gradient(120deg, #0e3e1b, #2f7d45); }
-.lms-detail__hero.is-accent-2 { background: linear-gradient(120deg, #0c3a19, #1d6b36); }
-.lms-detail__hero.is-accent-3 { background: linear-gradient(120deg, #123f22, #3d8a55); }
-.lms-detail__hero.is-accent-4 { background: linear-gradient(120deg, #0a3114, #1a5f30); }
-.lms-detail__hero.is-accent-5 { background: linear-gradient(120deg, #10361c, #267140); }
+
+/* The accent, as a 5px bar on the leading edge. A pseudo-element rather than a
+   border-left, so the card's own radius still rounds it. */
+.lms-detail__hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: var(--lms-accent, #14572a);
+}
+
+.lms-detail__hero.is-accent-0 { --lms-accent: linear-gradient(180deg, #0a3114, #14572a); }
+.lms-detail__hero.is-accent-1 { --lms-accent: linear-gradient(180deg, #0e3e1b, #2f7d45); }
+.lms-detail__hero.is-accent-2 { --lms-accent: linear-gradient(180deg, #0c3a19, #1d6b36); }
+.lms-detail__hero.is-accent-3 { --lms-accent: linear-gradient(180deg, #123f22, #3d8a55); }
+.lms-detail__hero.is-accent-4 { --lms-accent: linear-gradient(180deg, #0a3114, #1a5f30); }
+.lms-detail__hero.is-accent-5 { --lms-accent: linear-gradient(180deg, #10361c, #267140); }
 .lms-detail__hero-body { max-width: 72ch; }
 .lms-detail__path {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-bottom: 10px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--lms-mint);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--lms-green-600);
 }
 .lms-detail__path svg { width: 15px; height: 15px; }
 .lms-detail__title {
@@ -1688,7 +2101,7 @@
   margin: 12px 0 0;
   font-size: 15px;
   line-height: 1.6;
-  color: var(--lms-on-dark-2);
+  color: var(--lms-text-2);
 }
 .lms-detail__facts {
   display: flex;
@@ -1698,10 +2111,10 @@
   padding: 0;
   list-style: none;
   font-size: 13px;
-  color: var(--lms-on-dark-2);
+  color: var(--lms-muted);
 }
 .lms-detail__facts li { display: inline-flex; align-items: center; gap: 6px; }
-.lms-detail__facts svg { width: 15px; height: 15px; color: var(--lms-mint); }
+.lms-detail__facts svg { width: 15px; height: 15px; color: var(--lms-green-600); }
 
 .lms-detail__cols {
   display: grid;
@@ -1898,10 +2311,9 @@
 .lms-player__rail-head { padding: 16px 18px; border-bottom: 1px solid var(--lms-border); }
 .lms-player__rail-label {
   display: block;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-player__rail-course {
@@ -1917,10 +2329,9 @@
 .lms-player__mod-head { padding: 13px 18px 7px; }
 .lms-player__mod-label {
   display: block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-player__mod-title { display: block; font-size: 13.5px; font-weight: 600; color: var(--lms-text); }
@@ -1964,10 +2375,9 @@
 .lms-lesson-page__crumb {
   display: block;
   margin-bottom: 7px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-lesson-page__title {
@@ -2236,7 +2646,7 @@ a.lms-note__stamp:hover { text-decoration: underline; }
   pointer-events: none;
 }
 .lms-ring__value { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--lms-text); }
-.lms-ring__sub { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lms-muted); }
+.lms-ring__sub { font-size: 12.5px; font-weight: 600; letter-spacing: 0; color: var(--lms-muted); }
 
 .lms-segmented--sm .lms-segmented__btn { padding: 5px 12px; font-size: 12.5px; }
 
@@ -2522,11 +2932,10 @@ a.lms-note__stamp:hover { text-decoration: underline; }
 
 .lms-thread__heading {
   margin: 26px 0 12px;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: #8a958e;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0;
+  color: var(--lms-text);
 }
 
 .lms-answers { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
@@ -2658,10 +3067,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-reviewform__course { margin: 0; font-size: 15px; font-weight: 600; color: var(--lms-text); }
 .lms-reviewform__rating { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .lms-reviewform__label {
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-reviewform .lms-input { margin-top: 0; }
@@ -2685,8 +3093,12 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 22px 26px;
   margin-bottom: 18px;
   border-radius: var(--lms-radius-lg);
-  background: linear-gradient(115deg, var(--lms-green) 0%, var(--lms-green-800) 55%, #125228 100%);
-  color: #fff;
+  /* Pale mint, not a slab of brand green. Same reasoning as the dashboard's KPI
+     tiles: the fill was doing the same thing here, and the border is what marks
+     the panel out on a page of white cards. */
+  border: 1px solid #cdead9;
+  background: linear-gradient(150deg, #eaf7f0 0%, #e2f4ea 100%);
+  color: var(--lms-text);
 }
 .lms-level__main { display: flex; align-items: center; gap: 16px; }
 .lms-level__medal {
@@ -2697,28 +3109,27 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 54px;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 2px solid var(--lms-mint);
-  color: var(--lms-mint);
+  border: 2px solid var(--lms-green-600);
+  color: var(--lms-green-600);
 }
 .lms-level__medal svg { width: 26px; height: 26px; }
 .lms-level__eyebrow {
   margin: 0;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--lms-mint);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--lms-green-600);
 }
 .lms-level__name { margin: 3px 0 2px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
-.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-on-dark-2); }
+.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-muted); }
 .lms-level__bar { flex: 1; min-width: 220px; max-width: 420px; }
-.lms-level__bar .lms-progress { background: rgba(255, 255, 255, 0.18); margin-bottom: 7px; }
-.lms-level__bar .lms-progress__fill { background: var(--lms-mint); }
+.lms-level__bar .lms-progress { background: #d0e9db; margin-bottom: 7px; }
+.lms-level__bar .lms-progress__fill { background: var(--lms-green-600); }
 .lms-level__scale {
   display: flex;
   justify-content: space-between;
   font-size: 11.5px;
-  color: var(--lms-on-dark-3);
+  color: var(--lms-muted);
 }
 
 /* Closest badge */
@@ -2726,10 +3137,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-nextbadge__body { flex: 1; min-width: 180px; }
 .lms-nextbadge__label {
   margin: 0;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-nextbadge__name { margin: 3px 0 2px; font-size: 17px; font-weight: 600; }
@@ -2795,10 +3205,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-board th {
   padding: 0 12px 10px;
   text-align: left;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
   border-bottom: 1px solid var(--lms-border);
   white-space: nowrap;
@@ -2817,6 +3226,28 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-board__level { color: var(--lms-muted); font-size: 13px; }
 .lms-board__pts { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 
+/* The slice the server returns can skip ranks — the top three, then the
+   learner's own neighbours. This row is the elision, drawn rather than closed
+   so rank 3 sitting above rank 9 does not read as four consecutive places. */
+.lms-board__gap td {
+  padding: 2px 12px;
+  text-align: center;
+  color: var(--lms-muted);
+  letter-spacing: 0.2em;
+  border-bottom: 1px solid var(--lms-border);
+}
+
+/* Stands in for the table while it loads, when it fails, and when the learner
+   is the only person on their courses — the one case where a table of one with
+   a gold medal on it would say the opposite of what it means. */
+.lms-board__note {
+  margin: 0;
+  padding: 4px 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--lms-muted);
+}
+
 @media (max-width: 640px) {
   .lms-nextbadge__progress { width: 100%; }
   .lms-board__level { display: none; }
@@ -2833,8 +3264,12 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 20px 24px;
   margin-bottom: 18px;
   border-radius: var(--lms-radius-lg);
-  background: linear-gradient(115deg, var(--lms-green) 0%, var(--lms-green-800) 60%, #125228 100%);
-  color: #fff;
+  /* Pale mint, not a slab of brand green. Same reasoning as the dashboard's KPI
+     tiles: the fill was doing the same thing here, and the border is what marks
+     the panel out on a page of white cards. */
+  border: 1px solid #cdead9;
+  background: linear-gradient(150deg, #eaf7f0 0%, #e2f4ea 100%);
+  color: var(--lms-text);
 }
 .lms-membership__main { display: flex; align-items: center; gap: 15px; }
 .lms-membership__icon {
@@ -2845,29 +3280,28 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 48px;
   flex-shrink: 0;
   border-radius: 999px;
-  border: 2px solid var(--lms-mint);
-  color: var(--lms-mint);
+  border: 2px solid var(--lms-green-600);
+  color: var(--lms-green-600);
 }
 .lms-membership__icon svg { width: 23px; height: 23px; }
 .lms-membership__eyebrow {
   margin: 0;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--lms-mint);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--lms-green-600);
 }
 .lms-membership__name { margin: 3px 0 2px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
-.lms-membership__meta { margin: 0; font-size: 13px; color: var(--lms-on-dark-2); }
+.lms-membership__meta { margin: 0; font-size: 13px; color: var(--lms-muted); }
 .lms-membership__includes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .lms-membership__includes li {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: var(--lms-on-dark-2);
+  color: var(--lms-text-2);
 }
-.lms-membership__includes svg { width: 15px; height: 15px; color: var(--lms-mint); flex-shrink: 0; }
+.lms-membership__includes svg { width: 15px; height: 15px; color: var(--lms-green-600); flex-shrink: 0; }
 
 .lms-orders { display: flex; flex-direction: column; gap: 14px; }
 .lms-order {
@@ -2953,10 +3387,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-invoice__kind {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-green-600);
 }
 .lms-invoice__ref { margin: 4px 0 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
@@ -2970,10 +3403,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-invoice__parties p { margin: 0 0 2px; font-size: 13.5px; color: var(--lms-text-2); }
 .lms-invoice__label {
-  font-size: 10.5px !important;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px !important;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted) !important;
   margin-bottom: 6px !important;
 }
@@ -2982,10 +3414,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-invoice__table th {
   padding: 10px 0;
   text-align: left;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
   border-bottom: 1px solid var(--lms-border);
 }
@@ -3083,10 +3514,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-profile__bio { margin: 0; max-width: 70ch; font-size: 14.5px; line-height: 1.65; color: var(--lms-text-2); white-space: pre-wrap; }
 .lms-profile__details { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin: 20px 0 0; }
 .lms-profile__details dt {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-profile__details dd { margin: 3px 0 0; font-size: 14px; color: var(--lms-text-2); }
@@ -3120,10 +3550,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 /* Settings (L6) ------------------------------------------------------------ */
 .lms-account { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
 .lms-account dt {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-account dd {
@@ -3330,8 +3759,12 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 40px 32px;
   margin-bottom: 18px;
   border-radius: var(--lms-radius-lg);
-  background: linear-gradient(115deg, var(--lms-green) 0%, var(--lms-green-800) 55%, #125228 100%);
-  color: #fff;
+  /* Pale mint, not a slab of brand green. Same reasoning as the dashboard's KPI
+     tiles: the fill was doing the same thing here, and the border is what marks
+     the panel out on a page of white cards. */
+  border: 1px solid #cdead9;
+  background: linear-gradient(150deg, #eaf7f0 0%, #e2f4ea 100%);
+  color: var(--lms-text);
   text-align: center;
 }
 .lms-confirm__tick {
@@ -3341,8 +3774,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 62px;
   height: 62px;
   border-radius: 999px;
-  background: var(--lms-mint);
-  color: var(--lms-green);
+  background: var(--lms-green);
+  color: #fff;
 }
 .lms-confirm__tick svg { width: 32px; height: 32px; }
 .lms-confirm__title {
@@ -3351,15 +3784,15 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   font-weight: 600;
   letter-spacing: -0.02em;
 }
-.lms-confirm__sub { margin: 0 auto; max-width: 52ch; font-size: 15px; line-height: 1.6; color: var(--lms-on-dark-2); }
+.lms-confirm__sub { margin: 0 auto; max-width: 52ch; font-size: 15px; line-height: 1.6; color: var(--lms-text-2); }
 .lms-confirm__actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
 .lms-confirm__ghost {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: var(--lms-on-dark-line);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.7);
+  border-color: #cdead9;
+  color: var(--lms-text);
   box-shadow: none;
 }
-.lms-confirm__ghost:hover { background: rgba(255, 255, 255, 0.18); border-color: var(--lms-mint); color: #fff; }
+.lms-confirm__ghost:hover { background: #fff; border-color: var(--lms-green-600); color: var(--lms-text); }
 .lms-confirm__cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; align-items: start; }
 
 .lms-next { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; }
@@ -3419,7 +3852,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   border-radius: 0;
 }
 .lms-auth__brand strong { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-.lms-auth__brand span span { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lms-green-600); }
+.lms-auth__brand span span { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--lms-green-600); }
 .lms-auth__title { margin: 0 0 6px; font-size: clamp(26px, 3.4vw, 32px); font-weight: 600; letter-spacing: -0.02em; }
 .lms-auth__sub { margin: 0 0 26px; font-size: 14.5px; color: var(--lms-muted); }
 .lms-auth__sub a { color: var(--lms-green-600); font-weight: 600; }
@@ -3661,10 +4094,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-dtable th {
   padding: 8px 12px;
   text-align: left;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 650;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-muted);
   border-bottom: 1px solid var(--lms-border);
 }
@@ -3949,9 +4381,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   border-radius: 999px;
   background: var(--lms-mint-soft);
   color: var(--lms-green);
-  font-size: 9.5px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
 }
 .lms-clesson__time { flex-shrink: 0; font-size: 11px; color: var(--lms-muted); }
 .lms-clesson__tools { display: flex; flex-direction: column; flex-shrink: 0; }
@@ -3990,10 +4421,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-lessonedit__crumb {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-lessonedit__title { margin: 4px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
@@ -4701,10 +5131,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-result__icon svg { width: 26px; height: 26px; }
 .lms-result__label {
   margin: 0;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-green);
 }
 .lms-result.is-fail .lms-result__label { color: var(--lms-warning); }
@@ -4739,10 +5168,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin: 12px 0 0 36px;
 }
 .lms-review__answers dt {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-review__answers dd { margin: 2px 0 0; font-size: 14px; color: var(--lms-text-2); }
@@ -4936,10 +5364,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-certcard__thumb svg { width: 42px; height: 42px; }
 .lms-certcard__body { flex: 1; padding: 16px 18px; }
 .lms-certcard__kind {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-green-600);
 }
 .lms-certcard__title { margin: 5px 0 6px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
@@ -4988,10 +5415,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-cert__issuer { font-size: 0.95em; font-weight: 700; letter-spacing: 0.04em; }
 .lms-cert__kind {
-  font-size: 0.65em;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--cert-accent-soft);
 }
 .lms-cert__intro { margin: 0; font-size: 0.8em; color: rgba(255, 255, 255, 0.66); }
@@ -5120,7 +5546,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 @media (max-width: 620px) {
   .lms-dash-stats { grid-template-columns: 1fr; }
-  .lms-greeting { padding: 22px 20px; }
+  /* The head stacks on a phone: a greeting and a date side by side leaves the
+     greeting two words wide. */
+  .lms-page__head { flex-direction: column; align-items: stretch; gap: 8px; }
   .lms-crumbs__sep,
   .lms-crumbs a span { display: none; }
 }
@@ -5272,10 +5700,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-certdoc__issuer {
   margin: 0;
-  font-size: 1.05em;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 1.15em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--cert-accent);
 }
 .lms-certdoc__heading {
@@ -5604,10 +6031,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-previewgate__mark svg { width: 22px; height: 22px; }
 .lms-previewgate__kicker {
   margin: 0 0 3px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--lms-green);
 }
 .lms-previewgate__title {
@@ -5775,10 +6201,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-coach__sources-label {
   margin: 0 0 6px;
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-coach__sources ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -5822,8 +6247,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-live-list--past .lms-live-card { opacity: .72; }
 
 .lms-section-title {
-  font-size: 12.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
-  color: var(--lms-muted); margin: 0 0 10px;
+  font-size: 14.5px; font-weight: 650; letter-spacing: 0;
+  color: var(--lms-text); margin: 0 0 10px;
 }
 
 .lms-live-card {
@@ -5849,7 +6274,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 .lms-live-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  font-size: 12px; font-weight: 600; letter-spacing: 0;
   padding: 3px 8px; border-radius: var(--lms-radius-sm);
   background: var(--lms-surface-3); color: var(--lms-text-2); white-space: nowrap;
 }
@@ -6212,10 +6637,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
    without it every section is called "Module 0". */
 .lms-cmod__eyebrow {
   display: block;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-muted);
   margin-bottom: 2px;
 }
@@ -6311,10 +6735,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-addlesson__label {
   flex: 0 0 100%;
   margin: 0 0 2px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 /* Cancel last, and set apart, so it does not read as a sixth lesson type. */
@@ -6349,10 +6772,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-toc__label {
   margin: 0 0 10px;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: .09em;
-  text-transform: uppercase;
+  letter-spacing: 0;
   color: var(--lms-muted);
 }
 .lms-toc__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
@@ -6430,7 +6852,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-bundlecard__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .lms-bundlecard__tag {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  font-size: 12px; font-weight: 600; letter-spacing: 0;
   padding: 3px 8px; border-radius: var(--lms-radius-sm);
   background: var(--lms-surface-3); color: var(--lms-green);
 }
@@ -6509,13 +6931,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
      printed, and the motif has something to sit against. */
   /* A long fade rather than one flat green.
 
-     Three layers: a soft light source top-left, a wide mint bloom low on the
-     right where the illustration sits, and a base ramp with enough stops to
+     Three layers: a soft light source top-right, a wide mint bloom low on the
+     left where the illustration sits, and a base ramp with enough stops to
      travel slowly — a two-stop gradient over this much area reads as a solid
      colour with a seam in it. */
   background:
-    radial-gradient(90% 70% at 12% -5%, rgba(255, 255, 255, 0.13) 0%, transparent 62%),
-    radial-gradient(70% 55% at 88% 92%, rgba(126, 226, 168, 0.16) 0%, transparent 70%),
+    radial-gradient(90% 70% at 88% -5%, rgba(255, 255, 255, 0.13) 0%, transparent 62%),
+    radial-gradient(70% 55% at 12% 92%, rgba(126, 226, 168, 0.16) 0%, transparent 70%),
     linear-gradient(
       160deg,
       #135c2c 0%,
@@ -6532,14 +6954,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
    the JSX (so it can sit behind the motif in the stacking order), and `order`
    is what puts the reading order right without moving the markup. */
 .lms-authside__body { position: relative; max-width: 42ch; flex-shrink: 0; order: 1; }
-.lms-authside__eyebrow {
-  margin: 0 0 18px;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--lms-mint);
-}
 .lms-authside__lede {
   margin: 0;
   font-size: clamp(27px, 3.1vw, 38px);
@@ -6586,6 +7000,47 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-authside__icon svg { width: 16px; height: 16px; }
 
+/* The way through to the sign-in page, for the instructor or staff member who
+   landed on the sign-up form and has no row to fill in there.
+
+   Deliberately quiet. It is a signpost for a minority of arrivals, not a second
+   call to action competing with the form the page is built around — so it is
+   one line under a hairline, in the panel's muted white rather than the mint
+   the proof ticks use. The chevron points down because it is the LAST thing in
+   the panel; rotated a quarter turn it reads as "onward", which is what it
+   means here. */
+.lms-authside__internal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 26px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.66);
+}
+.lms-authside__internal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms var(--lms-ease);
+}
+.lms-authside__internal-link:hover,
+.lms-authside__internal-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+.lms-authside__internal-link svg {
+  width: 15px;
+  height: 15px;
+  transform: rotate(-90deg);
+}
+
 /* Below this the panel would be a header nobody scrolls past to reach the
    form, so it goes rather than stacking. */
 @media (max-width: 900px) {
@@ -6601,7 +7056,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__anim {
   position: relative;
   order: 2;
-  align-self: flex-end;
+  /* Left edge, under the start of the copy rather than trailing off the right.
+     The lede and the proof row are both left-aligned, so the art now shares
+     their margin and the panel reads as one column instead of a block of text
+     with a picture drifting away from it. The gradient's mint bloom moved with
+     it (see .lms-authside) — the light has to come from where the subject is,
+     or the panel looks lit from the empty half. */
+  align-self: flex-start;
   /* SIZED FROM HEIGHT, not width, and this is the whole point.
 
      It used to be `width: min(460px, 92%)` with a `@media (max-height: 800px)`
@@ -6628,7 +7089,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   /* Nothing here should shrink past the ratio; the height formula above is
      what responds to a short viewport. */
   flex: 0 0 auto;
-  margin-right: clamp(-40px, -2vw, 0px);
+  margin-left: clamp(-40px, -2vw, 0px);
   opacity: 0;
   transition: opacity .5s ease-out;
   pointer-events: none;

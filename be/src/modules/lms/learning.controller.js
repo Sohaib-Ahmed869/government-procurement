@@ -797,6 +797,77 @@ export const myEnrollments = asyncHandler(async (req, res) => {
 // Marks a lesson complete and, if that finishes the course, issues the
 // certificate. Completion and issuance happen together on the server so a
 // learner can't reach one without the other.
+/* Record that a lesson is finished, and everything that follows from it.
+
+   Shared by completeLesson — the learner pressing "Mark complete" — and by
+   submitQuiz, because PASSING a quiz is how that lesson gets finished. There is
+   no "mark complete" button on a quiz, and there should not be: the pass mark
+   already says whether the learner has done the thing.
+
+   Policy stays with the callers. This does the write; each caller decides for
+   itself whether the learner was entitled to reach it. completeLesson re-runs
+   the full gate because it is a bare endpoint anyone can POST to; submitQuiz
+   relies on the signed ticket, which only getQuiz issues and only after its own
+   gate has passed.
+
+   `activityMinutes` is null when the caller has already written its own
+   activity row. A quiz records the attempt's real duration, which is a better
+   number than the lesson's estimate — and recording both would count the day
+   twice. */
+async function applyLessonCompletion({ user, lesson, enrolment, activityMinutes, tzOffset }) {
+  const progress =
+    (await Progress.findOne({ user: user._id, course: lesson.course })) ??
+    new Progress({ user: user._id, course: lesson.course });
+
+  const already = progress.completedLessons.some((id) => String(id) === String(lesson._id));
+  if (!already) {
+    progress.completedLessons.push(lesson._id);
+    progress.minutesLearned += lesson.minutes || 0;
+
+    // The learner's day, not the server's — see localDay(). Only on a FIRST
+    // completion: re-opening a finished lesson is revision, and counting it
+    // again would let a learner run their week's minutes up by clicking.
+    //
+    // Not awaited and never fatal: an activity row is a chart, and a chart is
+    // not worth failing a completion the learner has earned.
+    if (activityMinutes !== null) {
+      LearningActivity.record({
+        user: user._id,
+        day: localDay(tzOffset),
+        minutes: activityMinutes,
+        lessons: 1,
+      }).catch(() => {});
+    }
+  }
+  progress.lastLesson = lesson._id;
+  progress.lastLessonAt = new Date();
+  await progress.save();
+
+  const total = await Lesson.countDocuments({ course: lesson.course });
+  const finished = progress.completedLessons.length >= total && total > 0;
+
+  let certificate = null;
+  let programCertificates = [];
+  if (finished && enrolment && !enrolment.completedAt) {
+    enrolment.completedAt = new Date();
+    await enrolment.save();
+    certificate = await issueCertificate({ user, courseId: lesson.course });
+    // A course completion can be the last step of a learning path. Issued in
+    // the same request so the learner is told once, not on a later page load.
+    programCertificates = await issueProgramCertificates({ user, courseId: lesson.course });
+  }
+
+  return {
+    completedLessons: progress.completedLessons,
+    lessonsDone: progress.completedLessons.length,
+    lessonsTotal: total,
+    percent: total ? Math.round((progress.completedLessons.length / total) * 100) : 0,
+    courseComplete: finished,
+    certificate,
+    programCertificates,
+  };
+}
+
 export const completeLesson = asyncHandler(async (req, res) => {
   const lesson = await Lesson.findById(req.params.lessonId);
   if (!lesson) throw ApiError.notFound('Lesson not found');
@@ -820,58 +891,16 @@ export const completeLesson = asyncHandler(async (req, res) => {
   });
   if (isLocked(completeGate)) throw ApiError.forbidden(JSON.stringify(completeGate));
 
-  const progress =
-    (await Progress.findOne({ user: req.user._id, course: lesson.course })) ??
-    new Progress({ user: req.user._id, course: lesson.course });
-
-  const already = progress.completedLessons.some((id) => String(id) === String(lesson._id));
-  if (!already) {
-    progress.completedLessons.push(lesson._id);
-    progress.minutesLearned += lesson.minutes || 0;
-
-    // The learner's day, not the server's — see localDay(). Only on a FIRST
-    // completion: re-opening a finished lesson is revision, and counting it
-    // again would let a learner run their week's minutes up by clicking.
-    //
-    // Not awaited and never fatal: an activity row is a chart, and a chart is
-    // not worth failing a completion the learner has earned.
-    LearningActivity.record({
-      user: req.user._id,
-      day: localDay(req.body?.tzOffset),
-      minutes: lesson.minutes || 0,
-      lessons: 1,
-    }).catch(() => {});
-  }
-  progress.lastLesson = lesson._id;
-  progress.lastLessonAt = new Date();
-  await progress.save();
-
-  const total = await Lesson.countDocuments({ course: lesson.course });
-  const finished = progress.completedLessons.length >= total && total > 0;
-
-  let certificate = null;
-  let programCertificates = [];
-  if (finished && !enrolment.completedAt) {
-    enrolment.completedAt = new Date();
-    await enrolment.save();
-    certificate = await issueCertificate({ user: req.user, courseId: lesson.course });
-    // A course completion can be the last step of a learning path. Issued in
-    // the same request so the learner is told once, not on a later page load.
-    programCertificates = await issueProgramCertificates({
+  return ok(
+    res,
+    await applyLessonCompletion({
       user: req.user,
-      courseId: lesson.course,
-    });
-  }
-
-  return ok(res, {
-    completedLessons: progress.completedLessons,
-    lessonsDone: progress.completedLessons.length,
-    lessonsTotal: total,
-    percent: total ? Math.round((progress.completedLessons.length / total) * 100) : 0,
-    courseComplete: finished,
-    certificate,
-    programCertificates,
-  });
+      lesson,
+      enrolment,
+      activityMinutes: lesson.minutes || 0,
+      tzOffset: req.body?.tzOffset,
+    }),
+  );
 });
 
 // PATCH /lms/progress/lessons/:lessonId/position. Video resume point.
@@ -1017,7 +1046,41 @@ export const submitQuiz = asyncHandler(async (req, res) => {
     quizzes: 1,
   }).catch(() => {});
 
+  /* PASSING THE QUIZ IS FINISHING THE LESSON.
+
+     This did not happen. The attempt was recorded, the result screen said "this
+     assessment counts towards your course completion", and nothing was written
+     to Progress — so a learner who passed every quiz in a course watched the
+     rail keep its unticked circle and the percentage refuse to move, and the
+     course could never reach 100% or issue its certificate. A quiz lesson has
+     no "mark complete" button to fall back on, and should not have one: the
+     pass mark is already the statement that the learner has done the thing.
+
+     Only on a PASS, and only for someone actually enrolled — `bypass` lets an
+     author or reviewer sit their own quiz to check the marking, and their trial
+     run is not course progress.
+
+     Idempotent by way of applyLessonCompletion: a retake finds the lesson
+     already in `completedLessons` and adds nothing. A retake that FAILS does
+     not undo it either, which matches the rest of the LMS — completion is
+     one-way on the server, and a learner who has passed has passed. */
+  let progress = null;
+  if (attempt.passed && enrolment?.isActive()) {
+    progress = await applyLessonCompletion({
+      user: req.user,
+      lesson,
+      enrolment,
+      // Already recorded above, from the attempt's own clock.
+      activityMinutes: null,
+      tzOffset: req.body?.tzOffset,
+    });
+  }
+
   return created(res, {
+    // What the course looks like now, so the player's rail and its percentage
+    // can be refreshed from the same response that reports the mark. Null when
+    // the attempt did not pass and nothing moved.
+    progress,
     attempt: {
       _id: attempt._id,
       score: attempt.score,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import LmsIcon from '../LmsIcon.jsx';
 import QuestionCard from './QuestionCard.jsx';
 import { quizzesApi } from '../../../api/lms.js';
@@ -22,6 +22,11 @@ export default function QuizRunner({ quiz, lessonId, slug, onSubmitted,
   ticket,
 }) {
   const navigate = useNavigate();
+  // PlayerLayout hands this down so a child that moves progress can tell the
+  // shell to re-read it. Taken from the context rather than from a prop for the
+  // same reason useLesson does: one place to get it right, and a screen that
+  // renders the runner cannot forget to pass it on.
+  const { reloadOutline } = useOutletContext() ?? {};
   const [answers, setAnswers] = useState({});
   const [i, setI] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +73,13 @@ export default function QuizRunner({ quiz, lessonId, slug, onSubmitted,
         ticket,
       );
       onSubmitted?.();
+      /* The player shell fetched the outline when it mounted and has no idea
+         this just happened, so its rail and its percentage keep showing the
+         course as it was — a passed quiz left its circle unticked and the bar
+         where it started. The same call useLesson makes after a completion,
+         for the same reason; it is awaited so the result screen renders against
+         a refreshed rail rather than one that ticks a moment later. */
+      await reloadOutline?.();
       navigate(
         `/learn/courses/${slug}/quiz/${lessonId}/result/${result.attempt._id}`,
         { state: { result } },
@@ -80,7 +92,7 @@ export default function QuizRunner({ quiz, lessonId, slug, onSubmitted,
       setError(err?.message ?? 'Your attempt didn’t reach us. Try submitting again.');
       setSubmitting(false);
     }
-  }, [answers, quiz.questions, lessonId, slug, navigate, onSubmitted, ticket]);
+  }, [answers, quiz.questions, lessonId, slug, navigate, onSubmitted, reloadOutline, ticket]);
 
   // Countdown. Submits whatever is answered when it hits zero rather than
   // discarding the attempt.

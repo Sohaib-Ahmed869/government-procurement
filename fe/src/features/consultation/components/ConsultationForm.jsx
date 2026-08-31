@@ -102,12 +102,17 @@ export default function ConsultationForm() {
           {/* --- intro / what to expect --- */}
           <aside className="consult__intro">
             <h1 className="consult__title">Request a Consultation</h1>
+            {/* The scope of the conversation sits INSIDE the lead, between
+                what the consultation is and where to read more — not in a
+                bordered notice under it. A box would have made one plain
+                sentence look like a legal warning, and it belongs with the
+                sentences that set expectations rather than after them. */}
             <p className="consult__lead">
               Connect with a member of our team for a complimentary,
               no-obligation consultation, in person or online, to discuss where
               you are in your journey. We&rsquo;ll share insights on how we can
-              assist and help you plan your next steps. For more information,
-              please refer to our{' '}
+              assist and help you plan your next steps. We do not advise on
+              specific tenders. For more information, please refer to our{' '}
               <Link className="consult__lead-link" to="/policies/conflicts-of-interest">
                 Conflict of Interest Policy
               </Link>
@@ -229,7 +234,7 @@ export default function ConsultationForm() {
                 name="message"
                 className="consult__input consult__textarea"
                 placeholder="Tell us what you'd like to cover"
-                rows={7}
+                rows={4}
                 value={form.message}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.message)}

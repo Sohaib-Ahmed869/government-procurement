@@ -4,6 +4,33 @@ import { ok, created, noContent } from '../../utils/apiResponse.js';
 import { parsePaging, paginate } from '../../utils/pagination.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { User } from '../../models/User.js';
+import { InstructorProfile } from '../../models/InstructorProfile.js';
+import { ROLES } from '../../constants/roles.js';
+
+/* An instructor is a User plus an InstructorProfile.
+
+   Everything on the teaching side reads the profile — the course byline, the
+   instructor's own profile screen, and the `status` that says whether they may
+   submit a course for review. A User row with role:"instructor" and no profile
+   is an account that can sign in and then find half the app missing.
+
+   This used to be created by the public sign-up form, which is where
+   instructors came from. They come from the CMS now (see SELF_SIGNUP_ROLES in
+   constants/roles.js), so the CMS is where the profile has to be created — on
+   the way in, and on a role change, since a super admin can also promote an
+   existing student.
+
+   `upsert` rather than `create`: promoting somebody who was an instructor once
+   before must not fail on the unique index, and must not wipe the headline and
+   bio they already wrote. */
+async function ensureInstructorProfile(user) {
+  if (user.role !== ROLES.INSTRUCTOR) return;
+  await InstructorProfile.findOneAndUpdate(
+    { user: user._id },
+    { $setOnInsert: { user: user._id } },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  );
+}
 
 // GET / — paginated staff list. Supports ?q (name/email regex) and ?role.
 export const listUsers = asyncHandler(async (req, res) => {
@@ -37,12 +64,13 @@ export const createUser = asyncHandler(async (req, res) => {
   if (existing) throw ApiError.conflict('A user with this email already exists');
 
   const user = await User.create({ name, email, password, role });
+  await ensureInstructorProfile(user);
   recordAudit({
     req,
     action: 'user.create',
     entity: 'User',
     entityId: user._id,
-    summary: `Created user ${user.email}`,
+    summary: `Created ${user.role} ${user.email}`,
   });
   return created(res, user.toSafeJSON());
 });
@@ -67,6 +95,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   if (password) user.password = password; // pre-save hook re-hashes.
 
   await user.save();
+  await ensureInstructorProfile(user);
   recordAudit({
     req,
     action: 'user.update',
