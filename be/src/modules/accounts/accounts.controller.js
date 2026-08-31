@@ -21,8 +21,14 @@ export function homeFor(role) {
 // provisioning and must stay that way. The two differ in one critical respect:
 // this one is unauthenticated, so it can never be allowed to mint a staff
 // account. `role` is validated against SELF_SIGNUP_ROLES rather than trusted.
+//
+// SELF_SIGNUP_ROLES is now students only. `role` is still read and still
+// checked rather than ignored: a request asking for an instructor account gets
+// a 403 saying so, which is the honest answer to an old bookmark or a stale
+// client, where silently creating a student account would leave somebody
+// signed in as the wrong thing and none the wiser.
 export const signup = asyncHandler(async (req, res) => {
-  const { name, email, password, role, organisation, headline } = req.body;
+  const { name, email, password, role } = req.body;
 
   if (!name?.trim() || !email?.trim() || !password) {
     throw ApiError.badRequest('Name, email and password are required');
@@ -53,14 +59,6 @@ export const signup = asyncHandler(async (req, res) => {
     password,
     role: requested,
   });
-
-  if (requested === ROLES.INSTRUCTOR) {
-    await InstructorProfile.create({
-      user: user._id,
-      organisation: organisation ?? '',
-      headline: headline ?? '',
-    });
-  }
 
   // Signed in immediately. Making someone sign in again right after signing up
   // is a step that exists only to annoy them.

@@ -128,10 +128,6 @@ export default function LoginPage() {
           <button type="submit" className="lms-btn lms-btn--primary lms-btn--block lms-auth__submit" disabled={busy}>
             {busy ? 'Signing you in…' : 'Sign in'}
           </button>
-
-          <p className="lms-auth__fine">
-            Staff accounts sign in here too. You’ll be taken to the CMS.
-          </p>
         </form>
 
         <OAuthButtons next={returnToFrom({ search: location.search, state: location.state })} />

@@ -167,7 +167,7 @@ export default function OrderConfirmationPage() {
           </ol>
 
           <p className="lms-detail__note">
-            Changed your mind? You can request a refund within 14 days. Quote{' '}
+            Changed your mind? You can request a refund within 7 days. Quote{' '}
             {order.reference}.
           </p>
         </section>

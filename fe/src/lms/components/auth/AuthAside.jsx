@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import LmsIcon from '../LmsIcon.jsx';
 import AuthLottie from './AuthLottie.jsx';
 
@@ -20,10 +21,23 @@ import AuthLottie from './AuthLottie.jsx';
 
 /* Three words each. This panel is read in a glance on the way to the form, not
    studied — the earlier two-line descriptions were a brochure competing with
-   the thing the visitor actually came to do. */
+   the thing the visitor actually came to do.
+
+   There is no eyebrow over the lede any more. It read "Government Procurement
+   Learning", which is the wordmark the form column already carries two inches
+   to the left — the panel was introducing a brand the visitor is looking
+   straight at. The lede opens the panel instead. */
 const PROOF = ['Recorded lectures', 'Marked assessments', 'Certificates'];
 
-export default function AuthAside() {
+/* `showInternalSignIn` puts a way through to the sign-in page at the foot of
+   the panel. The sign-up form creates learner accounts and nothing else now, so
+   an instructor who lands on it has no row to fill in — this is the line that
+   tells them where they actually go, without putting a second call to action
+   next to the one the page is for.
+
+   Off by default, and off on the sign-in page in particular: a link to the page
+   you are already on is furniture. */
+export default function AuthAside({ showInternalSignIn = false }) {
   return (
     <aside className="lms-authside">
       {/* If its chunk fails to load this renders nothing and the panel is just
@@ -32,7 +46,6 @@ export default function AuthAside() {
       <AuthLottie className="lms-authside__anim" />
 
       <div className="lms-authside__body">
-        <p className="lms-authside__eyebrow">Government Procurement Learning</p>
         <h2 className="lms-authside__lede">
           The rules, the practice, and the record that stands up to review.
         </h2>
@@ -44,6 +57,16 @@ export default function AuthAside() {
             </li>
           ))}
         </ul>
+
+        {showInternalSignIn ? (
+          <p className="lms-authside__internal">
+            <span>Instructor?</span>
+            <Link className="lms-authside__internal-link" to="/learn/login">
+              Internal sign in
+              <LmsIcon name="chevron" />
+            </Link>
+          </p>
+        ) : null}
       </div>
     </aside>
   );

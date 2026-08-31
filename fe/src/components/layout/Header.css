@@ -351,6 +351,18 @@
   box-shadow: var(--control-edge-shadow);
 }
 
+/* Student Login — the way into the LMS.
+
+   It carries .site-header__cta as well, so the fill, height, radius, type and
+   hover all come from that one rule and the two buttons cannot drift apart.
+   What is left here is the single difference: it is sized to its own label
+   rather than to --control-width. The bar already holds two fixed 190px toggle
+   segments and the 190px CTA, and a fourth cell that wide is what would push
+   the row into wrapping at the narrow desktop widths. */
+.site-header__login {
+  min-width: 0;
+}
+
 .site-header__cta-arrow {
   display: inline-flex;
   align-items: center;
@@ -645,8 +657,19 @@
   text-underline-offset: 6px;
 }
 
+.site-header__mobile-login,
 .site-header__mobile-cta {
   margin-top: clamp(2px, 0.6vh, 6px);
+}
+
+/* The two actions sit below the nav items, so they need setting apart from
+   them — otherwise the first of them reads as a fourteenth destination. The
+   gap goes above the CTA, which leads the pair here as it does in the top bar.
+   A gap rather than a rule: the links are `inline-flex`, so a border on one
+   would be drawn to the width of its own label rather than across the menu,
+   which reads as an underline on the wrong item. */
+.site-header__mobile-cta {
+  margin-top: clamp(10px, 2.4vh, 24px);
 }
 
 /* The CTA arrow tracks the link size so it never dominates a shrunken menu. */

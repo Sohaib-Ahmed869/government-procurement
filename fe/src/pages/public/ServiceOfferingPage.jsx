@@ -46,22 +46,24 @@ export default function ServiceOfferingPage() {
             </div>
           </header>
 
-          {/* WIN only. On Award this page is a list of what the firm does for a
-              buyer; on Win it is the syllabus of what the training covers, and
-              a bidder arriving on it needs to be told that before they read the
-              list as an offer to run their tender. Same box as the Sourcing
-              Advisor's disclaimer — .gp-notice, shared from styles/notice.css
-              so the two cannot drift apart. */}
-          {audience === 'win' && (
-            <div className="so-page__shell">
-              <aside className="gp-notice so-page__notice" aria-label="Important information">
-                <p className="gp-notice__lead">
-                  We provide training in the function of tendering for government
-                  contracts. The topics below are what that training covers.
-                </p>
-              </aside>
-            </div>
-          )}
+          {/* Both segments. It was Win only, on the reasoning that a bidder
+              needs telling the list is a syllabus rather than an offer to run
+              their tender — but a buyer reading the same page can take it for
+              an offer to run their procurement just as easily, and the sentence
+              is true of the firm's training either way. A scope statement that
+              appears on one toggle and not the other also reads, to anyone who
+              presses the toggle, as a caveat the firm is trying to place
+              narrowly. Same box as the Sourcing Advisor's disclaimer —
+              .gp-notice, shared from styles/notice.css so the two cannot drift
+              apart. */}
+          <div className="so-page__shell">
+            <aside className="gp-notice so-page__notice" aria-label="Important information">
+              <p className="gp-notice__lead">
+                We provide training in the function of tendering for government
+                contracts. The topics below are what that training covers.
+              </p>
+            </aside>
+          </div>
 
           {/* The six services as a list of headings, one open at a time. It was
               six full-width photo rows, which showed one service per screen and

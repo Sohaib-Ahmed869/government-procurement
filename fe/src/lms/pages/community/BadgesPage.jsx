@@ -2,12 +2,13 @@ import LmsIcon from '../../components/LmsIcon.jsx';
 import BadgeGrid from '../../components/community/BadgeGrid.jsx';
 import LeaderboardTable from '../../components/community/LeaderboardTable.jsx';
 import { useBadges } from '../../hooks/useBadges.js';
-import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
+import { useLeaderboard } from '../../hooks/useLeaderboard.js';
 
 // Badges and gamification (L5).
 export default function BadgesPage() {
   const { badges, earned, locked, points, level } = useBadges();
-  const { user } = useStudentAuth();
+  // Ranked server-side, because a leaderboard needs everybody else's record.
+  const standings = useLeaderboard();
 
   // The closest unearned badge, surfaced at the top. "what's next" is the part
   // that actually changes behaviour.
@@ -104,10 +105,22 @@ export default function BadgesPage() {
             <LmsIcon name="users" />
             Standings
           </h2>
-          <span className="lms-card__note">Among learners on your courses</span>
+          {/* Now says how many, once the count is known — "among learners on
+              your courses" is a scope, and a reader ranked 4th wants to know
+              whether that is 4 of 5 or 4 of 200. */}
+          <span className="lms-card__note">
+            {standings.cohort > 1
+              ? `Among ${standings.cohort} learners on your courses`
+              : 'Among learners on your courses'}
+          </span>
         </div>
         <div className="lms-board__wrap">
-          <LeaderboardTable you={user?.name ?? 'You'} points={points} level={level.name} />
+          <LeaderboardTable
+            rows={standings.rows}
+            you={standings.you}
+            cohort={standings.cohort}
+            status={standings.status}
+          />
         </div>
       </section>
     </div>

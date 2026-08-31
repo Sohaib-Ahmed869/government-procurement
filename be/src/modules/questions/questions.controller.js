@@ -59,7 +59,15 @@ export const list = asyncHandler(async (req, res) => {
   let sort;
   if (!wantsAll) {
     filter.status = QUESTION_STATUS.PUBLISHED;
-    sort = req.query.sort || '-publishedAt';
+    // Newest first, with createdAt as the tie-break rather than nothing.
+    //
+    // publishedAt alone is not a total order over this collection: it is only
+    // stamped on the first transition to Published, so any question published
+    // before that stamp existed carries none, and the seed gives every question
+    // it creates the same value. Mongo then returns the tied documents in
+    // whatever order it likes, which is why the forum's "Recent Answers" could
+    // open on an answer from months ago.
+    sort = req.query.sort || '-publishedAt -createdAt';
   } else {
     if (req.query.status) filter.status = req.query.status;
     sort = req.query.sort || '-createdAt';

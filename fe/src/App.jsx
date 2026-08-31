@@ -153,6 +153,7 @@ function PublicSite() {
           {/* The old one-off policy URLs, kept as redirects for the same
               reason. */}
           <Route path="/privacy" element={<Navigate to="/policies/privacy" replace />} />
+          <Route path="/cookies" element={<Navigate to="/policies/cookies" replace />} />
           <Route path="/terms" element={<Navigate to="/policies/terms" replace />} />
           <Route
             path="/conflicts-of-interest"

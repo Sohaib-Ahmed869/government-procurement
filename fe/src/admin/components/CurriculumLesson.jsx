@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { videoApi } from '../../api/lms.js';
 
 const KIND_LABEL = {
-  text: 'text', video: 'video', youtube: 'youtube', doc: 'doc', quiz: 'quiz',
+  text: 'Text', video: 'Video', youtube: 'YouTube', doc: 'Doc', quiz: 'Quiz',
 };
 
 function stamp(t) {
@@ -213,7 +213,7 @@ export default function CurriculumLesson({ lesson, flags }) {
                             className={q.correct?.includes(o.id) ? 'is-correct' : undefined}
                           >
                             {o.text}
-                            {q.correct?.includes(o.id) ? <span> correct</span> : null}
+                            {q.correct?.includes(o.id) ? <span> Correct</span> : null}
                           </li>
                         ))}
                       </ul>

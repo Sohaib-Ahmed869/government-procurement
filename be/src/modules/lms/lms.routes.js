@@ -11,6 +11,7 @@ import * as discussions from './discussions.controller.js';
 import * as notifications from './notifications.controller.js';
 import * as coach from './coach.controller.js';
 import * as reviews from './reviews.controller.js';
+import * as gamification from './gamification.controller.js';
 import * as programs from './programs.controller.js';
 import * as study from './study.controller.js';
 import * as live from './liveSessions.controller.js';
@@ -110,6 +111,10 @@ router.post('/coach/ask', protect, coach.ask);
 /* Course reviews (L5). Same records the instructor's Reviews page reads.
    Enrolment and progress are checked on write, in the controller. */
 router.get('/reviews/mine', protect, reviews.myReviews);
+
+/* Cohort standings for the badges page. `protect` because the ranking is scoped
+   to the signed-in learner's own courses — there is no anonymous view of it. */
+router.get('/badges/leaderboard', protect, gamification.leaderboard);
 router.post('/reviews', protect, reviews.saveReview);
 router.delete('/reviews/:id', protect, reviews.removeReview);
 

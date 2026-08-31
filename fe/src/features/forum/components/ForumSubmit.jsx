@@ -83,7 +83,7 @@ function Select({ id, options, value, onChange, placeholder }) {
 }
 
 export default function ForumSubmit() {
-  const { audience, isWin } = useAudience();
+  const { audience } = useAudience();
   const { ref, inView } = useInView();
   const [sent, setSent] = useState(false);
   const [category, setCategory] = useState('');
@@ -122,20 +122,26 @@ export default function ForumSubmit() {
     <section ref={ref} className={`forum-submit hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
       <div className="forum-submit__inner">
         <div className="forum-submit__main">
-          {/* Win only, and above the heading rather than under it — the same
-              place, and the same drop from the heading strip, as the Sourcing
-              Advisor's notice above its picker. It is a rule about what may be
-              asked, so it is read before the question is written. */}
-          {isWin && (
-            <aside
-              className="gp-notice forum-submit__notice"
-              aria-label="Important information"
-            >
-              <p className="gp-notice__lead">
-                I do not answer questions related to specific bids.
-              </p>
-            </aside>
-          )}
+          {/* Both segments, and above the heading rather than under it — the
+              same place, and the same drop from the heading strip, as the
+              Sourcing Advisor's notice above its picker. It is a rule about
+              what may be asked, so it is read before the question is written.
+
+              It was Win only, on the reasoning that a bid-specific question
+              comes from a bidder. But the form is one form: the toggle decides
+              which category the question is filed under, not who is typing, and
+              a buyer can ask about an identifiable procurement just as easily.
+              A rule about what may be asked that appears on one toggle and not
+              the other also reads, to anyone who presses the toggle, as a
+              caveat being placed narrowly. */}
+          <aside
+            className="gp-notice forum-submit__notice"
+            aria-label="Important information"
+          >
+            <p className="gp-notice__lead">
+              I do not answer questions related to specific bids.
+            </p>
+          </aside>
 
           {/* The categories button shares the heading's line. Below 1024px the
               sidebar at the end of this section is out of the flow, so the

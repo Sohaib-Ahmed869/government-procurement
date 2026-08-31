@@ -74,6 +74,10 @@ const LINK_COLUMNS = [
     heading: 'Policies',
     links: [
       { label: 'Privacy', href: '/policies/privacy' },
+      // Next to Privacy, which is where somebody looking for what we track
+      // will start, and because the Cookie Policy says it must be reachable
+      // "from the footer of every page".
+      { label: 'Cookies', href: '/policies/cookies' },
       { label: 'Terms', href: '/policies/terms' },
       { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
     ],
@@ -81,13 +85,14 @@ const LINK_COLUMNS = [
 ];
 
 // On small screens the headed columns collapse into a flat run of links, laid
-// out as six fixed rows (2 / 4 / 3 / 3 / 3 / 3). The rows are explicit rather than
-// wrap-driven so the grouping holds at every width; the CSS scales the type
-// down so each row still fits on one line.
+// out as six fixed rows (2 / 4 / 3 / 3 / 4 / 4). The rows are explicit rather
+// than wrap-driven so the grouping holds at every width: each row is a group a
+// reader can recognise, which a single wrapping list would lose.
 //
-// Rows are balanced by rendered width, not link count — the font-size divisor in
-// Footer.css is calibrated to the widest row, so a row much longer than the rest
-// shrinks the type for all of them. Keep new rows near the others in length.
+// Rows no longer have to be balanced by rendered width. They did while the row
+// was `nowrap` and sized off a font-size calc keyed to the widest one, so a long
+// row shrank the type on all six; .site-footer__flat-row wraps now (see
+// Footer.css) and a row longer than the screen takes a second line instead.
 const FLAT_ROWS = [
   [
     { label: 'Award Contracts', href: '/?audience=award' },
@@ -117,6 +122,7 @@ const FLAT_ROWS = [
   ],
   [
     { label: 'Privacy', href: '/policies/privacy' },
+    { label: 'Cookies', href: '/policies/cookies' },
     { label: 'Terms', href: '/policies/terms' },
     { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
   ],

@@ -47,12 +47,26 @@ export function relativeTime(iso) {
   return new Date(then).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 }
 
+/* The chart window, and the reason it is not 7.
+
+   The dashboard's chart offers 7, 14 and 30 days, and the headline tile
+   compares this week against the one before it — which needs fourteen days on
+   its own. Asking for thirty once and slicing what each card needs is one
+   request; asking per range is a request every time somebody presses a button,
+   for data already in the browser. */
+const WINDOW_DAYS = 30;
+
+// Minutes over the last `n` days of the window.
+function sumLast(rows, n) {
+  return rows.slice(-n).reduce((total, r) => total + (r.minutes || 0), 0);
+}
+
 export function useDashboard() {
   const [data, setData] = useState({ enrolments: [], quizzes: [], certificates: [] });
   const [status, setStatus] = useState('loading'); // loading | ready | error
   const [error, setError] = useState('');
 
-  const { activity, minutes: weekMinutes, streak, status: activityStatus } = useActivity(7);
+  const { activity: fullActivity, streak, status: activityStatus } = useActivity(WINDOW_DAYS);
 
   useEffect(() => {
     let alive = true;
@@ -186,23 +200,54 @@ export function useDashboard() {
       .sort(byRecency)
       .slice(0, 5);
 
+    /* The breakdown behind the donut: which courses the learner's completed
+       lessons actually sit in.
+
+       Lessons rather than courses, because a count of courses is already two of
+       the tiles above it and would tell the same story twice. This one answers
+       "where has the time gone", which nothing else on the page does.
+
+       Courses with nothing done are left out. A slice of zero draws nothing and
+       still takes a legend row, so an untouched course would appear only as a
+       name against a blank. */
+    const courseMix = enrolments
+      .filter((e) => (e.lessonsDone ?? 0) > 0)
+      .map((e) => ({
+        id: String(e._id),
+        label: e.course.title,
+        value: e.lessonsDone ?? 0,
+        percent: e.percent ?? 0,
+      }))
+      .sort((a, b) => b.value - a.value);
+
     return {
       resume,
       nextUp,
       recent,
+      courseMix,
       stats: {
         inProgress: inProgress.length,
         enrolled: enrolments.length,
         certificates: certificates.length,
         quizzesPassed: quizzes.filter((q) => q.best?.passed).length,
+        lessonsDone: enrolments.reduce((n, e) => n + (e.lessonsDone ?? 0), 0),
+        lessonsTotal: enrolments.reduce((n, e) => n + (e.lessonsTotal ?? 0), 0),
       },
     };
   }, [data]);
 
+  const weekMinutes = sumLast(fullActivity, 7);
+  // The seven days before those seven, which is what "vs last week" compares
+  // against. Slicing rather than a second request — the window already holds it.
+  const priorWeekMinutes = sumLast(fullActivity.slice(0, -7), 7);
+
   return {
     ...view,
-    activity,
+    // The whole window. The page slices it to whichever range is selected, so
+    // changing the range is a re-render rather than a round trip.
+    activity: fullActivity,
     weekMinutes,
+    priorWeekMinutes,
     streak,
     // One status for the page. The activity request is part of the picture, so
     // a dashboard that has its courses but not its chart is still loading —

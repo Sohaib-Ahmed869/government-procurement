@@ -193,6 +193,21 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
           >
             <span className="site-header__cta-label">Request a Consultation</span>
           </Link>
+
+          {/* The way into the learning platform.
+
+              Before the LMS existed, the only path to /learn was a course page's
+              Enrol button — so a learner who already had an account and simply
+              wanted to get back to it had nowhere on the site to click.
+
+              It wears .site-header__cta, so it is the same control as the button
+              to its left rather than a lookalike built beside it — one rule to
+              change when the bar's fill, height or type moves. Its own class is
+              only for what differs: it is sized to its label, because a fourth
+              190px cell is what would push this row into wrapping. */}
+          <Link className="site-header__cta site-header__login" to="/learn/login">
+            Student Login
+          </Link>
         </div>
 
         {/* Mobile-only: the hamburger that opens the menu. */}
@@ -301,7 +316,9 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
                 </li>
               );
             })}
-            {/* Last in the list, so it carries the last index. */}
+            {/* The two actions from the top bar, in the bar's order, after
+                the nav items — so they carry the last two indices and arrive
+                at the end of the stagger. */}
             <li style={{ '--i': navLinks.length }}>
               <Link
                 className="site-header__mobile-link site-header__mobile-cta"
@@ -309,6 +326,15 @@ export default function Header({ showToggle = true, audience: audienceProp }) {
                 onClick={closeMenu}
               >
                 Request a Consultation
+              </Link>
+            </li>
+            <li style={{ '--i': navLinks.length + 1 }}>
+              <Link
+                className="site-header__mobile-link site-header__mobile-login"
+                to="/learn/login"
+                onClick={closeMenu}
+              >
+                Student Login
               </Link>
             </li>
           </ul>
