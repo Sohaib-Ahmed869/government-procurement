@@ -156,7 +156,13 @@ export default function CohortProgressPage() {
                       </td>
                       <td>
                         <span className="lms-ecourse__avg">
-                          <ProgressBar percent={q.passRate} complete={q.passRate === 100} />
+                          {/* No `complete`: that flag fills the bar flat mint,
+                              which on a course card means "finished". A pass
+                              rate is a RATE — 100% of the people who sat it
+                              passed, which is not a thing being done — so it
+                              keeps the app's dark-green→mint gradient like
+                              every other measurement on the page. */}
+                          <ProgressBar percent={q.passRate} />
                           <span className="lms-roster__pct">{q.passRate}%</span>
                         </span>
                         {suspect ? (

@@ -192,13 +192,19 @@ export default function ActivityChart({ data, caption = 'Minutes learned', step 
     <div className="lms-chart">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={caption}>
         <defs>
-          {/* Brand green at the top of the curve, gone by the axis. The stops
-              fall away steeply on purpose: a fill still visible at the baseline
-              reads as a block with a lid rather than as a series settling. */}
+          {/* Brand green at the top of the curve, nearly gone by the axis.
+
+              The first version topped out at 0.24 and was down to 0.09 by the
+              middle, which on a week with one busy day left a wash so faint the
+              chart read as a bare line. These carry: solid enough at the top to
+              be the shape you see first, and still falling away to almost
+              nothing at the baseline — a fill that stays strong all the way
+              down reads as a block with a lid rather than as a series
+              settling. */}
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#14572a" stopOpacity="0.24" />
-            <stop offset="55%" stopColor="#3da05c" stopOpacity="0.09" />
-            <stop offset="100%" stopColor="#7ee2a8" stopOpacity="0" />
+            <stop offset="0%" stopColor="#14572a" stopOpacity="0.42" />
+            <stop offset="45%" stopColor="#2f8a4d" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#7ee2a8" stopOpacity="0.03" />
           </linearGradient>
         </defs>
 

@@ -8,7 +8,12 @@ import BackToTop from '../../../components/shared/BackToTop.jsx';
 import { TOPICS, TOOLS, TOOL_BY_VALUE } from '../data.js';
 import ToolMark from '../toolMarks.jsx';
 import { unwrapPrompt, promptTeaser } from '../promptText.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './PromptsBrowser.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'prompts';
 
 // B4 — the prompt library, laid out on the Courses page's structure: a filter
 // sidebar on desktop that becomes a slide-up panel on phones, and the results
@@ -57,7 +62,6 @@ function FilterGroup({ heading, name, options, value, onChange }) {
 
 export default function PromptsBrowser() {
   const { audience } = useAudience();
-  const inView = useMountReveal();
 
   // The filter rail scrolls away with the page, so the results can run well past
   // it. This is what gets a visitor back to the filters without scrolling the
@@ -96,8 +100,19 @@ export default function PromptsBrowser() {
   const [appliedKey, fading] = useFadeSwap(JSON.stringify([topic, useCase, tool]));
   const [shownTopic, shownUseCase, shownTool] = JSON.parse(appliedKey);
 
-  const [prompts, setPrompts] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     library on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [prompts, setPrompts] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // The rail and the results are both built from the CMS list, so the reveal is
+  // held until it lands — see the note on `ready` in useMountReveal. Played on
+  // mount it runs over the "Loading…" line, and the cards that follow are
+  // painted at their final opacity in the frame they mount.
+  const inView = useMountReveal(undefined, { ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -105,10 +120,14 @@ export default function PromptsBrowser() {
       try {
         const list = await promptsApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setPrompts(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -306,7 +325,7 @@ export default function PromptsBrowser() {
               the button above opens the phone panel and must not fade out from
               under the thumb that just pressed it. */}
           <div className={`browse-results${fading ? ' is-swapping' : ''}`}>
-          {status === 'loading' && <p className="browse-main__note">Loading prompts…</p>}
+          <LoadingStatus loading={status === 'loading'} label="Loading prompts" />
           {status === 'error' && (
             <p className="browse-main__note">
               We couldn&apos;t load the prompt library right now. Please try again shortly.

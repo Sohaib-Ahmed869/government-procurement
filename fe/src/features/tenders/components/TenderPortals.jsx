@@ -3,7 +3,12 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useInView } from '../../../hooks/useInView.js';
 import { tenderSitesApi } from '../../../api';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './TenderPortals.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'tender-sites';
 
 // Tender portals come from the CMS (Tenders). Each entry carries a name, a
 // subtitle, a logo and its destinations — a button appears only for the links
@@ -106,8 +111,13 @@ function TenderList({ sites, group = 'australian', audience }) {
 export default function TenderPortals() {
   const { audience } = useAudience();
 
-  const [sites, setSites] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     sites on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [sites, setSites] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
 
   useEffect(() => {
     let alive = true;
@@ -115,10 +125,14 @@ export default function TenderPortals() {
       try {
         const list = await tenderSitesApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setSites(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -156,21 +170,24 @@ export default function TenderPortals() {
         </div>
       </section>
 
-      {/* The loading line and the failure message, below the band rather than
-          inside it. In the band they were part of what it had to hold, so the
-          heading strip was 132px tall while the list was still coming and 90px
-          once it arrived — the title jumping up by the height of a line on
-          every visit, and staying down on a page that had failed to load. They
-          are the page's first content, and this is where the page starts. */}
-      {status !== 'ready' && (
+      <LoadingStatus loading={status === 'loading'} label="Loading tender websites" />
+
+      {/* The failure message, below the band rather than inside it. In the band
+          it was part of what it had to hold, so the heading strip was 132px
+          tall while the list was still coming and 90px once it arrived — the
+          title jumping up by the height of a line on every visit, and staying
+          down on a page that had failed to load.
+
+          Only the failure now. The loading line that used to sit here has gone:
+          the lists fade in as they arrive, so the wait needs nothing on screen
+          and the band no longer changes height between one state and the next.
+          A page that cannot load still has to say so. */}
+      {status === 'error' && (
         <section className="tp__band tp__band--status hm-band--light">
           <div className="tp__inner">
-            {status === 'loading' && <p className="tp__featured">Loading tender websites…</p>}
-            {status === 'error' && (
-              <p className="tp__featured">
-                We couldn&apos;t load the tender websites right now. Please try again shortly.
-              </p>
-            )}
+            <p className="tp__featured">
+              We couldn&apos;t load the tender websites right now. Please try again shortly.
+            </p>
           </div>
         </section>
       )}

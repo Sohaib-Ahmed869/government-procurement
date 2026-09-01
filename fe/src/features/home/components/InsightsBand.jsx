@@ -3,8 +3,12 @@ import { Link } from 'react-router-dom';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { articlesApi } from '../../../api';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './InsightsBand.css';
 import Arrow from '../../../components/shared/Arrow.jsx';
+
+// The rail's own read, kept apart from the Insights page's hundred.
+const CACHE_KEY = 'articles:home-rail';
 
 // The Insights band on the single-page homepage (A1).
 //
@@ -46,9 +50,12 @@ function readingMinutes(article) {
 
 export default function InsightsBand() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
-  const [articles, setArticles] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  // Seeded from the tab's cache — see api/cache.js.
+  const [articles, setArticles] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // The rail's cards come from the CMS, so the reveal waits for them.
+  const { ref, inView } = useInView({ ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -58,10 +65,11 @@ export default function InsightsBand() {
         // filled with the most recently published of the rest.
         const list = await articlesApi.list({ limit: 5, sort: '-featured -publishedAt' });
         if (!alive) return;
+        writeCache(CACHE_KEY, (list || []).slice(0, 5));
         setArticles((list || []).slice(0, 5));
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {

@@ -10,7 +10,12 @@ import {
   CATEGORIES,
   CATEGORY_BY_VALUE,
 } from '../data.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './JurisdictionsList.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'rules';
 
 const ALL_CATEGORIES = { value: 'all', label: 'All categories' };
 const ALL_JURISDICTIONS = { value: 'all', label: 'All jurisdictions' };
@@ -82,7 +87,6 @@ function FilterSelect({ id, label, value, options, onChange, wide = false }) {
 
 export default function JurisdictionsList() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
 
   const [state, setState] = useState('all');
   const [category, setCategory] = useState('all');
@@ -98,8 +102,17 @@ export default function JurisdictionsList() {
   const [shownState, shownCategory] = JSON.parse(appliedKey);
 
   // Rules come from the CMS (Content → Rules), ordered there.
-  const [rules, setRules] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     rules on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [rules, setRules] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // The cards are the whole section, so the reveal waits for them to exist —
+  // see the note on `ready` in useInView.
+  const { ref, inView } = useInView({ ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -107,10 +120,14 @@ export default function JurisdictionsList() {
       try {
         const list = await rulesApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setRules(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -204,7 +221,7 @@ export default function JurisdictionsList() {
 
         {/* The results, and only the results — the filter row above stays live. */}
         <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
-        {status === 'loading' && <p className="jl__empty">Loading rules…</p>}
+        <LoadingStatus loading={status === 'loading'} label="Loading rules" />
         {status === 'error' && (
           <p className="jl__empty">
             We couldn&apos;t load the rules right now. Please try again shortly.

@@ -20,29 +20,25 @@ function issuedOn(iso) {
 // `template`, which is the shape the old placeholder had — so `template.accent`
 // threw the moment this page met a real certificate and took the whole
 // Certificates tab down with it.
+//
+// Shaped like an enrolled-course card: badge row, body, actions. The stored
+// `design.accent` is not read here any more — it painted the green cover slab
+// that has gone, and it still paints the certificate itself on the detail page,
+// which is the only place a learner sees their design.
 export default function CertificateCard({ certificate }) {
   const id = certificate._id ?? certificate.id;
-  const design = certificate.design ?? {};
-  // Every field is optional here on purpose: a certificate issued before a
-  // design field existed still has to render.
-  const accent = design.accent || '#0a3114';
   const href = `/learn/certificates/${id}`;
 
   return (
     <article className="lms-certcard">
-      <Link
-        to={href}
-        className="lms-certcard__thumb"
-        style={{ '--cert-accent': accent }}
-        aria-label={certificate.title}
-      >
-        <LmsIcon name="award" />
+      <Link to={href} className="lms-certcard__cover" aria-label={certificate.title}>
+        <span className="lms-certcard__kind">
+          <LmsIcon name="award" />
+          {certificate.kind === 'path' ? 'Program certificate' : 'Course certificate'}
+        </span>
       </Link>
 
       <div className="lms-certcard__body">
-        <span className="lms-certcard__kind">
-          {certificate.kind === 'path' ? 'Program certificate' : 'Course certificate'}
-        </span>
         <h3 className="lms-certcard__title">
           <Link to={href}>{certificate.title}</Link>
         </h3>

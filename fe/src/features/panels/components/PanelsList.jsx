@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { panelsApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './PanelsList.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'panels';
 
 // B2 — the panels Government Procurement can be engaged through, by heading.
 //
@@ -15,10 +20,15 @@ export default function PanelsList() {
   // threshold 0 — the list is taller than a phone viewport, so waiting for 15%
   // of it to be on screen means the reveal can never fire. Same trap the
   // article body hit (B1).
-  const { ref, inView } = useInView({ threshold: 0 });
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     panels on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [panels, setPanels] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
 
-  const [panels, setPanels] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  const { ref, inView } = useInView({ threshold: 0, ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -26,10 +36,14 @@ export default function PanelsList() {
       try {
         const list = await panelsApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setPanels(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -70,7 +84,7 @@ export default function PanelsList() {
       aria-label="Panels we can be engaged through"
     >
       <div className="gp-list__inner">
-        {status === 'loading' && <p className="gp-empty">Loading panels…</p>}
+        <LoadingStatus loading={status === 'loading'} label="Loading panels" />
         {status === 'error' && (
           <p className="gp-empty">
             We couldn&apos;t load the panels right now. Please try again shortly.

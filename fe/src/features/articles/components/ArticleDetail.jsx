@@ -5,6 +5,7 @@ import { useReadingProgress } from '../../../hooks/useReadingProgress.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { articlesApi, teamApi } from '../../../api';
 import ArticleBar from './ArticleBar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './ArticleDetail.css';
 
 function formatDate(iso) {
@@ -85,12 +86,14 @@ export default function ArticleDetail({ slug }) {
     };
   }, [slug]);
 
+  // The wait is blank on purpose: the article fades in when it arrives, and a
+  // "Loading article…" line that has to be cleared before it can is a second
+  // arrival in front of the first. The band still paints the page's ground, so
+  // the header above it isn't left sitting on bare white.
   if (status === 'loading') {
     return (
       <section className="article" data-audience={audience}>
-        <div className="article-body">
-          <p className="article-overview">Loading article…</p>
-        </div>
+        <LoadingStatus loading label="Loading article" />
       </section>
     );
   }

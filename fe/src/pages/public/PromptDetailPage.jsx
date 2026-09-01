@@ -7,6 +7,7 @@ import { useMountReveal } from '../../hooks/useMountReveal.js';
 import { TOOL_BY_VALUE, TOPICS } from '../../features/prompts/data.js';
 import ToolMark from '../../features/prompts/toolMarks.jsx';
 import { unwrapPrompt } from '../../features/prompts/promptText.js';
+import LoadingStatus from '../../components/shared/LoadingStatus.jsx';
 import './PromptDetailPage.css';
 import Arrow from '../../components/shared/Arrow.jsx';
 
@@ -39,10 +40,15 @@ function CopyIcon({ copied }) {
 export default function PromptDetailPage() {
   const { id } = useParams();
   const { audience } = useAudience();
-  const mounted = useMountReveal();
 
   const [prompt, setPrompt] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | notfound | error
+
+  // Held until the prompt is here, and replayed for each `id`. Played on mount
+  // it runs while the page still says "Loading…", and the prompt that follows
+  // is painted at its final opacity in the frame it mounts — no animation left
+  // for the thing the visitor actually came to see.
+  const mounted = useMountReveal(id, { ready: status === 'ready' });
 
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
@@ -98,22 +104,23 @@ export default function PromptDetailPage() {
     timer.current = window.setTimeout(() => setCopied(false), 2000);
   }, [prompt]);
 
-  const shell = (children) => (
+  // `revealed` puts `is-in` on the page rather than on the heading strip alone,
+  // so the prompt itself fades in with its title instead of appearing under a
+  // heading that animated without it.
+  const shell = (children, revealed = false) => (
     <div className="page-scale">
       <PageLayout>
-        <div className="pd" data-audience={audience}>
+        <div className={`pd${revealed ? ' is-in' : ''}`} data-audience={audience}>
           {children}
         </div>
       </PageLayout>
     </div>
   );
 
+  // Nothing on the page while it waits. The prompt fades in when it arrives,
+  // which is the arrival — a "Loading…" line is a second one in front of it.
   if (status === 'loading') {
-    return shell(
-      <div className="pd__inner">
-        <p className="pd__state">Loading…</p>
-      </div>,
-    );
+    return shell(<LoadingStatus loading label="Loading prompt" />);
   }
 
   if (status !== 'ready') {
@@ -139,7 +146,7 @@ export default function PromptDetailPage() {
 
   return shell(
     <>
-      <header className={`pd__head${mounted ? ' is-in' : ''}`}>
+      <header className="pd__head">
         <div className="pd__inner">
           <Link className="pd__back hm-reveal" to="/prompt-library">
             <Arrow direction="left" /> Prompt Library
@@ -149,7 +156,7 @@ export default function PromptDetailPage() {
       </header>
 
       <div className="pd__body">
-        <div className="pd__inner">
+        <div className="pd__inner hm-reveal" data-delay="2">
           {/* Topic, use case and the assistant's mark — below the heading strip
               rather than inside it. In the strip they turned a title band into a
               three-line block and made this page's heading sit lower than every
@@ -198,5 +205,6 @@ export default function PromptDetailPage() {
         </div>
       </div>
     </>,
+    mounted,
   );
 }

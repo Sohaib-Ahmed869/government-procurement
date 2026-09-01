@@ -86,13 +86,26 @@
 /* --- reveal on mount --- */
 @media (prefers-reduced-motion: no-preference) {
   .forum-hero__title,
-  .forum-hero__sub,
-  .forum-hero__tools {
+  .forum-hero__sub {
     opacity: 0;
     transform: translateY(var(--gp-reveal-shift));
     transition:
       opacity var(--gp-reveal-dur) var(--gp-ease),
       transform var(--gp-reveal-dur) var(--gp-ease);
+  }
+
+  /* The search field and the "Submit a question" pill fade in WHERE THEY ARE.
+     No lift.
+
+     They were in the rule above, riding up 18px with the copy. Copy can arrive
+     that way — nobody is trying to touch it while it moves. These two are
+     controls, they are the first thing on this page anyone reaches for, and a
+     search box that is still travelling under the pointer is a target that
+     moves as you go for it. The row keeps the fade so it still belongs to the
+     hero's entrance; it just holds its position while it plays. */
+  .forum-hero__tools {
+    opacity: 0;
+    transition: opacity var(--gp-reveal-dur) var(--gp-ease);
   }
 
   .forum-hero.is-in .forum-hero__title {
@@ -107,9 +120,8 @@
   }
   .forum-tools.is-in .forum-hero__tools {
     opacity: 1;
-    transform: none;
     /* One step behind the title above it, not three: there is nothing between
-       them any more. */
+       them any more. No `transform: none` — there is no transform to undo. */
     transition-delay: calc(var(--gp-reveal-step) * 2);
   }
 }

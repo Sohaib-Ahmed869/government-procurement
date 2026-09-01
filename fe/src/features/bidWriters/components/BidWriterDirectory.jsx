@@ -5,7 +5,12 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
 import { CATEGORIES, CATEGORY_BY_VALUE, STATES, STATE_BY_VALUE } from '../data.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './BidWriterDirectory.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'bid-writers';
 
 // B7.4 — the directory, on the shared browse shell (styles/browse.css) that the
 // Prompt Library and the Templates library use.
@@ -47,7 +52,6 @@ function FilterGroup({ heading, name, options, value, onChange }) {
 
 export default function BidWriterDirectory() {
   const { audience } = useAudience();
-  const inView = useMountReveal();
   const topRef = useRef(null);
 
   const [params, setParams] = useSearchParams();
@@ -61,8 +65,19 @@ export default function BidWriterDirectory() {
     setParams(next, { replace: true });
   };
 
-  const [writers, setWriters] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     listings on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [writers, setWriters] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // The rail and the results are both built from the CMS list, so the reveal is
+  // held until it lands — see the note on `ready` in useMountReveal. Played on
+  // mount it runs over the "Loading…" line, and the cards that follow are
+  // painted at their final opacity in the frame they mount.
+  const inView = useMountReveal(undefined, { ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -70,10 +85,14 @@ export default function BidWriterDirectory() {
       try {
         const list = await bidWritersApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setWriters(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -200,7 +219,7 @@ export default function BidWriterDirectory() {
             </span>
           </button>
 
-          {status === 'loading' && <p className="browse-main__note">Loading listings…</p>}
+          <LoadingStatus loading={status === 'loading'} label="Loading listings" />
           {status === 'error' && (
             <p className="browse-main__note">
               We couldn&apos;t load the directory right now. Please try again shortly.

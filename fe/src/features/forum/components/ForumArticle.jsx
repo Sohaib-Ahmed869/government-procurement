@@ -3,6 +3,7 @@ import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './ForumArticle.css';
 
 function formatDate(iso) {
@@ -44,12 +45,14 @@ export default function ForumArticle() {
     };
   }, []);
 
+  // The sidebar is real content and stays; the main column waits blank rather
+  // than printing a line the question would have to replace.
   if (status === 'loading') {
     return (
       <section className="forum-article hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
-            <p className="forum-article__q">Loading question…</p>
+            <LoadingStatus loading label="Loading question" />
           </div>
           <ForumSidebar />
         </div>

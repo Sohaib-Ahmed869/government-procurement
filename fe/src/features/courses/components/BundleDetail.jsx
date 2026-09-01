@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './BundleDetail.css';
 import Arrow from '../../../components/shared/Arrow.jsx';
 
@@ -21,12 +22,12 @@ const formatPrice = (n, currency = 'AUD') =>
    advertise a saving the checkout would not honour.
    ------------------------------------------------------------------------ */
 export default function BundleDetail({ bundle, status }) {
+  // Blank while it waits — the bundle fades in on arrival rather than taking
+  // the place of a line of holding copy.
   if (status === 'loading') {
     return (
       <section className="bundle hm-band--light">
-        <div className="bundle__inner">
-          <p className="bundle__state">Loading…</p>
-        </div>
+        <LoadingStatus loading label="Loading bundle" />
       </section>
     );
   }

@@ -4,7 +4,15 @@ import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import { articlesApi, categoriesApi } from '../../../api';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './InsightsGrid.css';
+
+// What this page's two reads are remembered under for the life of the tab. The
+// article key names the limit: a rail asking for five and a grid asking for a
+// hundred are different answers and must not share a slot.
+const ARTICLES_KEY = 'articles:limit=100';
+const CATEGORIES_KEY = 'categories:article';
 
 
 function formatDate(iso) {
@@ -102,7 +110,6 @@ const PAGE_SIZE = 12;
 
 export default function InsightsGrid() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
   // The selected category id, or 'all'.
   const [category, setCategory] = useState('all');
 
@@ -112,9 +119,15 @@ export default function InsightsGrid() {
   // it replaces fade out first.
   const [shownCategory, fading] = useFadeSwap(category);
 
-  const [articles, setArticles] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Both reads are seeded from the tab's cache, so a return visit paints the
+     grid on the first frame instead of leaving a viewport of empty paper where
+     the cards go — see api/cache.js. */
+  const [articles, setArticles] = useState(() => readCache(ARTICLES_KEY) ?? []);
+  const [categories, setCategories] = useState(() => readCache(CATEGORIES_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(ARTICLES_KEY) ? 'ready' : 'loading'));
+
+  // The reveal waits for the articles — see the note on `ready` in useInView.
+  const { ref, inView } = useInView({ ready: status !== 'loading' });
 
   // On mobile the grid is a horizontal snap carousel; track which card is
   // centred so the pagination dots stay in sync.
@@ -133,11 +146,14 @@ export default function InsightsGrid() {
           categoriesApi.list({ kind: 'article' }).catch(() => []),
         ]);
         if (!alive) return;
+        writeCache(ARTICLES_KEY, list || []);
+        writeCache(CATEGORIES_KEY, cats || []);
         setArticles(list || []);
         setCategories(cats || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed refresh leaves a cached page up rather than blanking it.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -201,7 +217,7 @@ export default function InsightsGrid() {
 
         {/* The results, and only the results — the pill above stays live. */}
         <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
-        {status === 'loading' && <p className="insights__empty">Loading insights…</p>}
+        <LoadingStatus loading={status === 'loading'} label="Loading insights" />
         {status === 'error' && (
           <p className="insights__empty">
             We couldn&apos;t load our insights right now. Please try again shortly.

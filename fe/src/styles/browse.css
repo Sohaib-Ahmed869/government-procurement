@@ -58,13 +58,26 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .browse-filters,
-  .browse-group {
+  /* Written as `.browse .browse-filters` rather than `.browse-filters`, and the
+     descendant is doing real work: `.browse-filters` gets `transition:
+     var(--gp-fade)` further down this file for the segment recolour, and a
+     second `transition` on an equally specific selector REPLACES this one
+     rather than adding to it. The rail was left transitioning nothing but
+     colour — so it snapped from hidden to shown on every load while the results
+     beside it faded, which is the "content appears abruptly" this whole reveal
+     exists to prevent. One class of specificity puts it back. */
+  .browse .browse-filters,
+  .browse .browse-group {
     opacity: 0;
     transform: translateY(var(--gp-reveal-shift));
+    /* --gp-fade is carried along rather than left behind: this declaration now
+       outranks the rail's own, and a `transition` does not merge — whatever
+       wins is the whole list. Dropping it would trade the snap for a rail that
+       recolours instantly on the segment toggle. */
     transition:
       opacity var(--gp-reveal-dur) var(--gp-ease),
-      transform var(--gp-reveal-dur) var(--gp-ease);
+      transform var(--gp-reveal-dur) var(--gp-ease),
+      var(--gp-fade);
   }
 
   .browse.is-in .browse-filters,

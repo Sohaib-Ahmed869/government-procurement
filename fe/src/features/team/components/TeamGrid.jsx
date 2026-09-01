@@ -5,15 +5,29 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { teamApi } from '../../../api';
 import TeamAvatar from './TeamAvatar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './TeamGrid.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'team';
 
 export default function TeamGrid() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
 
   // Roster comes from the CMS (Content → Team), ordered there.
-  const [team, setTeam] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     roster on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [team, setTeam] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // Held until the roster is in hand: the grid is empty while it loads, and a
+  // reveal played over an empty grid leaves `is-in` on the section, so the cards
+  // land at full opacity with no animation left to play.
+  const { ref, inView } = useInView({ ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -21,10 +35,14 @@ export default function TeamGrid() {
       try {
         const list = await teamApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setTeam(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -39,7 +57,7 @@ export default function TeamGrid() {
       data-audience={audience}
     >
       <div className="team__inner">
-        {status === 'loading' && <p className="team__empty">Loading the team…</p>}
+        <LoadingStatus loading={status === 'loading'} label="Loading the team" />
         {status === 'error' && (
           <p className="team__empty">
             We couldn&apos;t load the team right now. Please try again shortly.

@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { careersApi } from '../../../api';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './CareersContent.css';
+
+// What this section's read is remembered under for the life of the tab.
+const CACHE_KEY = 'careers:openings';
 
 // Applications come by email, to the same address as the footer's contact block.
 const CV_EMAIL = 'mkheir@govprocurement.com.au';
@@ -35,25 +39,36 @@ function applyTargetProps(href) {
 
 export default function CareersContent() {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
 
   // Openings come from the CMS (Content → Careers). With none published the
   // whole section is left out rather than showing an empty heading.
-  const [roles, setRoles] = useState([]);
+  // Seeded from the tab's cache — see api/cache.js.
+  const [roles, setRoles] = useState(() => readCache(CACHE_KEY) ?? []);
+  // Set whether or not there are any openings: a failure and an empty list are
+  // both answers, and the reveal has to be released on either. A cached answer
+  // is one too.
+  const [loaded, setLoaded] = useState(() => hasCache(CACHE_KEY));
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         const list = await careersApi.listOpenings();
+        writeCache(CACHE_KEY, list || []);
         if (alive) setRoles(list || []);
       } catch {
         /* section stays hidden */
+      } finally {
+        if (alive) setLoaded(true);
       }
     })();
     return () => {
       alive = false;
     };
   }, []);
+
+  // Held until the openings are here, so they fade in rather than appearing
+  // into a section that has already finished revealing.
+  const { ref, inView } = useInView({ ready: loaded });
 
   return (
     <section
