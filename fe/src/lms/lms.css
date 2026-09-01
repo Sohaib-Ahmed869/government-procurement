@@ -122,6 +122,26 @@
     0 22px 44px -22px rgba(14, 46, 27, 0.16);
   --lms-ring: 0 0 0 3px rgba(10, 49, 20, 0.1);
 
+  /* The raised-card recipe, as one token. Five parts — a lit top edge, a
+     contact shadow and three spreads falling off — explained at length above
+     `.lms-raised` below. Every card surface in the app pulls from here so the
+     whole thing lifts by the same amount. */
+  --lms-lift:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 1px rgba(14, 46, 27, 0.06),
+    0 3px 6px -2px rgba(14, 46, 27, 0.07),
+    0 10px 20px -8px rgba(14, 46, 27, 0.10),
+    0 26px 46px -22px rgba(14, 46, 27, 0.13);
+  --lms-lift-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 1px rgba(14, 46, 27, 0.06),
+    0 6px 12px -4px rgba(14, 46, 27, 0.10),
+    0 16px 30px -12px rgba(14, 46, 27, 0.14),
+    0 34px 58px -26px rgba(14, 46, 27, 0.16);
+  /* Not flat white: the card's own surface gets a top and a bottom. */
+  --lms-lift-fill: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%);
+  --lms-lift-border: #e4ebe6;
+
   --lms-radius: 14px;
   --lms-radius-sm: 10px;
   --lms-radius-lg: 18px;
@@ -1091,59 +1111,6 @@
   white-space: nowrap;
 }
 
-/* ---------------------------------------------------------------------------
-   RAISED CARDS.
-
-   Every box on the dashboard, not just the four at the top: the KPI tiles, the
-   chart, the donut, the resume panel and the sessions list all sit on the page
-   the same way.
-
-   Four things together make a surface look lifted, and it is the combination
-   rather than any one of them:
-
-     1. a lit top edge — an inset white hairline, as if the light above the page
-        catches the card's leading edge. This is what reads as a physical edge
-        rather than a drawn border, and it is the piece most often left out;
-     2. a contact shadow — 1px, almost opaque, directly under the card, which is
-        what fixes it to the surface. Without it a card floats;
-     3. two spread shadows at increasing size and decreasing opacity, which is
-        how real penumbra falls off. One shadow at one size reads as a sticker;
-     4. a fill that is not flat white — a whisper of a ramp, so the card's own
-        surface has a top and a bottom.
-
-   All the shadow colours are the green-black --lms-shadow uses, so shade on the
-   mint canvas reads as shade rather than as soot.
-   ------------------------------------------------------------------------ */
-.lms-dash .lms-card,
-.lms-dash .lms-stat {
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 1px rgba(14, 46, 27, 0.06),
-    0 3px 6px -2px rgba(14, 46, 27, 0.07),
-    0 10px 20px -8px rgba(14, 46, 27, 0.10),
-    0 26px 46px -22px rgba(14, 46, 27, 0.13);
-}
-
-/* The white cards get the ramp; the KPI tiles already carry their own green
-   one and must not have a second background stacked on top of it. */
-.lms-dash .lms-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%);
-  border-color: #e4ebe6;
-}
-
-/* Only the tiles lift under the pointer, because only the tiles are links. A
-   card that rises when you hover it is telling you it can be clicked, and the
-   chart cannot. */
-.lms-dash .lms-stat:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 1px 1px rgba(14, 46, 27, 0.06),
-    0 6px 12px -4px rgba(14, 46, 27, 0.10),
-    0 16px 30px -12px rgba(14, 46, 27, 0.14),
-    0 34px 58px -26px rgba(14, 46, 27, 0.16);
-}
-
 /* The inner boxes inside those cards — the resume panel's two facts, the
    segmented range control — are recessed rather than raised. A raised box
    inside a raised box is two claims about the same surface. */
@@ -1605,6 +1572,21 @@
    what gets centred. */
 .lms-donut__legend { flex: 0 1 160px; }
 
+/* THE SAME DONUT IN THE WIDE COLUMN.
+
+   The rule above sizes the legend for a third-of-a-row card, which is where the
+   learner's donut sits. The instructor's sits in the wide column of its row —
+   the calendar beside it is the narrow one, because a month of 20px squares
+   spread across 600px reads as a grid with the days lost in it — and at that
+   width a 160px legend leaves the pair marooned in the middle of an empty card.
+
+   So here the legend grows into what is there. Capped, because a course title
+   set across 400px of card with a number at the far end is a table row, not a
+   legend entry; past the cap the label ellipses as it always did. */
+.lms-donut-lead .lms-donut { justify-content: flex-start; gap: 18px 32px; }
+.lms-donut-lead .lms-donut__ring { width: 148px; }
+.lms-donut-lead .lms-donut__legend { flex: 1 1 220px; max-width: 360px; }
+
 /* Continue-learning panel */
 .lms-resume__course {
   margin: 0 0 4px;
@@ -1944,59 +1926,85 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--lms-surface);
-  border: 1px solid var(--lms-border);
+  /* The shared lift every card surface in the app uses — see RAISED CARDS at
+     the foot of this file. A card sitting on the green canvas needs all of it
+     or it reads as a rectangle drawn on the page rather than one placed on it. */
+  background: var(--lms-lift-fill);
+  border: 1px solid var(--lms-lift-border);
   border-radius: var(--lms-radius);
-  box-shadow: var(--lms-shadow);
+  box-shadow: var(--lms-lift);
   transition: transform 0.18s var(--lms-ease), box-shadow 0.18s var(--lms-ease),
     border-color 0.18s var(--lms-ease);
 }
 .lms-course:hover {
   transform: translateY(-2px);
-  box-shadow: var(--lms-shadow-md);
-  border-color: var(--lms-border-strong);
+  border-color: var(--lms-tint-400);
+  box-shadow: var(--lms-lift-hover);
 }
 
 /* Cover. No artwork in the placeholder data, so each course gets a stable
    brand-family gradient keyed off its accent index. The chip and pill sit on
    top of it. Swap the background for the course image once uploads exist. */
+/* THE COVER IS A BADGE ROW NOW, not a picture.
+
+   It was a 104px block of dark-green gradient with the level and status pills
+   floating on it — the last of the app's green slabs, and a hundred pixels per
+   card spent on a decoration that carried nothing but two labels. The labels
+   are the content; they now sit on the card, and the card is a hundred pixels
+   shorter for it.
+
+   `is-accent-0` … `is-accent-5` are left as no-ops rather than removed. Three
+   components set the class from `course.accent`, the value is still on the
+   record, and a class that resolves to nothing is a smaller thing to carry
+   than a coordinated edit across all three for a decoration nobody asked to
+   keep. */
 .lms-course__cover {
   position: relative;
-  display: block;
-  height: 104px;
-  padding: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 18px 0;
   text-decoration: none;
 }
-.lms-course__cover.is-accent-0 { background: linear-gradient(135deg, #0a3114, #14572a); }
-.lms-course__cover.is-accent-1 { background: linear-gradient(135deg, #0e3e1b, #2f7d45); }
-.lms-course__cover.is-accent-2 { background: linear-gradient(135deg, #0c3a19, #1d6b36); }
-.lms-course__cover.is-accent-3 { background: linear-gradient(135deg, #123f22, #3d8a55); }
-.lms-course__cover.is-accent-4 { background: linear-gradient(135deg, #0a3114, #1a5f30); }
-.lms-course__cover.is-accent-5 { background: linear-gradient(135deg, #10361c, #267140); }
-.lms-course__cover:focus-visible { outline: none; box-shadow: inset 0 0 0 3px var(--lms-mint); }
 
+/* Nothing to see when there are no badges — an empty flex row would still take
+   its padding and leave a gap above the title. */
+.lms-course__cover:empty { display: none; }
+
+.lms-course__cover:focus-visible {
+  outline: none;
+  box-shadow: var(--lms-ring);
+  border-radius: var(--lms-radius-sm);
+}
+
+/* All three pills were positioned against the cover and coloured for a dark
+   ground. In flow now, and on white. */
 .lms-course__level {
-  position: absolute;
-  top: 12px;
-  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  border: 1px solid var(--lms-tint-400);
+  background: var(--lms-tint-100);
+  color: var(--lms-green-600);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(4px);
+  font-weight: 600;
+  letter-spacing: 0;
 }
-.lms-course__status { position: absolute; top: 12px; right: 12px; }
-.lms-course__status.is-completed { background: var(--lms-mint); color: var(--lms-green); }
-.lms-course__status.is-in-progress { background: rgba(255, 255, 255, 0.9); color: var(--lms-green); }
-.lms-course__status.is-not-started { background: rgba(255, 255, 255, 0.16); color: #fff; }
 
+.lms-course__level svg { width: 13px; height: 13px; }
+
+/* Pushed to the far end of the row, which is where it sat on the cover. */
+.lms-course__status { margin-left: auto; }
+.lms-course__status.is-completed { background: var(--lms-tint-200); color: var(--lms-green-600); }
+.lms-course__status.is-in-progress { background: var(--lms-tint-200); color: var(--lms-green-600); }
+.lms-course__status.is-not-started { background: var(--lms-surface-3); color: var(--lms-text-2); }
+
+/* Third in the row, and allowed to wrap onto its own line — "Certificate
+   earned" beside a level and a status is more than one line of a card holds. */
 .lms-course__ribbon {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -2014,7 +2022,7 @@
   flex-direction: column;
   gap: 10px;
   flex: 1;
-  padding: 16px 18px 18px;
+  padding: 14px 18px 18px;
 }
 
 .lms-course__path {
@@ -2113,7 +2121,7 @@
   gap: 8px;
   padding: 14px 18px;
   border-top: 1px solid var(--lms-border);
-  background: var(--lms-surface-2);
+  background: linear-gradient(180deg, #fbfdfb 0%, var(--lms-tint-100) 100%);
 }
 
 /* Completed courses fill mint rather than the green→mint gradient, so "done"
@@ -2121,8 +2129,18 @@
 .lms-progress__fill.is-complete { background: var(--lms-mint); }
 
 /* Loading skeletons -------------------------------------------------------- */
+/* The skeleton's cover is an empty div, and `:empty` above would hide it — so
+   the placeholder card would lose its top block and stop looking like the card
+   it stands in for. Given a height and a fill here instead. */
 .lms-course--skeleton { pointer-events: none; }
-.lms-course--skeleton .lms-course__cover { background: var(--lms-surface-3); }
+.lms-course--skeleton .lms-course__cover {
+  display: block;
+  height: 26px;
+  margin: 16px 18px 0;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--lms-surface-3);
+}
 .lms-skel {
   display: block;
   border-radius: 6px;
@@ -3111,10 +3129,10 @@ a.lms-note__stamp:hover { text-decoration: underline; }
   background: var(--lms-surface);
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius);
-  box-shadow: var(--lms-shadow-sm);
-  transition: border-color 0.15s var(--lms-ease), box-shadow 0.15s var(--lms-ease);
+  transition: transform 0.18s var(--lms-ease), box-shadow 0.18s var(--lms-ease),
+    border-color 0.18s var(--lms-ease);
 }
-.lms-thread:hover { border-color: var(--lms-border-strong); box-shadow: var(--lms-shadow); }
+.lms-thread:hover { border-color: var(--lms-tint-400); }
 .lms-thread__main {
   display: flex;
   gap: 18px;
@@ -3359,6 +3377,15 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 
 /* Badges (L5) -------------------------------------------------------------- */
+/* WHITE CARD, GREEN TYPE.
+
+   It was a pale mint panel with black type — the last tinted surface on a page
+   of white cards, and the tint was doing the work the type should. Now it is
+   the same white card as everything else on the page (fill, border and lift
+   come from the shared raised-card rules at the foot of this file) and the
+   COLOUR moved into the words: the whole banner is set in brand green, which is
+   what marks it out as the thing to read first without a second surface colour
+   on the page to do it. */
 .lms-level {
   display: flex;
   align-items: center;
@@ -3368,12 +3395,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 22px 26px;
   margin-bottom: 18px;
   border-radius: var(--lms-radius-lg);
-  /* Pale mint, not a slab of brand green. Same reasoning as the dashboard's KPI
-     tiles: the fill was doing the same thing here, and the border is what marks
-     the panel out on a page of white cards. */
-  border: 1px solid #cdead9;
-  background: linear-gradient(150deg, #eaf7f0 0%, #e2f4ea 100%);
-  color: var(--lms-text);
+  border: 1px solid var(--lms-lift-border);
+  color: var(--lms-green-600);
 }
 .lms-level__main { display: flex; align-items: center; gap: 16px; }
 .lms-level__medal {
@@ -3395,16 +3418,28 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   letter-spacing: 0;
   color: var(--lms-green-600);
 }
-.lms-level__name { margin: 3px 0 2px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
-.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-muted); }
+/* The level's name is the loudest thing in the banner, so it takes the darkest
+   green; everything else steps back to green-600 rather than to grey, because
+   a grey line inside an all-green panel reads as disabled. */
+.lms-level__name {
+  margin: 3px 0 2px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--lms-green);
+}
+.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-green-600); opacity: 0.78; }
 .lms-level__bar { flex: 1; min-width: 220px; max-width: 420px; }
-.lms-level__bar .lms-progress { background: #d0e9db; margin-bottom: 7px; }
-.lms-level__bar .lms-progress__fill { background: var(--lms-green-600); }
+/* A mint track, because the bar now sits on white rather than on the mint the
+   panel used to be — on white the default grey track is the one grey left in
+   the banner. The fill keeps the app's green→mint gradient. */
+.lms-level__bar .lms-progress { background: var(--lms-tint-200); margin-bottom: 7px; }
 .lms-level__scale {
   display: flex;
   justify-content: space-between;
   font-size: 11.5px;
-  color: var(--lms-muted);
+  color: var(--lms-green-600);
+  opacity: 0.78;
 }
 
 /* Closest badge */
@@ -4277,12 +4312,18 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-todo__body { flex: 1; min-width: 0; }
 
 .lms-instructor-courses { display: flex; flex-direction: column; gap: 14px; }
+/* The instructor's own course, and — same markup, same class — their own
+   learning path. Both lists are a column of things the author owns, which is
+   what a learner's course grid is too, so they are lifted the same way: fill,
+   border and shadow come from the shared raised-card rules at the foot of this
+   file, and the card rises under the pointer because every one of them opens a
+   builder. */
 .lms-icourse {
-  background: var(--lms-surface);
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius);
-  box-shadow: var(--lms-shadow-sm);
   overflow: hidden;
+  transition: transform 0.18s var(--lms-ease), box-shadow 0.18s var(--lms-ease),
+    border-color 0.18s var(--lms-ease);
 }
 .lms-icourse__head {
   display: flex;
@@ -4338,6 +4379,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   flex-wrap: wrap;
   padding: 14px 20px;
   border-top: 1px solid var(--lms-border);
+  /* The same footer ramp the learner's course card has, so the two sides of the
+     app describe a course card the same way. */
+  background: linear-gradient(180deg, #fbfdfb 0%, var(--lms-tint-100) 100%);
 }
 .lms-icourse__perf { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12.5px; color: var(--lms-muted); }
 .lms-icourse__perf span { display: inline-flex; align-items: center; gap: 7px; }
@@ -5050,11 +5094,11 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 /* Quizzes list (L3/R1) ------------------------------------------------------ */
 .lms-quizlist { display: flex; flex-direction: column; gap: 14px; }
 .lms-quizrow {
-  background: var(--lms-surface);
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius);
-  box-shadow: var(--lms-shadow-sm);
   overflow: hidden;
+  transition: transform 0.18s var(--lms-ease), box-shadow 0.18s var(--lms-ease),
+    border-color 0.18s var(--lms-ease);
 }
 .lms-quizrow.is-broken { border-color: #f2e0b4; }
 .lms-quizrow__head {
@@ -5612,50 +5656,69 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 18px;
 }
+/* Built out of the same parts as an enrolled-course card, because that is what
+   it is: a thing you own, in a grid of things you own. It used to open with a
+   110px slab of dark-green gradient carrying one award glyph — a cover with no
+   cover art, and the last green block left in a grid of white cards. The kind
+   of certificate is the only thing that slab actually said, so it says it as a
+   pill in a badge row, exactly where a course card puts its level. The fill,
+   border and lift come from the shared raised-card rules at the end of this
+   file. */
 .lms-certcard {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--lms-surface);
-  border: 1px solid var(--lms-border);
+  border: 1px solid var(--lms-lift-border);
   border-radius: var(--lms-radius);
-  box-shadow: var(--lms-shadow);
+  transition: transform 0.18s var(--lms-ease), box-shadow 0.18s var(--lms-ease),
+    border-color 0.18s var(--lms-ease);
 }
-.lms-certcard__thumb {
+.lms-certcard:hover { border-color: var(--lms-tint-400); }
+
+/* The badge row, in flow at the top of the card — .lms-course__cover's twin. */
+.lms-certcard__cover {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 110px;
-  /* Defaults live here, not in the component. A certificate's stored design
-     carries an accent but no soft variant, and one issued before the field
-     existed carries neither — so the card has to render with nothing passed in
-     rather than falling back to an unset custom property (which paints
-     nothing). The inline accent overrides only the one it sets. */
-  --cert-accent: #0a3114;
-  --cert-accent-soft: #7ee2a8;
-  background: linear-gradient(135deg, var(--cert-accent), #14572a);
-  color: var(--cert-accent-soft);
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 18px 0;
+  text-decoration: none;
 }
-.lms-certcard__thumb svg { width: 42px; height: 42px; }
-.lms-certcard__body { flex: 1; padding: 16px 18px; }
+.lms-certcard__cover:focus-visible {
+  outline: none;
+  box-shadow: var(--lms-ring);
+  border-radius: var(--lms-radius-sm);
+}
 .lms-certcard__kind {
-  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--lms-tint-400);
+  background: var(--lms-tint-100);
+  color: var(--lms-green-600);
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0;
-  color: var(--lms-green-600);
 }
-.lms-certcard__title { margin: 5px 0 6px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.lms-certcard__kind svg { width: 13px; height: 13px; }
+
+.lms-certcard__body { flex: 1; padding: 14px 18px 18px; }
+.lms-certcard__title { margin: 0 0 6px; font-size: 16.5px; font-weight: 600; line-height: 1.32; letter-spacing: -0.01em; }
 .lms-certcard__title a { color: var(--lms-text); text-decoration: none; }
 .lms-certcard__title a:hover { color: var(--lms-green-600); }
-.lms-certcard__meta { margin: 0 0 4px; font-size: 13px; color: var(--lms-muted); }
+.lms-certcard__title a:focus-visible { outline: none; box-shadow: var(--lms-ring); border-radius: 4px; }
+.lms-certcard__meta { margin: 0 0 4px; font-size: 12.5px; color: var(--lms-muted); }
 .lms-certcard__id { margin: 0; font-size: 12px; color: var(--lms-muted); font-variant-numeric: tabular-nums; }
 .lms-certcard__foot {
   display: flex;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   padding: 14px 18px;
   border-top: 1px solid var(--lms-border);
-  background: var(--lms-surface-2);
+  background: linear-gradient(180deg, #fbfdfb 0%, var(--lms-tint-100) 100%);
 }
 
 .lms-cert-stage { display: flex; justify-content: center; }
@@ -6165,6 +6228,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-icourse > .lms-icourse__actions {
   padding: 14px 20px;
   border-top: 1px solid var(--lms-border);
+  background: linear-gradient(180deg, #fbfdfb 0%, var(--lms-tint-100) 100%);
   flex-wrap: wrap;
 }
 /* Same reason: the "changes requested" note is a direct child too, so it needs
@@ -7041,7 +7105,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   max-height: calc(100vh - 120px);
   overflow-y: auto;
   padding: 16px 14px;
-  background: var(--lms-surface);
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius);
 }
@@ -7410,4 +7473,185 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 17px;
   color: var(--lms-mint);
   flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   RAISED CARDS.
+
+   Every card surface in the LMS — student side and instructor side alike, not
+   just the dashboard: the KPI tiles, the chart, the donut, course cards,
+   certificates, threads, orders, the instructor's own course and learning-path
+   lists, the builder's sections and its contents rail, the sessions list. One
+   elevation, applied once, so no page invents its own.
+
+   Four things together make a surface look lifted, and it is the combination
+   rather than any one of them:
+
+     1. a lit top edge — an inset white hairline, as if the light above the page
+        catches the card's leading edge. This is what reads as a physical edge
+        rather than a drawn border, and it is the piece most often left out;
+     2. a contact shadow — 1px, almost opaque, directly under the card, which is
+        what fixes it to the surface. Without it a card floats;
+     3. two spread shadows at increasing size and decreasing opacity, which is
+        how real penumbra falls off. One shadow at one size reads as a sticker;
+     4. a fill that is not flat white — a whisper of a ramp, so the card's own
+        surface has a top and a bottom.
+
+   All the shadow colours are the green-black --lms-shadow uses, so shade on the
+   mint canvas reads as shade rather than as soot.
+
+   What is deliberately NOT in this list: anything nested inside a card. The
+   resume panel's facts, the segmented control, question editors, resource rows,
+   quiz options — those are recessed, because a raised box inside a raised box
+   is two claims about the same surface.
+   ------------------------------------------------------------------------ */
+.lms-card,
+.lms-stat,
+.lms-profile,
+.lms-invoice,
+.lms-order,
+.lms-quizrow,
+.lms-thread,
+.lms-question,
+.lms-answer,
+.lms-level,
+.lms-membership,
+.lms-bundlecard,
+.lms-live-card,
+.lms-cmod,
+.lms-icourse,
+.lms-builder__toc,
+.lms-certcard {
+  box-shadow: var(--lms-lift);
+}
+
+/* The white cards get the ramp too. The membership strip is the one panel left
+   out: it carries its own green gradient and must not have a second background
+   stacked on top of it. (The level banner used to be the other one; it is a
+   white card with green type now — see .lms-level.) */
+.lms-card,
+.lms-stat,
+.lms-profile,
+.lms-invoice,
+.lms-order,
+.lms-quizrow,
+.lms-thread,
+.lms-question,
+.lms-answer,
+.lms-level,
+.lms-bundlecard,
+.lms-cmod,
+.lms-icourse,
+.lms-builder__toc,
+.lms-certcard {
+  background: var(--lms-lift-fill);
+}
+
+/* Border colours are set one at a time rather than in the group above, because
+   several of these cards carry a coloured edge that says something — the live
+   session's state stripe, a broken quiz's amber, an accepted answer's mint —
+   and a blanket `border-color` here would paint over all of them. */
+.lms-card,
+.lms-stat,
+.lms-profile,
+.lms-invoice,
+.lms-order,
+.lms-quizrow,
+.lms-thread,
+.lms-question,
+.lms-icourse,
+.lms-builder__toc,
+.lms-certcard {
+  border-color: var(--lms-lift-border);
+}
+
+/* The live-session card keeps its left stripe; only the other three edges move
+   to the lifted border. */
+.lms-live-card {
+  border-top-color: var(--lms-lift-border);
+  border-right-color: var(--lms-lift-border);
+  border-bottom-color: var(--lms-lift-border);
+}
+
+/* A card that rises under the pointer is telling you it can be clicked, so only
+   the ones that go somewhere do it. The chart, the invoice and the builder's
+   sections do not. */
+.lms-stat:hover,
+.lms-thread:hover,
+.lms-quizrow:hover,
+.lms-icourse:hover,
+.lms-certcard:hover {
+  transform: translateY(-2px);
+  border-color: var(--lms-tint-400);
+  box-shadow: var(--lms-lift-hover);
+}
+
+/* The hover border above is a blanket, so the one card whose resting border
+   carries meaning has to say it again: a quiz that cannot be marked stays amber
+   while the pointer is on it. */
+.lms-quizrow.is-broken:hover { border-color: #f2e0b4; }
+
+/* Two stat tiles opt out of the hover lift, and both for the same reason: they
+   are figures, not links. `.is-static` is set wherever a tile has nowhere to go;
+   `--tight` is the progress page's row of five, which never did. */
+.lms-stat.is-static:hover,
+.lms-stat--tight:hover {
+  transform: none;
+  box-shadow: var(--lms-lift);
+}
+
+/* Reduced motion already turns the translate off elsewhere in this file; the
+   shadow change is not motion and stays. */
+@media (max-width: 720px) {
+  .lms-stat:hover,
+  .lms-thread:hover,
+  .lms-quizrow:hover,
+  .lms-icourse:hover,
+  .lms-certcard:hover { transform: none; }
+}
+
+/* Paper has no light source above it, so nothing is raised on it. This has to
+   sit after the grouped rules above: a media query adds no specificity, and the
+   invoice's own print reset is now earlier in the file than the lift it is
+   trying to undo. */
+@media print {
+  .lms-card,
+  .lms-stat,
+  .lms-profile,
+  .lms-invoice,
+  .lms-order,
+  .lms-quizrow,
+  .lms-thread,
+  .lms-answer,
+  .lms-level,
+  .lms-membership,
+  .lms-bundlecard,
+  .lms-live-card,
+  .lms-cmod,
+  .lms-icourse,
+  .lms-builder__toc,
+  .lms-question,
+  .lms-course,
+  .lms-certcard {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* Same ordering problem as the print block: the reduced-motion reset earlier in
+   this file now runs before the hover lift it is meant to suppress. The shadow
+   still changes — that is not motion — only the travel goes. */
+@media (prefers-reduced-motion: reduce) {
+  .lms-stat,
+  .lms-thread,
+  .lms-quizrow,
+  .lms-icourse,
+  .lms-course,
+  .lms-certcard { transition: box-shadow 0.18s var(--lms-ease), border-color 0.18s var(--lms-ease); }
+  .lms-stat:hover,
+  .lms-thread:hover,
+  .lms-quizrow:hover,
+  .lms-icourse:hover,
+  .lms-course:hover,
+  .lms-certcard:hover { transform: none; }
 }

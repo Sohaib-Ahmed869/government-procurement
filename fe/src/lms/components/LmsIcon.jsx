@@ -23,6 +23,10 @@ const ICONS = {
   lessons: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
   book: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
   chart: <><path d="M3 3v18h18" /><path d="M7 15l4-5 3 3 5-7" /></>,
+  // A ring with a slice taken out, for a card whose content is a donut. Drawn
+  // as two arcs rather than a filled wedge so it strokes like the rest of the
+  // set.
+  pie: <><path d="M12 3a9 9 0 1 0 9 9h-9z" /><path d="M14 2.6A9 9 0 0 1 21.4 10H14z" /></>,
   users: <><circle cx="9" cy="8" r="3.5" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0" /><path d="M16 5a3.5 3.5 0 0 1 0 6.5M17 20a5.5 5.5 0 0 0-2.5-4.6" /></>,
   user: <><circle cx="12" cy="8" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
   eye: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></>,

@@ -145,27 +145,43 @@ export function useQuizAnalytics(lessonId) {
   return { data, status, error };
 }
 
+/* The dashboard's headline figures, from a course list already in hand.
+
+   A pure function rather than only a hook, because the dashboard needs the
+   course list AND its rollup, and calling useInstructorSummary() beside
+   useInstructorCourses() fetched /authoring/courses twice on every load — one
+   request for the tiles and an identical one for the list under them.
+
+   `learners` is the sum of ACTIVE ENROLMENTS. Someone enrolled in two of this
+   instructor's courses is two enrolments and one person, which is why nothing
+   here calls the figure "students" — same rule the enrolment summary follows. */
+export function summariseCourses(courses) {
+  const rated = courses.filter((c) => c.rating != null);
+  return {
+    courses: courses.length,
+    published: courses.filter((c) => c.state === 'published').length,
+    pending: courses.filter((c) => c.state === 'pending').length,
+    drafts: courses.filter((c) => c.state === 'draft').length,
+    lessons: courses.reduce((s, c) => s + (c.lessonCount ?? 0), 0),
+    learners: courses.reduce((s, c) => s + (c.learners ?? 0), 0),
+    // Courses anybody has actually enrolled in. The denominator for "where are
+    // my learners" — a donut of ten courses, eight of them empty, is two
+    // slices and eight labels.
+    withLearners: courses.filter((c) => (c.learners ?? 0) > 0).length,
+    // Video lessons with a file but no transcript (L2).
+    missingTranscripts: courses.reduce(
+      (s, c) => s + Math.max(0, (c.videoCount ?? 0) - (c.transcriptCount ?? 0)),
+      0,
+    ),
+    ratedCount: rated.length,
+    averageRating: rated.length
+      ? (rated.reduce((s, c) => s + c.rating, 0) / rated.length).toFixed(1)
+      : null,
+  };
+}
+
 export function useInstructorSummary() {
   const { courses, status } = useInstructorCourses();
-
-  const summary = useMemo(() => {
-    const rated = courses.filter((c) => c.rating != null);
-    return {
-      courses: courses.length,
-      published: courses.filter((c) => c.state === 'published').length,
-      pending: courses.filter((c) => c.state === 'pending').length,
-      lessons: courses.reduce((s, c) => s + (c.lessonCount ?? 0), 0),
-      learners: courses.reduce((s, c) => s + (c.learners ?? 0), 0),
-      // Video lessons with a file but no transcript (L2).
-      missingTranscripts: courses.reduce(
-        (s, c) => s + Math.max(0, (c.videoCount ?? 0) - (c.transcriptCount ?? 0)),
-        0,
-      ),
-      averageRating: rated.length
-        ? (rated.reduce((s, c) => s + c.rating, 0) / rated.length).toFixed(1)
-        : null,
-    };
-  }, [courses]);
-
+  const summary = useMemo(() => summariseCourses(courses), [courses]);
   return { ...summary, status };
 }

@@ -177,7 +177,11 @@ export default function QuizAnalyticsPage() {
                       </div>
                     </div>
 
-                    <ProgressBar percent={q.correctRate ?? 0} complete={q.correctRate === 100} />
+                    {/* A correct rate is a rate, not a completion — same
+                        reasoning as the pass-rate bars on Cohort Progress, so
+                        it keeps the dark-green gradient rather than filling
+                        flat mint at 100%. */}
+                    <ProgressBar percent={q.correctRate ?? 0} />
 
                     {note ? (
                       <p className="lms-item__note">
