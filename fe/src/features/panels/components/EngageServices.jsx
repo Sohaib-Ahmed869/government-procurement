@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { engageServicesApi } from '../../../api';
 import { useInView } from '../../../hooks/useInView.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './EngageServices.css';
+
+// What this section's read is remembered under for the life of the tab.
+const CACHE_KEY = 'engage-services';
 
 /* ---------------------------------------------------------------------------
    "How to Engage Us" for the WIN segment.
@@ -69,23 +74,37 @@ function consultationHref(service) {
 }
 
 export default function EngageServices({ audience }) {
-  const { ref, inView } = useInView({ threshold: 0 });
-  const [services, setServices] = useState([]);
+  // Seeded from the tab's cache, so a return visit renders the rows on the
+  // first frame instead of holding a viewport of empty space — see api/cache.js.
+  const [services, setServices] = useState(() => readCache(CACHE_KEY) ?? []);
+  // Whether the fetch has come back at all — a failed or empty list is still an
+  // answer, and the reveal has to be released either way or the section would
+  // sit hidden forever waiting for rows that are never coming. A cached answer
+  // counts as one.
+  const [loaded, setLoaded] = useState(() => hasCache(CACHE_KEY));
 
   useEffect(() => {
     let alive = true;
     engageServicesApi
       .list()
       .then((list) => {
+        writeCache(CACHE_KEY, list || []);
         if (alive) setServices(list || []);
       })
       .catch(() => {
         /* the section renders empty rather than breaking the page */
+      })
+      .finally(() => {
+        if (alive) setLoaded(true);
       });
     return () => {
       alive = false;
     };
   }, []);
+
+  // The rows ARE the section, so the reveal waits for them — see the note on
+  // `ready` in useInView.
+  const { ref, inView } = useInView({ threshold: 0, ready: loaded });
 
   return (
     <section
@@ -95,6 +114,11 @@ export default function EngageServices({ audience }) {
       aria-label="How to engage us"
     >
       <div className="eng__inner">
+        {/* The rows are the whole section, so until they arrive this page is a
+            hero and nothing else — and the footer's contact band comes up to
+            the fold to fill it. Held open instead. */}
+        <LoadingStatus loading={!loaded} label="Loading services" />
+
         <ul className="eng__list">
           {services.map((service, i) => (
             // `--i` drives the reveal stagger in the stylesheet. Set here rather

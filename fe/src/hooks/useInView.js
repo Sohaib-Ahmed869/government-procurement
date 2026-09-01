@@ -16,6 +16,20 @@ export function useInView({
   // Change this value to replay the reveal (e.g. pass the current audience so
   // toggling win/award re-triggers the animation).
   resetKey,
+  // False while the section is still waiting on its content.
+  //
+  // A section whose body comes from the CMS is on screen and empty long before
+  // it has anything to show, and the observer fires on the empty shell: the
+  // reveal plays over a "Loading…" line, `is-in` is left on the section, and the
+  // cards that arrive a second later mount into a section that has already
+  // finished animating — so they are painted at their final opacity in the frame
+  // they mount, which is the abrupt appearance this option exists to stop.
+  //
+  // Pass `{ ready: status !== 'loading' }` and the section is not observed until
+  // the data is in hand. The REVEAL_RESET_MS wait below then does the rest: the
+  // cards get one paint in their hidden state before `is-in` lands, which is
+  // what gives the transition something to animate FROM.
+  ready = true,
 } = {}) {
   const [node, setNode] = useState(null);
   const ref = useCallback((el) => setNode(el), []);
@@ -27,10 +41,12 @@ export function useInView({
   // element never goes back to its start state and the reveal doesn't replay.
   useLayoutEffect(() => {
     setInView(false);
-  }, [resetKey]);
+  }, [resetKey, ready]);
 
   useEffect(() => {
-    if (!node) return undefined;
+    // Nothing to reveal yet — the content hasn't arrived. Held hidden by the
+    // layout effect above until it has.
+    if (!node || !ready) return undefined;
 
     // Reset to hidden so the transition replays when resetKey changes.
     setInView(false);
@@ -65,7 +81,7 @@ export function useInView({
       window.clearTimeout(start);
       observer.disconnect();
     };
-  }, [node, threshold, rootMargin, once, resetKey]);
+  }, [node, threshold, rootMargin, once, resetKey, ready]);
 
   return { ref, inView };
 }

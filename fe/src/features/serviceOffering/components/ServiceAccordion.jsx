@@ -2,6 +2,7 @@ import { useEffect, useId, useState } from 'react';
 import { capabilitiesApi, capabilityCardsCache } from '../../../api';
 import { useInView } from '../../../hooks/useInView.js';
 import { resolveServices } from '../services.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './ServiceAccordion.css';
 
 // The services, as an accordion. However many there are — the list is whatever
@@ -25,20 +26,29 @@ import './ServiceAccordion.css';
 
 export default function ServiceAccordion({ audience }) {
   const [saved, setSaved] = useState(capabilityCardsCache.get);
-  const { ref, inView } = useInView({ threshold: 0 });
   const baseId = useId();
+
+  // `null` until an answer arrives, which is what holds the reveal below. A
+  // second visit in the same tab starts from the cache and is ready at once.
+  const { ref, inView } = useInView({ threshold: 0, ready: saved !== null });
 
   useEffect(() => {
     let alive = true;
     capabilitiesApi
       .list()
       .then((list) => {
-        if (!list) return;
+        if (!list) {
+          // Nothing published. Still an answer — leaving `saved` null would
+          // hold the reveal open on a page that has nothing more coming.
+          if (alive) setSaved((current) => current ?? []);
+          return;
+        }
         capabilityCardsCache.set(list);
         if (alive) setSaved(list);
       })
       .catch(() => {
         /* leave whatever is already on screen */
+        if (alive) setSaved((current) => current ?? []);
       });
     return () => {
       alive = false;
@@ -72,6 +82,11 @@ export default function ServiceAccordion({ audience }) {
       aria-label="Our services"
     >
       <div className="sv__inner">
+        {/* The list is the page. Until it arrives there is nothing under the
+            hero, and the footer's contact band rises to fill the gap — so the
+            space is held for it. */}
+        <LoadingStatus loading={saved === null} label="Loading services" />
+
         <ul className="sv__list hm-reveal">
           {services.map((service, i) => {
             const open = i === openIndex;

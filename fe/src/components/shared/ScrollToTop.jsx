@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 /* Puts the visitor at the top of the page on every navigation.
@@ -32,7 +32,26 @@ import { useLocation } from 'react-router-dom';
 export default function ScrollToTop() {
   const { key, hash } = useLocation();
 
-  useEffect(() => {
+  /* A LAYOUT effect, and that is the whole of it.
+
+     As a plain effect this ran after the browser had already painted, so every
+     navigation made from part-way down a page got at least one frame of the NEW
+     page drawn at the OLD scroll offset. The browser clamps that offset to
+     whatever the new page can scroll to, which — on a page whose content has
+     not arrived yet — is its own foot: the "Remain Connected" band and the
+     footer, on screen for a frame or two and then gone as the scroll snapped
+     back to the top. Measured from the footer's own "Our Team" link at
+     scrollY 1011: the band painted at y=128 in a 900px viewport before the
+     reset. That is the flash.
+
+     It is worst exactly where a visitor is most likely to be scrolled — the
+     footer nav, which they can only reach by scrolling to it — and it is
+     invisible from a page opened at the top, which is why it looked like some
+     pages had it and others did not.
+
+     useLayoutEffect runs after the DOM is updated and BEFORE the paint, so the
+     new page is never painted anywhere but the top. */
+  useLayoutEffect(() => {
     if (hash) return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [key, hash]);

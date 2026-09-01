@@ -4,7 +4,14 @@ import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { bundlesApi, coursesApi } from '../../../api';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './CoursesBrowser.css';
+
+// What this page's two reads are remembered under for the life of the tab, so a
+// return visit paints the grid rather than an empty band — see api/cache.js.
+const COURSES_KEY = 'courses:limit=100';
+const BUNDLES_KEY = 'bundles:limit=100';
 
 // Whole dollars: these are course prices, and the cents are always zero.
 const formatPrice = (n, currency = 'AUD') =>
@@ -79,7 +86,6 @@ export default function CoursesBrowser() {
   // under a short hero and is taller than the viewport, so it never satisfied
   // the observer's threshold on a shorter screen — the page looked like it
   // ended below the intro until you scrolled.
-  const inView = useMountReveal();
   const [category, setCategory] = useState('all');
   const [level, setLevel] = useState('all');
 
@@ -90,10 +96,19 @@ export default function CoursesBrowser() {
   const [appliedKey, fading] = useFadeSwap(JSON.stringify([category, level]));
   const [shownCategory, shownLevel] = JSON.parse(appliedKey);
 
-  const [courses, setCourses] = useState([]);
-  const [bundles, setBundles] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache alongside the status — both halves, or the
+     page reports itself ready with nothing to show and the grid arrives a
+     round trip later anyway. */
+  const [courses, setCourses] = useState(() => readCache(COURSES_KEY) ?? []);
+  const [bundles, setBundles] = useState(() => readCache(BUNDLES_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(COURSES_KEY) ? 'ready' : 'loading'));
   const [shown, setShown] = useState(PAGE_SIZE);
+
+  // The rail and the results are both built from the CMS list, so the reveal is
+  // held until it lands — see the note on `ready` in useMountReveal. Played on
+  // mount it runs over the "Loading…" line, and the cards that follow are
+  // painted at their final opacity in the frame they mount.
+  const inView = useMountReveal(undefined, { ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -107,11 +122,14 @@ export default function CoursesBrowser() {
           bundlesApi.list({ limit: 100 }).catch(() => []),
         ]);
         if (!alive) return;
+        writeCache(COURSES_KEY, list || []);
+        writeCache(BUNDLES_KEY, bundleList || []);
         setCourses(list || []);
         setBundles(bundleList || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed refresh leaves a cached page up rather than blanking it.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -240,7 +258,7 @@ export default function CoursesBrowser() {
 
           {/* The results, and only the results — see useFadeSwap above. */}
           <div className={`gp-swap${fading ? ' is-swapping' : ''}`}>
-          {status === 'loading' && <p className="courses-main__title">Loading courses…</p>}
+          <LoadingStatus loading={status === 'loading'} label="Loading courses" />
           {status === 'error' && (
             <p className="courses-main__title">
               We couldn&apos;t load the courses right now. Please try again shortly.

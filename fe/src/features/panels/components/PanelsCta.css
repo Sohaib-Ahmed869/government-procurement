@@ -22,13 +22,24 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .gp-cta__copy,
-  .gp-cta__button {
+  /* `.gp-cta .gp-cta__button` for the same reason as the browse rail: the
+     button sets its own `transition` further down (hover lift plus the segment
+     recolour), and at equal specificity that REPLACES this one instead of
+     joining it — leaving the button to appear in one frame while the copy
+     beside it faded up. */
+  .gp-cta .gp-cta__copy,
+  .gp-cta .gp-cta__button {
     opacity: 0;
     translate: 0 var(--gp-reveal-shift);
+    /* The button's hover lift and the segment recolour are repeated here
+       because this declaration now outranks the button's own, and a
+       `transition` does not merge — the winning list is the only list. Keep
+       the `transform` timing in step with .gp-cta__button below. */
     transition:
       opacity var(--gp-reveal-dur) var(--gp-ease),
-      translate var(--gp-reveal-dur) var(--gp-ease);
+      translate var(--gp-reveal-dur) var(--gp-ease),
+      transform 200ms var(--gp-ease),
+      var(--gp-fade);
   }
 
   .gp-cta.is-in .gp-cta__copy,

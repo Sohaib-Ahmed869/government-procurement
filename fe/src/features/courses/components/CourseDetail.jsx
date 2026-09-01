@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useInView } from '../../../hooks/useInView.js';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import RegisterInterestForm from '../../../components/forms/RegisterInterestForm.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './CourseDetail.css';
 
 // Course data (title, summary, body, image, media, availability) comes from the
@@ -57,18 +58,39 @@ const Icon = {
 
 export default function CourseDetail({ course, status = 'ready' }) {
   const { audience } = useAudience();
-  const { ref, inView } = useInView();
+  // Held until the course is here. Without it the reveal plays over the
+  // "Loading course…" line and the real page, arriving into a section that has
+  // already finished animating, is painted at full opacity in one frame.
+  const { ref, inView } = useInView({ ready: status === 'ready' && Boolean(course) });
 
-  // Loading / error / not-found states, themed to match the detail page.
-  if (status !== 'ready' || !course) {
-    let message = 'Loading course…';
-    if (status === 'error') {
-      message = "We couldn't load this course right now. Please try again shortly.";
-    } else if (status === 'notfound') {
-      message = "We couldn't find that course.";
-    }
+  // The wait itself: nothing on the band but its ground. The course fades in
+  // when it arrives, and a "Loading course…" line under a placeholder "Course"
+  // heading is two things to take away before it can.
+  if (status === 'loading') {
     return (
-      <section ref={ref} className={`cd hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
+      <section key="cd-pending" className="cd hm-band--light" data-audience={audience}>
+        <LoadingStatus loading label="Loading course" />
+      </section>
+    );
+  }
+
+  // Error and not-found are messages, not waits — they say what happened and
+  // offer the way back, and they are readable straight away (`is-in` outright
+  // rather than `inView`, since `.cd__main` is what the reveal hides). The key
+  // is what makes the swap to the loaded page a fresh mount rather than a diff
+  // over the same nodes, which is what gives the reveal below an element
+  // painted hidden to animate from.
+  if (status !== 'ready' || !course) {
+    const message =
+      status === 'notfound'
+        ? "We couldn't find that course."
+        : "We couldn't load this course right now. Please try again shortly.";
+    return (
+      <section
+        key="cd-pending"
+        className="cd hm-band--light is-in"
+        data-audience={audience}
+      >
         <div className="cd__inner">
           <div className="cd__main">
             <h1 className="cd__title">{status === 'notfound' ? 'Course not found' : 'Course'}</h1>
@@ -110,7 +132,12 @@ export default function CourseDetail({ course, status = 'ready' }) {
   );
 
   return (
-    <section ref={ref} className={`cd hm-band--light${inView ? ' is-in' : ''}`} data-audience={audience}>
+    <section
+      key="cd-ready"
+      ref={ref}
+      className={`cd hm-band--light${inView ? ' is-in' : ''}`}
+      data-audience={audience}
+    >
       <div className="cd__inner">
         {/* --- main column --- */}
         <div className="cd__main">

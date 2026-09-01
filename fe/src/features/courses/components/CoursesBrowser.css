@@ -38,12 +38,25 @@
   /* The stagger lands on the two properties the reveal owns and nowhere else.
      `transform` and the colours — everything the pointer drives — sit at 0s, in
      BOTH directions: a single delay value here is what made leaving a card take
-     as long as the stagger before it settled back. */
+     as long as the stagger before it settled back.
+
+     ONE VALUE PER PROPERTY, IN THE ORDER `.courses-card` DECLARES THEM:
+     transform, background-color, opacity, translate. This list had five values
+     against that rule's four, so every slot after the second was shifted by
+     one: `opacity` took the third value — 0s — and only `translate` was left
+     staggered. The cards all faded in together and merely slid up in sequence,
+     which reads as one arrival rather than as a grid filling in, and is why
+     this page looked nothing like Insights doing the same thing.
+
+     A delay list shorter or longer than the property list is not an error the
+     browser reports; it is quietly cycled or truncated. If a property is ever
+     added to that transition, a value has to be added here too. */
   .courses-browse.is-in .courses-card {
     opacity: 1;
     translate: none;
     transition-delay:
-      0s, 0s, 0s,
+      0s,
+      0s,
       calc(0.12s + var(--i, 0) * 0.06s),
       calc(0.12s + var(--i, 0) * 0.06s);
   }

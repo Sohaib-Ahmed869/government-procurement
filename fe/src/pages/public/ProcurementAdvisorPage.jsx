@@ -7,6 +7,7 @@ import AdvisorStepper from '../../features/advisor/components/AdvisorStepper.jsx
 import JurisdictionPicker from '../../features/advisor/components/JurisdictionPicker.jsx';
 import { JURISDICTIONS, getRulePack } from '../../features/advisor/jurisdictions.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
+import LoadingStatus from '../../components/shared/LoadingStatus.jsx';
 import './ProcurementAdvisorPage.css';
 
 // A6 — the Procurement Advisor.
@@ -75,12 +76,22 @@ export default function ProcurementAdvisorPage() {
             </div>
           </header>
 
-          <section className="pa-page__body">
+          {/* `is-in` on the body as well as the head, so what the visitor came
+              to this page for fades in with the title above it rather than
+              being the one thing on the page that simply appears. It reveals
+              only the children that ask for it (`.is-in .hm-reveal`), so the
+              stepper and the disclaimer are untouched — the picker's boxes
+              carry the class below. */}
+          <section className={`pa-page__body${mounted ? ' is-in' : ''}`}>
             <div className="pa-page__shell">
               {live && rules ? (
                 <AdvisorStepper rules={rules} onExit={exit} key={live.slug} />
               ) : live ? (
-                <p className="pa-note">Loading the {live.name} rules…</p>
+                /* Blank while the pack loads. It is a dynamic import off the
+                   same origin, so the wait is a few frames on any connection —
+                   short enough that a line of holding copy is on screen for
+                   less time than it takes to read. */
+                <LoadingStatus loading label={`Loading the ${live.name} rules`} />
               ) : (
                 <>
                   {/* The same component the result carries, so the wording is
@@ -88,7 +99,12 @@ export default function ProcurementAdvisorPage() {
                       how this box was still showing the old placeholder copy
                       after the client's wording landed on the other one. */}
                   <AdvisorDisclaimer variant="intro" />
-                  <JurisdictionPicker showLogos />
+                  {/* The same `hm-reveal` the homepage's advisory band passes
+                      into this component (AdvisoryBand.jsx). It was the only
+                      difference between the two: one row of boxes faded in and
+                      the other, on the page the boxes actually belong to, did
+                      not. */}
+                  <JurisdictionPicker showLogos itemClassName="hm-reveal" />
                 </>
               )}
             </div>

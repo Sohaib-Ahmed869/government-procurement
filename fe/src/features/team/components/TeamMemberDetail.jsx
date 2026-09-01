@@ -5,6 +5,7 @@ import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useInView } from '../../../hooks/useInView.js';
 import { articlesApi, teamApi } from '../../../api';
 import TeamAvatar from './TeamAvatar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './TeamMemberDetail.css';
 
 // Two rows of the 4-up desktop "Published work" grid.
@@ -80,13 +81,15 @@ export default function TeamMemberDetail({ slug }) {
   }, [authorName]);
   const visibleArticles = articles.slice(0, shownWork);
 
-  // Still loading — hold the page rather than flashing "not found".
+  // Still loading — hold the page rather than flashing "not found". The way
+  // back is all that shows: the profile fades in when it arrives, so a
+  // "Loading…" line under the link is only something to take away again.
   if (member === null) {
     return (
       <section className="tm hm-band--light" data-audience={audience}>
         <div className="tm__inner">
           <BackLink />
-          <p className="tm__bio">Loading…</p>
+          <LoadingStatus loading label="Loading profile" />
         </div>
       </section>
     );

@@ -179,12 +179,35 @@ body {
    `section > *` and `header > *` are how the public pages are built (a band, a
    shell inside it). Anything not matching simply recolours without fading —
    the failure mode is "less animation", never a flash.
+
+   THE FOOTER IS TWO BANDS, AND IT USED TO BE FADED AS ONE.
+   This read `.page-layout > .site-footer > *`, which is a level too high: the
+   footer's direct children ARE the bands — `.site-footer__subscribe`, the
+   "Remain Connected" band, which carries its own paper ground, and
+   `.site-footer__inner` under it. Fading those took the band's BACKGROUND off
+   the screen along with its copy, so the light band vanished to whatever sat
+   behind it and came back a beat later. That is the exact failure this comment
+   spends three paragraphs ruling out for the page above, described from the
+   outside as the footer flashing on the way into a page.
+
+   `> * > *` puts the footer on the same footing as every other band on the
+   site: the shell inside it fades, the ground it sits on stays painted and
+   recolours underneath via --gp-fade.
    -------------------------------------------------------------------------- */
 .page-layout__main :is(section, header, article) > *,
-.page-layout > .site-footer > * {
+.page-layout > .site-footer > * > * {
   transition:
     opacity var(--gp-swap) var(--gp-ease),
     transform var(--gp-swap) var(--gp-ease);
+}
+
+/* The grounds themselves, recolouring rather than fading — the same treatment
+   the header gets below, and for the same reason: they never leave the screen,
+   so there is nothing to fade them for. .site-footer__subscribe declares this
+   for itself in Footer.css; the dark footer under it had nothing, and swapped
+   its colour in one frame while everything around it took 480ms. */
+.page-layout > .site-footer {
+  transition: var(--gp-fade);
 }
 
 /* The hero's media layer is excluded: the footage is the same in both segments,
@@ -200,21 +223,21 @@ body {
    running: `will-change` left on permanently is its own performance bug, since
    every element it names keeps a compositing layer for the life of the page. */
 html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > *,
-html[data-audience-swap='out'] .page-layout > .site-footer > *,
+html[data-audience-swap='out'] .page-layout > .site-footer > * > *,
 html[data-audience-swap='in'] .page-layout__main :is(section, header, article) > *,
-html[data-audience-swap='in'] .page-layout > .site-footer > * {
+html[data-audience-swap='in'] .page-layout > .site-footer > * > * {
   will-change: opacity, transform;
 }
 
 html[data-audience-swap='out'] .page-layout__main :is(section, header, article) > *:not(.home-hero__media),
-html[data-audience-swap='out'] .page-layout > .site-footer > * {
+html[data-audience-swap='out'] .page-layout > .site-footer > * > * {
   opacity: 0;
   transform: translateY(-6px);
   transition-duration: 380ms; /* SWAP_FADE_OUT_MS */
 }
 
 html[data-audience-swap='in'] .page-layout__main :is(section, header, article) > *,
-html[data-audience-swap='in'] .page-layout > .site-footer > * {
+html[data-audience-swap='in'] .page-layout > .site-footer > * > * {
   opacity: 1;
   transform: none;
   transition-duration: 640ms; /* SWAP_FADE_IN_MS */
@@ -245,9 +268,53 @@ html[data-audience-swap='out'] .page-layout__main :is(section, header, article) 
 
 @media (prefers-reduced-motion: reduce) {
   .page-layout__main :is(section, header, article) > *,
-  .page-layout > .site-footer > * {
+  .page-layout > .site-footer > * > * {
     transition: none;
     opacity: 1;
     transform: none;
   }
+}
+
+/* Present to a screen reader, absent from the page.
+
+   The visible "Loading…" lines are gone — a section now simply fades in when
+   its content arrives, which is the whole point of holding the reveal until
+   then (hooks/useInView.js). But a page that says nothing while it waits says
+   nothing to somebody who cannot see it fade either, so the line survives here
+   as an announcement rather than as copy. See components/shared/LoadingStatus.
+
+   `clip` alongside `clip-path` on purpose: the old property is what older
+   screen-reader/browser pairs honour, and the two together are the combination
+   that has been safe for years. Not `display: none` or `visibility: hidden` —
+   both remove the element from the accessibility tree, which is exactly the
+   thing being kept. */
+.gp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The space a section holds while it waits, so the page below it doesn't come
+   up to meet the fold and drop away again when the content lands.
+
+   `.page-layout` above is a flex column a viewport tall, which is what puts the
+   footer at the bottom of the WINDOW on a page with nothing in the middle yet —
+   the "Remain Connected" band arriving on screen for as long as the request
+   takes and leaving the moment it answers. A viewport of held space puts the
+   footer where the loaded page will put it, below the fold, and it stays there.
+
+   Divided by --gp-scale for the same reason `.page-layout`'s own min-height is
+   (see the note there): above 1441px this sits inside a `zoom`ed subtree, where
+   a `vh` resolves against the real viewport and is then magnified — a flat
+   100vh would hold nearly two screens on a 4K display. The property is 1 below
+   that width, so the division is a no-op everywhere else. */
+.gp-hold {
+  min-height: calc(100vh / var(--gp-scale, 1));
 }

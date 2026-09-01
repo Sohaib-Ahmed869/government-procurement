@@ -4,6 +4,7 @@ import { pagesApi } from '../../../api';
 import { useAudience } from '../../../context/AudienceContext.jsx';
 import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { POLICY_BY_SLUG, POLICY_SECTIONS } from '../policies.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './PolicyDocument.css';
 
 // B5.3 — the long-form policy template.
@@ -35,12 +36,21 @@ function slugifyHeading(heading, i) {
 export default function PolicyDocument() {
   const { slug } = useParams();
   const { audience } = useAudience();
-  const shown = useMountReveal();
 
   const policy = POLICY_BY_SLUG[slug];
 
   const [page, setPage] = useState(null);
   const [status, setStatus] = useState('loading'); // loading | ready | error
+
+  // Held until the document is here, so it fades in rather than appearing into
+  // a section that has already finished revealing.
+  //
+  // This drives the BODY alone. The title is painted from the first frame and
+  // never animates — see the note on the reveal block in PolicyDocument.css:
+  // it sits directly under the site header on a page the visitor has just been
+  // sent to the top of, and lifting it into place there reads as the page
+  // settling rather than as an entrance.
+  const shown = useMountReveal(slug, { ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -150,7 +160,7 @@ export default function PolicyDocument() {
           <h1 className="pol__title">{title}</h1>
         </header>
 
-        {status === 'loading' && <p className="pol__loading">Loading…</p>}
+        <LoadingStatus loading={status === 'loading'} label="Loading" />
 
         {status === 'ready' && (
           <div className="pol__layout">

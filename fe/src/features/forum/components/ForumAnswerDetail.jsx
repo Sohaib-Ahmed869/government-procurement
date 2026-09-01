@@ -5,6 +5,7 @@ import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
 import './ForumArticle.css';
 import './ForumAnswerDetail.css';
 
@@ -54,12 +55,13 @@ export default function ForumAnswerDetail() {
     };
   }, [id]);
 
+  // Blank while it waits; the answer fades in when it lands.
   if (status === 'loading') {
     return (
       <section className="forum-article hm-band--light">
         <div className="forum-article__inner">
           <div className="forum-article__main">
-            <p className="forum-article__q">Loading question…</p>
+            <LoadingStatus loading label="Loading question" />
           </div>
         </div>
       </section>

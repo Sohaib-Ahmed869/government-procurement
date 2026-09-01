@@ -22,8 +22,20 @@
   padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
 }
 
+/* The DOCUMENT reveals; the title does not.
+
+   `.pol__head` used to be in here with the body. On these four pages that is
+   the wrong thing to animate: a policy opens on its own title rather than on a
+   heading band, so the title is the first thing on the page and it sits right
+   under the site header — and a heading that lifts 18px into place directly
+   below fixed chrome, on a page the visitor has just been taken to the top of,
+   reads as the page settling rather than as an entrance.
+
+   So the title is simply there from the first paint, and the reveal is left to
+   the thing that actually arrives: the document under it, which is the CMS read
+   this page waits on. It also loses its stagger delay with the head gone —
+   there is nothing left for it to come second to. */
 @media (prefers-reduced-motion: no-preference) {
-  .pol__head,
   .pol__layout {
     opacity: 0;
     transform: translateY(var(--gp-reveal-shift));
@@ -32,13 +44,10 @@
       transform var(--gp-reveal-dur) var(--gp-ease);
   }
 
-  .pol.is-in .pol__head,
   .pol.is-in .pol__layout {
     opacity: 1;
     transform: none;
   }
-
-  .pol.is-in .pol__layout { transition-delay: var(--gp-reveal-step); }
 }
 
 /* --- head ----------------------------------------------------------------- */
@@ -71,12 +80,8 @@
   color: var(--gp-muted);
 }
 
-
-.pol__loading {
-  margin: 32px 0 0;
-  font-size: 15px;
-  color: var(--gp-muted);
-}
+/* .pol__loading has gone with the "Loading…" line it styled — the document
+   fades in when it arrives (see components/shared/LoadingStatus.jsx). */
 
 /* --- layout --------------------------------------------------------------- */
 

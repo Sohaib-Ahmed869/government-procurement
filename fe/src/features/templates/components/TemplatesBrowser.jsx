@@ -6,7 +6,12 @@ import { useMountReveal } from '../../../hooks/useMountReveal.js';
 import { useFadeSwap } from '../../../hooks/useFadeSwap.js';
 import BackToTop from '../../../components/shared/BackToTop.jsx';
 import { CATEGORIES, FORMATS, FORMAT_BY_VALUE, fileSize } from '../data.js';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './TemplatesBrowser.css';
+
+// What this page's read is remembered under for the life of the tab.
+const CACHE_KEY = 'templates';
 
 // B6.5 — the Templates library, browsed exactly as the Prompt Library is.
 //
@@ -45,7 +50,6 @@ function FilterGroup({ heading, name, options, value, onChange }) {
 
 export default function TemplatesBrowser() {
   const { audience } = useAudience();
-  const inView = useMountReveal();
   const topRef = useRef(null);
 
   const [params, setParams] = useSearchParams();
@@ -69,8 +73,19 @@ export default function TemplatesBrowser() {
   const [appliedKey, fading] = useFadeSwap(JSON.stringify([category, useCase, format]));
   const [shownCategory, shownUseCase, shownFormat] = JSON.parse(appliedKey);
 
-  const [templates, setTemplates] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  /* Seeded from the tab's cache, so coming back to this page renders the
+     library on the first frame rather than showing an empty section for the
+     length of a round trip — which is the gap that reads as a flash where the
+     footer's contact band sits. The request below still goes out, so an edit
+     made in the CMS lands on this view. See api/cache.js. */
+  const [templates, setTemplates] = useState(() => readCache(CACHE_KEY) ?? []);
+  const [status, setStatus] = useState(() => (hasCache(CACHE_KEY) ? 'ready' : 'loading'));
+
+  // The rail and the results are both built from the CMS list, so the reveal is
+  // held until it lands — see the note on `ready` in useMountReveal. Played on
+  // mount it runs over the "Loading…" line, and the cards that follow are
+  // painted at their final opacity in the frame they mount.
+  const inView = useMountReveal(undefined, { ready: status !== 'loading' });
 
   useEffect(() => {
     let alive = true;
@@ -78,10 +93,14 @@ export default function TemplatesBrowser() {
       try {
         const list = await templatesApi.list();
         if (!alive) return;
+        writeCache(CACHE_KEY, list || []);
         setTemplates(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        // A failed REFRESH must not blank a page that is already showing the
+        // cached answer, so the error state is only for a page with nothing on
+        // it yet.
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
@@ -265,7 +284,7 @@ export default function TemplatesBrowser() {
 
           {/* Everything that answers the filters, and nothing that sets them. */}
           <div className={`browse-results${fading ? ' is-swapping' : ''}`}>
-          {status === 'loading' && <p className="browse-main__note">Loading templates…</p>}
+          <LoadingStatus loading={status === 'loading'} label="Loading templates" />
           {status === 'error' && (
             <p className="browse-main__note">
               We couldn&apos;t load the templates right now. Please try again shortly.

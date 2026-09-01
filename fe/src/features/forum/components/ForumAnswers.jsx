@@ -4,6 +4,8 @@ import { useInView } from '../../../hooks/useInView.js';
 import { questionsApi } from '../../../api';
 import { CATEGORY_LABEL } from '../data.js';
 import ForumSidebar from './ForumSidebar.jsx';
+import LoadingStatus from '../../../components/shared/LoadingStatus.jsx';
+import { readCache, writeCache, hasCache } from '../../../api/cache.js';
 import './ForumAnswers.css';
 
 function formatDate(iso) {
@@ -39,15 +41,27 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
   const [params] = useSearchParams();
   const query = (params.get('q') || '').trim();
 
-  // resetKey replays the reveal animation whenever the list changes.
-  const { ref, inView } = useInView({ resetKey: `${category}-${query}` });
-
   const [answers, setAnswers] = useState([]);
-  const [status, setStatus] = useState('loading'); // loading | ready | error
+  // Keyed by the filter, because the answers for Win and the answers for a
+  // search are different reads and must not share a slot.
+  const cacheKey = `questions:${query ? `q=${query}` : `category=${category}`}`;
+  const [status, setStatus] = useState(() => (hasCache(cacheKey) ? 'ready' : 'loading'));
+
+  // resetKey replays the reveal animation whenever the list changes; `ready`
+  // holds it until the answers are actually here, so they fade in rather than
+  // appearing into a section that has already finished revealing.
+  const { ref, inView } = useInView({
+    resetKey: `${category}-${query}`,
+    ready: status !== 'loading',
+  });
 
   useEffect(() => {
     let alive = true;
-    setStatus('loading');
+    // Straight to 'ready' where the answer is already in hand: a cached filter
+    // must not drop the list back to an empty section for a frame.
+    const cached = readCache(cacheKey);
+    if (cached) setAnswers(cached);
+    setStatus(cached ? 'ready' : 'loading');
     (async () => {
       try {
         // A search spans the whole forum, so the category filter comes off —
@@ -57,16 +71,17 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
           query || category === 'all' ? { limit: 100 } : { limit: 100, category },
         );
         if (!alive) return;
+        writeCache(cacheKey, list || []);
         setAnswers(list || []);
         setStatus('ready');
       } catch {
-        if (alive) setStatus('error');
+        if (alive) setStatus((current) => (current === 'ready' ? 'ready' : 'error'));
       }
     })();
     return () => {
       alive = false;
     };
-  }, [category, query]);
+  }, [category, query, cacheKey]);
 
   // Match on title and body. The list is capped at 100 server-side, so this
   // filters what was fetched rather than issuing a second request.
@@ -101,7 +116,7 @@ export default function ForumAnswers({ heading = 'Recent Answers', category = 'w
         <div className="forum-answers__main">
           <h2 className="forum-answers__heading">{title}</h2>
 
-          {status === 'loading' && <p className="forum-answers__empty">Loading questions…</p>}
+          <LoadingStatus loading={status === 'loading'} label="Loading questions" />
           {status === 'error' && (
             <p className="forum-answers__empty">
               We couldn&apos;t load questions right now. Please try again shortly.
