@@ -1,3 +1,5 @@
+import Select from '../Select.jsx';
+
 // Filter bar for course lists: a segmented status control, a search box and a
 // sort select. Kept generic (tabs are passed in) so the catalogue page can
 // reuse it with its own segments.
@@ -48,21 +50,17 @@ export default function CatalogFilters({
           />
         </div>
 
+        {/* The <label> and its screen-reader span went with the native
+            element: a <label> associates with a form control, and this is a
+            button, so it named nothing. The name is on the control now. */}
         {sortOptions.length ? (
-          <label className="lms-sort">
-            <span className="lms-sr-only">Sort by</span>
-            <select
-              className="lms-select"
-              value={sort}
-              onChange={(e) => onSortChange(e.target.value)}
-            >
-              {sortOptions.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            className="lms-sort"
+            aria-label="Sort by"
+            value={sort}
+            onChange={onSortChange}
+            options={sortOptions}
+          />
         ) : null}
       </div>
     </div>

@@ -80,7 +80,7 @@
 }
 
 .rif__input::placeholder {
-  color: var(--band-muted);
+  color: var(--band-placeholder);
 }
 
 /* Focus in the segment's own colour, matching the Q&A submit form: --gp-brand
@@ -131,7 +131,7 @@
   color: #fff;
   background: var(--cd-cta, linear-gradient(180deg, #2f7d45 0%, #276a39 100%));
   border: none;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   cursor: pointer;
   transition:
     filter 0.18s ease,

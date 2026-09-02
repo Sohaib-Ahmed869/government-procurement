@@ -45,7 +45,7 @@
 
 .pd__head .pd__back {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
   text-decoration: none;
 }
 .pd__head .pd__back:hover { color: #fff; text-decoration: none; }
@@ -132,7 +132,7 @@
   gap: 8px;
   padding: 9px 16px;
   border: 1px solid var(--gp-brand);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--gp-brand);
   color: var(--gp-paper);
   font-family: inherit;

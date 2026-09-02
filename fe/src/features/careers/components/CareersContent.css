@@ -134,7 +134,7 @@
   color: #fff;
 
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-muted: #fff;
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: rgba(255, 255, 255, 0.06);
   --band-surface-hover: rgba(255, 255, 255, 0.16);
@@ -169,7 +169,7 @@
   color: #fff;
   text-decoration: none;
   background: var(--gp-brand);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
      the segment cross-fade's pace and far too slow for a pointer: the button
      looked like it was thinking about it. Background moves fast; colour and
@@ -204,7 +204,7 @@
   text-decoration: none;
   background: var(--gp-brand);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
      the segment cross-fade's pace and far too slow for a pointer: the button
      looked like it was thinking about it. Background moves fast; colour and

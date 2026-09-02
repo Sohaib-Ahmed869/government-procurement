@@ -2,7 +2,7 @@
    (.admin-input look: bordered, rounded, green focus ring). */
 .rte {
   border: 1px solid var(--admin-border);
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: #fff;
   overflow: hidden;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -30,7 +30,7 @@
   height: 30px;
   padding: 0 8px;
   border: 1px solid transparent;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: transparent;
   color: var(--admin-text);
   font-family: inherit;
@@ -117,7 +117,7 @@
 .rte__editable img {
   max-width: 100%;
   height: auto;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   margin: 14px 0;
 }
 

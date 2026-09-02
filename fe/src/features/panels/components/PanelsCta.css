@@ -97,7 +97,7 @@
   color: var(--gp-paper);
   text-decoration: none;
   background: var(--gp-brand);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   transition:
     transform 200ms var(--gp-ease),
     var(--gp-fade);

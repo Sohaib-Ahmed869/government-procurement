@@ -10,6 +10,10 @@ function initials(name) {
 // Top bar: a mobile drawer toggle, the current page title, and the signed-in
 // user with a logout button. Desktop sidebar collapsing lives in the sidebar
 // itself, so there is no collapse control here.
+//
+// A section with no title (the admin home) renders no heading at all rather
+// than an empty one — the old `title || 'Dashboard'` fallback meant the home
+// screen was the one place the header named a page the page also named.
 export default function AdminHeader({ title, onOpenMobile }) {
   const { user, logout } = useAuth();
   return (
@@ -28,7 +32,7 @@ export default function AdminHeader({ title, onOpenMobile }) {
             <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <h1 className="admin-header__title">{title || 'Dashboard'}</h1>
+        {title ? <h1 className="admin-header__title">{title}</h1> : null}
       </div>
       <div className="admin-header__user">
         <span className="admin-header__chip">

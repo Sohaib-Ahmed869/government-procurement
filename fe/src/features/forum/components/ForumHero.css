@@ -4,7 +4,7 @@
      the dark --band-* roles itself. */
   background: var(--gp-head-bg);
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.72);
+  --band-muted: #fff;
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: var(--gp-brand);
   --band-accent: var(--gp-accent);
@@ -224,7 +224,7 @@
 }
 
 .forum-hero__search-input::placeholder {
-  color: var(--gp-muted);
+  color: var(--gp-placeholder);
 }
 
 /* strip the native search clear button */
@@ -256,7 +256,7 @@
      and the cards under it are the one dark object on this page, not two. */
   background: var(--gp-head-bg);
   border: 1px solid var(--gp-head-bg);
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   transition:
     background 160ms var(--gp-ease),
     border-color 160ms var(--gp-ease),
@@ -332,7 +332,7 @@
        near-black ink on a near-black panel, which is why the open panel looked
        empty. */
     --band-ink: #fff;
-    --band-muted: rgba(255, 255, 255, 0.72);
+    --band-muted: #fff;
     --band-line: rgba(255, 255, 255, 0.16);
     --band-surface: rgba(255, 255, 255, 0.08);
     --band-surface-hover: rgba(255, 255, 255, 0.16);

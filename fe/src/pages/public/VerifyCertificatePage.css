@@ -42,7 +42,7 @@
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.verify__input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.verify__input::placeholder { color: rgba(255, 255, 255, 0.72); }
 .verify__input:hover { border-color: rgba(255, 255, 255, 0.36); }
 .verify__input:focus {
   outline: none;
@@ -54,7 +54,7 @@
   flex-shrink: 0;
   padding: 13px 24px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--sysmsg-accent);
   color: var(--sysmsg-on-accent);
   font-family: inherit;
@@ -73,7 +73,7 @@
 .verify__echo {
   margin: 0 0 8px;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
 }
 .verify__echo code {
   padding: 3px 8px;
@@ -111,7 +111,7 @@
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.6);
+  color: #fff;
 }
 
 .verify__facts dd {
@@ -136,7 +136,7 @@
 .verify__more summary {
   cursor: pointer;
   font-size: 13.5px;
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
 }
 .verify__more summary:hover { color: #fff; }
 .verify__more .verify__form { margin-top: 14px; }

@@ -82,7 +82,14 @@
   --lms-border-strong: #dbe2de;
   --lms-text: #16211b;
   --lms-text-2: #3d4a43;
-  --lms-muted: #6b776f;
+  /* Secondary copy is no longer a grey: card meta, table captions, helper
+     lines and empty states read at the same near-black as body text, so
+     nothing in the app looks greyed out. #6b776f is kept below as --lms-grey
+     for the handful of places that are NOT running text — a placeholder, a
+     calendar day outside the month, a muted rule — where a lighter tone is
+     carrying meaning rather than just softening type. */
+  --lms-muted: var(--lms-text);
+  --lms-grey: #6b776f;
 
   /* The navigation rail. A panel a shade lighter than the canvas rather than a
      block of brand green: fifteen rows of white-on-green is a lot of saturated
@@ -93,11 +100,14 @@
   --lms-rail: linear-gradient(180deg, #fbfdfc 0%, #f6fbf8 52%, #f3f9f6 100%);
   --lms-rail-line: #e2eae5;
   --lms-rail-ink: #26332c;
-  --lms-rail-ink-2: #7b877f;
+  /* The rail's second tier was a pale grey-green; it now matches the first. */
+  --lms-rail-ink-2: var(--lms-rail-ink);
 
   /* Still used by the player's dark chrome and the marketing hero. */
-  --lms-on-dark: rgba(255, 255, 255, 0.92);
-  --lms-on-dark-2: rgba(255, 255, 255, 0.66);
+  /* Text on the app's dark green surfaces — the player chrome and the todo
+     rail. Both were washes of white; both are now full white. */
+  --lms-on-dark: #fff;
+  --lms-on-dark-2: #fff;
   --lms-on-dark-3: rgba(255, 255, 255, 0.42);
   --lms-on-dark-line: rgba(255, 255, 255, 0.12);
 
@@ -142,12 +152,22 @@
   --lms-lift-fill: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%);
   --lms-lift-border: #e4ebe6;
 
-  --lms-radius: 14px;
-  --lms-radius-sm: 10px;
-  --lms-radius-lg: 18px;
+  /* All three now resolve to the product's one corner (--gp-radius, set in
+     styles/tokens.css off the header's CTA). The three names are kept because
+     the stylesheet uses them to say WHICH KIND of thing it is cutting — a card,
+     a control, a modal — and that reads better than 200 copies of one value.
+     They no longer differ; if a step scale is ever wanted back, it goes here. */
+  --lms-radius: var(--gp-radius);
+  --lms-radius-sm: var(--gp-radius);
+  --lms-radius-lg: var(--gp-radius);
 
   --lms-sidebar-w: 262px;
-  --lms-sidebar-w-collapsed: 76px;
+  /* Wide enough for the logo and the collapse control to sit on ONE line, and
+     no wider. The rail pulls its own padding in and shrinks the toggle when it
+     collapses (see below), which is what buys the room at this width — at 76
+     with the open padding they did not fit and the head wrapped, putting the
+     arrow on a row of its own under the mark. */
+  --lms-sidebar-w-collapsed: 72px;
   --lms-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   font-family: 'Outfit Variable', system-ui, sans-serif;
@@ -252,7 +272,7 @@
   flex: 1;
   min-width: 0;
   padding: 5px 6px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   color: var(--lms-green);
   text-decoration: none;
   transition: background 0.16s var(--lms-ease);
@@ -312,7 +332,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: none;
   color: var(--lms-rail-ink-2);
   cursor: pointer;
@@ -356,7 +376,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 7px 11px;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   color: var(--lms-rail-ink);
   font-size: 13.5px;
   font-weight: 500;
@@ -414,7 +434,7 @@
 .lms-sidebar__badge {
   min-width: 20px;
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-text-2);
   font-size: 11.5px;
@@ -443,7 +463,7 @@
   width: 100%;
   padding: 7px 9px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: none;
   font-family: inherit;
   text-align: left;
@@ -536,7 +556,7 @@
   width: 100%;
   padding: 8px 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: none;
   color: var(--lms-text-2);
   font-family: inherit;
@@ -560,7 +580,7 @@
   margin-top: 5px;
   padding-top: 11px;
   border-top: 1px solid var(--lms-border);
-  border-radius: 0 0 7px 7px;
+  border-radius: 0 0 var(--gp-radius) var(--gp-radius);
 }
 .lms-sidebar__menu-item--out:hover { background: var(--lms-danger-soft); color: var(--lms-danger); }
 
@@ -575,8 +595,28 @@
   overflow: hidden;
   pointer-events: none;
 }
-.lms-shell.is-collapsed .lms-sidebar__head { flex-wrap: wrap; justify-content: center; gap: 8px; }
-.lms-shell.is-collapsed .lms-sidebar__brand { flex: 0 0 auto; justify-content: center; }
+/* One line: mark, then the control that opens the rail back up. The rail gives
+   up its own side padding and the toggle drops 4px, which is what lets the pair
+   fit across 72px instead of 88. */
+.lms-shell.is-collapsed .lms-sidebar { padding-left: 6px; padding-right: 6px; }
+.lms-shell.is-collapsed .lms-sidebar__head {
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 4px;
+  padding-left: 0;
+  padding-right: 0;
+}
+/* `gap: 0` again, and for the same reason as the links: the wordmark beside
+   the mark is squeezed to `width: 0`, not removed, so it still claimed the
+   brand's 10px gap. That pushed mark + gap + toggle past the rail's 60px of
+   content and the logo was clipped against the edge. */
+.lms-shell.is-collapsed .lms-sidebar__brand {
+  flex: 0 0 auto;
+  justify-content: center;
+  gap: 0;
+  padding: 4px 0;
+}
+.lms-shell.is-collapsed .lms-sidebar__toggle { width: 22px; height: 22px; }
 .lms-shell.is-collapsed .lms-sidebar__group {
   height: 0;
   margin-top: 12px;
@@ -588,8 +628,19 @@
   border-top: 0;
   margin-top: 4px;
 }
-.lms-shell.is-collapsed .lms-sidebar__link { justify-content: center; padding: 10px; }
-.lms-shell.is-collapsed .lms-sidebar__me { justify-content: center; padding: 7px; }
+/* `gap: 0` is what actually centres the icons, and it has to be set on BOTH
+   flex rows. The labels are collapsed to `width: 0` rather than removed from
+   the flow — which is what lets them animate — but a zero-width child still
+   takes its row's gap. The link's own 10px was the obvious one; the icon and
+   its text sit inside .lms-sidebar__link-label, which carries a second 10px,
+   and zeroing only the outer one left every icon 5px left of centre. */
+.lms-shell.is-collapsed .lms-sidebar__link {
+  justify-content: center;
+  gap: 0;
+  padding: 10px;
+}
+.lms-shell.is-collapsed .lms-sidebar__link-label { gap: 0; }
+.lms-shell.is-collapsed .lms-sidebar__me { justify-content: center; gap: 0; padding: 7px; }
 
 /* Mobile drawer ----------------------------------------------------------- */
 .lms-sidebar__backdrop {
@@ -613,13 +664,23 @@
   gap: 16px;
   height: 64px;
   padding: 0 28px;
-  /* Barely tinted and quite transparent: the wash is at its strongest in the
-     top-right corner, which is behind this bar, and a near-opaque header there
-     clipped the gradient into a lid with a hard edge under it. */
-  background: rgba(251, 254, 251, 0.72);
-  backdrop-filter: saturate(180%) blur(12px);
-  -webkit-backdrop-filter: saturate(180%) blur(10px);
-  border-bottom: 1px solid var(--lms-border);
+  /* Frosted, and flush.
+
+     Two things were being confused for each other here. The FROST — content
+     going soft as it scrolls under the bar — is worth having and needs the
+     backdrop filter, so it is back. What made the header read as a panel laid
+     over the page was never the blur: it was the hairline under it, drawing an
+     edge where the eye then expects a lift.
+
+     The tint is high enough (0.88) that the wash behind it barely reads, so the
+     bar does not show a slice of gradient at a different strength from the band
+     below — which is what the earlier 0.72 did — while still leaving the blur
+     something to work on. No border, no shadow: it ends where the content
+     begins, and the only thing that marks it is the softening of whatever has
+     scrolled beneath. */
+  background: rgba(251, 253, 252, 0.88);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
 }
 
 .lms-header__left {
@@ -627,35 +688,6 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-}
-
-/* Breadcrumb. "Home / Dashboard", as in the reference layout. */
-.lms-crumbs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  font-size: 14px;
-  color: var(--lms-muted);
-}
-.lms-crumbs a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--lms-muted);
-  text-decoration: none;
-  border-radius: 6px;
-}
-.lms-crumbs a:hover { color: var(--lms-green); }
-.lms-crumbs a:focus-visible { outline: none; box-shadow: var(--lms-ring); }
-.lms-crumbs svg { width: 15px; height: 15px; }
-.lms-crumbs__sep { color: var(--lms-border-strong); }
-.lms-crumbs__current {
-  color: var(--lms-text);
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .lms-header__right {
@@ -684,14 +716,14 @@
   height: 38px;
   padding: 0 14px 0 36px;
   border: 1px solid var(--lms-border);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-2);
   color: var(--lms-text);
   font-family: inherit;
   font-size: 14px;
   transition: background 0.15s var(--lms-ease), border-color 0.15s var(--lms-ease);
 }
-.lms-search input::placeholder { color: var(--lms-muted); }
+.lms-search input::placeholder { color: var(--lms-grey); }
 .lms-search input:focus {
   outline: none;
   background: var(--lms-surface);
@@ -709,7 +741,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 1px solid var(--lms-border);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-text);
   cursor: pointer;
@@ -780,7 +812,7 @@
   gap: 5px;
   padding: 4px 10px;
   border: 1px solid var(--lms-border);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-text);
   font: inherit;
@@ -894,7 +926,7 @@
   flex-shrink: 0;
   width: 30px;
   height: 30px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-2);
   color: var(--lms-green);
 }
@@ -940,7 +972,7 @@
   gap: 8px;
   padding: 9px 16px;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-text);
   font-family: inherit;
@@ -982,7 +1014,7 @@
 .lms-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
 .lms-btn--ghost:hover { background: var(--lms-surface-3); border-color: transparent; }
 
-.lms-btn--sm { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+.lms-btn--sm { padding: 6px 12px; font-size: 13px; border-radius: var(--gp-radius); }
 
 /* Cards ------------------------------------------------------------------- */
 .lms-card {
@@ -1060,6 +1092,50 @@
   gap: 14px;
   margin-bottom: 12px;
 }
+
+/* The dashboard, as one grid.
+
+   Five panels, one gutter figure. They used to be a stack of rows each with its
+   own gap and its own margin below it, which meant the space between the chart
+   and the donut was not the space between the donut and the resume panel — a
+   grid with a single `gap` cannot get that wrong.
+
+   The figures panel spans the first two rows of the right column. That is what
+   puts two figures beside the chart and two beside the donut while they stay
+   ONE bordered card: split into a pair of cards to fill two rows, the four
+   readings would go back to being separate boxes that happen to be adjacent. */
+.lms-dash-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    'activity figures'
+    'mix      figures'
+    'resume   live';
+  gap: 14px;
+}
+/* The instructor's home shares this grid and its figures panel; only the areas
+   differ, because there is no activity chart on that side (nothing in the
+   authoring API exposes enrolments as a daily series) and because Your courses
+   grows by a row per course.
+
+   That growth is why it takes the full width at the foot rather than sitting
+   beside the calendar: a card that grows paired with one that does not leaves a
+   hole in whichever is shorter, and the hole changes sides as courses are
+   added. Everything above it is fixed height, so every edge across the gutter
+   lines up and stays lined up. */
+.lms-dash-grid--instructor {
+  grid-template-areas:
+    'mix      figures'
+    'live     figures'
+    'courses  courses';
+}
+.lms-dash-courses { grid-area: courses; }
+
+.lms-dash-activity { grid-area: activity; }
+.lms-dash-grid > .lms-gauges { grid-area: figures; }
+.lms-dash-mix { grid-area: mix; }
+.lms-dash-resume { grid-area: resume; }
+.lms-dash-live { grid-area: live; }
 
 /* Three cells: the one you act on, and two you read.
 
@@ -1188,7 +1264,7 @@
   width: 20px;
   height: 20px;
   margin: 0 auto;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   font-size: 11.5px;
   font-variant-numeric: tabular-nums;
   color: var(--lms-text-2);
@@ -1196,7 +1272,7 @@
 
 /* The days either side of the month are context, not content — they keep the
    weeks aligned and say nothing else. */
-.lms-cal__day.is-outside { color: #c3ccc7; }
+.lms-cal__day.is-outside { color: var(--lms-grey); }
 
 /* TODAY takes the dark gradient, the same one the primary button and the
    active nav row carry, so "you are here" looks the same everywhere in the
@@ -1343,15 +1419,18 @@
    lower than the space it was centring in, so the ring measured 39px below the
    heading and 29px above the card floor — centred in its own box and visibly
    not centred in the card. Zeroed, both gaps are the same. */
-.lms-dash .lms-card--centre { display: flex; flex-direction: column; }
+.lms-dash .lms-card--centre,
+.lms-prog-grid .lms-card--centre { display: flex; flex-direction: column; }
 
 /* Only the donut card closes the gap under its heading; the resume panel keeps
    its own, because a course title needs air under a heading in a way a grid of
    numerals does not. */
-.lms-dash .lms-card--centre:has(.lms-donut) .lms-card__head { margin-bottom: 0; }
+.lms-dash .lms-card--centre:has(.lms-donut) .lms-card__head,
+.lms-prog-grid .lms-card--centre:has(.lms-donut) .lms-card__head { margin-bottom: 0; }
 
 /* The donut is a wrapping row, so `align-content` is what centres it. */
-.lms-dash .lms-card--centre > .lms-donut { flex: 1; align-content: center; }
+.lms-dash .lms-card--centre > .lms-donut,
+.lms-prog-grid .lms-card--centre > .lms-donut { flex: 1; align-content: center; }
 
 /* A card body that is a column of blocks takes the remaining height and centres
    its own contents in it. Same job as the donut rule above, different
@@ -1366,6 +1445,9 @@
 
 .lms-dash .lms-page__head { margin-bottom: 12px; }
 .lms-dash .lms-card { padding: 13px 16px; }
+/* The transcripts alert sits above the grid rather than in it, so it carries
+   the gap the grid would otherwise have given it. */
+.lms-dash > .lms-todo { margin-bottom: 12px; }
 .lms-dash .lms-card__head { margin-bottom: 11px; }
 .lms-dash .lms-dash-row:last-child { margin-bottom: 0; }
 .lms-dash-stats {
@@ -1377,84 +1459,127 @@
 /* ---------------------------------------------------------------------------
    The dashboard's headline row.
 
-   Four tiles across, and the first one filled. Four identical tiles is a row
-   with no entry point — the eye has to read all four to find the one that
-   matters — so the figure the learner opens the page for takes the brand green
-   and the other three sit quietly beside it in the same shape.
+   ONE panel, not four tiles. Four separately bordered, separately shadowed
+   boxes in a row is the shape every dashboard template ships with, and it is
+   wrong here for a reason beyond taste: these four figures are one answer to
+   one question — where am I up to — and four boxes say they are four unrelated
+   readings that happen to be adjacent. Hairlines between cells inside a single
+   card say what is true: one reading, in four parts.
 
-   `auto-fit` with a 190px floor rather than `repeat(4, 1fr)`: the tiles wrap to
-   two-up and then one-up on their own, and the row never squeezes a number
-   narrower than it can be read at. --------------------------------------- */
-.lms-kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 14px;
-  margin-bottom: 12px;
-}
+   TWO OF THE FOUR GET A RING, AND TWO DO NOT, deliberately.
 
-/* All four tiles are white, and identical to each other.
+   A ring is a proportion: it needs a whole to be a part of. Lessons completed
+   has one (every lesson in everything enrolled) and courses in progress has one
+   (everything enrolled). Minutes learned this week and certificates earned do
+   not — there is no weekly target in the model and no ceiling on certificates —
+   and drawing an arc against a denominator invented to make the row match would
+   be a picture of a number that does not exist. Those two set their figure at
+   the ring's optical size in the same square, so the row still scans as one
+   set; the mark differs because the data does.
 
-   They were green, a step darker than the canvas — which worked as a band but
-   put the page's two strongest surfaces (a tinted canvas and four tinted tiles)
-   side by side with only a border between them. White is what every other card
-   on the dashboard is, so the tiles now read as the same material at a
-   different size, and the green canvas has something to be a background TO.
-
-   Identical, all four. The first used to be a step darker again to mark it as
-   the one to read first — but a row of four figures where one is shaded
-   differently reads as a status on that figure, not as a reading order. Order
-   is left to right; that is enough. */
-
-/* A column, not the icon-beside-text row .lms-stat uses elsewhere. The label
-   leads, the number is the thing, the supporting line closes — which is the
-   order somebody reads a figure they are being shown rather than one they are
-   looking up. */
-.lms-stat.lms-kpi {
+   Every cell closes on a state pill — up or down on last week, so many of so
+   many enrolled — which is the part a learner reads first and the part four
+   bare numbers never said. The pills are also why the panel needs no heading of
+   its own: each cell states its own scope, so a title saying "where you're up
+   to" over a note saying "across everything you're enrolled in" was the panel
+   describing what the reader could already see. ------------------------- */
+/* `.lms-card.lms-gauges`, not `.lms-gauges`: `.lms-dash .lms-card` sets a
+   13px/16px pad at the same specificity a single class cannot beat, and the
+   cells have to reach the card's edges for their dividers to meet its border.
+   The 12px foot is the gap every other dashboard row carries — see
+   .lms-dash-row. */
+.lms-card.lms-gauges {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0;
-  padding: 14px 16px 13px;
-  border-color: #e4ebe6;
-  background: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%);
+  padding: 0;
+  overflow: hidden;
 }
 
-.lms-stat.lms-kpi:hover { border-color: var(--lms-tint-400); }
-
-/* The label keeps the green. It is the one word of colour on an otherwise white
-   tile, and it is what still ties the row to the theme. */
-.lms-stat.lms-kpi .lms-stat__label { color: var(--lms-green-600); }
-.lms-stat.lms-kpi .lms-stat__value { color: var(--lms-text); }
-
-.lms-stat.lms-kpi .lms-stat__icon {
-  background: var(--lms-tint-100);
-  color: var(--lms-green-600);
+.lms-gauges__row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
-.lms-kpi__top {
+/* A cell is a link, so the whole column is the target rather than a small
+   caption under an ornament. */
+.lms-gauge {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  align-items: center;
+  /* Centred, not top-aligned: the panel is as tall as the two cards beside it,
+     so a quadrant is taller than its contents and the ring would otherwise hang
+     from the top edge with the pill stranded above a gap. */
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.16s var(--lms-ease);
+}
+/* A 2x2's dividers are a cross, not three verticals: the second cell in each
+   row takes the upright, the second row takes the crossbar. */
+.lms-gauge:nth-child(even) { border-left: 1px solid var(--lms-border); }
+.lms-gauge:nth-child(n + 3) { border-top: 1px solid var(--lms-border); }
+.lms-gauge:hover { background: var(--lms-tint-50); }
+.lms-gauge:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+
+/* The shared square. Ring or figure, both marks occupy it, so the four labels
+   below sit on one baseline whichever mark is above them. */
+.lms-gauge__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 108px;
+}
+/* The ring's own centred value is sized here rather than in ProgressRing: the
+   component is shared with My Progress, where the ring is 148px and its number
+   should stay large. */
+.lms-gauge__mark .lms-ring__value { font-size: 26px; }
+
+/* A count, at the weight the ring's percentage carries beside it. No circle
+   drawn around it — a complete hairline ring next to a real arc invites being
+   read as 100%. */
+.lms-gauge__figure {
+  /* A duration is two tokens ("2h 45m") and the mark's box is a square sized
+     for the ring, so it wraps unless told not to. It overflows the square
+     symmetrically instead, which costs nothing — the cell is far wider. */
+  white-space: nowrap;
+  font-size: 31px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--lms-text);
 }
 
-/* Smaller than the 44px chip on the other stat tiles: here it sits beside the
-   label as a mark, not as the tile's leading element. */
-.lms-stat.lms-kpi .lms-stat__icon { width: 30px; height: 30px; border-radius: 9px; }
-.lms-stat.lms-kpi .lms-stat__icon svg { width: 16px; height: 16px; }
-.lms-stat.lms-kpi .lms-stat__value { margin: 0; font-size: 26px; }
-.lms-stat.lms-kpi .lms-stat__hint { margin-top: 4px; }
+.lms-gauge__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lms-text);
+  text-align: center;
+}
 
-/* The week-on-week line. Direction is stated in the words too ("+12% vs last
-   week"), so the colour is reinforcement rather than the only signal — the
-   figure still reads correctly to anyone who cannot separate the two hues.
-
-   Scoped to the KPI tiles rather than to one of them: only the first carries a
-   comparison today, and the day a second does it should look the same. */
-.lms-kpi .lms-stat__hint.is-up { color: var(--lms-green-600); font-weight: 600; }
-.lms-kpi .lms-stat__hint.is-down { color: #8a6316; font-weight: 600; }
-.lms-kpi .lms-stat__hint.is-flat { color: var(--lms-muted); }
+/* The state, as a pill. Colour is reinforcement only — every pill says its
+   state in words, so the row reads correctly without separating the hues. */
+/* The box corner, not a capsule. Everything else that reads as a pill in this
+   file — .lms-pill, .lms-live-badge, .lms-badge__tier — is on --gp-radius, and
+   these three were the only ones rounded to their own height. */
+.lms-gauge__pill {
+  padding: 3px 10px;
+  border-radius: var(--gp-radius);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--lms-surface-3);
+  color: var(--lms-muted);
+  text-align: center;
+}
+.lms-gauge__pill.is-good { background: var(--lms-mint-soft); color: var(--lms-green-600); }
+/* The theme's amber, from the tokens. These were the admin palette's hex
+   values pasted in, which is the same colour today and one edit away from not
+   being. */
+.lms-gauge__pill.is-warn { background: var(--lms-warning-soft); color: var(--lms-warning); }
 
 /* ---------------------------------------------------------------------------
    The donut and its legend.
@@ -1536,7 +1661,7 @@
   width: 10px;
   height: 10px;
   flex-shrink: 0;
-  border-radius: 3px;
+  border-radius: var(--gp-radius);
 }
 
 /* The name gives up its width first: a course title can run to a line and a
@@ -1683,7 +1808,7 @@
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
 }
@@ -1769,7 +1894,7 @@
   z-index: 5;
   transform: translate(-50%, -100%);
   padding: 7px 11px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--lms-text);
   color: #fff;
   font-size: 12.5px;
@@ -1803,7 +1928,7 @@
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-green-600);
 }
@@ -1830,7 +1955,7 @@
   align-items: center;
   gap: 5px;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 11.5px;
   font-weight: 700;
   background: var(--lms-surface-3);
@@ -1855,7 +1980,7 @@
   gap: 2px;
   padding: 3px;
   border: 1px solid var(--lms-border);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   box-shadow: var(--lms-shadow-sm);
 }
@@ -1865,7 +1990,7 @@
   gap: 7px;
   padding: 7px 15px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: transparent;
   color: var(--lms-muted);
   font-family: inherit;
@@ -1880,7 +2005,7 @@
 .lms-segmented__btn.is-active { background: var(--lms-green-deep); color: #fff; }
 .lms-segmented__count {
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-muted);
   font-size: 11.5px;
@@ -1898,7 +2023,7 @@
   height: 38px;
   padding: 0 32px 0 12px;
   border: 1px solid var(--lms-border);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface)
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b776f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
     no-repeat right 9px center / 15px;
@@ -1909,6 +2034,124 @@
   appearance: none;
 }
 .lms-select:focus { outline: none; border-color: var(--lms-mint); box-shadow: var(--lms-ring); }
+
+/* THE OPEN LIST, WHICH IS NOT THE CONTROL. The closed select has been themed
+   since it was written; what looked default was the popup the browser draws
+   from the OPTIONS, which inherits none of the box's styling.
+
+   `color-scheme: light` is the part that matters most — without it the popup is
+   drawn to the OS setting, which is where the grey slab came from on a machine
+   in dark mode. The option colours then paint the list itself. The highlight on
+   the row under the cursor is still the platform's to draw in some browsers;
+   these rules make everything around it ours. */
+.lms-select,
+select.lms-input {
+  color-scheme: light;
+}
+.lms-select option,
+select.lms-input option {
+  background: var(--lms-surface);
+  color: var(--lms-text);
+}
+.lms-select option:checked,
+select.lms-input option:checked {
+  background: var(--lms-mint-soft);
+  color: var(--lms-green);
+}
+/* Firefox honours this. Chromium draws the popup's hover row itself and ignores
+   it — see the note in the commit; a themed hover there needs the select
+   replaced with a listbox of our own. */
+.lms-select option:hover,
+select.lms-input option:hover {
+  background: var(--lms-mint-soft);
+  color: var(--lms-green);
+}
+
+/* OUR OWN DROPDOWN ------------------------------------------------------------
+   See the note in components/Select.jsx for why a native <select> could not be
+   finished: the open list is drawn by the browser, outside the page, and its
+   hover row is the platform's to paint.
+
+   The closed control is deliberately identical to .lms-select — same height,
+   border, corner and chevron — so the two can sit on one screen while the
+   remaining native ones are swapped over, and nobody can tell which is which
+   until it opens. */
+.lms-sel { position: relative; display: inline-block; }
+.lms-sel__button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--gp-radius);
+  background: var(--lms-surface);
+  color: var(--lms-text);
+  font-family: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s var(--lms-ease), box-shadow 0.16s var(--lms-ease);
+}
+.lms-sel__button:hover { border-color: var(--lms-border-strong); }
+.lms-sel__button:focus-visible,
+.lms-sel.is-open .lms-sel__button {
+  outline: none;
+  border-color: var(--lms-mint);
+  box-shadow: var(--lms-ring);
+}
+.lms-sel__button:disabled { opacity: 0.55; cursor: not-allowed; }
+.lms-sel__value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lms-sel__chevron {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--lms-grey);
+  transition: transform 0.16s var(--lms-ease);
+}
+.lms-sel.is-open .lms-sel__chevron { transform: rotate(180deg); }
+
+/* The list. In the document, so it takes the app's surface, border and corner
+   like any other panel — and its own hover, which was the whole point. */
+.lms-sel__list {
+  position: absolute;
+  /* Under the header (z-index 30), not over it. The list closes on scroll, so
+     this only covers the frame in between — but in that frame an open menu was
+     painting across the search field and the notifications bell. */
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-height: 264px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--gp-radius);
+  background: var(--lms-surface);
+  box-shadow: var(--lms-shadow-md);
+}
+/* No tick on the chosen row. It is already the only green, bold one in the
+   list, and a mark on the right pushed every label into a column of its own
+   width for a fact the weight had already made. */
+.lms-sel__option {
+  display: flex;
+  align-items: center;
+  padding: 7px 9px;
+  border-radius: var(--gp-radius);
+  font-size: 13.5px;
+  color: var(--lms-text-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* One highlight, driven by `active`, which the pointer and the arrow keys both
+   set — so a mouse and a keyboard never disagree about where the list is. */
+.lms-sel__option.is-active { background: var(--lms-tint-100); color: var(--lms-text); }
+.lms-sel__option.is-selected { color: var(--lms-green); font-weight: 600; }
+.lms-sel__option.is-selected.is-active { background: var(--lms-mint-soft); }
 
 /* Course grid -------------------------------------------------------------- */
 .lms-course-grid {
@@ -1985,7 +2228,7 @@
   align-items: center;
   gap: 6px;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   border: 1px solid var(--lms-tint-400);
   background: var(--lms-tint-100);
   color: var(--lms-green-600);
@@ -2009,7 +2252,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint);
   color: var(--lms-green);
   font-size: 11.5px;
@@ -2057,7 +2300,7 @@
 }
 .lms-course__title a { color: var(--lms-text); text-decoration: none; }
 .lms-course__title a:hover { color: var(--lms-green-600); }
-.lms-course__title a:focus-visible { outline: none; box-shadow: var(--lms-ring); border-radius: 4px; }
+.lms-course__title a:focus-visible { outline: none; box-shadow: var(--lms-ring); border-radius: var(--gp-radius); }
 
 .lms-course__by { margin: -4px 0 0; font-size: 13px; color: var(--lms-muted); }
 
@@ -2138,12 +2381,12 @@
   height: 26px;
   margin: 16px 18px 0;
   padding: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
 }
 .lms-skel {
   display: block;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: linear-gradient(90deg, var(--lms-surface-3) 25%, #e6ebe8 37%, var(--lms-surface-3) 63%);
   background-size: 400% 100%;
   animation: lms-shimmer 1.3s ease-in-out infinite;
@@ -2206,7 +2449,7 @@
   gap: 8px;
   padding: 9px 14px;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   font-size: 13.5px;
   font-weight: 550;
@@ -2278,7 +2521,7 @@
 }
 .lms-module__count {
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   font-weight: 700;
   font-size: 11.5px;
@@ -2335,16 +2578,13 @@
 
    Six dark-green gradients, one per accent, with the title reversed out — the
    same slab the dashboard's greeting band was, on the page a learner opens
-   most. It is a card now: white, with the accent kept as a colour bar down its
-   leading edge, which is where a course's identity can live without painting
-   the whole top of the screen.
+   most. It is a plain white card now.
 
-   `is-accent-N` stays and still means what it meant. Only the surface it paints
-   changed, so nothing that assigns an accent has to know about this. */
+   `is-accent-N` is still set on it by the pages that render it, and is now a
+   no-op here, exactly as it already is on the course thumbnails further down.
+   Nothing that assigns an accent has to know it stopped being painted. */
 .lms-detail__hero {
-  position: relative;
-  overflow: hidden;
-  padding: 26px 30px 26px 34px;
+  padding: 26px 30px;
   margin-bottom: 20px;
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius-lg);
@@ -2353,24 +2593,12 @@
   color: var(--lms-text);
 }
 
-/* The accent, as a 5px bar on the leading edge. A pseudo-element rather than a
-   border-left, so the card's own radius still rounds it. */
-.lms-detail__hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 5px;
-  background: var(--lms-accent, #14572a);
-}
+/* The per-course accent used to be a 5px gradient bar down the hero's leading
+   edge, with six of them keyed off an accent index. It was decoration keyed to
+   nothing a reader could act on — course 3 is not "greener" than course 2 — and
+   it was the loudest of the six leading-edge stripes this file carried. Gone,
+   along with the .is-accent-N custom properties that fed only it. */
 
-.lms-detail__hero.is-accent-0 { --lms-accent: linear-gradient(180deg, #0a3114, #14572a); }
-.lms-detail__hero.is-accent-1 { --lms-accent: linear-gradient(180deg, #0e3e1b, #2f7d45); }
-.lms-detail__hero.is-accent-2 { --lms-accent: linear-gradient(180deg, #0c3a19, #1d6b36); }
-.lms-detail__hero.is-accent-3 { --lms-accent: linear-gradient(180deg, #123f22, #3d8a55); }
-.lms-detail__hero.is-accent-4 { --lms-accent: linear-gradient(180deg, #0a3114, #1a5f30); }
-.lms-detail__hero.is-accent-5 { --lms-accent: linear-gradient(180deg, #10361c, #267140); }
 .lms-detail__hero-body { max-width: 72ch; }
 .lms-detail__path {
   display: inline-flex;
@@ -2472,7 +2700,7 @@
   width: 34px;
   height: 34px;
   flex-shrink: 0;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-green-600);
 }
@@ -2535,7 +2763,7 @@
   gap: 7px;
   flex-shrink: 0;
   padding: 7px 12px 7px 8px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   color: var(--lms-on-dark);
   font-size: 13.5px;
   font-weight: 550;
@@ -2715,9 +2943,11 @@
   padding: 15px 17px;
   border-radius: var(--lms-radius-sm);
   background: var(--lms-mint-soft);
-  border-left: 3px solid var(--lms-green);
 }
-.lms-callout.is-warn { background: var(--lms-warning-soft); border-left-color: var(--lms-warning); }
+/* Mint or amber, and an icon in the matching tone — the tint and the glyph are
+   what separate a note from a warning. The 3px rule that used to sit on the
+   leading edge said the same thing a third time. */
+.lms-callout.is-warn { background: var(--lms-warning-soft); }
 .lms-callout svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--lms-green); }
 .lms-callout.is-warn svg { color: var(--lms-warning); }
 .lms-callout strong { display: block; margin-bottom: 3px; font-size: 14px; color: var(--lms-text); }
@@ -2887,40 +3117,209 @@ a.lms-note__stamp:hover { text-decoration: underline; }
 .lms-bookmark__stamp svg { width: 13px; height: 13px; }
 
 /* Progress page (L3) ------------------------------------------------------- */
-.lms-overview {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 28px;
-  align-items: center;
+/* THE SEGMENTED BAR -----------------------------------------------------------
+   A proportion drawn as discrete segments rather than one filled strip. The
+   same argument the donut makes for a gapped ring: separated on a track, each
+   segment is a mark of its own, and the figure becomes countable — the end of a
+   solid fill has to be estimated against its track, where "twelve lit of
+   twenty" is simply read.
+
+   `flex: 1` on every segment rather than a fixed width, so one component draws
+   a seven-segment week and a twenty-segment overall bar without either of them
+   needing to know how wide its container is. */
+.lms-segbar {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  width: 100%;
+  height: 9px;
 }
-.lms-overview__ring { text-align: center; }
-.lms-overview__caption {
-  max-width: 20ch;
-  margin: 12px auto 0;
+.lms-segbar__seg {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 1.5px;
+  background: var(--lms-surface-3);
+  transition: background 0.25s var(--lms-ease);
+}
+.lms-segbar__seg.is-on { background: var(--lms-green-600); }
+/* Finished fills mint — the same swap .lms-progress__fill.is-complete makes, so
+   done reads differently from nearly-done at a glance and the two bar styles
+   never disagree about what finished looks like. */
+.lms-segbar.is-done .lms-segbar__seg.is-on { background: var(--lms-mint); }
+.lms-segbar.is-warn .lms-segbar__seg.is-on { background: var(--lms-warning); }
+
+/* THE PAGE, IN TWO HALVES ----------------------------------------------------
+   Two independent stacks rather than a grid of paired rows. The cards in each
+   column are different heights for every learner — three courses or nine, two
+   quizzes or twenty — and pairing them into rows would either stretch the
+   shorter of each pair or leave a hole beside it. Stacks let each card be its
+   own height and the columns simply end where they end.
+
+   Named areas, not two column stacks. Stacks let each column end wherever its
+   content runs out, so no card edge on the left ever lined up with one on the
+   right and the gutter down the middle read as two unrelated pages. Grid rows
+   share a top and a bottom by definition.
+
+   WHICH CARDS ARE PAIRED IS THE WHOLE DESIGN, and the rule is: only cards whose
+   height does not depend on how much the learner has.
+
+   Course completion grows by a row per enrolment and Assessment results by a
+   row per quiz. Pairing either against the donut — which is one ring and at
+   most five legend lines, whatever happens — guarantees a hole in one of them,
+   and worse, guarantees it MOVES: at two courses the donut is the taller and
+   the completion card sits half empty; at eight it flips and the donut is
+   stranded in white. So the two growing cards each take the full width, where
+   there is no neighbour to be out of step with, and they can lengthen for
+   years without anything to align against.
+
+   That leaves the fixed pair — the standing panel and the donut — sharing the
+   first row, which is what a learner opens this page to read: where am I, and
+   where has the time gone. The chart follows underneath at full width, which a
+   time series wants anyway. */
+.lms-prog-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    'stand    mix'
+    'activity activity'
+    'courses  courses'
+    'quizzes  quizzes';
+  gap: 16px;
+}
+.lms-prog-stand { grid-area: stand; }
+.lms-prog-courses { grid-area: courses; }
+.lms-prog-quizzes { grid-area: quizzes; }
+.lms-prog-activity { grid-area: activity; }
+.lms-prog-mix { grid-area: mix; }
+
+/* THE RING AND ITS LEGEND, SIDE BY SIDE AND NEVER WRAPPING.
+
+   The base .lms-donut wraps the legend under the ring when what is left beside
+   it would be too narrow, which is right for the dashboard's third-of-a-row
+   card. Here it was the bug: at a 230px ring the pair needed more width than
+   this card has on a 1200px screen, so the legend dropped underneath — and
+   underneath it kept the 360px cap meant for a column layout, leaving a band of
+   white down the right of every legend row.
+
+   So: no wrap, and the ring sized as a share of the card rather than as a
+   constant. It gives up width first as the card narrows, down to 150px, which
+   is what keeps the legend beside it at every width instead of at some of them.
+   The dashboard's 120px ring is untouched — this is scoped to this card. */
+.lms-prog-mix .lms-donut {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 26px;
+}
+.lms-prog-mix .lms-donut__ring { width: clamp(150px, 40%, 230px); }
+/* Fills whatever is left, with no cap: the cap is what put the gap on the
+   right. A long course title still ellipses — .lms-donut__label gives up its
+   width first so the figure beside it is never pushed off. */
+.lms-prog-mix .lms-donut__legend { flex: 1 1 auto; max-width: none; }
+
+/* Whichever of the pair is shorter takes the slack in the middle rather than at
+   the bottom. The standing panel spreads it across its three grid rows — the
+   same thing the dashboard's figures panel does — and the donut simply
+   centres, which is what .lms-card--centre was written for. */
+.lms-prog-mix { display: flex; flex-direction: column; }
+.lms-prog-mix > .lms-donut { flex: 1; }
+.lms-prog-stand { display: flex; flex-direction: column; }
+.lms-prog-stand .lms-score__grid { flex: 1; grid-template-rows: repeat(3, minmax(0, 1fr)); }
+.lms-prog-stand .lms-score__row { justify-content: center; }
+
+/* WHERE YOU STAND -------------------------------------------------------------
+   The panel that replaced a 148px ring beside four icon tiles. The overall
+   figure leads, the twenty-segment bar states it as a mark, and the four
+   readings sit under it in a grid divided by hairlines rather than by gaps —
+   they are four parts of one standing, not four cards that happen to be next to
+   each other. */
+.lms-score { padding: 0; }
+.lms-score__bar { margin: 0 20px; }
+/* The headline bar is the page's biggest single measure, so it is drawn a step
+   heavier than the 6px one inside a course row. */
+.lms-score__bar .lms-progress { height: 10px; margin-bottom: 0; }
+.lms-score__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 14px;
+}
+.lms-score__eyebrow {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--lms-green-600);
+}
+.lms-score__figure {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--lms-text);
+}
+.lms-score__figure span { font-size: 22px; font-weight: 500; color: var(--lms-muted); }
+.lms-score__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: var(--gp-radius);
+  background: var(--lms-mint-soft);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lms-green-600);
+}
+.lms-score__streak svg { width: 14px; height: 14px; }
+.lms-score__caption {
+  margin: 10px 20px 0;
   font-size: 12.5px;
-  line-height: 1.5;
   color: var(--lms-muted);
 }
-.lms-overview__stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-/* Inside the overview the tiles are already on a card, so they lose their own
-   shadow and lift. Otherwise it reads as cards inside a card. */
-.lms-stat--tight {
-  padding: 14px 16px;
-  box-shadow: none;
-  background: var(--lms-surface-2);
-}
-.lms-stat--tight:hover { transform: none; box-shadow: none; border-color: var(--lms-mint); }
-.lms-stat--tight.is-static { cursor: default; }
-.lms-stat--tight.is-static:hover { border-color: var(--lms-border); }
-.lms-stat--tight .lms-stat__value { font-size: 22px; }
-.lms-stat--tight .lms-stat__icon { width: 38px; height: 38px; border-radius: 10px; }
-.lms-stat--tight .lms-stat__icon svg { width: 18px; height: 18px; }
 
-/* Completion ring */
+/* Two across, three down. The panel is half the page wide, and four rows in
+   that space is 130px each — narrower than "Assessments passed" is. The last
+   two are Notes and Bookmarks, which used to be a card of their own: the
+   shortest thing on the page by a long way, so whichever grid row it landed in
+   stretched it to twice its content. */
+.lms-score__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+  border-top: 1px solid var(--lms-border);
+}
+.lms-score__row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 18px 15px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.16s var(--lms-ease);
+}
+.lms-score__row:nth-child(even) { border-left: 1px solid var(--lms-border); }
+.lms-score__row:nth-child(n + 3) { border-top: 1px solid var(--lms-border); }
+.lms-score__row:not(.is-static):hover { background: var(--lms-tint-50); }
+.lms-score__row:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-score__row-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.lms-score__row-label { font-size: 12.5px; font-weight: 600; color: var(--lms-text-2); }
+.lms-score__row-value {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--lms-text);
+  font-variant-numeric: tabular-nums;
+}
+/* A row with no whole to be a part of draws no bar, and holds the space so the
+   captions below stay on one line across the four. */
+.lms-score__row-flat { display: block; height: 6px; }
+.lms-score__row .lms-progress { margin-bottom: 0; }
+.lms-score__row-caption { font-size: 11.5px; color: var(--lms-muted); }
+
+
 .lms-ring { position: relative; }
 .lms-ring svg { display: block; }
 .lms-ring__track { fill: none; stroke: var(--lms-surface-3); }
@@ -3026,13 +3425,14 @@ a.lms-note__stamp:hover { text-decoration: underline; }
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   font-size: 11px;
   font-weight: 700;
   color: var(--lms-muted);
 }
 .lms-modbar__bar { width: 110px; flex-shrink: 0; }
+.lms-modbar__bar .lms-segbar { height: 6px; gap: 2px; }
 .lms-modbar__bar .lms-progress { margin-bottom: 0; height: 6px; }
 .lms-modbar__count {
   width: 38px;
@@ -3053,6 +3453,11 @@ a.lms-note__stamp:hover { text-decoration: underline; }
 }
 .lms-result-row + .lms-result-row { border-top: 1px solid var(--lms-border); }
 .lms-result-row__body { flex: 1; min-width: 0; }
+/* Fixed, not flexible: the score bars have to line up down the column or they
+   are four unrelated marks rather than a set to read against each other. */
+.lms-result-row__bar { width: 84px; flex-shrink: 0; }
+.lms-result-row__bar .lms-progress { margin-bottom: 0; height: 6px; }
+.lms-result-row__bar.is-warn .lms-progress__fill { background: var(--lms-warning); }
 .lms-result-row__title {
   display: block;
   font-size: 14px;
@@ -3075,9 +3480,26 @@ a.lms-note__stamp:hover { text-decoration: underline; }
 }
 .lms-result-row__score span { display: block; font-size: 12px; font-weight: 500; color: var(--lms-muted); }
 
+@media (max-width: 1080px) {
+  /* One column, in reading order: where you stand, the courses behind it, the
+     results, then the two charts. */
+  .lms-prog-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'stand' 'mix' 'activity' 'courses' 'quizzes';
+  }
+  .lms-prog-mix .lms-donut__ring { width: clamp(150px, 32%, 210px); }
+}
 @media (max-width: 860px) {
-  .lms-overview { grid-template-columns: minmax(0, 1fr); }
   .lms-progrow__bar { display: none; }
+  .lms-result-row__bar { display: none; }
+}
+@media (max-width: 560px) {
+  .lms-prog-mix .lms-donut { flex-wrap: wrap; justify-content: center; }
+  .lms-prog-mix .lms-donut__ring { width: 190px; }
+  .lms-prog-mix .lms-donut__legend { flex: 1 1 100%; }
+  .lms-score__grid { grid-template-columns: minmax(0, 1fr); }
+  .lms-score__row:nth-child(even) { border-left: 0; }
+  .lms-score__row + .lms-score__row { border-top: 1px solid var(--lms-border); }
 }
 
 /* Community (L5) ----------------------------------------------------------- */
@@ -3115,7 +3537,7 @@ a.lms-note__stamp:hover { text-decoration: underline; }
   display: inline-block;
   margin-left: 8px;
   padding: 1px 8px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
   font-size: 10.5px;
@@ -3276,7 +3698,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 44px;
   padding: 7px 0;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-muted);
   font-family: inherit;
@@ -3317,7 +3739,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-stars.is-interactive input:focus-visible + .lms-star {
   outline: 2px solid var(--lms-green);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: var(--gp-radius);
 }
 
 /* Reviews */
@@ -3428,7 +3850,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   letter-spacing: -0.02em;
   color: var(--lms-green);
 }
-.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-green-600); opacity: 0.78; }
+.lms-level__meta { margin: 0; font-size: 13px; color: var(--lms-green-600); }
 .lms-level__bar { flex: 1; min-width: 220px; max-width: 420px; }
 /* A mint track, because the bar now sits on white rather than on the mint the
    panel used to be — on white the default grey track is the one grey left in
@@ -3439,19 +3861,30 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   justify-content: space-between;
   font-size: 11.5px;
   color: var(--lms-green-600);
-  opacity: 0.78;
+  opacity: 1;
 }
 
 /* Closest badge */
 .lms-nextbadge { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .lms-nextbadge__body { flex: 1; min-width: 180px; }
+/* "Closest badge" now carries the tier pill beside it, so the panel names the
+   rank the learner is working towards — the one thing the grey medal it
+   replaced could never say. */
 .lms-nextbadge__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0;
   color: var(--lms-muted);
 }
+/* The panel sets the tier on the mark, not on a .lms-badge wrapper, so the
+   pill beside it needs its own metal rather than an inherited one. */
+.lms-nextbadge__label .lms-badge__tier.is-bronze { --badge-metal: #8a5a2b; --badge-tint: #f6ead9; }
+.lms-nextbadge__label .lms-badge__tier.is-silver { --badge-metal: #5c6862; --badge-tint: #eceeed; }
+.lms-nextbadge__label .lms-badge__tier.is-gold { --badge-metal: #8a6a14; --badge-tint: #fbf0cf; }
 .lms-nextbadge__name { margin: 3px 0 2px; font-size: 17px; font-weight: 600; }
 .lms-nextbadge__desc { margin: 0; font-size: 13.5px; color: var(--lms-muted); }
 .lms-nextbadge__progress { width: 200px; flex-shrink: 0; }
@@ -3465,7 +3898,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-badge {
   display: flex;
-  gap: 14px;
+  gap: 13px;
   padding: 14px 16px;
   border: 1px solid var(--lms-border);
   border-radius: var(--lms-radius);
@@ -3473,40 +3906,83 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-badge.is-earned { background: var(--lms-surface); border-color: var(--lms-border-strong); }
 
-/* Tier colours. Kept as a gradient medal rather than a flat swatch so the three
-   tiers stay distinguishable in greyscale and to colour-blind readers. The
-   metals differ in lightness, not just hue. */
-.lms-badge__medal {
+/* THE TIER, THREE WAYS, AND NOT ONE OF THEM A MEDAL.
+
+   This was a 46px circle filled with a metal gradient, holding the icon. The
+   circle carried exactly one fact — which tier — and carried it in a code only
+   a sighted reader who already knows bronze from silver could read. Worse, a
+   LOCKED badge drew that circle grey with a padlock in it, so the tier of the
+   badge a learner is actually chasing was the single thing the card refused to
+   say.
+
+   Now: the word in a tinted pill, and the icon drawn on the card's own surface
+   in the metal's dark tone. Two carriers, and the colour is reinforcement
+   rather than the only one — the same test the gauge pills on the dashboard
+   are held to.
+
+   There WAS a third: a 3px rule down the card's left edge in the metal. It went
+   with the other five like it in this file. A coloured bar on a card's leading
+   edge is a decoration that gets applied to everything once it exists, and it
+   never said anything the pill beside it did not.
+
+   The metals are set as one custom property per tier and everything downstream
+   reads from it, so a tier is one line to retune rather than four. */
+.lms-badge.is-bronze { --badge-metal: #8a5a2b; --badge-tint: #f6ead9; }
+.lms-badge.is-silver { --badge-metal: #5c6862; --badge-tint: #eceeed; }
+.lms-badge.is-gold   { --badge-metal: #8a6a14; --badge-tint: #fbf0cf; }
+
+/* A LOCKED BADGE KEEPS ITS METAL. Greying the rule and the pill along with
+   everything else made the "Still to earn" grid a uniform grey wall in which a
+   Gold and a Bronze were the same card with a different word on it — and the
+   tier is precisely what decides whether a badge is worth chasing. Not earned
+   is said by the things that mean it: the muted card, the padlock in place of
+   the glyph, and a progress bar where the points would be. */
+
+
+/* No fill, no shape, no 46px of ornament — the glyph itself, at the tier's
+   tone. `.is-*` on the mark is for the "closest badge" panel, which sets the
+   tier on the mark rather than on a card wrapper. */
+.lms-badge__mark,
+.lms-badge__mark.is-bronze,
+.lms-badge__mark.is-silver,
+.lms-badge__mark.is-gold {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
   flex-shrink: 0;
-  border-radius: 999px;
-  background: var(--lms-surface-3);
-  color: var(--lms-muted);
+  width: 26px;
+  padding-top: 1px;
+  color: var(--badge-metal, var(--lms-green-600));
 }
-.lms-badge__medal svg { width: 21px; height: 21px; }
-.lms-badge.is-earned.is-bronze .lms-badge__medal,
-.lms-badge__medal.is-bronze { background: linear-gradient(155deg, #d8a06a, #a9713d); color: #fff; }
-.lms-badge.is-earned.is-silver .lms-badge__medal,
-.lms-badge__medal.is-silver { background: linear-gradient(155deg, #cfd6d2, #98a49d); color: #fff; }
-.lms-badge.is-earned.is-gold .lms-badge__medal,
-.lms-badge__medal.is-gold { background: linear-gradient(155deg, #e8c766, #c9a03a); color: #fff; }
+.lms-badge__mark.is-bronze { --badge-metal: #8a5a2b; }
+.lms-badge__mark.is-silver { --badge-metal: #5c6862; }
+.lms-badge__mark.is-gold { --badge-metal: #8a6a14; }
+.lms-badge__mark svg { width: 24px; height: 24px; }
+.lms-badge.is-locked .lms-badge__mark { color: var(--lms-muted); }
 
 .lms-badge__body { min-width: 0; flex: 1; }
 .lms-badge__name { display: block; font-size: 14.5px; font-weight: 600; color: var(--lms-text); }
 .lms-badge.is-locked .lms-badge__name { color: var(--lms-text-2); }
-.lms-badge__desc { display: block; margin: 2px 0 8px; font-size: 12.5px; line-height: 1.45; color: var(--lms-muted); }
+.lms-badge__desc { display: block; margin: 2px 0 9px; font-size: 12.5px; line-height: 1.45; color: var(--lms-muted); }
+
+/* One row closing every card, earned or not: the tier, then either what it was
+   worth or how far off it is. Earned and locked used to close on different
+   things in different shapes; they now differ only in what follows the tier. */
+.lms-badge__foot { display: flex; align-items: center; gap: 9px; }
 .lms-badge__tier {
-  display: inline-block;
-  font-size: 11.5px;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--gp-radius);
+  background: var(--badge-tint, var(--lms-surface-3));
+  font-size: 11px;
   font-weight: 700;
-  color: var(--lms-green-600);
+  letter-spacing: 0.02em;
+  color: var(--badge-metal, var(--lms-muted));
 }
-.lms-badge__progress { display: flex; align-items: center; gap: 10px; }
-.lms-badge__progress .lms-progress { margin-bottom: 0; height: 6px; }
+.lms-badge__points { font-size: 11.5px; font-weight: 600; color: var(--lms-green-600); }
+/* The bar sits in the closing row now rather than in a wrapper of its own, so
+   the reset that .lms-badge__progress used to apply moves onto the row. */
+.lms-badge__foot .lms-progress { flex: 1; min-width: 40px; margin-bottom: 0; height: 6px; }
 .lms-badge__count { flex-shrink: 0; font-size: 11.5px; color: var(--lms-muted); font-variant-numeric: tabular-nums; }
 
 /* Leaderboard */
@@ -3525,8 +4001,8 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-board td { padding: 11px 12px; border-bottom: 1px solid var(--lms-border); }
 .lms-board tr:last-child td { border-bottom: 0; }
 .lms-board tr.is-you td { background: var(--lms-mint-soft); }
-.lms-board tr.is-you td:first-child { border-radius: 8px 0 0 8px; }
-.lms-board tr.is-you td:last-child { border-radius: 0 8px 8px 0; }
+.lms-board tr.is-you td:first-child { border-radius: var(--gp-radius) 0 0 var(--gp-radius); }
+.lms-board tr.is-you td:last-child { border-radius: 0 var(--gp-radius) var(--gp-radius) 0; }
 .lms-board__rank { width: 46px; text-align: center; color: var(--lms-muted); font-weight: 600; }
 .lms-board__medal { width: 19px; height: 19px; }
 .lms-board__medal.is-gold { color: #c9a03a; }
@@ -3642,7 +4118,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 32px;
   height: 32px;
   flex-shrink: 0;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-green-600);
 }
@@ -3974,7 +4450,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-pay__methods span {
   padding: 4px 10px;
   border: 1px solid var(--lms-border);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   font-size: 11.5px;
   font-weight: 600;
@@ -3993,7 +4469,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   color: #fff;
 }
 .lms-line__thumb.is-accent-0 { background: linear-gradient(135deg, #0a3114, #14572a); }
@@ -4199,7 +4675,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 32px;
   height: 32px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: none;
   color: var(--lms-muted);
   cursor: pointer;
@@ -4231,7 +4707,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-green);
 }
@@ -4301,7 +4777,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--lms-warning-soft);
   color: var(--lms-warning);
 }
@@ -4340,7 +4816,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 46px;
   height: 46px;
   flex-shrink: 0;
-  border-radius: 11px;
+  border-radius: var(--gp-radius);
   color: #fff;
 }
 .lms-icourse__thumb.is-accent-0 { background: linear-gradient(135deg, #0a3114, #14572a); }
@@ -4440,7 +4916,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 36px;
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: linear-gradient(135deg, #0a3114, #1a5f30);
   color: #fff;
 }
@@ -4469,13 +4945,12 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-item {
   padding: 16px;
   border: 1px solid var(--lms-border);
-  border-left-width: 3px;
   border-radius: var(--lms-radius-sm);
   background: var(--lms-surface-2);
 }
-.lms-item.is-bad { border-left-color: var(--lms-danger); }
-.lms-item.is-warn { border-left-color: var(--lms-warning); }
-.lms-item.is-note { border-left-color: var(--lms-border-strong); }
+/* is-bad / is-warn / is-note used to tint a 3px leading edge. The verdict is
+   written out in .lms-item__note, with its own icon — the stripe was a colour
+   code for a sentence sitting directly beneath it. */
 .lms-item__head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
 .lms-item__id { flex: 1; min-width: 0; }
 .lms-item__prompt { margin: 0; font-size: 14.5px; font-weight: 550; color: var(--lms-text); }
@@ -4579,7 +5054,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-tab__count {
   margin-left: 6px;
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-warning-soft);
   color: var(--lms-warning);
   font-size: 11px;
@@ -4623,7 +5098,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 22px;
   height: 22px;
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   font-size: 11.5px;
   font-weight: 700;
@@ -4637,7 +5112,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 8px;
   padding: 4px 6px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: none;
   font-family: inherit;
   font-size: 13.5px;
@@ -4659,7 +5134,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 24px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: none;
   color: var(--lms-muted);
   cursor: pointer;
@@ -4681,7 +5156,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 9px;
   padding: 7px 8px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: none;
   font-family: inherit;
   font-size: 13px;
@@ -4697,7 +5172,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-clesson__flag {
   flex-shrink: 0;
   padding: 1px 6px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
   font-size: 11px;
@@ -4715,7 +5190,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin-top: 4px;
   padding: 7px 8px;
   border: 1px dashed var(--lms-border-strong);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: none;
   font-family: inherit;
   font-size: 12.5px;
@@ -4760,7 +5235,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 8px;
   padding: 9px 14px;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   font-size: 13.5px;
   font-weight: 550;
@@ -4791,7 +5266,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   color: var(--lms-green);
 }
@@ -4800,7 +5275,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-upload__body { flex: 1; min-width: 0; }
 .lms-upload__name { margin: 0; font-size: 14px; font-weight: 550; color: var(--lms-text); }
 .lms-upload__meta { margin: 2px 0 0; font-size: 12.5px; color: var(--lms-muted); word-break: break-all; }
-.lms-upload__meta code { font-size: 11.5px; background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 4px; }
+.lms-upload__meta code { font-size: 11.5px; background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: var(--gp-radius); }
 .lms-upload__actions { display: flex; gap: 8px; flex-shrink: 0; }
 .lms-upload__label { margin: 0 0 8px; font-size: 13.5px; font-weight: 600; color: var(--lms-text); }
 
@@ -4872,7 +5347,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   border-radius: var(--lms-radius-sm);
   background: var(--lms-surface-2);
 }
-.lms-resrow__icon { width: 34px; height: 34px; border-radius: 9px; }
+.lms-resrow__icon { width: 34px; height: 34px; border-radius: var(--gp-radius); }
 .lms-resrow__icon svg { width: 16px; height: 16px; }
 .lms-resrow__body { flex: 1; min-width: 0; }
 .lms-resrow__body .lms-input { margin-top: 0; background: var(--lms-surface); }
@@ -4903,7 +5378,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: var(--lms-green-deep);
   color: #fff;
   font-size: 12px;
@@ -5058,7 +5533,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 42px;
   height: 42px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--lms-warning-soft);
   color: var(--lms-warning);
 }
@@ -5116,7 +5591,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border-radius: 11px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
 }
@@ -5175,6 +5650,10 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 13px 18px;
   border-top: 1px solid var(--lms-border);
 }
+/* Two buttons where there was one, so the foot needs a group to push right
+   rather than a single child. */
+.lms-quizrow__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
 .lms-quizrow__note { font-size: 12.5px; color: var(--lms-muted); }
 
 /* Confirm dialog ----------------------------------------------------------- */
@@ -5206,7 +5685,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 40px;
   height: 40px;
   flex-shrink: 0;
-  border-radius: 11px;
+  border-radius: var(--gp-radius);
   background: var(--lms-danger-soft);
   color: var(--lms-danger);
 }
@@ -5253,9 +5732,9 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   position: absolute;
   z-index: 2;
   padding: 4px 9px;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: rgba(0, 0, 0, 0.32);
-  color: rgba(255, 255, 255, 0.5);
+  color: #fff;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -5322,7 +5801,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   justify-content: center;
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
 }
@@ -5365,7 +5844,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 28px;
   height: 28px;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-muted);
   font-family: inherit;
@@ -5473,7 +5952,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   font-size: 12px;
   font-weight: 700;
@@ -5542,7 +6021,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 }
 .lms-attempts__best {
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
   font-size: 12px;
@@ -5564,7 +6043,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 30px;
   height: 30px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
   font-size: 12px;
   font-weight: 700;
@@ -5694,7 +6173,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   align-items: center;
   gap: 6px;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   border: 1px solid var(--lms-tint-400);
   background: var(--lms-tint-100);
   color: var(--lms-green-600);
@@ -5708,7 +6187,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-certcard__title { margin: 0 0 6px; font-size: 16.5px; font-weight: 600; line-height: 1.32; letter-spacing: -0.01em; }
 .lms-certcard__title a { color: var(--lms-text); text-decoration: none; }
 .lms-certcard__title a:hover { color: var(--lms-green-600); }
-.lms-certcard__title a:focus-visible { outline: none; box-shadow: var(--lms-ring); border-radius: 4px; }
+.lms-certcard__title a:focus-visible { outline: none; box-shadow: var(--lms-ring); border-radius: var(--gp-radius); }
 .lms-certcard__meta { margin: 0 0 4px; font-size: 12.5px; color: var(--lms-muted); }
 .lms-certcard__id { margin: 0; font-size: 12px; color: var(--lms-muted); font-variant-numeric: tabular-nums; }
 .lms-certcard__foot {
@@ -5738,7 +6217,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-cert__inner {
   padding: 3em 3em 2.25em;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   text-align: center;
   color: #fff;
 }
@@ -5758,7 +6237,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   letter-spacing: 0.01em;
   color: var(--cert-accent-soft);
 }
-.lms-cert__intro { margin: 0; font-size: 0.8em; color: rgba(255, 255, 255, 0.66); }
+.lms-cert__intro { margin: 0; font-size: 0.8em; color: #fff; }
 .lms-cert__name {
   margin: 0.4em 0 0;
   font-size: 2.4em;
@@ -5766,7 +6245,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   letter-spacing: -0.02em;
   line-height: 1.15;
 }
-.lms-cert__body { margin: 0.9em 0 0; font-size: 0.85em; color: rgba(255, 255, 255, 0.66); }
+.lms-cert__body { margin: 0.9em 0 0; font-size: 0.85em; color: #fff; }
 .lms-cert__course {
   margin: 0.4em auto 0;
   max-width: 22ch;
@@ -5775,7 +6254,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   line-height: 1.3;
   color: var(--cert-accent-soft);
 }
-.lms-cert__hours { margin: 1em 0 0; font-size: 0.78em; color: rgba(255, 255, 255, 0.55); }
+.lms-cert__hours { margin: 1em 0 0; font-size: 0.78em; color: #fff; }
 
 .lms-cert__foot {
   display: flex;
@@ -5787,7 +6266,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-cert__sig { text-align: left; min-width: 9em; padding-top: 0.5em; border-top: 1px solid rgba(255, 255, 255, 0.3); }
 .lms-cert__sig.is-right { text-align: right; }
 .lms-cert__sig-name { display: block; font-size: 0.85em; font-weight: 600; }
-.lms-cert__sig-role { display: block; font-size: 0.68em; color: rgba(255, 255, 255, 0.55); }
+.lms-cert__sig-role { display: block; font-size: 0.68em; color: #fff; }
 .lms-cert__seal {
   display: inline-flex;
   align-items: center;
@@ -5804,7 +6283,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin: 2em 0 0;
   font-size: 0.62em;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.42);
+  color: #fff;
 }
 
 @media (max-width: 720px) {
@@ -5858,8 +6337,16 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 /* Responsive -------------------------------------------------------------- */
 @media (max-width: 1180px) {
   .lms-dash-row { grid-template-columns: minmax(0, 1fr); }
+  .lms-dash-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'activity' 'figures' 'mix' 'resume' 'live';
+  }
+  .lms-dash-grid--instructor {
+    grid-template-areas: 'figures' 'mix' 'live' 'courses';
+  }
   .lms-dash-stats { grid-template-rows: none; grid-template-columns: repeat(2, 1fr); }
 }
+
 
 @media (max-width: 900px) {
   /* The sidebar becomes an off-canvas drawer; the shell collapses to one column. */
@@ -5884,11 +6371,28 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 @media (max-width: 620px) {
   .lms-dash-stats { grid-template-columns: 1fr; }
+  .lms-gauges__row { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .lms-gauge:nth-child(even) { border-left: 0; }
+  .lms-gauge + .lms-gauge { border-top: 1px solid var(--lms-border); }
+  /* Stacked, the mark goes beside the words rather than above them — four
+     centred columns is four screens of scrolling. A grid, not a row: the label
+     and the pill have to stay stacked against the mark, which flex-direction
+     alone would lay out as three things side by side. */
+  .lms-gauge {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'mark label' 'mark pill';
+    align-content: center;
+    column-gap: 16px;
+    row-gap: 4px;
+    padding: 14px 18px;
+  }
+  .lms-gauge__mark { grid-area: mark; align-self: center; }
+  .lms-gauge__label { grid-area: label; align-self: end; text-align: left; }
+  .lms-gauge__pill { grid-area: pill; align-self: start; justify-self: start; }
   /* The head stacks on a phone: a greeting and a date side by side leaves the
      greeting two words wide. */
   .lms-page__head { flex-direction: column; align-items: stretch; gap: 8px; }
-  .lms-crumbs__sep,
-  .lms-crumbs a span { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5905,7 +6409,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-video--embed {
   position: relative;
   aspect-ratio: 16 / 9;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
   background: #000;
   margin-top: 14px;
@@ -5937,7 +6441,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
 }
@@ -5975,13 +6479,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 38px;
   padding: 0;
   border: 1px solid var(--lms-border);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: none;
   cursor: pointer;
   flex-shrink: 0;
 }
 .lms-colourpick__input::-webkit-color-swatch-wrapper { padding: 3px; }
-.lms-colourpick__input::-webkit-color-swatch { border: none; border-radius: 5px; }
+.lms-colourpick__input::-webkit-color-swatch { border: none; border-radius: var(--gp-radius); }
 .lms-colourpick__hex {
   width: 130px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -5992,7 +6496,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-swatch {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   border: 2px solid transparent;
   cursor: pointer;
   display: inline-flex;
@@ -6011,13 +6515,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   --cert-accent: #0a3114;
   --cert-bg: #ffffff;
   --cert-text: #1a1a1a;
-  --cert-muted: rgba(26, 26, 26, 0.68);
+  --cert-muted: var(--cert-text);
   width: 100%;
   max-width: 760px;
   aspect-ratio: 1.414 / 1;      /* A4 landscape */
   background: var(--cert-bg);
   border: 1px solid var(--lms-border);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   box-shadow: var(--lms-shadow-sm);
   padding: 14px;
   container-type: inline-size;
@@ -6025,7 +6529,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-certdoc__frame {
   height: 100%;
   border: 2px solid var(--cert-accent);
-  border-radius: 4px;
+  border-radius: var(--gp-radius);
   padding: 5cqw 6cqw;
   display: flex;
   flex-direction: column;
@@ -6192,7 +6696,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 7px;
   padding: 8px 14px 8px 11px;
   border: 1px solid var(--lms-border-strong);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-text);
   font-size: 13.5px;
@@ -6250,7 +6754,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin: 0 0 6px 30px;
   padding: 3px 9px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--lms-mint-soft);
   color: var(--lms-green);
   font-family: inherit;
@@ -6268,7 +6772,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin: 2px 0 10px 30px;
   padding: 11px 12px 12px;
   border: 1px solid var(--lms-border);
-  border-radius: 11px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-2);
 }
 .lms-drip__head {
@@ -6295,13 +6799,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 3px;
   padding: 3px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface-3);
 }
 .lms-drip__mode {
   padding: 6px 4px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: transparent;
   color: var(--lms-muted);
   font-family: inherit;
@@ -6363,7 +6867,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   justify-content: center;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--lms-surface);
   color: var(--lms-green);
 }
@@ -6505,7 +7009,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   border: 1px solid var(--lms-border);
   background: var(--lms-surface-2);
   color: var(--lms-text-2);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   padding: 7px 13px;
   font: inherit;
   font-size: 13px;
@@ -6598,13 +7102,11 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 18px 20px;
   background: var(--lms-surface);
   border: 1px solid var(--lms-border);
-  border-left: 3px solid var(--lms-border-strong);
   border-radius: var(--lms-radius);
 }
-/* The stripe carries the state, readable before any text is. */
-.lms-live-card--live { border-left-color: var(--lms-danger); }
-.lms-live-card--upcoming { border-left-color: var(--lms-green); }
-.lms-live-card--cancelled { border-left-color: var(--lms-muted); }
+/* The state was a coloured stripe on the leading edge AND a .lms-live-badge in
+   words in the card's first column. The badge says "Live now" where the stripe
+   said red, and it says it to a reader who cannot tell red from grey. */
 .lms-live-card--cancelled .lms-live-card__title { text-decoration: line-through; }
 
 .lms-live-card__when { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
@@ -6699,14 +7201,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 13px 14px;
   border-radius: var(--lms-radius);
   border: 1px solid var(--lms-border);
-  border-left: 3px solid var(--lms-muted);
   background: var(--lms-surface);
   box-shadow: 0 10px 30px -12px rgba(10, 49, 20, .35), 0 2px 6px -2px rgba(10, 49, 20, .15);
   animation: lms-toast-in .22s ease-out;
 }
-.lms-toast--success { border-left-color: var(--lms-green); }
-.lms-toast--error { border-left-color: var(--lms-danger); }
-.lms-toast--info { border-left-color: var(--lms-warning); }
+/* Tone is the icon's colour, set on .lms-toast__icon below, and the icon
+   differs in SHAPE per tone as well (check / lock / clock). The leading-edge
+   stripe that used to double it is gone. */
 
 @keyframes lms-toast-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -6790,7 +7291,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   color: var(--lms-text);
   font-weight: 500;
 }
-.lms-oauth__btn:hover { background: var(--lms-surface-2); border-color: var(--lms-muted); }
+.lms-oauth__btn:hover { background: var(--lms-surface-2); border-color: var(--lms-grey); }
 .lms-oauth__btn:focus-visible { outline: none; border-color: var(--lms-mint); box-shadow: var(--lms-ring); }
 
 /* Brand marks keep their own colours — a recoloured Google mark is both wrong
@@ -7304,7 +7805,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   margin: 14px 0 0;
   font-size: 14.5px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
 }
 
 .lms-authside__proof {
@@ -7323,7 +7824,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   font-weight: 600;
   margin-bottom: 2px;
 }
-.lms-authside__proof span span { font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, 0.66); }
+.lms-authside__proof span span { font-size: 13px; line-height: 1.5; color: #fff; }
 .lms-authside__icon {
   flex-shrink: 0;
   display: inline-flex;
@@ -7331,7 +7832,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   justify-content: center;
   width: 34px;
   height: 34px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: rgba(255, 255, 255, 0.10);
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--lms-mint);
@@ -7356,7 +7857,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   padding: 20px 0 0;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.66);
+  color: #fff;
 }
 .lms-authside__internal-link {
   display: inline-flex;
@@ -7466,7 +7967,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 8px;
   font-size: 15px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 .lms-authside__proof li svg {
   width: 17px;

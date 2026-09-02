@@ -19,7 +19,9 @@
 
 .breadcrumbs__link {
   color: currentColor;
-  opacity: 0.7;
+  /* Was 0.7. The trail reads at the band's own text colour; hover still marks
+     the link, with the underline rather than a change in strength. */
+  opacity: 1;
   text-decoration: none;
   transition: opacity 0.15s ease;
 }
@@ -34,5 +36,5 @@
 }
 
 .breadcrumbs__sep {
-  opacity: 0.4;
+  opacity: 1;
 }

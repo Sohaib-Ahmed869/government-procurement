@@ -59,7 +59,7 @@
      a surface with a hairline instead, warming its border on hover. */
   background: var(--band-surface);
   border: 1px solid var(--band-line);
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
@@ -102,7 +102,8 @@
      dark options on it. One token, no override, no segment named here. */
   background: var(--band-surface);
   border: 1px solid var(--band-line);
-  border-radius: 14px;
+  /* The corner .insights-pill__button has. */
+  border-radius: var(--gp-radius);
   /* 0.12, not 0.35. The heavier shadow was carrying a dark menu off a dark
      band; under a light menu on paper it reads as a smudge. */
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
@@ -119,7 +120,7 @@
   cursor: pointer;
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
 }
 
 .insights-pill__option:hover,
@@ -273,16 +274,13 @@
   color: var(--band-ink);
 }
 
-/* Mint on Award; the Win segment carries no green, so it takes the grey the
-   rest of that side uses for accents. */
+/* The card sits on paper, so the chevron takes the title's own ink on both
+   segments. It used to be the segment accent — mint on Award, a pale grey on
+   Win — and both measured under 2:1 against the card. */
 .insights-card__chevron {
   margin-left: 6px;
   vertical-align: -2px;
-  color: var(--gp-mint-300);
-}
-
-.insights[data-audience='win'] .insights-card__chevron {
-  color: #c9c9c9;
+  color: var(--band-ink);
 }
 
 /* Pushed to the foot of the card rather than sitting straight under the title,
@@ -371,7 +369,7 @@
   cursor: pointer;
   background: var(--band-surface-hover);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: background-color 0.15s ease;

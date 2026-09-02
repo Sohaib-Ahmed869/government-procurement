@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import NoteList from '../../components/progress/NoteList.jsx';
 import { useNotes } from '../../hooks/useNotes.js';
+import Select from '../../components/Select.jsx';
 
 // Every note the learner has taken (L3), grouped by course. Grouping rather
 // than one flat list because notes are almost always re-read in the context of
@@ -66,15 +67,16 @@ export default function NotesPage() {
             />
           </div>
           <div className="lms-filters__right">
-            <label className="lms-sort">
-              <span className="lms-sr-only">Filter by course</span>
-              <select className="lms-select" value={course} onChange={(e) => setCourse(e.target.value)}>
-                <option value="all">All courses</option>
-                {courses.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.title}</option>
-                ))}
-              </select>
-            </label>
+            <Select
+              className="lms-sort"
+              aria-label="Filter by course"
+              value={course}
+              onChange={setCourse}
+              options={[
+                { value: 'all', label: 'All courses' },
+                ...courses.map((c) => ({ value: c.slug, label: c.title })),
+              ]}
+            />
           </div>
         </div>
       ) : null}

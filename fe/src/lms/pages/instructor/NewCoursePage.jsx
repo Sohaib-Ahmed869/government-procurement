@@ -4,6 +4,7 @@ import LmsIcon from '../../components/LmsIcon.jsx';
 import { formatMoney, gstInside } from '../../utils/money.js';
 import { authoringApi } from '../../../api/lms.js';
 import { LEVELS, SEGMENTS } from '../../constants/courseTaxonomy.js';
+import Select from '../../components/Select.jsx';
 
 // Create a course (R1).
 //
@@ -18,6 +19,8 @@ export default function NewCoursePage() {
   const [touched, setTouched] = useState(false);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  // Select passes the value, not an event — the inputs above still pass events.
+  const pick = (key) => (v) => setForm((f) => ({ ...f, [key]: v }));
   const valid = form.title.trim().length >= 3;
 
   const submit = async (e) => {
@@ -87,21 +90,13 @@ export default function NewCoursePage() {
         <div className="lms-formgrid lms-formgrid--2">
           <label className="lms-field">
             <span className="lms-field__label">Category</span>
-            <select className="lms-select" value={form.segment} onChange={set('segment')}>
-              {SEGMENTS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
+            <Select value={form.segment} onChange={pick('segment')} options={SEGMENTS} />
             <span className="lms-field__hint">Which audience filter it appears under.</span>
           </label>
 
           <label className="lms-field">
             <span className="lms-field__label">Level</span>
-            <select className="lms-select" value={form.level} onChange={set('level')}>
-              {LEVELS.map((l) => (
-                <option key={l.value} value={l.value}>{l.label}</option>
-              ))}
-            </select>
+            <Select value={form.level} onChange={pick('level')} options={LEVELS} />
             <span className="lms-field__hint">How much prior knowledge it assumes.</span>
           </label>
         </div>

@@ -2,19 +2,21 @@ import { Link } from 'react-router-dom';
 import { useStudentAuth } from '../context/StudentAuthContext.jsx';
 import NotificationsMenu from '../components/NotificationsMenu.jsx';
 
-/* Top bar: mobile drawer toggle, breadcrumb trail, course search and
-   notifications.
+/* Top bar: mobile drawer toggle, course search and notifications.
 
-   Who is signed in is NOT here. It used to be, as an inert chip beside the
-   bell, at the same time as the sidebar's foot carried a Log out button and
+   No breadcrumb and no page title. The sidebar already marks the section the
+   reader is in, and every screen opens on its own .lms-page__head — a trail
+   saying "Home / Dashboard" above a heading was the third place one screen
+   named itself. The bar is now only the things it alone can carry.
+
+   Who is signed in is NOT here either. It used to be, as an inert chip beside
+   the bell, at the same time as the sidebar's foot carried a Log out button and
    the nav carried Profile and Settings — the same account, stated in three
    places, actionable in none of them. It is the sidebar's identity card now,
    which is where an app with a sidebar puts it. The desktop collapse control
    lives there too, so neither is repeated here. */
-export default function LmsHeader({ crumbs = [], onOpenMobile }) {
+export default function LmsHeader({ onOpenMobile }) {
   const { isAuthenticated } = useStudentAuth();
-  const current = crumbs[crumbs.length - 1];
-  const trail = crumbs.slice(0, -1);
 
   return (
     <header className="lms-header">
@@ -32,25 +34,6 @@ export default function LmsHeader({ crumbs = [], onOpenMobile }) {
           </svg>
         </button>
 
-        <nav className="lms-crumbs" aria-label="Breadcrumb">
-          {trail.map((crumb) => (
-            <span key={crumb.to} style={{ display: 'contents' }}>
-              <Link to={crumb.to}>
-                {crumb.home ? (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
-                    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  </svg>
-                ) : null}
-                <span>{crumb.label}</span>
-              </Link>
-              <span className="lms-crumbs__sep" aria-hidden="true">/</span>
-            </span>
-          ))}
-          <span className="lms-crumbs__current" aria-current="page">
-            {current?.label}
-          </span>
-        </nav>
       </div>
 
       <div className="lms-header__right">

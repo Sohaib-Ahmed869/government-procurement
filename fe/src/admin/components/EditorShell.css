@@ -35,7 +35,7 @@
   width: 34px;
   height: 34px;
   border: 1px solid var(--admin-border);
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: #fff;
   color: var(--admin-text);
   cursor: pointer;
@@ -87,7 +87,7 @@
 .editor__main {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 16px;
+  border-radius: var(--gp-radius);
   padding: 28px 32px;
   box-shadow: var(--admin-shadow);
   min-height: 60vh;
@@ -105,7 +105,7 @@
 .editor-panel {
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 14px;
+  border-radius: var(--gp-radius);
   padding: 16px;
   box-shadow: var(--admin-shadow-sm);
 }
@@ -133,7 +133,7 @@
   background: transparent;
   outline: none;
 }
-.editor-title::placeholder { color: #c2ccc6; }
+.editor-title::placeholder { color: var(--admin-grey); }
 
 .editor-body-label {
   display: block;
@@ -151,7 +151,7 @@
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--admin-border);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   padding: 12px 14px;
   font-family: inherit;
   font-size: 15px;
@@ -161,7 +161,7 @@
   resize: vertical;
 }
 
-.editor-overview::placeholder { color: #9aa8a1; }
+.editor-overview::placeholder { color: var(--admin-grey); }
 
 .editor-overview:focus {
   outline: none;
@@ -174,7 +174,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-2);
   margin-bottom: 12px;
 }
@@ -197,7 +197,7 @@
   position: relative;
   display: block;
   border: 1.5px dashed var(--admin-border-strong);
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease;
@@ -212,13 +212,13 @@
 .editor-hero input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .editor-hero__replace {
   position: absolute; right: 8px; bottom: 8px;
-  padding: 4px 10px; border-radius: 999px;
+  padding: 4px 10px; border-radius: var(--gp-radius);
   background: rgba(10,49,20,0.8); color: #fff; font-size: 12px;
 }
 
 /* SEO snippet preview */
 .editor-seo-preview {
-  padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: 10px;
+  padding: 10px 12px; border: 1px solid var(--admin-border); border-radius: var(--gp-radius);
   background: #fff; margin-top: 8px;
 }
 .editor-seo-preview__title { color: #1a4fd0; font-size: 15px; line-height: 1.3; }

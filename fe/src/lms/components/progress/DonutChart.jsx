@@ -31,6 +31,10 @@ const SHADES = ['#14572a', '#2f8a4d', '#4faf70', '#7ac794', '#a6dcb9', '#cdecd9'
 // Drawn as stroked arcs on one circle rather than as filled wedge paths:
 // `stroke-dasharray` on a circle is one number per slice and cannot produce the
 // hairline seams that abutting filled paths do at some sizes.
+// Geometry only. Everything below is in viewBox units and the SVG is drawn at
+// `width: 100%`, so the RENDERED diameter is whatever CSS gives .lms-donut__ring
+// — 120px on the dashboard, larger on the progress page. Stroke, gaps and caps
+// scale with it, which is why none of this needs a size prop.
 const SIZE = 180;
 const STROKE = 14;
 const R = (SIZE - STROKE) / 2;

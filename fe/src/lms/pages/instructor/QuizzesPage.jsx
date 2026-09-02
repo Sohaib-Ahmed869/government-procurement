@@ -211,33 +211,34 @@ export default function QuizzesPage() {
                     <span className="lms-quizrow__note">
                       Edited in the course builder, so questions live in one place only.
                     </span>
-                    <Link
-                      className="lms-btn lms-btn--sm lms-btn--primary"
-                      to={`/learn/instructor/courses/${row.courseId}`}
-                    >
-                      <LmsIcon name="note" />
-                      Edit quiz
-                    </Link>
+                    <span className="lms-quizrow__actions">
+                      {/* Per-question analytics for THIS quiz, which have
+                          existed at /authoring/analytics/quizzes/:lessonId all
+                          along — the page just never linked to them. Offered
+                          only where there is something to analyse: a quiz with
+                          no questions has no cohort to have failed them. */}
+                      {row.questionCount > 0 ? (
+                        <Link
+                          className="lms-btn lms-btn--sm"
+                          to={`/learn/instructor/progress/quizzes/${row.lessonId}`}
+                        >
+                          <LmsIcon name="chart" />
+                          Results
+                        </Link>
+                      ) : null}
+                      <Link
+                        className="lms-btn lms-btn--sm lms-btn--primary"
+                        to={`/learn/instructor/courses/${row.courseId}`}
+                      >
+                        <LmsIcon name="note" />
+                        Edit quiz
+                      </Link>
+                    </span>
                   </div>
                 </article>
               ))}
             </div>
           )}
-
-          {/* Said plainly rather than shown as an empty chart. */}
-          <section className="lms-card" style={{ marginTop: 18 }}>
-            <div className="lms-card__head">
-              <h2 className="lms-card__title">
-                <LmsIcon name="chart" />
-                Results
-              </h2>
-            </div>
-            <p className="lms-detail__note" style={{ marginTop: 0 }}>
-              Pass rates and per-question analysis, covering which question the cohort fails most
-              and which wrong answer they pick, arrives once attempts are stored on the
-              server. There is nothing to show until learners have taken these.
-            </p>
-          </section>
         </>
       )}
     </div>

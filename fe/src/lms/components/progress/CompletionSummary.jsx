@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LmsIcon from '../LmsIcon.jsx';
 import ProgressBar from './ProgressBar.jsx';
+import SegmentBar from './SegmentBar.jsx';
 
 function duration(minutes) {
   if (!minutes) return '0m';
@@ -35,6 +36,10 @@ function CourseRow({ course }) {
           </span>
         </span>
         <span className="lms-progrow__right">
+          {/* A solid bar at course level. Ten segments here would be tenths of
+              a forty-lesson course — an arbitrary division that only looks
+              countable. The module bars below DO count, one segment per
+              lesson, which is what earns them the segmented mark. */}
           <span className="lms-progrow__bar">
             <ProgressBar percent={course.percent} complete={course.complete} />
           </span>
@@ -53,7 +58,20 @@ function CourseRow({ course }) {
                 {mod.title}
               </span>
               <span className="lms-modbar__bar">
-                <ProgressBar percent={mod.percent} complete={mod.percent === 100} />
+                {/* One segment per lesson, so the bar IS the module: four lit
+                    of six is read off it directly. Past eight lessons the
+                    segments come out thinner than the gaps between them, and a
+                    module that long falls back to a solid bar. */}
+                {mod.total > 1 && mod.total <= 8 ? (
+                  <SegmentBar
+                    percent={mod.percent}
+                    segments={mod.total}
+                    tone={mod.percent === 100 ? 'done' : ''}
+                    label={mod.title}
+                  />
+                ) : (
+                  <ProgressBar percent={mod.percent} complete={mod.percent === 100} />
+                )}
               </span>
               <span className="lms-modbar__count">
                 {mod.done}/{mod.total}

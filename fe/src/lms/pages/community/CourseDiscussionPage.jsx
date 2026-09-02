@@ -4,6 +4,7 @@ import LmsIcon from '../../components/LmsIcon.jsx';
 import DiscussionComposer from '../../components/community/DiscussionComposer.jsx';
 import { useDiscussions } from '../../hooks/useDiscussions.js';
 import { useMyCourses } from '../../hooks/useMyCourses.js';
+import Select from '../../components/Select.jsx';
 
 function ago(iso) {
   const mins = Math.floor((Date.now() - Date.parse(iso)) / 60000);
@@ -149,15 +150,16 @@ export default function CourseDiscussionPage() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <label className="lms-sort">
-            <span className="lms-sr-only">Filter by course</span>
-            <select className="lms-select" value={courseFilter} onChange={(e) => setCourse(e.target.value)}>
-              <option value="all">All courses</option>
-              {enrolled.map((c) => (
-                <option key={c.slug} value={c.slug}>{c.title}</option>
-              ))}
-            </select>
-          </label>
+          <Select
+            className="lms-sort"
+            aria-label="Filter by course"
+            value={courseFilter}
+            onChange={setCourse}
+            options={[
+              { value: 'all', label: 'All courses' },
+              ...enrolled.map((c) => ({ value: c.slug, label: c.title })),
+            ]}
+          />
         </div>
       </div>
 

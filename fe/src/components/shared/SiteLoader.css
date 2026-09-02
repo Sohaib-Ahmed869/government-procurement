@@ -116,7 +116,7 @@
   font-size: calc(17px * var(--sl));
   font-weight: 400;
   letter-spacing: 0.01em;
-  color: rgba(255, 255, 255, 0.82);
+  color: #fff;
 
   animation: site-loader-rise 700ms var(--gp-ease) both;
   animation-delay: 120ms;

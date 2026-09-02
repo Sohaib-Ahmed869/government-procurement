@@ -22,7 +22,9 @@
      rather than by two sets of numbers kept in step by hand. */
   --control-pad-y: 6px;
   --control-pad-x: 18px;
-  --control-radius: 4px;
+  /* The corner the rest of the product is now cut to as well — held in
+     styles/tokens.css so the bar and the pages under it cannot drift apart. */
+  --control-radius: var(--gp-radius);
   /* STANDARDISED PREVIEW: one size for every label in the bar. */
   --control-font: 13.5px;
   /* The first line's box height, shared by the toggle's label and the CTA.

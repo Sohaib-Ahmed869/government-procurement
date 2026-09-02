@@ -3,6 +3,7 @@ import ImageUploader from './ImageUploader.jsx';
 import { LEVELS, RESOURCE_TYPES, SEGMENTS } from '../../constants/courseTaxonomy.js';
 import { courseDurationLabel } from '../../hooks/useAuthoring.js';
 import RichTextEditor from '../../../admin/components/RichTextEditor.jsx';
+import Select from '../Select.jsx';
 
 // Descriptions written before the builder had a rich text editor are stored as
 // plain text, and the course page renders the field as HTML - so their line
@@ -215,15 +216,7 @@ export default function CourseBuilder({
         <div className="lms-formgrid">
           <label className="lms-field">
             <span className="lms-field__label">Level</span>
-            <select
-              className="lms-select"
-              value={course.level}
-              onChange={(e) => set({ level: e.target.value })}
-            >
-              {LEVELS.map((l) => (
-                <option key={l.value} value={l.value}>{l.label}</option>
-              ))}
-            </select>
+            <Select value={course.level} onChange={(v) => set({ level: v })} options={LEVELS} />
           </label>
 
           <div className="lms-field">
@@ -239,15 +232,11 @@ export default function CourseBuilder({
 
           <label className="lms-field">
             <span className="lms-field__label">Resource type</span>
-            <select
-              className="lms-select"
+            <Select
               value={course.resourceType}
-              onChange={(e) => set({ resourceType: e.target.value })}
-            >
-              {RESOURCE_TYPES.map((r) => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
+              onChange={(v) => set({ resourceType: v })}
+              options={RESOURCE_TYPES}
+            />
           </label>
         </div>
 
@@ -441,15 +430,11 @@ export default function CourseBuilder({
         <div className="lms-formgrid">
           <label className="lms-field">
             <span className="lms-field__label">State</span>
-            <select
-              className="lms-select"
+            <Select
               value={course.availability ?? 'open'}
-              onChange={(e) => set({ availability: e.target.value })}
-            >
-              {AVAILABILITY.map((a) => (
-                <option key={a.value} value={a.value}>{a.label}</option>
-              ))}
-            </select>
+              onChange={(v) => set({ availability: v })}
+              options={AVAILABILITY}
+            />
             <span className="lms-field__hint">
               A published course can still be “Coming soon”. It shows in the catalogue but
               can’t be bought yet.

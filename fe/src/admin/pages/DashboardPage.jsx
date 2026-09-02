@@ -4,22 +4,26 @@ import { dashboardApi } from '../../api';
 import { CATEGORY_LABEL } from '../../features/forum/data.js';
 import StatusBadge from '../components/StatusBadge.jsx';
 
-// Inline stat-tile icons (no external icon dependency).
-const STAT_ICONS = {
-  question: <><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2.5 2-2.5 3.5" /><path d="M12 17.5h.01" /></>,
-  users: <><circle cx="9" cy="8" r="3.5" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0" /><path d="M16 5a3.5 3.5 0 0 1 0 6.5M17 20a5.5 5.5 0 0 0-2.5-4.6" /></>,
-  mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m4 7 8 6 8-6" /></>,
-  calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></>,
-  doc: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></>,
-  video: <><rect x="2" y="5" width="14" height="14" rx="2.5" /><path d="m16 10 6-3v10l-6-3z" /></>,
-  book: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
-};
-
-function StatIcon({ name }) {
+// The one inline icon left on this page: the mark on a submission in the
+// recent-questions list. The dashboard's figures no longer sit in icon tiles,
+// so the topic glyphs that fed them (users, mail, doc, video, book) are gone.
+function QuestionIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      {STAT_ICONS[name] || STAT_ICONS.doc}
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.7-2.5 2-2.5 3.5" />
+      <path d="M12 17.5h.01" />
+    </svg>
+  );
+}
+
+// The mark on a queue that has nothing in it.
+function TickIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m4 12.5 5 5 11-11" />
     </svg>
   );
 }
@@ -58,24 +62,40 @@ function timeAgo(value) {
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-// A single metric card. `alert` cards emphasise an outstanding count.
-function MetricCard({ to, icon, label, value, alert, foot, cta }) {
-  const isAlert = alert && value > 0;
+/* One queue: how deep it is, what it is, and the way into it.
+
+   A row rather than a tile because that is the shape of the information — a
+   count, a name and an action read across, and a queue at zero should take a
+   line, not a third of the band. The empty state drops the figure for a tick
+   and drops the action entirely: there is nothing to go and do. */
+function QueueRow({ to, label, value, describe, action }) {
+  const open = value > 0;
   return (
-    <Link to={to} className={`dash-card${isAlert ? ' dash-card--alert' : ''}`}>
-      <div className="dash-card__head">
-        <span className="dash-card__icon"><StatIcon name={icon} /></span>
-        {isAlert && <span className="dash-card__pill">Needs review</span>}
-      </div>
-      <span className="dash-card__value">{value}</span>
-      <span className="dash-card__label">{label}</span>
-      <span className="dash-card__foot">
-        <span className="dash-card__foot-note">{foot}</span>
-        <span className="dash-card__foot-cta">
-          {cta}
+    <Link to={to} className={`dash-queue__row${open ? ' is-open' : ''}`}>
+      <span className="dash-queue__count">{open ? value : <TickIcon />}</span>
+      <span className="dash-queue__body">
+        <span className="dash-queue__label">{label}</span>
+        <span className="dash-queue__note">{open ? describe(value) : 'All caught up'}</span>
+      </span>
+      {open && (
+        <span className="dash-queue__action">
+          <span className="dash-queue__action-label">{action}</span>
           <ArrowIcon />
         </span>
-      </span>
+      )}
+    </Link>
+  );
+}
+
+// One standing figure in the strip. No icon and no arrow: three segments of a
+// single bordered strip, each of them a link, need neither to be read as one
+// set nor to advertise that they can be pressed.
+function StatSegment({ to, label, value, note }) {
+  return (
+    <Link to={to} className="dash-stat">
+      <span className="dash-stat__value">{value}</span>
+      <span className="dash-stat__label">{label}</span>
+      <span className="dash-stat__note">{note}</span>
     </Link>
   );
 }
@@ -101,22 +121,22 @@ export default function DashboardPage() {
     return <p className="admin-tablestate">Couldn&apos;t load the dashboard. Is the API running?</p>;
 
   const c = data.content || {};
-  const draftFoot = (t) => (t?.draft ? plural(t.draft, 'draft') : 'All published');
+  const draftNote = (t) => (t?.draft ? plural(t.draft, 'draft') : 'All published');
 
   const attention = [
     {
       label: 'Pending questions',
       value: data.pendingQuestions ?? 0,
       to: '/admin/moderation',
-      icon: 'question',
-      cta: 'Moderate',
+      action: 'Moderate',
+      describe: (n) => `${plural(n, 'question')} waiting on a decision`,
     },
     {
       label: 'New consultations',
       value: data.newConsultations ?? 0,
       to: '/admin/consultations',
-      icon: 'calendar',
-      cta: 'Review',
+      action: 'Review',
+      describe: (n) => `${n} ${n === 1 ? 'enquiry' : 'enquiries'} not yet actioned`,
     },
   ];
 
@@ -125,25 +145,19 @@ export default function DashboardPage() {
       label: 'Subscribers',
       value: data.subscriberCount ?? 0,
       to: '/admin/subscribers',
-      icon: 'users',
-      foot: 'Confirmed',
-      cta: 'Manage',
+      note: 'Confirmed',
     },
     {
       label: 'Insights',
       value: c.articles?.published ?? 0,
       to: '/admin/articles',
-      icon: 'doc',
-      foot: draftFoot(c.articles),
-      cta: 'Open',
+      note: draftNote(c.articles),
     },
     {
       label: 'Courses',
       value: c.courses?.published ?? 0,
       to: '/admin/courses',
-      icon: 'book',
-      foot: draftFoot(c.courses),
-      cta: 'Open',
+      note: draftNote(c.courses),
     },
   ];
 
@@ -153,13 +167,6 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="admin-page__head">
-        <div className="admin-page__heading">
-          <h2 className="admin-page__title">Dashboard</h2>
-          <p className="admin-page__subtitle">An overview of activity across the site.</p>
-        </div>
-      </div>
-
       {/* Actionable queues */}
       <section className="dash-section">
         <h3 className="dash-section__label">
@@ -168,14 +175,9 @@ export default function DashboardPage() {
             {openItems ? `${openItems} open` : 'All clear'}
           </span>
         </h3>
-        <div className="dash-grid dash-grid--3">
+        <div className="dash-queue">
           {attention.map((s) => (
-            <MetricCard
-              key={s.label}
-              {...s}
-              alert
-              foot={s.value > 0 ? 'Awaiting action' : 'All caught up'}
-            />
+            <QueueRow key={s.label} {...s} />
           ))}
         </div>
       </section>
@@ -183,9 +185,9 @@ export default function DashboardPage() {
       {/* Content & audience */}
       <section className="dash-section">
         <h3 className="dash-section__label">Content &amp; audience</h3>
-        <div className="dash-grid dash-grid--4">
+        <div className="dash-stats">
           {library.map((s) => (
-            <MetricCard key={s.label} {...s} />
+            <StatSegment key={s.label} {...s} />
           ))}
         </div>
       </section>
@@ -207,7 +209,7 @@ export default function DashboardPage() {
               {recentQuestions.map((q) => (
                 <li key={q._id || q.id} className="dash-list__item">
                   <span className="dash-list__avatar dash-list__avatar--q" aria-hidden="true">
-                    <StatIcon name="question" />
+                    <QuestionIcon />
                   </span>
                   <span className="dash-list__body">
                     <span className="dash-list__primary">{q.title}</span>

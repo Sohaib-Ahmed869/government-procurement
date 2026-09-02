@@ -1,4 +1,5 @@
 import LmsIcon from '../LmsIcon.jsx';
+import Select from '../Select.jsx';
 
 const TYPES = [
   { value: 'single', label: 'Single choice' },
@@ -111,16 +112,12 @@ export default function QuizBuilder({ quiz, onChange }) {
             <li className="lms-qedit" key={q.id}>
               <div className="lms-qedit__head">
                 <span className="lms-qedit__num">{i + 1}</span>
-                <select
-                  className="lms-select"
+                <Select
                   value={q.type}
-                  onChange={(e) => changeType(q, e.target.value)}
+                  onChange={(v) => changeType(q, v)}
+                  options={TYPES}
                   aria-label={`Question ${i + 1} type`}
-                >
-                  {TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
+                />
                 <button
                   type="button"
                   className="lms-btn lms-btn--sm lms-btn--ghost"

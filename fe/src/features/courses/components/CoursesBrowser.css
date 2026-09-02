@@ -293,7 +293,7 @@
   color: var(--band-ink);
   background: transparent;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   cursor: pointer;
   transition:
     background-color 0.15s ease,
@@ -315,7 +315,7 @@
 .courses-sort__option:focus-visible {
   outline: 2px solid var(--band-accent);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
 }
 
 /* --- card grid --- */
@@ -534,7 +534,7 @@
     cursor: pointer;
     background: var(--band-surface);
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--gp-radius);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--band-line);
@@ -606,7 +606,9 @@
 .courses-card__price s {
   font-size: 12.5px;
   font-weight: 400;
-  opacity: 0.6;
+  /* Was 0.6. The strike-through already says this price no longer applies, so
+     the type does not also have to be faded to say it. */
+  opacity: 1;
 }
 
 /* "View more" — the glass pill the insights grid uses, so the two listings on
@@ -622,7 +624,7 @@
   cursor: pointer;
   background: var(--band-surface-hover);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: background-color 0.15s ease;

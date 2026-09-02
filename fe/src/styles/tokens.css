@@ -185,7 +185,11 @@
   --gp-award-paper-deep: #dbe6d6;
   --gp-award-line: #cfdcc9;
   --gp-award-ink: #10281a;              /* green-black body text */
-  --gp-award-muted: #5b6f60;
+  /* Secondary copy is no longer a lighter grey-green: it reads at body-text
+     weight, so nothing on a paper band is greyed out. #5b6f60 is kept below
+     for the one thing that still has to look unfilled - a placeholder. */
+  --gp-award-muted: var(--gp-award-ink);
+  --gp-award-placeholder: #5b6f60;
   --gp-award-accent: var(--gp-mint-300);
   --gp-award-warm: #c1663a;             /* clay */
   /* Same accent, dark enough to be read as text on the paper steps. The two
@@ -223,7 +227,9 @@
   --gp-win-paper-deep: #e2e2df;
   --gp-win-line: #d9d9d5;
   --gp-win-ink: #191817;
-  --gp-win-muted: #6b665c;
+  /* See the note on --gp-award-muted. */
+  --gp-win-muted: var(--gp-win-ink);
+  --gp-win-placeholder: #6b665c;
   --gp-win-accent: #e0a63f;             /* amber */
   --gp-win-warm: var(--gp-mint-300);    /* mint keeps a role, as the second */
   --gp-win-warm-ink: #1a5c3f;           /* deep mint — 5.5:1 on paper-deep */
@@ -276,6 +282,7 @@
   --gp-line: var(--gp-win-line);
   --gp-ink: var(--gp-win-ink);
   --gp-muted: var(--gp-win-muted);
+  --gp-placeholder: var(--gp-win-placeholder);
   --gp-accent: var(--gp-win-accent);
   --gp-accent-warm: var(--gp-win-warm);
   --gp-accent-ink: var(--gp-win-warm-ink);
@@ -301,6 +308,7 @@
   --gp-line: var(--gp-award-line);
   --gp-ink: var(--gp-award-ink);
   --gp-muted: var(--gp-award-muted);
+  --gp-placeholder: var(--gp-award-placeholder);
   --gp-accent: var(--gp-award-accent);
   --gp-accent-warm: var(--gp-award-warm);
   /* Which accent to use depends on what it sits on. --gp-accent and
@@ -326,9 +334,26 @@
   --gp-line: var(--gp-win-line);
   --gp-ink: var(--gp-win-ink);
   --gp-muted: var(--gp-win-muted);
+  --gp-placeholder: var(--gp-win-placeholder);
   --gp-accent: var(--gp-win-accent);
   --gp-accent-warm: var(--gp-win-warm);
   --gp-accent-ink: var(--gp-win-warm-ink);
+}
+
+/* Corner radius — one value for every box and button in the product.
+
+   The reference is the header's own controls: the Request a Consultation CTA
+   and the Student Login button beside it. They were cut to 4px while the rest
+   of the product ran anywhere from 6px to a full 999px pill, so the bar at the
+   top of every page disagreed with the page under it. Everything box- or
+   button-shaped now resolves to this token, which means the shape is changed
+   in one place rather than in four hundred declarations.
+
+   What deliberately does NOT use it: things whose roundness is the point —
+   avatars, status dots, the settings switch, progress tracks, medals and the
+   certificate seal. Those keep their own 999px/50%. */
+:root {
+  --gp-radius: 4px;
 }
 
 /* The alternating band on the Service Offering rows: a light green on Award, a

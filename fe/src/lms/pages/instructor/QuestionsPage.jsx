@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { useQuestionInbox } from '../../hooks/useDiscussions.js';
+import Select from '../../components/Select.jsx';
 
 function ago(iso) {
   const mins = Math.floor((Date.now() - Date.parse(iso)) / 60000);
@@ -158,19 +159,16 @@ export default function QuestionsPage() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <label className="lms-sort">
-            <span className="lms-sr-only">Filter by course</span>
-            <select
-              className="lms-select"
-              value={courseFilter}
-              onChange={(e) => setCourseFilter(e.target.value)}
-            >
-              <option value="all">All courses</option>
-              {courses.map((c) => (
-                <option key={c._id} value={c.slug}>{c.title}</option>
-              ))}
-            </select>
-          </label>
+          <Select
+            className="lms-sort"
+            aria-label="Filter by course"
+            value={courseFilter}
+            onChange={setCourseFilter}
+            options={[
+              { value: 'all', label: 'All courses' },
+              ...courses.map((c) => ({ value: c.slug, label: c.title })),
+            ]}
+          />
         </div>
       </div>
 

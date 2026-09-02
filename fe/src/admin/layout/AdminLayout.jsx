@@ -14,7 +14,11 @@ const STORAGE_KEY = 'gp.admin.sidebar.collapsed';
 // Prompt Library) and two were missing altogether, so /admin/panels and
 // /admin/bid-writers both fell through to the "Admin" default.
 const SECTION_TITLES = {
-  '': 'Dashboard',
+  /* The admin home has no title. It is the only screen whose name says nothing
+     a reader could not already see — the sidebar's first item is marked, and
+     the sections below are labelled. Every other entry here names a body of
+     content the page does not otherwise announce. */
+  '': '',
   articles: 'Insights',
   courses: 'Courses',
   pages: 'Pages',

@@ -138,7 +138,7 @@
   max-width: 620px;
   font-size: clamp(16px, 1.5vw, 19px);
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.84);
+  color: #fff;
 }
 
 .home-hero__actions {

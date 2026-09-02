@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import LmsIcon from '../LmsIcon.jsx';
+import Select from '../Select.jsx';
 
 // Ask a question, or reply to one (L5). `withTitle` and the course picker are
 // only shown when starting a thread. A reply needs neither.
@@ -48,18 +49,13 @@ export default function DiscussionComposer({
             onChange={(e) => setTitle(e.target.value)}
           />
           {courses.length ? (
-            <label className="lms-composer__course">
-              <span className="lms-sr-only">Course</span>
-              <select
-                className="lms-select"
-                value={courseSlug}
-                onChange={(e) => onCourseChange(e.target.value)}
-              >
-                {courses.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.title}</option>
-                ))}
-              </select>
-            </label>
+            <Select
+              className="lms-composer__course"
+              aria-label="Course"
+              value={courseSlug}
+              onChange={onCourseChange}
+              options={courses.map((c) => ({ value: c.slug, label: c.title }))}
+            />
           ) : null}
         </>
       ) : null}
