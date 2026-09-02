@@ -215,7 +215,7 @@
 }
 
 .consult__input::placeholder {
-  color: var(--gp-muted);
+  color: var(--gp-placeholder);
 }
 
 /* The segment's own colour on the field's edge, drawn twice on the same line so
@@ -269,7 +269,7 @@
   cursor: pointer;
   background: var(--gp-brand);
   border: 0;
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   transition: background-color 0.15s ease;
 }
 

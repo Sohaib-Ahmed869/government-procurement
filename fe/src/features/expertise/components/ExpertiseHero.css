@@ -98,7 +98,7 @@
 .xp__role {
   margin: 14px 0 0;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #fff;
 }
 
 .xp__actions {
@@ -122,7 +122,7 @@
      The soft inset highlights approximate the glass edge/refraction. */
   /* Fallback glass (any browser): thin fill + light blur + directional edge. */
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   backdrop-filter: blur(4px) brightness(1.25) saturate(1.15);
   -webkit-backdrop-filter: blur(4px) brightness(1.25) saturate(1.15);
   box-shadow:

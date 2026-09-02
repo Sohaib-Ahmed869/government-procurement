@@ -75,7 +75,7 @@
      edge of their own. */
   background: var(--gp-paper);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   box-shadow: inset 0 0 0 1px var(--band-line);
 }
 
@@ -98,7 +98,9 @@
   padding: 6px;
   list-style: none;
   background: var(--band-surface);
-  border-radius: 12px;
+  /* The corner its own trigger has. A 12px menu hanging off a 4px button read
+     as two components rather than one control opening. */
+  border-radius: var(--gp-radius);
   box-shadow:
     0 16px 36px rgba(0, 0, 0, 0.38),
     inset 0 0 0 1px var(--band-line);
@@ -115,7 +117,7 @@
   cursor: pointer;
   background: none;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
 }
 
 .jl-select__option:hover,
@@ -147,13 +149,16 @@
   color: var(--band-ink);
   background: var(--gp-paper);
   border: 0;
-  border-radius: 10px;
+  /* Matched to .jl-select__button beside it, which it already shares its
+     padding and type size with — the corner was the last thing making the pair
+     look like two different controls. */
+  border-radius: var(--gp-radius);
   outline: none;
   box-shadow: inset 0 0 0 1px var(--band-line);
 }
 
 .jl__search-input::placeholder {
-  color: var(--band-muted);
+  color: var(--band-placeholder);
 }
 
 .jl__reset {
@@ -214,7 +219,7 @@
   color: #fff;
 
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-muted: #fff;
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: rgba(255, 255, 255, 0.06);
   --band-surface-hover: rgba(255, 255, 255, 0.16);

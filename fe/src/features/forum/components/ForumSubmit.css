@@ -261,7 +261,10 @@
      tinted one the field below it uses. */
   background: var(--gp-paper);
   border: 1px solid var(--band-line);
-  border-radius: 14px;
+  /* The corner .forum-submit__input has — this menu hangs off one, and every
+     field on this form is 10px. Not --gp-radius: the point is that the list and
+     the control it opens from agree, and here they agree at 10. */
+  border-radius: 10px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 }
@@ -277,7 +280,7 @@
   cursor: pointer;
   background: none;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   transition: background-color 0.15s ease;
 }
 
@@ -301,7 +304,7 @@
   cursor: pointer;
   background: var(--gp-brand);
   border: 0;
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
      the segment cross-fade's pace and far too slow for a pointer: the button
      looked like it was thinking about it. Background moves fast; colour and

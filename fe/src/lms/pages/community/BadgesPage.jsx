@@ -55,11 +55,14 @@ export default function BadgesPage() {
 
       {next ? (
         <section className="lms-card lms-nextbadge">
-          <span className={`lms-badge__medal is-${next.tier}`}>
+          <span className={`lms-badge__mark is-${next.tier}`}>
             <LmsIcon name={next.icon} />
           </span>
           <div className="lms-nextbadge__body">
-            <p className="lms-nextbadge__label">Closest badge</p>
+            <p className="lms-nextbadge__label">
+              Closest badge
+              <span className={`lms-badge__tier is-${next.tier}`}>{next.tierMeta.label}</span>
+            </p>
             <p className="lms-nextbadge__name">{next.name}</p>
             <p className="lms-nextbadge__desc">{next.description}</p>
           </div>

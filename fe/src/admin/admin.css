@@ -13,7 +13,11 @@
   --admin-border-strong: #dbe2de;
   --admin-text: #16211b;
   --admin-text-2: #3d4a43;
-  --admin-muted: #6b776f;
+  /* Secondary copy now reads at the same near-black as body text — see the
+     matching note in lms.css. --admin-grey keeps the old tone for the one
+     thing that still has to look unfilled: a field's placeholder. */
+  --admin-muted: var(--admin-text);
+  --admin-grey: #6b776f;
   --admin-danger: #c0392b;
 
   /* Softer, more layered shadows — closer to Stripe/Linear than a hard drop. */
@@ -23,9 +27,12 @@
   --admin-shadow-lg: 0 12px 40px -12px rgba(16, 40, 24, 0.22), 0 3px 8px rgba(16, 40, 24, 0.05);
   --admin-ring: 0 0 0 3px rgba(10, 49, 20, 0.1);
 
-  --admin-radius: 14px;
-  --admin-radius-sm: 10px;
-  --admin-radius-lg: 18px;
+  /* Same single corner as the LMS and the site header — see --gp-radius in
+     styles/tokens.css. The three names are kept for what they say, not for a
+     difference in value. */
+  --admin-radius: var(--gp-radius);
+  --admin-radius-sm: var(--gp-radius);
+  --admin-radius-lg: var(--gp-radius);
 
   --admin-sidebar-w: 258px;
   --admin-sidebar-w-collapsed: 74px;
@@ -96,7 +103,7 @@
   align-items: center;
   gap: 11px;
   padding: 6px;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   min-width: 0;
   flex: 1;
   font-size: 16px;
@@ -126,7 +133,7 @@
   display: block;
   background: var(--admin-green);
   padding: 6px;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   box-sizing: content-box;
 }
 
@@ -161,7 +168,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 1px solid var(--admin-border-strong);
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-2);
   color: var(--admin-muted);
   cursor: pointer;
@@ -192,7 +199,7 @@
   padding: 0 12px 8px;
   font-size: 12px;
   letter-spacing: 0;
-  color: #96a29a;
+  color: var(--admin-text);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -206,7 +213,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 9px 12px;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   color: var(--admin-text-2);
   font-size: 14px;
   font-weight: 500;
@@ -233,7 +240,7 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  opacity: 0.85;
+  opacity: 1;
   transition: opacity 0.16s var(--admin-ease);
 }
 
@@ -263,7 +270,7 @@
 .admin-sidebar__badge {
   min-width: 20px;
   padding: 1px 7px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--admin-green);
   color: #fff;
   font-size: 12px;
@@ -359,7 +366,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 1px solid var(--admin-border);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
   color: var(--admin-text);
   cursor: pointer;
@@ -402,7 +409,7 @@
   gap: 9px;
   padding: 4px 14px 4px 5px;
   border: 1px solid var(--admin-border);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-2);
   font-size: 13.5px;
 }
@@ -443,7 +450,7 @@
   gap: 8px;
   padding: 9px 16px;
   border: 1px solid var(--admin-border-strong);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
   color: var(--admin-text);
   font-family: inherit;
@@ -484,7 +491,7 @@
 .admin-btn--danger:hover { background: #fbecea; border-color: var(--admin-danger); }
 .admin-btn--danger:focus-visible { box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.16); }
 
-.admin-btn--sm { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+.admin-btn--sm { padding: 6px 12px; font-size: 13px; border-radius: var(--gp-radius); }
 
 /* Cards / panels -------------------------------------------------------- */
 .admin-card {
@@ -557,13 +564,13 @@
   padding: 3px;
   background: var(--admin-surface-2);
   border: 1px solid var(--admin-border);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
 }
 .admin-tab {
   border: 0;
   background: transparent;
   padding: 6px 14px;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -598,7 +605,7 @@
   top: 0;
   z-index: 1;
   background: var(--admin-surface-2);
-  color: #8a958e;
+  color: var(--admin-text);
   font-weight: 600;
   font-size: 12.5px;
   letter-spacing: 0;
@@ -652,7 +659,7 @@
   width: 48px;
   height: 48px;
   margin-bottom: 4px;
-  border-radius: 14px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-2);
   border: 1px solid var(--admin-border);
   color: var(--admin-muted);
@@ -673,7 +680,7 @@
   align-items: center;
   gap: 5px;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
@@ -686,7 +693,7 @@
   content: '';
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: currentColor;
   opacity: 0.7;
 }
@@ -717,14 +724,14 @@
   width: 100%;
   padding: 10px 13px;
   border: 1px solid var(--admin-border-strong);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: #fff;
   font-family: inherit;
   font-size: 14px;
   color: var(--admin-text);
   transition: border-color 0.15s var(--admin-ease), box-shadow 0.15s var(--admin-ease);
 }
-.admin-input::placeholder, .admin-textarea::placeholder { color: #9aa8a0; }
+.admin-input::placeholder, .admin-textarea::placeholder { color: var(--admin-grey); }
 .admin-input:hover, .admin-textarea:hover, .admin-select:hover { border-color: #b9c7bf; }
 .admin-input:focus, .admin-textarea:focus, .admin-select:focus {
   outline: none;
@@ -780,7 +787,7 @@
   gap: 7px;
   padding: 7px 13px;
   border: 1px solid var(--admin-border-strong);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
   font-size: 13px;
   color: var(--admin-text-2);
@@ -799,7 +806,7 @@
 
 .admin-alert {
   padding: 12px 15px;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 16px;
@@ -853,7 +860,7 @@
 }
 .dash-section__count {
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -863,104 +870,113 @@
 }
 .dash-section__count.is-active { background: #fdf1d8; color: #8a6316; }
 
-.dash-grid { display: grid; gap: 16px; }
-.dash-grid--3 { grid-template-columns: repeat(3, 1fr); }
-.dash-grid--4 { grid-template-columns: repeat(4, 1fr); }
+/* Attention queue ------------------------------------------------------------
+   Two queues, and they are not four-up tiles. A queue is a line of work: it has
+   a depth, a name and a way in, and those read left-to-right in one row far
+   better than stacked inside a card with a third of the row left empty beside
+   it. One container, hairline-divided, so two queues look like two queues and
+   not like a grid that came up short.
 
-/* Metric card */
-.dash-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 18px 20px 14px;
-  background: var(--admin-surface);
+   The zero state matters more than the busy one. An empty queue showing a 30px
+   "0" is a card demanding to be read in order to be dismissed; here it drops to
+   a tick and a grey line, and the eye goes straight past it to the amber row
+   that wants something. */
+.dash-queue {
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius);
+  background: var(--admin-surface);
   box-shadow: var(--admin-shadow);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.18s var(--admin-ease), box-shadow 0.18s var(--admin-ease),
-    border-color 0.18s var(--admin-ease);
+  overflow: hidden;
 }
-.dash-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--admin-shadow-md);
-  border-color: var(--admin-border-strong);
-}
-.dash-card:focus-visible { outline: none; box-shadow: var(--admin-ring); }
-
-.dash-card__head {
+.dash-queue__row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 16px;
+  padding: 15px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.16s var(--admin-ease);
 }
-.dash-card__icon {
+.dash-queue__row + .dash-queue__row { border-top: 1px solid var(--admin-border); }
+.dash-queue__row:hover { background: var(--admin-bg-soft, #f7faf8); }
+.dash-queue__row:focus-visible { outline: none; box-shadow: var(--admin-ring); }
+
+/* The depth, as the first thing in the row. Fixed width so the labels beside it
+   line up whether the count is 0 or 12. */
+.dash-queue__count {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 11px;
-  background: var(--admin-mint-soft);
-  color: var(--admin-green);
-  transition: background 0.18s var(--admin-ease);
+  min-width: 34px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--admin-muted);
 }
-.dash-card__icon svg { width: 20px; height: 20px; }
-.dash-card:hover .dash-card__icon { background: #d3f2df; }
-.dash-card__pill {
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
+.dash-queue__count svg { width: 19px; height: 19px; color: var(--admin-green); }
+
+.dash-queue__body { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.dash-queue__label { font-size: 14px; font-weight: 600; color: var(--admin-text); }
+.dash-queue__note { font-size: 12.5px; color: var(--admin-muted); }
+
+.dash-queue__action {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #f2e0b4;
+  border-radius: var(--gp-radius);
   background: #fdf1d8;
+  font-size: 12.5px;
+  font-weight: 600;
   color: #8a6316;
 }
+.dash-queue__action svg { transition: transform 0.18s var(--admin-ease); }
+.dash-queue__row:hover .dash-queue__action svg { transform: translateX(3px); }
 
-.dash-card__value {
-  font-size: 30px;
+/* Open rows carry the amber, and only on the count and the way in — the row's
+   background stays white so a busy dashboard doesn't become a wall of tint. */
+.dash-queue__row.is-open .dash-queue__count { color: #8a6316; }
+
+/* Stat strip -----------------------------------------------------------------
+   Three standing figures. They are not actionable and they are not urgent, so
+   they get one strip between them rather than three shadowed cards competing
+   with the queue above. Dividers, not gaps: the figures belong to each other. */
+.dash-stats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-surface);
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
+}
+.dash-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.16s var(--admin-ease);
+}
+.dash-stat + .dash-stat { border-left: 1px solid var(--admin-border); }
+.dash-stat:hover { background: var(--admin-bg-soft, #f7faf8); }
+.dash-stat:focus-visible { outline: none; box-shadow: var(--admin-ring); }
+
+.dash-stat__value {
+  font-size: 26px;
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1;
   color: var(--admin-text);
 }
-.dash-card__label {
-  margin-top: 6px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--admin-muted);
-}
-.dash-card__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--admin-border);
-  font-size: 12.5px;
-  color: var(--admin-muted);
-}
-.dash-card__foot-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--admin-green);
-  font-weight: 600;
-}
-.dash-card__foot-cta svg { transition: transform 0.18s var(--admin-ease); }
-.dash-card:hover .dash-card__foot-cta svg { transform: translateX(3px); }
-
-/* Alert variant: an outstanding queue that needs action. */
-.dash-card--alert {
-  border-color: #f2e0b4;
-  background: linear-gradient(180deg, #fffdf7 0%, var(--admin-surface) 60%);
-}
-.dash-card--alert .dash-card__icon { background: #fdf1d8; color: #8a6316; }
-.dash-card--alert:hover .dash-card__icon { background: #fbe9c4; }
-.dash-card--alert .dash-card__value { color: #6f4e12; }
-.dash-card--alert .dash-card__foot-cta { color: #8a6316; }
+.dash-stat__label { font-size: 13.5px; font-weight: 500; color: var(--admin-text-2); }
+.dash-stat__note { font-size: 12px; color: var(--admin-muted); }
 
 /* Recent-activity two-column layout */
 .dash-cols {
@@ -1015,7 +1031,9 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  /* A rounded SQUARE tile, not a circular avatar, so it follows the product's
+     box radius rather than staying with the round ones. */
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-3);
   color: var(--admin-text-2);
   font-size: 12.5px;
@@ -1043,11 +1061,19 @@
 .dash-list__meta { font-size: 12px; color: var(--admin-muted); white-space: nowrap; }
 
 @media (max-width: 1000px) {
-  .dash-grid--4 { grid-template-columns: repeat(2, 1fr); }
   .dash-cols { grid-template-columns: 1fr; }
 }
+/* The strip stacks rather than squeezing three 26px figures into a phone
+   width. Rows, so the divider turns with it — a vertical rule between stacked
+   segments would separate nothing. */
 @media (max-width: 620px) {
-  .dash-grid--3, .dash-grid--4 { grid-template-columns: 1fr; }
+  .dash-stats { grid-auto-flow: row; }
+  .dash-stat + .dash-stat { border-left: 0; border-top: 1px solid var(--admin-border); }
+  /* The action loses its label and keeps the arrow; the row is already a link
+     and the label is the widest thing competing with the queue name. */
+  .dash-queue__row { gap: 12px; padding: 14px; }
+  .dash-queue__action { padding: 6px 9px; }
+  .dash-queue__action-label { display: none; }
 }
 
 /* Modal ----------------------------------------------------------------- */
@@ -1060,7 +1086,7 @@
   animation: admin-fade 0.16s var(--admin-ease);
 }
 .admin-modal {
-  background: #fff; border-radius: 16px; padding: 26px;
+  background: #fff; border-radius: var(--gp-radius); padding: 26px;
   max-width: 420px; width: 100%;
   box-shadow: var(--admin-shadow-lg);
   border: 1px solid var(--admin-border);
@@ -1073,7 +1099,7 @@
   width: 44px;
   height: 44px;
   margin-bottom: 14px;
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   background: var(--admin-mint-soft);
   color: var(--admin-green);
 }
@@ -1131,7 +1157,7 @@
   height: 34px;
   padding: 0;
   border: 1px solid var(--admin-border);
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
   color: var(--admin-muted);
   cursor: pointer;
@@ -1219,7 +1245,7 @@
   padding: 40px 40px 44px;
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 18px;
+  border-radius: var(--gp-radius);
   box-shadow:
     0 1px 2px rgba(16, 40, 24, 0.04),
     0 24px 48px -20px rgba(16, 40, 24, 0.22),
@@ -1287,7 +1313,7 @@
   height: 34px;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: transparent;
   color: var(--admin-muted);
   cursor: pointer;
@@ -1305,7 +1331,7 @@
 .admin-login__spinner {
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--gp-radius);
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #fff;
   animation: admin-spin 0.7s linear infinite;
@@ -1332,7 +1358,7 @@
 @keyframes admin-spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 560px) {
-  .admin-login__card { padding: 28px 24px 32px; border-radius: 16px; }
+  .admin-login__card { padding: 28px 24px 32px; border-radius: var(--gp-radius); }
   .admin-login__art { width: 90%; height: 60%; top: -6%; }
   .admin-login__art--right { right: -30%; }
   .admin-login__art--left { left: -30%; }
@@ -1352,7 +1378,7 @@
   flex-direction: column;
   background: var(--admin-surface);
   border: 1px solid var(--admin-border);
-  border-radius: 14px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
   box-shadow: var(--admin-shadow);
   transition: transform 0.18s var(--admin-ease), box-shadow 0.18s var(--admin-ease),
@@ -1390,7 +1416,7 @@
   background:
     radial-gradient(120% 90% at 20% 0%, rgba(126, 226, 168, 0.35), transparent 60%),
     linear-gradient(150deg, var(--admin-green) 0%, var(--admin-green-600) 55%, #082a11 100%);
-  color: rgba(255, 255, 255, 0.55);
+  color: #fff;
 }
 .admin-libcard__ph svg { width: 40px; height: 40px; }
 
@@ -1412,7 +1438,7 @@
   align-items: center;
   gap: 4px;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 12px;
   font-weight: 600;
   color: var(--admin-green);
@@ -1436,7 +1462,7 @@
   right: 10px;
   z-index: 2;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -1453,7 +1479,7 @@
   right: 10px;
   z-index: 2;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   font-size: 12px;
   font-weight: 600;
   color: #fff;
@@ -1473,7 +1499,7 @@
   width: 48px;
   height: 48px;
   padding-left: 4px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 18px;
   color: var(--admin-green);
   background: rgba(255, 255, 255, 0.9);
@@ -1516,7 +1542,7 @@
   display: inline-flex;
   align-items: center;
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--admin-mint-soft);
   color: var(--admin-green);
   font-size: 12px;
@@ -1655,7 +1681,7 @@
   flex-shrink: 0;
   width: 52px;
   height: 52px;
-  border-radius: 14px;
+  border-radius: var(--gp-radius);
   background: var(--admin-mint-soft);
   color: var(--admin-green);
 }
@@ -1742,7 +1768,7 @@
   left: 9px;
   z-index: 2;
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -1759,7 +1785,7 @@
   right: 9px;
   z-index: 2;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   font-size: 11px;
   font-weight: 600;
   color: #fff;
@@ -1787,7 +1813,7 @@
   gap: 6px;
   padding: 7px 12px;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--gp-radius);
   background: #fff;
   color: var(--admin-text);
   font: inherit;
@@ -1830,7 +1856,7 @@
   align-items: center;
   gap: 4px;
   padding: 1px 8px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-3);
   color: var(--admin-text-2);
   font-weight: 600;
@@ -1856,11 +1882,11 @@
 /* Courses review (LMS submissions) ------------------------------------------
    Courses are authored in the LMS; this screen approves them and picks what the
    homepage features. */
-.admin-seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--admin-border); border-radius: 999px; background: var(--admin-surface); }
-.admin-seg__btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 15px; border: 0; border-radius: 999px; background: none; color: var(--admin-muted); font-family: inherit; font-size: 13.5px; font-weight: 550; cursor: pointer; }
+.admin-seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--admin-border); border-radius: var(--gp-radius); background: var(--admin-surface); }
+.admin-seg__btn { display: inline-flex; align-items: center; gap: 7px; padding: 7px 15px; border: 0; border-radius: var(--gp-radius); background: none; color: var(--admin-muted); font-family: inherit; font-size: 13.5px; font-weight: 550; cursor: pointer; }
 .admin-seg__btn:hover { background: var(--admin-surface-3); color: var(--admin-text); }
 .admin-seg__btn.is-active { background: var(--admin-green); color: #fff; }
-.admin-seg__count { padding: 1px 7px; border-radius: 999px; background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; }
+.admin-seg__count { padding: 1px 7px; border-radius: var(--gp-radius); background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; }
 .admin-seg__btn.is-active .admin-seg__count { background: rgba(255,255,255,0.18); color: #fff; }
 
 .admin-courses { display: flex; flex-direction: column; gap: 14px; }
@@ -1870,7 +1896,7 @@
 .admin-course__meta { margin: 3px 0 0; font-size: 12.5px; color: var(--admin-muted); }
 .admin-course__stats { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 12.5px; color: var(--admin-muted); }
 .admin-course__stats strong { color: var(--admin-text); }
-.admin-course__note { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; background: #fdf1d8; color: #6f4e12; font-size: 13px; }
+.admin-course__note { margin: 12px 0 0; padding: 10px 12px; border-radius: var(--gp-radius); background: #fdf1d8; color: #6f4e12; font-size: 13px; }
 .admin-course__foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--admin-border); }
 .admin-course__feature { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--admin-text-2); cursor: pointer; }
 .admin-course__feature input { width: 16px; height: 16px; accent-color: var(--admin-green); }
@@ -1880,7 +1906,7 @@
    them instead of butting up against the stats above. */
 .admin-course > .admin-course__actions { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--admin-border); }
 
-.admin-badge { padding: 3px 10px; border-radius: 999px; background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.admin-badge { padding: 3px 10px; border-radius: var(--gp-radius); background: var(--admin-surface-3); color: var(--admin-muted); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 .admin-badge--ok { background: var(--admin-mint-soft); color: var(--admin-green); }
 .admin-badge--warn { background: #fdf1d8; color: #8a6316; }
 .admin-badge--danger { background: #fbecea; color: var(--admin-danger); }
@@ -1906,7 +1932,7 @@
 }
 .admin-curric__total {
   display: inline-flex; align-items: baseline; gap: 5px;
-  padding: 5px 10px; border-radius: 999px;
+  padding: 5px 10px; border-radius: var(--gp-radius);
   background: var(--admin-mint-soft); color: var(--admin-green);
   font-size: 12.5px;
 }
@@ -1922,7 +1948,7 @@
 
 .admin-curric__mod {
   border: 1px solid var(--admin-border);
-  border-radius: 12px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
   background: var(--admin-surface);
 }
@@ -1935,7 +1961,7 @@
 .admin-curric__mod-no {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; flex-shrink: 0;
-  border-radius: 7px;
+  border-radius: var(--gp-radius);
   background: var(--admin-green); color: #fff;
   font-size: 12px; font-weight: 650;
 }
@@ -1959,7 +1985,7 @@
 .admin-curric__kind {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 52px; padding: 2px 8px; flex-shrink: 0;
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: var(--admin-mint-soft); color: var(--admin-green);
   font-size: 12px; font-weight: 600; letter-spacing: 0;
   /* KIND_LABEL carries the casing, but an unrecognised kind falls through to
@@ -1973,7 +1999,7 @@
 .admin-curric__lesson-title { flex: 1; min-width: 0; }
 .admin-curric__flags { display: flex; gap: 6px; flex-shrink: 0; }
 .admin-curric__flag {
-  padding: 2px 7px; border-radius: 999px;
+  padding: 2px 7px; border-radius: var(--gp-radius);
   font-size: 11px; white-space: nowrap;
   background: var(--admin-mint-soft); color: var(--admin-green);
 }
@@ -1983,7 +2009,7 @@
 
 .admin-curric__empty {
   padding: 18px 14px; text-align: center;
-  border: 1px dashed var(--admin-border); border-radius: 10px;
+  border: 1px dashed var(--admin-border); border-radius: var(--gp-radius);
   color: var(--admin-muted); font-size: 13px;
 }
 
@@ -2003,7 +2029,7 @@
   flex-shrink: 0;
   padding: 3px 10px;
   border: 1px solid var(--admin-border);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
   font-size: 12px;
   color: var(--admin-text-2);
@@ -2038,7 +2064,7 @@
   position: relative;
   aspect-ratio: 16 / 9;
   max-width: 420px;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
   background: #000;
 }
@@ -2051,7 +2077,7 @@
   overflow-y: auto;
   padding: 8px 10px;
   border: 1px solid var(--admin-border);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface);
 }
 .admin-curric__cues p { margin: 0 0 4px; font-size: 12.5px; line-height: 1.5; }
@@ -2080,7 +2106,7 @@
   width: 7px;
   height: 7px;
   border: 1px solid var(--admin-border);
-  border-radius: 50%;
+  border-radius: var(--gp-radius);
 }
 /* The answer key, visible because this route is staff-only and a marking
    scheme a reviewer can't see is one they can't check. */
@@ -2105,7 +2131,7 @@
 .admin-curric__video {
   width: 100%;
   max-width: 460px;
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   background: #000;
   display: block;
 }
@@ -2116,7 +2142,7 @@
   margin: 12px 0;
   padding: 12px 14px 12px 30px;
   border: 1px solid var(--admin-line);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   background: var(--admin-surface-2, #f7f9f8);
   display: flex;
   flex-direction: column;

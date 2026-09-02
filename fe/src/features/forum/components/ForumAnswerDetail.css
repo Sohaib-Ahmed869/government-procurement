@@ -20,7 +20,7 @@
   font-weight: 500;
   color: var(--gp-green-900);
   background: var(--gp-mint-300);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   text-decoration: none;
   transition: opacity 0.25s ease;
 }

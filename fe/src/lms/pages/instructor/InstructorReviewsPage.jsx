@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import RatingStars from '../../components/community/RatingStars.jsx';
 import { useInstructorReviews } from '../../hooks/useReviews.js';
+import Select from '../../components/Select.jsx';
 
 function on(iso) {
   return new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -210,19 +211,16 @@ export default function InstructorReviewsPage() {
               />
               <span>{POOR} stars and below</span>
             </label>
-            <label className="lms-sort">
-              <span className="lms-sr-only">Filter by course</span>
-              <select
-                className="lms-select"
-                value={courseFilter}
-                onChange={(e) => setCourseFilter(e.target.value)}
-              >
-                <option value="all">All courses</option>
-                {courses.map((c) => (
-                  <option key={c._id} value={c.slug}>{c.title}</option>
-                ))}
-              </select>
-            </label>
+            <Select
+              className="lms-sort"
+              aria-label="Filter by course"
+              value={courseFilter}
+              onChange={setCourseFilter}
+              options={[
+                { value: 'all', label: 'All courses' },
+                ...courses.map((c) => ({ value: c.slug, label: c.title })),
+              ]}
+            />
           </div>
         </div>
 

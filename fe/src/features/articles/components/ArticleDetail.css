@@ -8,8 +8,10 @@
   /* Fill behind the topic pill and the author's initial disc. Follows the
      segment: green for Award, grey for Win. */
   --art-chip: linear-gradient(180deg, #2f7d45 0%, #276a39 100%);
-  --art-text: rgba(255, 255, 255, 0.84);
-  --art-muted: rgba(255, 255, 255, 0.6);
+  /* Both were washes of white; both now read at full strength, like the rest
+     of the dark hero. */
+  --art-text: #fff;
+  --art-muted: #fff;
 
   font-family: 'Geist Variable', system-ui, sans-serif;
   background: var(--art-bg);
@@ -142,7 +144,7 @@
 }
 
 .article-hero__sep {
-  color: rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 /* ---------- Byline ----------
@@ -321,7 +323,7 @@
   gap: 8px;
   padding: 8px 14px;
   border: 1px solid var(--art-border);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -439,7 +441,7 @@
 .article-related__topic {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff;
 }
 
 .article-related__date {
@@ -460,7 +462,7 @@
   margin-top: 20px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff;
 }
 
 /* ---------- Reveal animation ---------- */
@@ -802,7 +804,7 @@
 
 .article-related__meta,
 .article-related__date {
-  color: rgba(255, 255, 255, 0.72);
+  color: #fff;
 }
 
 .article-related__topic {
@@ -813,7 +815,7 @@
   margin-top: 20px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: #fff;
 }
 
 /* ---------- Reveal animation ---------- */

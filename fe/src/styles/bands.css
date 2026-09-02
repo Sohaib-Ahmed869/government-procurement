@@ -30,7 +30,12 @@
   color: #fff;
 
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.72);
+  /* Secondary copy on a dark band is full white, not a 72% wash of it: the
+     lede under a heading and the meta line under a card title now read at the
+     same strength as everything else on the band. The old value survives as
+     the placeholder role, which still has to look like an empty field. */
+  --band-muted: #fff;
+  --band-placeholder: rgba(255, 255, 255, 0.72);
   --band-line: rgba(255, 255, 255, 0.12);
   /* The bright accent is built for dark grounds — see the note on
      --gp-accent-ink in tokens.css. */
@@ -47,6 +52,7 @@
 
   --band-ink: var(--gp-ink);
   --band-muted: var(--gp-muted);
+  --band-placeholder: var(--gp-placeholder);
   --band-line: var(--gp-line);
   /* …and the darkened one is what passes AA on paper. */
   --band-accent: var(--gp-accent-ink);

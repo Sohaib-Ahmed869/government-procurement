@@ -106,6 +106,12 @@ export function useDashboard() {
     const inProgress = enrolments.filter(
       (e) => (e.lessonsTotal ?? 0) > 0 && (e.lessonsDone ?? 0) < e.lessonsTotal,
     );
+    // Every lesson in the course done. The complement of `inProgress` among
+    // enrolments that HAVE lessons — a course with no lessons published is
+    // neither under way nor finished, and must not count as either.
+    const completed = enrolments.filter(
+      (e) => (e.lessonsTotal ?? 0) > 0 && (e.lessonsDone ?? 0) >= e.lessonsTotal,
+    );
 
     /* The resume panel. The most recently touched course that still has a
        lesson left in it — which is what "continue" means, and is not the same
@@ -226,7 +232,7 @@ export function useDashboard() {
       recent,
       courseMix,
       stats: {
-        inProgress: inProgress.length,
+        completed: completed.length,
         enrolled: enrolments.length,
         certificates: certificates.length,
         quizzesPassed: quizzes.filter((q) => q.best?.passed).length,

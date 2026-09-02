@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import DonutChart from '../../components/progress/DonutChart.jsx';
+import ProgressRing from '../../components/progress/ProgressRing.jsx';
 import SessionCalendar from '../../components/growth/SessionCalendar.jsx';
 import { useInstructorCourses, summariseCourses } from '../../hooks/useInstructor.js';
 import { useAuthoredSessions, formatSessionClock, relativeTo } from '../../hooks/useLiveSessions.js';
@@ -12,9 +13,15 @@ import { firstNameOf } from '../../utils/names.js';
    The instructor's home (R1).
 
    Built to the same shape as the learner's dashboard, because it answers the
-   same question from the other side of the course: a KPI row, then a band of
-   two cards — one that says where the work landed, one that says what is
-   coming — then the list.
+   same question from the other side of the course. It shares that page's grid
+   and its figures panel outright — .lms-dash-grid with a different set of named
+   areas, and .lms-gauges unchanged — so the two dashboards cannot drift into
+   looking like two products.
+
+   The one structural difference is Your courses, which runs the full width at
+   the foot. It grows by a row per course, and pairing a card that grows against
+   one that does not guarantees a hole in whichever is shorter — and guarantees
+   the hole moves as courses are added. Everything above it is fixed height.
 
    Everything on it comes from two requests, and deliberately only two:
 
@@ -102,55 +109,65 @@ export default function InstructorDashboardPage() {
     [live.sessions],
   );
 
-  /* The four headline figures, drawn as the learner's are.
+  /* The four headline figures, drawn exactly as the learner's are: a ring where
+     there is a real whole to be a part of, the figure itself where there is
+     not, and a state pill under each.
 
-     Each one carries a supporting line, because on this side of the course
-     every headline has an obvious follow-up question: how many of those courses
-     are actually live, how many of those lessons have video, how many people
-     left the rating. A tile that answers only the first is half a tile. */
-  const tiles = [
+     Two have a whole. Courses published is of every course authored, and a
+     rating is of five — so the rating's ring draws 4.6/5 as a 92% arc while its
+     centre still reads "4.6", because 92% is a number the instructor never
+     asked about. Enrolments and lessons have no ceiling and get no arc, the
+     same rule the learner's dashboard follows. */
+  const gauges = [
     {
       key: 'courses',
-      icon: 'book',
-      label: 'Courses',
-      value: s.courses,
-      hint: s.courses
-        ? `${s.published} published${s.pending ? `, ${s.pending} in review` : ''}`
-        : 'Nothing created yet',
+      label: 'Courses published',
+      value: s.published,
+      percent: s.courses ? (s.published / s.courses) * 100 : null,
       to: '/learn/instructor/courses',
+      pill: s.courses
+        ? `${s.published} of ${s.courses}${s.pending ? `, ${s.pending} in review` : ''}`
+        : 'Nothing created yet',
+      tone: s.courses && s.published === s.courses ? 'good' : '',
     },
     {
       key: 'learners',
-      icon: 'users',
       // Enrolments, not people: someone taking two of these courses is two
       // enrolments and one person. The label says what is counted.
       label: 'Enrolments',
       value: s.learners.toLocaleString('en-AU'),
-      hint: s.withLearners
+      to: '/learn/instructor/students',
+      pill: s.withLearners
         ? `Across ${s.withLearners} of ${s.courses} courses`
         : 'Nobody enrolled yet',
-      to: '/learn/instructor/students',
+      tone: s.learners > 0 ? 'good' : '',
     },
     {
       key: 'lessons',
-      icon: 'lessons',
       label: 'Lessons published',
       value: s.lessons,
-      hint: s.missingTranscripts
+      to: '/learn/instructor/courses',
+      pill: s.missingTranscripts
         ? `${s.missingTranscripts} without a transcript`
         : 'All videos transcribed',
-      direction: s.missingTranscripts ? 'down' : undefined,
-      to: '/learn/instructor/courses',
+      // Green either way. The count is a fact about the library, not a fault to
+      // be flagged twice — the alert above the grid is what asks for the work,
+      // and amber here made the same point a second time in the one colour on
+      // the page that is not the brand's.
+      tone: 'good',
     },
     {
       key: 'rating',
-      icon: 'star',
       label: 'Average rating',
-      value: s.averageRating ?? '-',
-      hint: s.ratedCount
+      value: s.averageRating ?? '—',
+      // Out of five, which is the whole a rating is a part of.
+      percent: s.averageRating ? (Number(s.averageRating) / 5) * 100 : null,
+      display: s.averageRating ?? undefined,
+      to: '/learn/instructor/reviews',
+      pill: s.ratedCount
         ? `${s.ratedCount} ${s.ratedCount === 1 ? 'course' : 'courses'} rated`
         : 'No ratings yet',
-      to: '/learn/instructor/reviews',
+      tone: Number(s.averageRating) >= 4 ? 'good' : '',
     },
   ];
 
@@ -198,29 +215,63 @@ export default function InstructorDashboardPage() {
 
       {status === 'ready' && (
         <>
-          {/* ---- the headline row ---- */}
-          <div className="lms-kpis">
-            {tiles.map((t) => (
-              <Link key={t.key} to={t.to} className="lms-stat lms-kpi">
-                <span className="lms-kpi__top">
-                  <span className="lms-stat__label">{t.label}</span>
-                  <span className="lms-stat__icon"><LmsIcon name={t.icon} /></span>
-                </span>
-                <span className="lms-stat__value">{t.value}</span>
-                <span className={`lms-stat__hint${t.direction ? ` is-${t.direction}` : ''}`}>
-                  {t.hint}
-                </span>
+          {/* The one piece of work worth interrupting for. Above the grid, not
+              in it: it is an alert about something to go and fix, and it is
+              absent entirely on an account with nothing outstanding — an area
+              in the grid that disappears would leave the row it sat in. */}
+          {s.missingTranscripts > 0 ? (
+            <section className="lms-card lms-todo">
+              <span className="lms-todo__icon">
+                <LmsIcon name="text" />
+              </span>
+              <div className="lms-todo__body">
+                <p className="lms-todo__title">
+                  {s.missingTranscripts} video lesson{s.missingTranscripts === 1 ? '' : 's'} without a transcript
+                </p>
+                <p className="lms-todo__text">
+                  Transcripts make lessons searchable and usable without sound, and they’re
+                  required for accessibility.
+                </p>
+              </div>
+              <Link className="lms-btn lms-btn--primary lms-btn--sm" to="/learn/instructor/courses">
+                Review courses
               </Link>
-            ))}
-          </div>
+            </section>
+          ) : null}
 
-          {/* ---- where the learners are, and what is scheduled ---- */}
-          <div className="lms-dash-row">
+          <div className="lms-dash-grid lms-dash-grid--instructor">
+            {/* The learner dashboard's figures panel, unchanged: four readings
+                in one bordered card, two per row, spanning the first two rows
+                of the right column. */}
+            <section className="lms-card lms-gauges">
+              <div className="lms-gauges__row">
+                {gauges.map((g) => (
+                  <Link key={g.key} to={g.to} className="lms-gauge">
+                    <span className="lms-gauge__mark">
+                      {g.percent === null || g.percent === undefined ? (
+                        <span className="lms-gauge__figure">{g.value}</span>
+                      ) : (
+                        <ProgressRing
+                          percent={g.percent}
+                          display={g.display}
+                          label={g.label}
+                          size={108}
+                          stroke={10}
+                        />
+                      )}
+                    </span>
+                    <span className="lms-gauge__label">{g.label}</span>
+                    <span className={`lms-gauge__pill${g.tone ? ` is-${g.tone}` : ''}`}>{g.pill}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
             {/* `--centre` puts the ring in the middle of the card's height
                 rather than under the heading with the rest of the card empty;
                 `lms-donut-lead` lets the legend use the width of the wide
                 column, which the learner's third-of-a-row donut has not got. */}
-            <section className="lms-card lms-card--centre lms-donut-lead">
+            <section className="lms-card lms-card--centre lms-donut-lead lms-dash-mix">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <LmsIcon name="pie" />
@@ -255,7 +306,7 @@ export default function InstructorDashboardPage() {
               )}
             </section>
 
-            <section className="lms-card">
+            <section className="lms-card lms-dash-live">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <LmsIcon name="video" />
@@ -309,72 +360,51 @@ export default function InstructorDashboardPage() {
                 </>
               )}
             </section>
-          </div>
 
-          {/* The one piece of work worth surfacing: video without transcripts. */}
-          {s.missingTranscripts > 0 ? (
-            <section className="lms-card lms-todo" style={{ marginBottom: 12 }}>
-              <span className="lms-todo__icon">
-                <LmsIcon name="text" />
-              </span>
-              <div className="lms-todo__body">
-                <p className="lms-todo__title">
-                  {s.missingTranscripts} video lesson{s.missingTranscripts === 1 ? '' : 's'} without a transcript
-                </p>
-                <p className="lms-todo__text">
-                  Transcripts make lessons searchable and usable without sound, and they’re
-                  required for accessibility.
-                </p>
-              </div>
-              <Link className="lms-btn lms-btn--primary lms-btn--sm" to="/learn/instructor/courses">
-                Review courses
-              </Link>
-            </section>
-          ) : null}
-
-          <section className="lms-card">
-            <div className="lms-card__head">
-              <h2 className="lms-card__title">
-                <LmsIcon name="book" />
-                Your courses
-              </h2>
-              <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/instructor/courses">
-                View all
-              </Link>
-            </div>
-
-            {courses.length === 0 ? (
-              <div className="lms-blank">
-                <LmsIcon name="book" className="lms-blank__icon" />
-                <h2>No courses yet</h2>
-                <p>
-                  A course is modules, and a module is lessons. Start with the outline. You can
-                  add video, transcripts and quizzes as you go.
-                </p>
-                <Link className="lms-btn lms-btn--primary" to="/learn/instructor/courses/new">
-                  <LmsIcon name="plus" />
-                  Create your first course
+            <section className="lms-card lms-dash-courses">
+              <div className="lms-card__head">
+                <h2 className="lms-card__title">
+                  <LmsIcon name="book" />
+                  Your courses
+                </h2>
+                <Link className="lms-btn lms-btn--sm lms-btn--ghost" to="/learn/instructor/courses">
+                  View all
                 </Link>
               </div>
-            ) : (
-              <div className="lms-list">
-                {courses.map((c) => (
-                  <Link key={c._id} to={`/learn/instructor/courses/${c._id}`} className="lms-list__item">
-                    <span className="lms-list__icon"><LmsIcon name="book" /></span>
-                    <span className="lms-list__body">
-                      <span className="lms-list__title">{c.title}</span>
-                      <span className="lms-list__meta">
-                        {c.moduleCount} modules · {c.lessonCount} lessons · {c.learners.toLocaleString('en-AU')} enrolments
-                      </span>
-                    </span>
-                    <span className="lms-list__trail">
-                      {c.learners?.toLocaleString('en-AU') ?? 0} enrolled
-                    </span>
+
+              {courses.length === 0 ? (
+                <div className="lms-blank">
+                  <LmsIcon name="book" className="lms-blank__icon" />
+                  <h2>No courses yet</h2>
+                  <p>
+                    A course is modules, and a module is lessons. Start with the outline. You can
+                    add video, transcripts and quizzes as you go.
+                  </p>
+                  <Link className="lms-btn lms-btn--primary" to="/learn/instructor/courses/new">
+                    <LmsIcon name="plus" />
+                    Create your first course
                   </Link>
-                ))}
-              </div>
-            )}
-          </section>
+                </div>
+              ) : (
+                <div className="lms-list">
+                  {courses.map((c) => (
+                    <Link key={c._id} to={`/learn/instructor/courses/${c._id}`} className="lms-list__item">
+                      <span className="lms-list__icon"><LmsIcon name="book" /></span>
+                      <span className="lms-list__body">
+                        <span className="lms-list__title">{c.title}</span>
+                        <span className="lms-list__meta">
+                          {c.moduleCount} modules · {c.lessonCount} lessons · {c.learners.toLocaleString('en-AU')} enrolments
+                        </span>
+                      </span>
+                      <span className="lms-list__trail">
+                        {c.learners?.toLocaleString('en-AU') ?? 0} enrolled
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
         </>
       )}
     </div>

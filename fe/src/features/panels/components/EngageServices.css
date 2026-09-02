@@ -75,7 +75,7 @@
   gap: 7px;
   padding: 9px 15px;
   border: 1px solid var(--gp-line);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--gp-paper);
   color: var(--gp-ink);
   font-size: 13.5px;

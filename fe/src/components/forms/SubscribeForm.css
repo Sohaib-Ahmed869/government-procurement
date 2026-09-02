@@ -109,13 +109,13 @@
   color: var(--gp-ink);
   background: var(--gp-paper);
   border: 1px solid var(--gp-line);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   transition: var(--gp-fade), box-shadow 150ms var(--gp-ease);
 }
 
 .subscribe-form__input::placeholder {
-  color: var(--gp-muted);
-  opacity: 0.75;
+  color: var(--gp-placeholder);
+  opacity: 1;
 }
 
 .subscribe-form__input:focus-visible {
@@ -143,7 +143,7 @@
   color: #fff;
   background: var(--gp-brand);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   cursor: pointer;
   /* Hover has to feel immediate. --gp-fade runs at --gp-swap (480ms), which is
      the segment cross-fade's pace and far too slow for a pointer: the button

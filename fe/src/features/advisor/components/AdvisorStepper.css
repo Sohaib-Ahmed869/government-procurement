@@ -236,7 +236,7 @@
   flex-direction: column;
   flex-shrink: 0;
   border: 1px solid var(--gp-line);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
 }
 
@@ -306,7 +306,7 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   border: 1px solid transparent;
   cursor: pointer;
   transition:

@@ -32,7 +32,7 @@
 
 .tm[data-audience='win'] {
   --tm-accent: #c9c9c9;
-  --tm-location: #c9c9c9;
+  --tm-location: #fff;
   /* The pill itself carries the grey, not the writing on it. A light wash of
      white over the dark band reads as grey while leaving the label at full
      white — greying the text as well was the previous attempt and cost 30% of
@@ -303,7 +303,7 @@
   text-decoration: none;
   background: var(--tm-action-fill, rgba(255, 255, 255, 0.08));
   border: 1px solid var(--tm-action-line, rgba(255, 255, 255, 0.7));
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   transition:
     background-color 0.15s ease,
     border-color 0.15s ease;
@@ -421,7 +421,7 @@
   color: var(--band-on-accent);
   text-decoration: none;
   background: var(--band-accent);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   transition: filter 0.15s ease;
 }
 
@@ -660,7 +660,7 @@
   cursor: pointer;
   background: var(--band-surface-hover);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   transition: background-color 0.15s ease;
 }
 

@@ -137,7 +137,7 @@
   display: block;
   margin-top: 20px;
   padding: 14px 20px;
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   background: var(--band-accent);
   color: var(--band-on-accent);
   font-size: 15px;

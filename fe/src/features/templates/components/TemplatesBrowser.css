@@ -146,7 +146,7 @@
   color: var(--gp-paper);
   background: var(--gp-brand);
   border: 1px solid var(--gp-brand);
-  border-radius: 999px;
+  border-radius: var(--gp-radius);
   transition:
     background 160ms var(--gp-ease),
     border-color 160ms var(--gp-ease),

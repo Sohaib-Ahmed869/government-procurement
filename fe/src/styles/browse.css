@@ -208,7 +208,7 @@
   color: var(--gp-accent-ink);
   background: none;
   border: 1px solid var(--gp-line);
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   cursor: pointer;
   transition: border-color 160ms var(--gp-ease);
 }
@@ -293,7 +293,7 @@
     color: var(--gp-ink);
     background: var(--gp-paper-alt);
     border: 1px solid var(--gp-line);
-    border-radius: 12px;
+    border-radius: var(--gp-radius);
     cursor: pointer;
   }
 

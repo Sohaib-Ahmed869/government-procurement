@@ -220,7 +220,7 @@
   font-size: 13.5px;
   color: #fff;
   border: 0;
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
 }
 
 .tp__search-wrap {
@@ -250,7 +250,9 @@
 }
 
 .tp__search::placeholder {
-  color: rgba(255, 255, 255, 0.55);
+  /* Raised from 0.55. Still lighter than typed text, so an empty field still
+     reads as empty, but no longer a faint wash on the dark bar. */
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .tp__select {
@@ -327,7 +329,7 @@
   cursor: pointer;
   background: none;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--gp-radius);
   transition: background-color 0.15s ease;
 }
 
@@ -538,7 +540,7 @@
   color: var(--band-ink);
   text-decoration: none;
   white-space: nowrap;
-  border-radius: 100px;
+  border-radius: var(--gp-radius);
   border: 1px solid var(--band-line);
   background: var(--band-surface-hover);
   -webkit-backdrop-filter: blur(12px);
@@ -675,7 +677,9 @@
   .tp__search {
     height: 48px;
     padding-left: 46px;
-    border-radius: 12px;
+    /* Same corner as the wide layout — this step only changes the field's
+       height and type, not its shape. */
+    border-radius: var(--gp-radius);
     font-size: 15px;
   }
 

@@ -18,7 +18,7 @@
   margin: 0 0 22px;
   padding: 18px 20px;
   border: 1px solid var(--admin-line, #e3e6e4);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
 }
 
 .arp__legend {
@@ -41,7 +41,7 @@
   line-height: 1.55;
   color: var(--admin-muted);
   background: var(--admin-sunken, #f4f6f5);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
 }
 
 /* --- one figure ----------------------------------------------------------- */
@@ -87,7 +87,7 @@
   padding: 0 12px;
   background: #fff;
   border: 1px solid var(--admin-line, #d7dcd9);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
 }
 
 .arp__input:focus-within {
@@ -123,7 +123,7 @@
 .arp__source {
   margin-bottom: 8px;
   border: 1px solid var(--admin-line, #e3e6e4);
-  border-radius: 6px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
 }
 
@@ -169,7 +169,7 @@
 .arp__current-panel {
   margin: 0 0 28px;
   border: 1px solid var(--admin-line, #e3e6e4);
-  border-radius: 8px;
+  border-radius: var(--gp-radius);
   overflow: hidden;
 }
 

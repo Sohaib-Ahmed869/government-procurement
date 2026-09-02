@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import ProgressBar from '../../components/progress/ProgressBar.jsx';
+import ProgressRing from '../../components/progress/ProgressRing.jsx';
 import { firstNameOf } from '../../utils/names.js';
 import ActivityChart from '../../components/progress/ActivityChart.jsx';
 import DonutChart from '../../components/progress/DonutChart.jsx';
@@ -49,18 +50,15 @@ import { useLiveSessions, formatSessionClock, relativeTo } from '../../hooks/use
 
 const ICONS = {
   book: <><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" /><path d="M4 19a2 2 0 0 1 2-2h13" /></>,
-  award: <><circle cx="12" cy="9" r="6" /><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7" /></>,
   play: <><circle cx="12" cy="12" r="9" /><path d="m10 8.5 6 3.5-6 3.5z" /></>,
   quiz: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9.5 12.5a1.6 1.6 0 0 1 3 .6c0 1.1-1.5 1.3-1.5 2.2" /><path d="M11 18h.01" /></>,
   video: <><rect x="2" y="5" width="14" height="14" rx="2.5" /><path d="m16 10 6-3v10l-6-3z" /></>,
   doc: <><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h6" /></>,
-  check: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></>,
   flame: <><path d="M12 3c3 3.5 5 6 5 9a5 5 0 0 1-10 0c0-1.6.6-3 1.7-4.4.4 1 1 1.7 1.8 2.1C10.3 7.6 11 5.2 12 3z" /></>,
   chart: <><path d="M3 3v18h18" /><path d="M7 15l4-5 3 3 5-7" /></>,
   pie: <><path d="M12 3a9 9 0 1 0 9 9h-9z" /><path d="M14 2.6A9 9 0 0 1 21.4 10H14z" /></>,
   live: <><rect x="2" y="5" width="14" height="14" rx="2.5" /><path d="m16 10 6-3v10l-6-3z" /></>,
-  trend: <><path d="M3 17 9 11l4 4 8-8" /><path d="M15 7h6v6" /></>,
 };
 
 function Icon({ name, className }) {
@@ -192,48 +190,60 @@ export default function DashboardPage() {
     ];
   }, [courseMix]);
 
-  /* The four headline figures, all four drawn the same.
+  /* The four headline figures, as one panel of gauges rather than four tiles.
 
-     Minutes learned leads because it is the figure that MOVES — the other three
-     change a handful of times a year, and a tile that reads the same every day
-     is not a headline. It used to be shaded a step darker to say so, which read
-     as a status on that one figure rather than as a reading order. Position
-     says it well enough. */
-  const statTiles = [
+     `percent` is set only where a real whole exists to be a part of. Minutes
+     this week has no target in the model and certificates have no ceiling, so
+     those two show their figure and no arc — see the note on .lms-gauges in
+     lms.css. `pill` is the state each one is in, which is the thing a learner
+     reads before the number.
+
+     Minutes learned leads because it is the figure that MOVES; the other three
+     change a handful of times a year. Order is left to right, which is enough. */
+  const gauges = [
     {
       key: 'week',
       label: 'Learned this week',
       value: minutesLogged(weekMinutes),
-      hint: delta?.text ?? 'Your first week',
-      direction: delta?.direction,
-      icon: 'trend',
       to: '/learn/progress',
+      pill: delta?.text ?? (streak > 1 ? `${streak}-day streak` : 'Your first week'),
+      tone: delta ? { up: 'good', down: 'warn', flat: '' }[delta.direction] : '',
     },
     {
-      key: 'inProgress',
-      label: 'Courses in progress',
-      value: stats.inProgress,
-      hint: stats.enrolled ? `${stats.enrolled} enrolled` : 'Nothing enrolled yet',
-      icon: 'book',
+      key: 'completed',
+      label: 'Courses completed',
+      value: stats.completed,
+      // Of everything enrolled — the whole this is a part of.
+      //
+      // This was "Courses in progress", which drew the ring against the same
+      // denominator and so read 100% for a learner who had finished nothing:
+      // both their courses were under way, and the arc said done. Courses
+      // FINISHED over courses enrolled is the figure that ring was claiming.
+      percent: stats.enrolled ? (stats.completed / stats.enrolled) * 100 : null,
       to: '/learn/my-courses',
+      pill: stats.enrolled ? `${stats.completed} of ${stats.enrolled} enrolled` : 'Nothing enrolled yet',
+      tone: stats.enrolled && stats.completed === stats.enrolled ? 'good' : '',
     },
     {
       key: 'lessons',
       label: 'Lessons completed',
       value: stats.lessonsDone,
-      hint: stats.lessonsTotal ? `${overall}% of everything enrolled` : 'Nothing enrolled yet',
-      icon: 'check',
+      percent: stats.lessonsTotal ? overall : null,
       to: '/learn/progress',
+      pill: stats.lessonsTotal
+        ? `${stats.lessonsDone} of ${stats.lessonsTotal} lessons`
+        : 'Nothing enrolled yet',
+      tone: stats.lessonsTotal && overall === 100 ? 'good' : '',
     },
     {
       key: 'certificates',
       label: 'Certificates earned',
       value: stats.certificates,
-      hint: stats.quizzesPassed
+      to: '/learn/certificates',
+      pill: stats.quizzesPassed
         ? `${stats.quizzesPassed} ${stats.quizzesPassed === 1 ? 'quiz' : 'quizzes'} passed`
         : 'Finish a course to earn one',
-      icon: 'award',
-      to: '/learn/certificates',
+      tone: stats.certificates > 0 ? 'good' : '',
     },
   ];
 
@@ -283,29 +293,13 @@ export default function DashboardPage() {
 
       {status === 'ready' && (
         <>
-          {/* ---- the headline row ---- */}
-          <div className="lms-kpis">
-            {statTiles.map((s) => (
-              <Link
-                key={s.key}
-                to={s.to}
-                className="lms-stat lms-kpi"
-              >
-                <span className="lms-kpi__top">
-                  <span className="lms-stat__label">{s.label}</span>
-                  <span className="lms-stat__icon"><Icon name={s.icon} /></span>
-                </span>
-                <span className="lms-stat__value">{s.value}</span>
-                <span className={`lms-stat__hint${s.direction ? ` is-${s.direction}` : ''}`}>
-                  {s.hint}
-                </span>
-              </Link>
-            ))}
-          </div>
-
-          {/* ---- minutes over time, and where they went ---- */}
-          <div className="lms-dash-row">
-            <section className="lms-card">
+          {/* Five panels on one grid, so every gutter between them is the
+              same 14px — placement is by named area below, in lms.css. The
+              figures panel spans the first two rows of the right column,
+              which is what puts two of them beside the chart and two beside
+              the donut without splitting it into two cards. */}
+          <div className="lms-dash-grid">
+            <section className="lms-card lms-dash-activity">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="chart" />
@@ -331,9 +325,27 @@ export default function DashboardPage() {
               <ActivityChart data={chartData} caption="Minutes learned per day" />
             </section>
 
+            <section className="lms-card lms-gauges">
+              <div className="lms-gauges__row">
+                {gauges.map((g) => (
+                  <Link key={g.key} to={g.to} className="lms-gauge">
+                    <span className="lms-gauge__mark">
+                      {g.percent === null || g.percent === undefined ? (
+                        <span className="lms-gauge__figure">{g.value}</span>
+                      ) : (
+                        <ProgressRing percent={g.percent} label={g.label} size={108} stroke={10} />
+                      )}
+                    </span>
+                    <span className="lms-gauge__label">{g.label}</span>
+                    <span className={`lms-gauge__pill${g.tone ? ` is-${g.tone}` : ''}`}>{g.pill}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
             {/* `--centre` puts the donut in the middle of the card rather
                 than under the heading with the rest of the card empty. */}
-            <section className="lms-card lms-card--centre">
+            <section className="lms-card lms-card--centre lms-dash-mix">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="pie" />
@@ -353,14 +365,11 @@ export default function DashboardPage() {
                 />
               )}
             </section>
-          </div>
 
-          {/* ---- what to resume, and what is scheduled ---- */}
-          <div className="lms-dash-row">
-            {/* `--centre` because the row's height is set by the calendar
-                beside it, which is taller — so without this the panel hangs
-                from the heading with the rest of the card empty below it. */}
-            <section className="lms-card lms-card--centre">
+            {/* `--centre` because the grid's last row is as tall as the
+                calendar beside it — without it the panel hangs from its heading
+                over an empty card. */}
+            <section className="lms-card lms-card--centre lms-dash-resume">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="play" />
@@ -447,7 +456,7 @@ export default function DashboardPage() {
               </div>
             </section>
 
-            <section className="lms-card">
+            <section className="lms-card lms-dash-live">
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <Icon name="live" />

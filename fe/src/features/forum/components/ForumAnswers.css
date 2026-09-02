@@ -118,7 +118,7 @@
   color: #fff;
 
   --band-ink: #fff;
-  --band-muted: rgba(255, 255, 255, 0.82);
+  --band-muted: #fff;
   --band-line: rgba(255, 255, 255, 0.12);
   --band-surface: rgba(255, 255, 255, 0.06);
   --band-surface-hover: rgba(255, 255, 255, 0.16);
