@@ -4613,32 +4613,66 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   max-width: 640px;
   width: 100%;
   margin: 0 auto;
+  /* The brand lockup above the form is sized off THIS box, not off the viewport
+     — see .lms-auth__brand. The column's width is not a function of the window:
+     the panel is capped at 640px, its side padding is a clamp, and the aside
+     beside it disappears at 900px, so between 390px and 1920px the column goes
+     342 → 563 → 435 → 496 and back. A vw-based size cannot follow that; a
+     container query unit is measured against this element and follows it
+     exactly. Safe to declare: the panel's inline size comes from the grid
+     column and its own max-width, never from its contents. */
+  container-type: inline-size;
 }
-/* Centred over the form rather than tucked into its top-left corner. It is the
-   only thing above the heading, and one small lockup pinned to the left of a
-   wide column read as dropped there rather than placed.
-   `align-self` is the property that does it — the column is a flex parent, so
-   the earlier flex-start here outranked any text-align on the ancestor. */
+/* The full width of the form column, and FLUSH with it at both ends — the
+   G of the mark on the same vertical as the S of "Sign in", the final t of
+   "Procurement" on the same vertical as the right edge of the inputs. It is the
+   first thing on the page and the only thing above the heading, and at 40px+15px
+   it sat as a stamp in the middle of a 496px column with empty paper either
+   side of it.
+
+   Two things together make the edges line up, and neither does it alone:
+
+     `align-self: stretch` gives the element the column's width. The panel is a
+     flex parent, so the `center` this used to carry sized the box to its
+     contents instead;
+
+     `space-between` puts the two pieces ON those edges. Sizing alone always
+     leaves a few pixels over — the wordmark's width is a function of the font's
+     metrics, not of anything CSS can solve for — and centring split that
+     remainder into a visible inset at each end, which is exactly the
+     misalignment this fixes. The distribution absorbs it into the middle gap,
+     where it is invisible, so the edges are exact at every width.
+
+   The `gap` is therefore a MINIMUM rather than the actual spacing. The cqi
+   sizes below are calibrated to leave a little over at every width — always
+   some, so the wordmark never runs PAST the column (it is `nowrap`, so it
+   would overhang rather than wrap), and never much, so what lands between the
+   mark and the words stays close to the gap asked for. */
 .lms-auth__brand {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: clamp(8px, 2cqi, 24px);
   margin-bottom: 34px;
   color: var(--lms-text);
   text-decoration: none;
-  align-self: center;
+  align-self: stretch;
 }
 /* The artwork on its own — no tile. gp-02-dark.svg is the green variant, so it
-   needs no ground to stand on and nothing competes with it. */
+   needs no ground to stand on and nothing competes with it. Sized in cqi off
+   the panel, so it tracks the column at every breakpoint rather than the window
+   (see the note on `container-type` there). */
 .lms-auth__brand-mark {
   display: block;
-  width: 40px;
+  width: clamp(44px, 17cqi, 100px);
   height: auto;
   background: none;
   border-radius: 0;
 }
-.lms-auth__brand strong { display: block; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-.lms-auth__brand span span { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--lms-green-600); }
+/* nowrap on the wordmark: it is a lockup, and the one thing worse than a lockup
+   that stops short of the column is one that breaks across two lines. */
+.lms-auth__brand strong { display: block; font-size: clamp(17px, 6.85cqi, 40px); font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; white-space: nowrap; }
+.lms-auth__brand span span { display: block; font-size: clamp(12px, 3.9cqi, 22px); font-weight: 600; letter-spacing: 0; color: var(--lms-green-600); line-height: 1.2; }
 .lms-auth__title { margin: 0 0 6px; font-size: clamp(26px, 3.4vw, 32px); font-weight: 600; letter-spacing: -0.02em; }
 .lms-auth__sub { margin: 0 0 26px; font-size: 14.5px; color: var(--lms-muted); }
 .lms-auth__sub a { color: var(--lms-green-600); font-weight: 600; }
@@ -7954,18 +7988,30 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 /* The trimmed proof row: three short claims on one line where there is room,
    wrapping to two where there is not. Replaces three stacked two-line items
-   that read as a brochure beside the form. */
+   that read as a brochure beside the form.
+
+   `space-between` rather than a fixed gap, so the row begins and ends exactly
+   where the lede and the hairline above it do. With a gap the three claims
+   bunched at the left and stopped short of the rule they hang under, and the
+   panel had a ragged right edge running down it. `column-gap` stays as the
+   MINIMUM the distribution can close to, which is what keeps the words from
+   touching once the row wraps. */
 .lms-authside__proof {
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 10px 20px;
+  justify-content: space-between;
+  gap: 10px 16px;
   margin-top: 26px;
   padding-top: 22px;
 }
 .lms-authside__proof li {
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  /* Half a point off 15px. The three claims measure 431px at this size against
+     the 441px the panel gives them — at 15px they were 450px and the third
+     wrapped to a line of its own, which left the first row split by the
+     distribution and the row under it half empty. */
+  font-size: 14.5px;
   font-weight: 500;
   color: #fff;
 }

@@ -178,13 +178,31 @@
    an oversight: --gp-award-warm-ink is stated directly rather than reached
    through --gp-accent-ink, which would swap it for the Win ramp's deep mint and
    put us back to hunting for a second colour that reads as well as this one. */
+/* The fill is TRANSITIONED as well as themed, and that is what makes it read as
+   filling rather than as stepping.
+
+   --gp-fade covers background-color, colour and border-colour only — no
+   transform — so every scaleX it was given landed in one frame. Scrolling is
+   discrete (a wheel notch is 50-100px, which on a 4000px article is a
+   percent-and-a-half of the bar at once) and the hook quantises on top of that,
+   so the rule jumped a dozen pixels at a time down the page.
+
+   130ms linear, not eased: this is following a continuous gesture rather than
+   playing an entrance, and an ease-out on a value that is re-set every frame
+   reads as the bar lagging and catching up. Linear over one wheel notch is
+   invisible as an animation and simply looks like motion. */
 .article-bar__progress-fill {
   display: block;
   width: 100%;
   height: 100%;
   transform-origin: left center;
   background: var(--gp-award-warm-ink);
-  transition: var(--gp-fade);
+  transition: transform 130ms linear, var(--gp-fade);
+}
+
+/* Someone who has asked for less motion gets the value, not the tween. */
+@media (prefers-reduced-motion: reduce) {
+  .article-bar__progress-fill { transition: var(--gp-fade); }
 }
 
 /* A direct child of .page-layout__main, which is a column flex container whose

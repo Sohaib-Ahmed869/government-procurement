@@ -120,11 +120,12 @@ export default function CourseDetail({ course, status = 'ready' }) {
       : 'Free';
 
   // Purchase CTA. Coming-soon courses collect interest; open courses buy/enrol.
-  const ctaLabel = isComingSoon ? 'Register interest' : 'Buy course';
-  /* "Buy course" used to link to a consultation booking, from before there was
-     a checkout. It now enters the LMS: sign in, then the checkout or the course
-     depending on what they already own. Coming-soon still collects interest —
-     there is nothing to sell yet. */
+  const ctaLabel = isComingSoon ? 'Register interest' : 'Click to enroll';
+  /* The button used to say "Buy course" and, before that, linked to a
+     consultation booking. It now enters the LMS: sign in, then the checkout or
+     the course depending on what they already own — so "enrol" is what it
+     actually starts, and the label says so. Coming-soon still collects interest
+     — there is nothing to sell yet. */
   const PrimaryCta = isComingSoon ? (
     <a className="cd-buy__cta" href="#register-interest">{ctaLabel}</a>
   ) : (

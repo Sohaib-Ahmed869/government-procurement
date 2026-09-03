@@ -9,16 +9,25 @@
    Close together: at the 14px gap this used to carry, four stacked boxes made
    the sidebar taller than the answer cards beside it, so the section ended in a
    column of dead space and everything below it was pushed down the page. */
+/* One column, as wide as the LONGEST label and no wider, with every box filling
+   it. So all four share a right edge — "Other" ends where "Award Contracts"
+   ends — without the column being stretched to the width of the rail, which
+   left the two short labels sitting in boxes mostly full of nothing.
+
+   A single `max-content` grid track is what does it: the track measures the
+   widest item, and grid items stretch to their track by default. A flex column
+   cannot — `flex-start` sizes each box to its own text and `stretch` sizes them
+   all to the container, and the width wanted here is neither. */
 .forum-sidebar__cats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: max-content;
+  justify-content: start;
   gap: 6px;
 }
 
 /* Filled, softly-rounded category boxes. */
 .forum-cat {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   /* Tighter than the 10px/18px this carried — the four boxes sit as a close
      stack rather than four widely-spaced rows. */

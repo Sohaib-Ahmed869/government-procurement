@@ -47,7 +47,7 @@ export default function AuthAside({ showInternalSignIn = false }) {
 
       <div className="lms-authside__body">
         <h2 className="lms-authside__lede">
-          The rules, the practice, and the record that stands up to review.
+          The rules, the practice, and the record that stands up to review
         </h2>
         <ul className="lms-authside__proof">
           {PROOF.map((item) => (
