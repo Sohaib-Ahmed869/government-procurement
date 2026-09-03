@@ -3,8 +3,8 @@ import './AdvisorDisclaimer.css';
 
 // A6.9 / A6.10 — the disclaimer.
 //
-// The wording is the client's, verbatim. It carries four things: that the tool
-// is not AI-powered, that nothing you type is collected, that what it applies
+// The wording is the client's, verbatim. It carries four things: that the tools
+// are not AI-powered, that nothing you type is collected, that what they apply
 // are fixed rules for the jurisdiction you picked, and that general guidance is
 // not advice. Privacy and Terms are linked rather than named, so the sentence
 // that points at them can be acted on from here.
@@ -26,12 +26,12 @@ export default function AdvisorDisclaimer({ variant = 'result' }) {
           statement continuing, so it continues on the same line and wraps
           wherever the box happens to end. */}
       <p className="gp-notice__lead">
-        <strong>This tool is not AI-powered</strong> and does not collect any data
-        about you or what you enter. It applies fixed, hard-coded sourcing rules for
-        the jurisdiction you select. The guidance provided is general in nature and is
-        not a substitute for legal, financial, probity or procurement advice. For more
-        information, see our <Link to="/policies/privacy">Privacy Policy</Link> and{' '}
-        <Link to="/policies/terms">Terms of Use</Link>.
+        <strong>These tools are not AI-powered</strong> and do not collect any data
+        about you or what you enter. They apply fixed, hard-coded sourcing rules for
+        the jurisdiction you select. The guidance they provide is general in nature and
+        is not a substitute for legal, financial, probity or procurement advice. For
+        more information, see our <Link to="/policies/privacy">Privacy Policy</Link>{' '}
+        and <Link to="/policies/terms">Terms of Use</Link>.
       </p>
     </aside>
   );

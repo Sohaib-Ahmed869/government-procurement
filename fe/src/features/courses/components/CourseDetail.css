@@ -396,6 +396,13 @@
   border: none;
   border-radius: var(--gp-radius);
   cursor: pointer;
+  /* It is a <Link>, not a <button> — the same note as .cd-bar__cta below. The
+     browser drew its own underline under the label, which on a filled block the
+     width of the sidebar read as a link inside a button rather than as the
+     button itself. The label stays left, on the same vertical as the price and
+     the heading above it. */
+  text-decoration: none;
+  text-align: left;
   transition:
     filter 0.18s ease,
     transform 0.18s ease;

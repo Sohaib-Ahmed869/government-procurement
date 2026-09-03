@@ -73,15 +73,20 @@ export function useReadingProgress({ offset = 0 } = {}) {
         return;
       }
 
-      // Quantised to half a percent before it goes into state. The raw fraction
-      // changes on every scroll frame, and every change re-rendered the whole
-      // article — a React render per frame, competing with the reveal
-      // animations for the same frame budget. Half a percent is finer than the
-      // bar can draw (it is a few hundred pixels wide at most), so the bar is
-      // pixel-identical and the renders drop from one per frame to at most two
-      // hundred over the length of the article.
+      // Quantised before it goes into state. The raw fraction changes on every
+      // scroll frame, and every change re-renders the whole article — a React
+      // render per frame, competing with the reveal animations for the same
+      // frame budget.
+      //
+      // A fifth of a percent, not the half it was. The bar is the full width of
+      // the window, not "a few hundred pixels" as the earlier note assumed, so
+      // half a percent is 7px on a 1440px screen — a step the eye follows as a
+      // jump rather than as movement. A fifth of a percent is under 3px there,
+      // which is below what reads as a step, and the fill's own 130ms transition
+      // (ArticleBar.css) closes what is left. It costs at most 500 renders over
+      // a whole article, still an order off one per frame.
       const next = Math.min(1, Math.max(0, (scrolled - begin) / span));
-      setProgress((prev) => (Math.abs(next - prev) < 0.005 && next > 0 && next < 1 ? prev : next));
+      setProgress((prev) => (Math.abs(next - prev) < 0.002 && next > 0 && next < 1 ? prev : next));
     };
 
     // Coalesced to one measurement per frame — scroll fires far more often than

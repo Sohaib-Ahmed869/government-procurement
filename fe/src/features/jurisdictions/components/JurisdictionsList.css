@@ -26,10 +26,17 @@
   --band-accent: var(--gp-brand);
 }
 
+/* The bottom padding is the grid's own top margin, not --gp-body-pad.
+
+   Those are different numbers — 24px against ~16px — and the cards sit between
+   them, so the space above the first card was half again the space under the
+   last one and the block read as pushed up against the section below it. The
+   top padding stays on the token: that one separates the FILTER PANEL from the
+   heading band above, which is a different gap doing a different job. */
 .jl__inner {
   max-width: var(--gp-shell);
   margin: 0 auto;
-  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) var(--gp-body-pad);
+  padding: var(--gp-body-pad) clamp(20px, 4vw, 60px) 24px;
 }
 
 /* --- filter panel --- */

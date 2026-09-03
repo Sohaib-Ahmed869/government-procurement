@@ -49,6 +49,26 @@
 /* --- one prompt ----------------------------------------------------------- */
 
 .pl-card {
+  /* The two controls on this card's right edge — the tool mark at the top and
+     the Copy button at the bottom — are the same WIDTH, so they begin and end
+     on the same two verticals however different their shapes are. One number
+     sets both; neither can drift from the other.
+
+     80px is a floor, not a round figure picked to look tidy. The button's width
+     is content-driven and its label changes on use: the icon, its gap and the
+     word "Copied" measure 67px together (the gap between icon and label is 6px
+     rather than 8px for exactly this reason), so the box cannot come below that
+     plus enough air either side to read as a button. It is pinned rather than
+     left to the content for the same reason — "Copy" is 13px narrower than "Copied",
+     so an unpinned button grew the moment it was pressed and slid out from
+     under the mark above it. Pinning to the wider state fixes the alignment and
+     the jump together.
+
+     The mark is a circle of that same width, so it is 80px tall against the
+     button's 36px. That is inherent to matching a wide control with a round
+     one, and is the intended reading: same span, different shape. */
+  --pl-control-w: 80px;
+  --pl-copy-h: 36px;
   display: flex;
   flex-direction: column;
   /* The containing block for the link's overlay — see .pl-card__open::after. */
@@ -70,8 +90,20 @@
    as a <button> and is a <Link> now, so the browser was drawing its own
    underline under the title AND the teaser — the whole card came out underlined,
    which is not what either line is. */
+/* A two-column grid, NOT a block. The mark spans both rows on the right while
+   the title and the teaser stack tightly on the left.
+
+   As a block it was head-then-teaser, and the head's height was the height of
+   the tallest thing in it — the 80px disc. So a one-line title left ~55px of
+   empty paper under it before the teaser began, and the two lines that belong
+   together read as two separate blocks with a hole between them. The disc is
+   out of that column now, so the teaser sits directly under the title and the
+   gap is the 8px margin it asks for. */
 .pl-card__open {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 14px;
+  align-content: start;
   width: 100%;
   padding: 14px 18px 10px;
   border: 0;
@@ -105,11 +137,32 @@
   inset: 0;
 }
 
+/* `flex-start`, so the title begins at the TOP of the card beside the mark.
+
+   It was `baseline`, then `center`. Both were answers to a small chip: a pill
+   has no text of its own, so its baseline is the bottom edge of the mark inside
+   it, and centring was what kept a 40px badge level with the line next to it.
+   Neither survives a mark the height of this one — against an 80px disc,
+   centring drops a one-line title into the middle of the card and leaves a band
+   of empty paper above it, so the card reads as starting halfway down. Top
+   aligned, the title and the mark begin on the same line and a title that wraps
+   grows downward from it. */
 .pl-card__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
+  /* The wrapper stops laying anything out and hands its two children straight to
+     the grid above, so the title can share a column with the teaser that is not
+     inside it. A <span> has no semantics to lose to `display: contents`. */
+  display: contents;
+}
+
+.pl-card__title { grid-column: 1; grid-row: 1; }
+.pl-card__teaser { grid-column: 1; grid-row: 2; }
+
+/* Both rows, and pinned to the top of them — the title is what it sits beside,
+   and a teaser that runs to two lines must not drag it down the card. */
+.pl-card .pl-tool {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
 }
 
 /* Level 3 is the tool, and it is a tag on the prompt rather than a heading:
@@ -142,6 +195,27 @@
   border-radius: 999px;
   color: var(--gp-paper);
   background: var(--gp-brand);
+}
+
+/* ON A CARD the mark is a disc as wide as the Copy button below it — see
+   --pl-control-w.
+
+   The artwork inside is 60% of the disc rather than the 16px ToolMark defaults
+   to. Sizing the disc alone was not enough: a 16px glyph in a 40px circle is a
+   small logo on a large badge, and what the eye compares is the artwork, not
+   the ground behind it.
+
+   Sized here rather than on .pl-tool itself, because the prompt detail page
+   reuses the same chip INLINE in a line of meta text (PromptDetailPage.css) —
+   40px there would be a badge sitting a head above its own sentence. */
+.pl-card .pl-tool {
+  width: var(--pl-control-w);
+  height: var(--pl-control-w);
+}
+
+.pl-card .pl-tool .tool-mark {
+  width: calc(var(--pl-control-w) * 0.6);
+  height: calc(var(--pl-control-w) * 0.6);
 }
 
 /* The name is still there for a screen reader, and still the accessible name of
@@ -195,6 +269,11 @@
   color: var(--gp-muted);
 }
 
+/* One row, the two actions on its two ends: "View prompt" on the card's left
+   edge, under the title, and Copy on its right, under the mark. `align-items:
+   center` is what keeps them level with each other across that span. The
+   distribution is `margin-right: auto` on the label rather than
+   `space-between` here — see the note on .pl-card__view. */
 .pl-card__foot {
   display: flex;
   align-items: center;
@@ -206,12 +285,22 @@
 .pl-copy {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  /* 6px, not 8. The button's box is pinned to --pl-control-w and that number is
+     set by its widest label, so every point taken out of here is a point off
+     the width of BOTH controls on this card. */
+  gap: 6px;
   /* Above the card-wide link overlay, so taking the prompt still takes it
      rather than opening the page behind it. */
   position: relative;
   z-index: 1;
-  padding: 9px 16px;
+  /* Both dimensions come from tokens rather than from a padding that has to be
+     re-derived every time the label or the type size moves. The fixed width is
+     also what stops the button growing when its label becomes "Copied" — see
+     --pl-control-w. */
+  width: var(--pl-control-w);
+  height: var(--pl-copy-h);
+  justify-content: center;
+  padding: 0;
   font: inherit;
   font-size: 13.5px;
   font-weight: 600;
@@ -271,12 +360,14 @@
 }
 
 @media (max-width: 560px) {
-  .pl-card__head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
+  /* The head STAYS a row here. It used to stack, which was right while the tool
+     mark was a 28px chip — dropping it under the title cost nothing and gave the
+     title the full card. It is wrong now: the mark and the Copy button are the
+     same width and are read as a pair on the card's right edge, and stacking
+     moved the mark to the left while Copy stayed right, so the one thing this
+     layout is built on came apart on exactly the screens with least room to
+     spare. The title takes ~200px on a 390px card and wraps, which is what a
+     title should do. */
   .pl-card__foot {
     flex-wrap: wrap;
   }
@@ -287,6 +378,11 @@
    clickable all the same: the link's overlay covers the foot too, so the label
    does what it says under the pointer while staying a single tab stop. */
 .pl-card__view {
+  /* Pushes Copy over to the right edge and holds this label on the left. It
+     lives here rather than as `justify-content: space-between` on the row above
+     because the live region after Copy is a real element in that flex row; with
+     `space-between` the free space would be split around it instead of all
+     landing between these two. */
   margin-right: auto;
   font-size: 13px;
   font-weight: 600;
