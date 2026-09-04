@@ -1,7 +1,7 @@
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ok } from '../../utils/apiResponse.js';
-import { env } from '../../config/env.js';
+import { env, siteUrl } from '../../config/env.js';
 import { signAuthToken } from '../../utils/token.js';
 import { ROLES, STAFF_ROLES } from '../../constants/roles.js';
 import { User } from '../../models/User.js';
@@ -58,7 +58,7 @@ function safeNext(next) {
   return next;
 }
 
-const frontendBase = () => env.clientOrigins[0] ?? 'http://localhost:5173';
+const frontendBase = () => siteUrl();
 
 function failureRedirect(reason) {
   return `${frontendBase()}/learn/login?error=${encodeURIComponent(reason)}`;

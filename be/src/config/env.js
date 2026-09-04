@@ -15,6 +15,20 @@ export const env = {
     .map((s) => s.trim())
     .filter(Boolean),
 
+  /* The canonical public address of the site, for links we PUT IN EMAILS.
+
+     Everything used to build these from clientOrigins[0], which is the CORS
+     allowlist — its order is an accident of whoever last edited the variable.
+     That is how password-reset emails went out pointing at a preview
+     deployment (…-xi.vercel.app) instead of the real domain: the preview URL
+     simply happened to be listed first.
+
+     An allowlist answers "may this origin call us?". It is the wrong thing to
+     ask when the question is "what address should a customer see?". Set
+     PUBLIC_SITE_URL and the two stop being confused; unset, it falls back to
+     the old behaviour so nothing breaks. */
+  publicSiteUrl: (process.env.PUBLIC_SITE_URL || '').trim().replace(/\/$/, ''),
+
   mongoUri: process.env.MONGO_URI || '',
 
   /* ---- Feature flags -------------------------------------------------------
@@ -179,7 +193,11 @@ export const env = {
     port: Number(process.env.SMTP_PORT) || 587,
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.MAIL_FROM || 'Government Procurement <no-reply@example.com>',
+    // No default. An invented no-reply@example.com would be a guaranteed
+    // rejection at any host that requires the From to be the mailbox you
+    // authenticated as — and it would mask the sensible fallback, which is
+    // SMTP_USER itself. senderFor() in utils/mailer.js does that.
+    from: process.env.MAIL_FROM || '',
   },
 
   seedAdmin: {
@@ -196,3 +214,10 @@ export const s3Configured = Boolean(
 );
 
 export const mailConfigured = Boolean(env.mail.host);
+
+/* Where to send a person. Prefers the canonical public address, falls back to
+   the first allowed origin, then to local dev. Use this for anything a human
+   will click — never clientOrigins[0] directly. */
+export function siteUrl() {
+  return env.publicSiteUrl || env.clientOrigins[0] || 'http://localhost:5173';
+}

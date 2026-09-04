@@ -22,7 +22,8 @@
     "check": "node --check src/server.js",
     "hls:package": "node src/scripts/package-hls.js",
     "hls:secret": "node src/scripts/package-hls.js --secret",
-    "zoom:check": "node src/scripts/check-zoom.js"
+    "zoom:check": "node src/scripts/check-zoom.js",
+    "mail:check": "node src/scripts/check-mail.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
