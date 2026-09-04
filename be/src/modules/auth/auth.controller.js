@@ -99,13 +99,20 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     // Use the first configured client origin, falling back to a relative path.
     const base = env.clientOrigins[0] || '';
     const link = `${base}/admin/reset-password?token=${encodeURIComponent(token)}`;
-    /* sendMailSafe, NOT sendMail, and this is a security property rather than
-       tidiness. This endpoint answers identically whether or not the account
-       exists, on purpose. A throwing send would break that: a missing address
-       returns 200 (nothing is sent) while a real one returns 500 (the send
-       failed) — which tells an attacker exactly which addresses are registered.
-       It must fail the same way for everyone. */
-    await sendMailSafe({
+    /* NOT awaited, and sendMailSafe rather than sendMail. Both halves of that
+       are the same security property.
+
+       This endpoint answers identically whether or not the account exists, on
+       purpose. A throwing send breaks it one way: a missing address returns 200
+       and a real one returns 500. Awaiting breaks it another, and measurably —
+       a real address took 4.1 SECONDS against Hostinger while an unknown one
+       returned in 157ms, so the bodies matched and a stopwatch still told you
+       which addresses were registered.
+
+       Firing it off unawaited makes both paths return immediately. It is also
+       simply better: nobody should wait on an SMTP handshake to be told we have
+       sent them an email. Failures are logged by sendMailSafe. */
+    void sendMailSafe({
       to: user.email,
       subject: 'Reset your password',
       text: `Reset your password using this link: ${link}`,
