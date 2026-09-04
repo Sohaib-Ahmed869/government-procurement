@@ -7,6 +7,7 @@ import { SUBSCRIBER_STATUS } from '../../constants/statuses.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Subscriber } from '../../models/Subscriber.js';
 import { sendMailSafe } from '../../utils/mailer.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
 import { env } from '../../config/env.js';
 
 // Escape user input before using it inside a RegExp (admin search).
@@ -57,10 +58,15 @@ export const submit = asyncHandler(async (req, res) => {
   const sent = await sendMailSafe({
     to: email,
     subject: 'Confirm your subscription',
-    html: `<p>Thanks for subscribing. Please confirm your subscription by clicking the link below:</p>
-<p><a href="${confirmUrl}">Confirm my subscription</a></p>
-<p>If you did not request this, you can ignore this email.</p>`,
-    text: `Confirm your subscription: ${confirmUrl}`,
+    ...renderEmail({
+      heading: 'Confirm your subscription',
+      paragraphs: [
+        'Thanks for subscribing to Government Procurement. One more step: confirm this address so we know it reached the right inbox.',
+      ],
+      cta: { label: 'Confirm my subscription', url: confirmUrl },
+      note: 'If you did not sign up, ignore this email and nothing further will be sent.',
+      preheader: 'One click to confirm your Government Procurement subscription.',
+    }),
   });
 
   if (!sent.queued && !sent.logged) {

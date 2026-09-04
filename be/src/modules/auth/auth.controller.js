@@ -5,6 +5,7 @@ import { recordAudit } from '../../models/AuditLog.js';
 import { User } from '../../models/User.js';
 import { signAuthToken, signResetToken, verifyResetToken } from '../../utils/token.js';
 import { sendMailSafe } from '../../utils/mailer.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
 import { env } from '../../config/env.js';
 
 // POST /register — admin creates a staff user. Guarded in the routes file.
@@ -98,7 +99,13 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     const token = signResetToken({ sub: user._id });
     // Use the first configured client origin, falling back to a relative path.
     const base = env.clientOrigins[0] || '';
-    const link = `${base}/admin/reset-password?token=${encodeURIComponent(token)}`;
+    /* /learn/reset-password, NOT /admin/reset-password.
+       There is no reset page under /admin — it was never built — so every
+       reset email ever sent pointed at a route that does not resolve. The one
+       under /learn takes any account: resetPassword below looks the user up by
+       the token's subject and never consults their role, exactly as the shared
+       sign-in page does. */
+    const link = `${base}/learn/reset-password?token=${encodeURIComponent(token)}`;
     /* NOT awaited, and sendMailSafe rather than sendMail. Both halves of that
        are the same security property.
 
@@ -112,12 +119,18 @@ export const forgotPassword = asyncHandler(async (req, res) => {
        Firing it off unawaited makes both paths return immediately. It is also
        simply better: nobody should wait on an SMTP handshake to be told we have
        sent them an email. Failures are logged by sendMailSafe. */
-    void sendMailSafe({
-      to: user.email,
-      subject: 'Reset your password',
-      text: `Reset your password using this link: ${link}`,
-      html: `<p>Reset your password using this link:</p><p><a href="${link}">${link}</a></p>`,
+    const mail = renderEmail({
+      heading: 'Reset your password',
+      intro: `Hello${user.name ? ` ${user.name.split(' ')[0]}` : ''},`,
+      paragraphs: [
+        'We received a request to reset the password on your Government Procurement account. Choose a new one using the button below.',
+      ],
+      cta: { label: 'Choose a new password', url: link },
+      note: 'This link can only be used once, and expires shortly. If you did not ask for a password reset you can ignore this email — your current password still works.',
+      preheader: 'Choose a new password for your Government Procurement account.',
     });
+
+    void sendMailSafe({ to: user.email, subject: 'Reset your password', ...mail });
   }
 
   return ok(res, successBody);

@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { env, mailConfigured } from '../config/env.js';
+import { logoAttachment } from './emailTemplate.js';
 
 /* ---------------------------------------------------------------------------
    Outbound email.
@@ -120,7 +121,7 @@ export function mailPreflight() {
    THROWS on a real failure. That is right for the callers where the email IS
    the deliverable — an admin pressing "send the answer" has to be told it did
    not go. For everything else, use sendMailSafe. */
-export async function sendMail({ to, subject, html, text, replyTo }) {
+export async function sendMail({ to, subject, html, text, replyTo, attachments }) {
   const transport = getTransport();
   if (!transport) {
     // eslint-disable-next-line no-console
@@ -129,7 +130,18 @@ export async function sendMail({ to, subject, html, text, replyTo }) {
     );
     return { queued: false, logged: true };
   }
-  const info = await transport.sendMail({ from: senderFor(), to, subject, html, text, replyTo });
+  /* The logo rides along with any HTML email, here rather than in each
+     caller. renderEmail() references it as cid:gp-logo, and a caller that
+     forgot to attach it would send a broken image — so no caller has to. */
+  const info = await transport.sendMail({
+    from: senderFor(),
+    to,
+    subject,
+    html,
+    text,
+    replyTo,
+    attachments: attachments ?? (html ? logoAttachment() : undefined),
+  });
   return { queued: true, messageId: info?.messageId };
 }
 

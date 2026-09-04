@@ -1,6 +1,7 @@
 import { User } from '../../models/User.js';
 import { Notification, NOTIFICATION_KINDS } from '../../models/Notification.js';
 import { sendMail } from '../../utils/mailer.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
 import { env } from '../../config/env.js';
 
 /* ---------------------------------------------------------------------------
@@ -71,9 +72,12 @@ function email({ to, subject, lines, threadId }) {
   sendMail({
     to,
     subject,
-    html: `${body.map((l) => `<p>${l}</p>`).join('\n')}
-<p><a href="${url}">${cta}</a></p>`,
-    text: `${body.join('\n\n')}\n\n${cta}: ${url}`,
+    ...renderEmail({
+      heading: subject,
+      paragraphs: body,
+      cta: { label: cta, url },
+      preheader: body[0] || subject,
+    }),
   }).catch(() => {
     /* A notification that failed to send must not take the reply down with it.
        mailer.js already falls back to logging when SMTP is unconfigured, so
