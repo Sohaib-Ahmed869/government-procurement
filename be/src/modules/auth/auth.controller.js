@@ -6,7 +6,7 @@ import { User } from '../../models/User.js';
 import { signAuthToken, signResetToken, verifyResetToken } from '../../utils/token.js';
 import { sendMailSafe } from '../../utils/mailer.js';
 import { renderEmail } from '../../utils/emailTemplate.js';
-import { env } from '../../config/env.js';
+import { env, siteUrl } from '../../config/env.js';
 
 // POST /register — admin creates a staff user. Guarded in the routes file.
 export const register = asyncHandler(async (req, res) => {
@@ -98,7 +98,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   if (user) {
     const token = signResetToken({ sub: user._id });
     // Use the first configured client origin, falling back to a relative path.
-    const base = env.clientOrigins[0] || '';
+    const base = siteUrl();
     /* /learn/reset-password, NOT /admin/reset-password.
        There is no reset page under /admin — it was never built — so every
        reset email ever sent pointed at a route that does not resolve. The one

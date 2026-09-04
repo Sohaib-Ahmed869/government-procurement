@@ -2,7 +2,7 @@ import { User } from '../../models/User.js';
 import { Notification, NOTIFICATION_KINDS } from '../../models/Notification.js';
 import { sendMail } from '../../utils/mailer.js';
 import { renderEmail } from '../../utils/emailTemplate.js';
-import { env } from '../../config/env.js';
+import { env, siteUrl } from '../../config/env.js';
 
 /* ---------------------------------------------------------------------------
    Who gets told when something happens in a course discussion, and how.
@@ -56,7 +56,7 @@ function wants(user, key) {
 // Where a thread lives in the client. One place, because it is about to be
 // written into emails that outlive this deploy.
 const threadUrl = (threadId) =>
-  `${env.clientOrigins[0] || ''}/learn/discussions/${threadId}`;
+  `${siteUrl()}/learn/discussions/${threadId}`;
 
 /* Best-effort, and deliberately NOT awaited by the request that triggered it.
 

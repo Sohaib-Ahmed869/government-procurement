@@ -8,7 +8,7 @@ import { recordAudit } from '../../models/AuditLog.js';
 import { Subscriber } from '../../models/Subscriber.js';
 import { sendMailSafe } from '../../utils/mailer.js';
 import { renderEmail } from '../../utils/emailTemplate.js';
-import { env } from '../../config/env.js';
+import { env, siteUrl } from '../../config/env.js';
 
 // Escape user input before using it inside a RegExp (admin search).
 function escapeRegex(str) {
@@ -48,7 +48,7 @@ export const submit = asyncHandler(async (req, res) => {
   if (!doc.unsubscribeToken) doc.unsubscribeToken = randomBytes(32).toString('hex');
   await doc.save();
 
-  const origin = env.clientOrigins[0];
+  const origin = siteUrl();
   const confirmUrl = `${origin}/subscribe/confirm?token=${doc.confirmToken}`;
   /* The confirm link is the whole point of this request — without it the row
      sits PENDING for ever and the person has no way to finish. So the outcome

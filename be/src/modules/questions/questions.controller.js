@@ -7,7 +7,7 @@ import { QUESTION_STATUS, QUESTION_STATUSES } from '../../constants/statuses.js'
 import { recordAudit } from '../../models/AuditLog.js';
 import { sendMail } from '../../utils/mailer.js';
 import { renderEmail } from '../../utils/emailTemplate.js';
-import { env } from '../../config/env.js';
+import { env, siteUrl } from '../../config/env.js';
 import { Question } from '../../models/Question.js';
 
 // POST / — PUBLIC. The website forum submission form. Always born 'submitted';
@@ -176,7 +176,7 @@ export const sendAnswer = asyncHandler(async (req, res) => {
   if (paras.length === 0) throw ApiError.badRequest('Save an answer before sending it');
 
   const lessonList = question.answer?.lessons || [];
-  const origin = env.clientOrigins[0];
+  const origin = siteUrl();
   // Only published questions have a page to link to.
   const link =
     question.status === QUESTION_STATUS.PUBLISHED && question.slug
