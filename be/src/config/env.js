@@ -179,7 +179,11 @@ export const env = {
     port: Number(process.env.SMTP_PORT) || 587,
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.MAIL_FROM || 'Government Procurement <no-reply@example.com>',
+    // No default. An invented no-reply@example.com would be a guaranteed
+    // rejection at any host that requires the From to be the mailbox you
+    // authenticated as — and it would mask the sensible fallback, which is
+    // SMTP_USER itself. senderFor() in utils/mailer.js does that.
+    from: process.env.MAIL_FROM || '',
   },
 
   seedAdmin: {

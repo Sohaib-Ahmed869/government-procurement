@@ -4,7 +4,7 @@ import { ok, created } from '../../utils/apiResponse.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { User } from '../../models/User.js';
 import { signAuthToken, signResetToken, verifyResetToken } from '../../utils/token.js';
-import { sendMail } from '../../utils/mailer.js';
+import { sendMailSafe } from '../../utils/mailer.js';
 import { env } from '../../config/env.js';
 
 // POST /register — admin creates a staff user. Guarded in the routes file.
@@ -99,7 +99,13 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     // Use the first configured client origin, falling back to a relative path.
     const base = env.clientOrigins[0] || '';
     const link = `${base}/admin/reset-password?token=${encodeURIComponent(token)}`;
-    await sendMail({
+    /* sendMailSafe, NOT sendMail, and this is a security property rather than
+       tidiness. This endpoint answers identically whether or not the account
+       exists, on purpose. A throwing send would break that: a missing address
+       returns 200 (nothing is sent) while a real one returns 500 (the send
+       failed) — which tells an attacker exactly which addresses are registered.
+       It must fail the same way for everyone. */
+    await sendMailSafe({
       to: user.email,
       subject: 'Reset your password',
       text: `Reset your password using this link: ${link}`,
