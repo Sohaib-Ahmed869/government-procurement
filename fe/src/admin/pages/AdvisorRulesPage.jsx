@@ -445,8 +445,8 @@ function CurrentFigures({ pack, published }) {
           <strong>Rules in use now</strong>
           <span className="arp__panel-meta">
             {published
-              ? `Version “${published.version}”${published.asAt ? `, as at ${published.asAt}` : ''} · ${changedCount} value${changedCount === 1 ? '' : 's'} changed from the built-in rules`
-              : `Built-in rules, as at ${pack.asAt} · nothing changed from the CMS yet`}
+              ? `Version “${published.version}”${published.asAt ? `, as at ${published.asAt}` : ''} | ${changedCount} value${changedCount === 1 ? '' : 's'} changed from the built-in rules`
+              : `Built-in rules, as at ${pack.asAt} | nothing changed from the CMS yet`}
           </span>
         </span>
         <span className="arp__panel-toggle">{open ? 'Hide' : 'Show'}</span>

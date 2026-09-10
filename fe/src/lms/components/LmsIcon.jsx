@@ -12,6 +12,9 @@ const ICONS = {
   // whole job of this icon.
   quiz: <><circle cx="12" cy="12" r="9" /><path d="M9.4 9.6a2.7 2.7 0 0 1 5.1 1.2c0 1.8-2.5 2.2-2.5 3.7" /><path d="M12 17.6h.01" /></>,
   check: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>,
+  // The empty counterpart to `check`. Same circle, no tick — a lesson not
+  // started reads as the same dot the finished one fills in.
+  circle: <><circle cx="12" cy="12" r="9" /></>,
   lock: <><rect x="4" y="10" width="16" height="11" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></>,
   clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></>,

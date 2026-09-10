@@ -303,7 +303,7 @@ export default function ActivityChart({ data, caption = 'Minutes learned', step 
             marginTop: -16,
           }}
         >
-          {dayLabel(hover)} · <strong>{logged(hover.minutes)}</strong>
+          {dayLabel(hover)} | <strong>{logged(hover.minutes)}</strong>
         </div>
       ) : null}
 

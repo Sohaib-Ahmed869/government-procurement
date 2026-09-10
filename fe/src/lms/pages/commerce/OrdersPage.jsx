@@ -49,7 +49,7 @@ export default function OrdersPage() {
         <div>
           <h1 className="lms-page__title">Orders</h1>
           <p className="lms-page__subtitle">
-            {orders.length} order{orders.length === 1 ? '' : 's'} · {formatCents(spent)} spent
+            {orders.length} order{orders.length === 1 ? '' : 's'} | {formatCents(spent)} spent
             {' '}(including GST).
           </p>
         </div>

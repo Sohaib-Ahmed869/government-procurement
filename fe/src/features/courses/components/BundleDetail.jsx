@@ -68,7 +68,7 @@ export default function BundleDetail({ bundle, status }) {
         <div className="bundle__cols">
           <div className="bundle__main">
             <h2 className="bundle__section">
-              What’s included · {courses.length} {courses.length === 1 ? 'course' : 'courses'}
+              What’s included | {courses.length} {courses.length === 1 ? 'course' : 'courses'}
             </h2>
 
             {courses.length === 0 ? (

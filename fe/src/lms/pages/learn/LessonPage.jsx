@@ -9,6 +9,7 @@ import BookmarkButton from '../../components/progress/BookmarkButton.jsx';
 import LessonStates from '../../components/lesson/LessonStates.jsx';
 import PreviewGate from '../../components/lesson/PreviewGate.jsx';
 import { useLesson } from '../../hooks/useLesson.js';
+import { useReadToEnd } from '../../hooks/useReadToEnd.js';
 import { lessonHref } from '../../utils/lessonHref.js';
 
 // A text lesson (L1): the body, its downloadable resources, the learner's notes
@@ -16,9 +17,12 @@ import { lessonHref } from '../../utils/lessonHref.js';
 // rail and the exit route are already on screen.
 export default function LessonPage() {
   const { slug, lessonId } = useParams();
-  const { data, status, gate, error, complete, markComplete, reload } = useLesson(slug, lessonId);
+  const { data, status, gate, error, markComplete, reload } = useLesson(slug, lessonId);
 
   const [tab, setTab] = useState('resources'); // resources | notes
+
+  // The way forward stays shut until the bottom of the text has been on screen.
+  const [endRef, readToEnd] = useReadToEnd(lessonId);
 
   // Reset the per-lesson UI when navigating between lessons.
   useEffect(() => {
@@ -31,7 +35,7 @@ export default function LessonPage() {
     );
   }
 
-  const { course, lesson, module: mod, index, total, prev, next, body, resources, enrolled } = data;
+  const { course, lesson, index, total, prev, next, body, resources, enrolled } = data;
 
   // This route renders TEXT lessons. A video, an embed, a document or a quiz
   // has its own screen, and landing here would tell the learner their video
@@ -54,10 +58,6 @@ export default function LessonPage() {
   return (
     <div className="lms-lesson-page">
       <div className="lms-lesson-page__head">
-        <span className="lms-lesson-page__crumb">
-          Module {mod.order} · {mod.title} · Lesson {index + 1} of {total}
-        </span>
-        <h1 className="lms-lesson-page__title">{lesson.title}</h1>
         <div className="lms-lesson-page__meta">
           <span><LmsIcon name="clock" /> {lesson.minutes} min read</span>
           {lesson.preview ? (
@@ -82,6 +82,10 @@ export default function LessonPage() {
         )}
       </article>
 
+      {/* Sits directly under the body, so "seen" means the last line of the
+          lesson rather than the notes and resources further down the page. */}
+      <div ref={endRef} className="lms-readend" aria-hidden="true" />
+
       {/* Directly under the body, where somebody who has just finished reading
           the sample actually is. */}
       <PreviewGate course={course} lesson={lesson} enrolled={enrolled} />
@@ -90,9 +94,11 @@ export default function LessonPage() {
         slug={slug}
         prev={prev}
         next={next}
-        complete={complete}
-        onToggleComplete={markComplete}
-        enrolled={enrolled}
+        index={index}
+        total={total}
+        onAdvance={enrolled ? markComplete : undefined}
+        canAdvance={readToEnd}
+        blockedHint="Read to the end of this lesson to continue"
       />
 
       {/* Resources and notes sit under the lesson rather than in a sidebar, so

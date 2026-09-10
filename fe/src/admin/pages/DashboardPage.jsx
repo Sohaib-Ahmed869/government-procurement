@@ -215,7 +215,7 @@ export default function DashboardPage() {
                     <span className="dash-list__primary">{q.title}</span>
                     <span className="dash-list__secondary">
                       {q.submitter?.name || q.submitter?.email || 'Anonymous'}
-                      {q.category ? ` · ${CATEGORY_LABEL[q.category] || q.category}` : ''}
+                      {q.category ? ` | ${CATEGORY_LABEL[q.category] || q.category}` : ''}
                     </span>
                   </span>
                   <span className="dash-list__trail">

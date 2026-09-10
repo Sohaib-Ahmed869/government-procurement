@@ -42,7 +42,7 @@ export function lessonHref(slug, lesson) {
   }
 
   // Uploaded video and a YouTube embed are different screens: one plays a
-  // signed, expiring source with a watermark, the other an iframe. They share
+  // signed, expiring source, the other an iframe. They share
   // the /watch route because to a learner they are both "watch this".
   if (lesson.kind === 'video' || lesson.kind === 'youtube') {
     return `/learn/courses/${slug}/watch/${id}`;

@@ -57,7 +57,7 @@ export default function InstructorCoursesPage() {
                       <Link to={`/learn/instructor/courses/${c._id}`}>{c.title}</Link>
                     </h2>
                     <p className="lms-icourse__meta">
-                      {c.levelLabel} · {c.durationLabel} ·{' '}
+                      {c.levelLabel} | {c.durationLabel} |{' '}
                       {c.price ? formatMoney(c.price) : 'Free'}
                     </p>
                   </div>

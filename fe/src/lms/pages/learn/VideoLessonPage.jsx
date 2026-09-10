@@ -6,26 +6,26 @@ import YouTubeEmbed from '../../components/player/YouTubeEmbed.jsx';
 import TranscriptPanel from '../../components/player/TranscriptPanel.jsx';
 import PreviewGate from '../../components/lesson/PreviewGate.jsx';
 import LessonNav from '../../components/lesson/LessonNav.jsx';
+import UpNextCountdown from '../../components/lesson/UpNextCountdown.jsx';
 import ResourceList from '../../components/lesson/ResourceList.jsx';
 import NoteEditor from '../../components/progress/NoteEditor.jsx';
 import BookmarkButton from '../../components/progress/BookmarkButton.jsx';
 import LessonStates from '../../components/lesson/LessonStates.jsx';
 import { useSecureVideo } from '../../hooks/useSecureVideo.js';
-import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import { useLesson } from '../../hooks/useLesson.js';
 import { progressApi } from '../../../api/lms.js';
 import { formatTime, transcriptToText } from '../../utils/transcript.js';
+import { isLocked } from '../../utils/gating.js';
 
 // How often the resume point is written back. Every timeupdate would be four
 // requests a second per learner; half a minute loses at most that much position.
 const POSITION_SAVE_MS = 30_000;
 
-// A video lesson (L2): protected playback on an expiring link, an identity
-// watermark, and a transcript synced both ways.
+// A video lesson (L2): protected playback on an expiring link, and a transcript
+// synced both ways.
 export default function VideoLessonPage() {
   const { slug, lessonId } = useParams();
-  const { user } = useStudentAuth();
-  const { data, status, gate, error, complete, markComplete, reload } = useLesson(slug, lessonId);
+  const { data, status, gate, error, markComplete, reload } = useLesson(slug, lessonId);
 
   const videoRef = useRef(null);
   // The live YouTube player, when this lesson is an embed. Held so the
@@ -40,12 +40,17 @@ export default function VideoLessonPage() {
   const latestRef = useRef(0);
 
   const [restarted, setRestarted] = useState(false);
+  // Set when the video plays to its end, cleared when the learner dismisses the
+  // countdown or moves on. Separate from the lesson's completion, which Next
+  // also records — this one is specifically "the picture stopped".
+  const [ended, setEnded] = useState(false);
 
   useEffect(() => {
     setCurrentTime(0);
     setDuration(0);
     setTab('transcript');
     setRestarted(false);
+    setEnded(false);
     lastSavedRef.current = 0;
     latestRef.current = 0;
   }, [lessonId]);
@@ -155,6 +160,26 @@ export default function VideoLessonPage() {
     [onTime],
   );
 
+  /* The video ran to the end (L3).
+
+     Two things happen, and they are one thought: the lesson is DONE, so it gets
+     its tick like a passed quiz does — watching a lecture to the end is the
+     video equivalent of answering the last question — and the learner is
+     offered the next one on a countdown rather than left on a dead frame.
+
+     Marking complete here is what makes the rail's ticks mean the same thing
+     for a lecture as they already did for a quiz. It is idempotent on the
+     server and a no-op once `complete` is set, so re-watching costs nothing.
+
+     `catch` is deliberate and empty-handed: failing to record the completion
+     must not swallow the countdown, which is the part the learner can see. */
+  const onEnded = useCallback(() => {
+    setEnded(true);
+    // The position is at the end; leave it there rather than writing a resume
+    // point that would drop them onto the closing frame next time.
+    markComplete?.();
+  }, [markComplete]);
+
   const downloadTranscript = useCallback(() => {
     if (!data?.transcript?.length) return;
     const blob = new Blob([transcriptToText(data.transcript)], { type: 'text/plain' });
@@ -172,21 +197,10 @@ export default function VideoLessonPage() {
     );
   }
 
-  const { course, lesson, module: mod, index, total, prev, next, resources, transcript, enrolled } = data;
-
-  // The watermark carries who is watching. Signed out (preview), there is no
-  // identity to stamp, so it renders nothing rather than a fake one.
-  const watermark = user ? `${user.name} · ${user.email}` : null;
+  const { course, lesson, index, total, prev, next, resources, transcript, enrolled } = data;
 
   return (
     <div className="lms-lesson-page lms-lesson-page--video">
-      <div className="lms-lesson-page__head">
-        <span className="lms-lesson-page__crumb">
-          Module {mod.order} · {mod.title} · Lesson {index + 1} of {total}
-        </span>
-        <h1 className="lms-lesson-page__title">{lesson.title}</h1>
-      </div>
-
       {/* A YouTube lesson is an iframe, not a signed source, so none of the
           expiring-link machinery below applies to it. */}
       {isEmbed ? (
@@ -196,6 +210,7 @@ export default function VideoLessonPage() {
             startSeconds={initialStart}
             title={lesson.title}
             onTimeUpdate={onEmbedTime}
+            onEnded={onEnded}
             playerRef={ytRef}
           />
         ) : (
@@ -228,12 +243,20 @@ export default function VideoLessonPage() {
           videoRef={videoRef}
           src={video.url}
           kind={video.kind ?? 'mp4'}
-          watermark={watermark}
           startAt={initialStart}
           onTimeUpdate={onTime}
           onLoadedMetadata={setDuration}
+          onEnded={onEnded}
         />
       )}
+
+      {/* Straight under the player, which is where the learner is looking when
+          the picture stops. Only when there IS somewhere to go: the last lesson
+          in a course ends, and offering a countdown to nothing would be a
+          five-second wait for a navigation that never happens. */}
+      {ended && next && !isLocked(next.gate) ? (
+        <UpNextCountdown slug={slug} next={next} onDismiss={() => setEnded(false)} />
+      ) : null}
 
       {/* A video that opens part-way through looks broken unless you are told
           why. It also needs a way out: someone returning to re-watch from the
@@ -308,9 +331,9 @@ export default function VideoLessonPage() {
         slug={slug}
         prev={prev}
         next={next}
-        complete={complete}
-        onToggleComplete={markComplete}
-        enrolled={enrolled}
+        index={index}
+        total={total}
+        onAdvance={enrolled ? markComplete : undefined}
       />
 
       <div className="lms-card lms-lesson-page__aside">

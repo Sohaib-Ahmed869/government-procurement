@@ -189,12 +189,12 @@ export default function ResourcesEditor({ courseId, resources = [], onChange }) 
                 />
                 <span className="lms-resrow__meta">
                   {r.url ? (
-                    <>Link · {r.url}</>
+                    <>Link | {r.url}</>
                   ) : (
                     <>
                       {(r.kind ?? 'file').toUpperCase()}
-                      {r.sizeBytes ? ` · ${sizeLabel(r.sizeBytes)}` : ''}
-                      {r.name ? ` · ${r.name}` : ''}
+                      {r.sizeBytes ? ` | ${sizeLabel(r.sizeBytes)}` : ''}
+                      {r.name ? ` | ${r.name}` : ''}
                     </>
                   )}
                 </span>

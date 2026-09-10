@@ -145,8 +145,8 @@ export default function CohortProgressPage() {
                             {q.title}
                           </Link>
                           <span className="lms-roster__sub">
-                            {q.course?.title} · {q.questionCount} question
-                            {q.questionCount === 1 ? '' : 's'} · pass at {q.passMark}%
+                            {q.course?.title} | {q.questionCount} question
+                            {q.questionCount === 1 ? '' : 's'} | pass at {q.passMark}%
                           </span>
                         </span>
                       </td>

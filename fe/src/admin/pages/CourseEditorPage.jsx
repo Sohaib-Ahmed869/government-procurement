@@ -10,7 +10,7 @@ const BLANK = {
   resourceType: 'courses', segment: 'general', level: 'beginner',
   durationLabel: '',
   availability: 'coming_soon', startDate: '',
-  featured: 'false', status: 'draft',
+  status: 'draft',
   // Course detail page fields.
   instructorName: '', instructorRole: '', instructorAvatarUrl: '',
   price: '', currency: 'AUD', levelLabel: '', sidebarSummary: '',
@@ -54,21 +54,6 @@ const toDateInput = (value) => (value ? String(value).slice(0, 10) : '');
 
 const TYPE_LABEL = { courses: 'Course', artefacts: 'Artefact', bundles: 'Bundle' };
 
-// Homepage slots per resource type — the "Unlock your potential" section renders
-// 4 course cards and 2 artefact cards. A type absent here has no rail there
-// (bundles), so it gets no Featured control at all. Mirrors the same map in
-// courses.controller.js, which refuses to store the flag for those types.
-const FEATURED_SLOTS = { courses: 4, artefacts: 2 };
-
-// Only a published resource holds a slot: a featured draft isn't on the homepage
-// yet. So a draft can be marked featured while a slot is free and find the rail
-// full by the time it's published — this is what the author sees then. The flag
-// is dropped for them, so the next Publish click goes through.
-const noSlotNotice = (resourceType, max) =>
-  `No space in featured ${resourceType}. All ${max} homepage slots are taken by ` +
-  `published ${resourceType}, so this one has been changed to not featured on ` +
-  'homepage. Click Publish again to publish it.';
-
 // Authoring view for a single course (create /new and edit /:id) — document
 // column on the left, settings rail on the right, sticky save/publish bar. On
 // create we save the record first, then push the image to the returned id (an
@@ -92,38 +77,10 @@ export default function CourseEditorPage() {
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [error, setError] = useState(null);
-  const [notice, setNotice] = useState(null);
-  // How many *other* published resources of this type hold a homepage slot.
-  const [featuredElsewhere, setFeaturedElsewhere] = useState(0);
   // State rather than a ref — `dirty` below is memoised, so the saved baseline
   // has to be something React can see change, or saving leaves `dirty` stuck on
   // its previous value.
   const [snapshot, setSnapshot] = useState(() => JSON.stringify(BLANK));
-
-  // Scoped to the resource type currently selected, so switching a resource from
-  // Courses to Artefacts re-checks against the artefact rail. Re-counted after
-  // every save, so unfeaturing something in a second tab doesn't leave the
-  // control stuck.
-  const resourceType = form.resourceType;
-  useEffect(() => {
-    if (!FEATURED_SLOTS[resourceType]) {
-      setFeaturedElsewhere(0); // no homepage rail for this type
-      return undefined;
-    }
-    let alive = true;
-    coursesApi
-      .list({ featured: true, status: 'published', resourceType, limit: 100 })
-      .then((items) => {
-        if (!alive) return;
-        const others = (items || []).filter((c) => (c._id || c.id) !== currentId);
-        setFeaturedElsewhere(others.length);
-      })
-      .catch(() => {
-        // Can't tell — leave the control open rather than blocking on a hiccup.
-        if (alive) setFeaturedElsewhere(0);
-      });
-    return () => { alive = false; };
-  }, [resourceType, currentId, justSaved]);
 
   useEffect(() => {
     if (!currentId) return;
@@ -138,7 +95,7 @@ export default function CourseEditorPage() {
           level: c.level ?? 'beginner',
           durationLabel: c.durationLabel ?? '',
           availability: c.availability ?? 'coming_soon', startDate: toDateInput(c.startDate),
-          featured: c.featured ? 'true' : 'false', status: c.status ?? 'draft',
+          status: c.status ?? 'draft',
           instructorName: c.instructor?.name ?? '',
           instructorRole: c.instructor?.role ?? '',
           instructorAvatarUrl: c.instructor?.avatarUrl ?? '',
@@ -182,9 +139,6 @@ export default function CourseEditorPage() {
     durationLabel: form.durationLabel,
     availability: form.availability,
     startDate: form.startDate || undefined,
-    // Types without a homepage rail can't carry the flag — so switching a
-    // featured course to a Bundle clears it rather than leaving it stranded.
-    featured: FEATURED_SLOTS[form.resourceType] ? form.featured === 'true' : false,
     status: statusOverride || form.status,
     instructor: {
       name: form.instructorName,
@@ -202,19 +156,10 @@ export default function CourseEditorPage() {
     whoShouldTake: linesToWho(form.whoShouldTake),
   });
 
-  // Drop the featured flag and explain why, leaving everything else untouched.
-  // The author's next Publish click then goes through.
-  const releaseFeatured = () => {
-    set('featured', 'false');
-    setError(null);
-    setNotice(noSlotNotice(resourceType, FEATURED_SLOTS[resourceType]));
-  };
-
   const save = async (statusOverride) => {
     if (!form.title.trim()) { setError('Please add a title before saving.'); return; }
     setSaving(true);
     setError(null);
-    setNotice(null);
     try {
       const body = payload(statusOverride);
       let savedId = currentId;
@@ -239,45 +184,18 @@ export default function CourseEditorPage() {
         navigate(`/admin/courses/${savedId}`, { replace: true });
       }
     } catch (err) {
-      // The API refused because the rail is full — the same case the pre-flight
-      // check below catches, but reached when the count went stale (another
-      // editor published a featured resource meanwhile). Handle it the same way
-      // rather than showing a dead end.
-      if (err?.errors?.featured === 'no-free-slot') releaseFeatured();
-      else setError(err.message || 'Failed to save');
+      setError(err.message || 'Failed to save');
       setSaving(false);
     }
   };
 
-  // Publishing a featured draft is the moment it would actually claim a homepage
-  // slot. If the rail for its type is full, unfeature it and say so instead of
-  // publishing — the author clicks Publish again to go ahead. Unpublishing never
-  // needs a slot, so it passes straight through.
   const onPublishClick = () => {
-    const goingLive = form.status !== 'published';
-    const max = FEATURED_SLOTS[resourceType];
-    if (goingLive && form.featured === 'true' && max && featuredElsewhere >= max) {
-      releaseFeatured();
-      return;
-    }
-    save(goingLive ? 'published' : 'draft');
+    save(form.status !== 'published' ? 'published' : 'draft');
   };
 
   if (loading) return <p className="admin-tablestate">Loading course…</p>;
 
   const isPublished = form.status === 'published';
-
-  // Homepage slots for this resource type. Bundles have no rail, so the whole
-  // slot UI is left out for them and the control stays open.
-  const maxFeatured = FEATURED_SLOTS[resourceType];
-  const isFeatured = form.featured === 'true';
-  const slotsFull = Boolean(maxFeatured) && featuredElsewhere >= maxFeatured;
-  const featureLocked = slotsFull && !isFeatured;
-  // Slots in use right now, counting this resource only if it's actually live.
-  const slotsUsed = featuredElsewhere + (isFeatured && isPublished ? 1 : 0);
-  // A featured draft with nowhere to land: warn before they hit Publish, since
-  // that's the click that will drop the flag.
-  const willLoseSlotOnPublish = isFeatured && !isPublished && slotsFull;
 
   return (
     <EditorShell
@@ -288,7 +206,6 @@ export default function CourseEditorPage() {
       saving={saving}
       justSaved={justSaved}
       error={error}
-      notice={notice}
       onBack={() => navigate('/admin/courses')}
       onSave={() => save()}
       onPublish={onPublishClick}
@@ -301,40 +218,6 @@ export default function CourseEditorPage() {
               <span className={`editor-publish__dot${isPublished ? ' is-live' : ''}`} />
               <span>{isPublished ? 'Published, live on the site' : 'Draft, not visible yet'}</span>
             </div>
-            {/* No Featured control for a type with no homepage rail — there'd be
-                nowhere for the flag to take effect. */}
-            {maxFeatured ? (
-              <>
-                <FormField
-                  label="Featured" name="featured" as="select" value={form.featured} onChange={onChange}
-                  options={[{ value: 'false', label: 'No' }, { value: 'true', label: 'Featured on homepage' }]}
-                  disabled={featureLocked}
-                  hint={`(${slotsUsed} of ${maxFeatured} slots used)`}
-                />
-                {/* Suppressed while the notice banner is up — it already explains
-                    that the rail is full and what was done about it. */}
-                {featureLocked && !notice && (
-                  <p className="editor-hint">
-                    All {maxFeatured} homepage slots are taken by published {resourceType}. Remove
-                    one from the homepage first, then this one can take its place.
-                  </p>
-                )}
-                {willLoseSlotOnPublish && (
-                  <p className="editor-hint">
-                    All {maxFeatured} homepage slots have been taken since this draft was marked
-                    featured. Publishing it will change it to not featured on homepage.
-                  </p>
-                )}
-                {isFeatured && !isPublished && !slotsFull && (
-                  <p className="editor-hint">Takes a homepage slot once published.</p>
-                )}
-              </>
-            ) : (
-              <p className="editor-hint">
-                {TYPE_LABEL[resourceType] || 'These'}s aren&rsquo;t shown on the homepage, so they
-                can&rsquo;t be featured there.
-              </p>
-            )}
           </div>
 
           <div className="editor-panel">

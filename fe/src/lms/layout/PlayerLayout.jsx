@@ -41,6 +41,32 @@ export default function PlayerLayout() {
     ? Math.round((enrolment.lessonsDone / course.lessons) * 100)
     : 0;
 
+  /* The lesson's heading, hoisted out of the child screen.
+
+     Every in-course screen used to print its own crumb and <h1> as the first
+     thing in the reading column, which put the rail's top edge level with a
+     line of text while the video, the quiz card and everything else started an
+     inch further down. Nothing lined up with anything. It belongs above BOTH
+     columns, so the card on the left and the card on the right start on the
+     same line.
+
+     Read off the outline the rail is already using, which also means the title
+     is on screen while the child is still loading its own data. */
+  const activeId = lessonId ?? quizId;
+  const modIndex = modules.findIndex((m) =>
+    m.lessons.some((l) => String(l.id) === String(activeId)),
+  );
+  const activeMod = modIndex >= 0 ? modules[modIndex] : null;
+  const lessonIndex = activeMod
+    ? activeMod.lessons.findIndex((l) => String(l.id) === String(activeId))
+    : -1;
+  // Position in the COURSE, not in the module: "Lesson 3 of 12" counts the ones
+  // in the modules above this one too.
+  const lessonsBefore = modules
+    .slice(0, Math.max(modIndex, 0))
+    .reduce((s, m) => s + m.lessons.length, 0);
+  const lessonTotal = modules.reduce((s, m) => s + m.lessons.length, 0);
+
   return (
     <div className="lms">
       <div className={`lms-player${railOpen ? ' is-rail-open' : ''}`}>
@@ -81,6 +107,18 @@ export default function PlayerLayout() {
         </header>
 
         <div className="lms-player__body">
+          {activeMod && lessonIndex >= 0 ? (
+            <div className="lms-player__head">
+              <span className="lms-lesson-page__crumb">
+                Module {activeMod.order} | {activeMod.title} | Lesson{' '}
+                {lessonsBefore + lessonIndex + 1} of {lessonTotal}
+              </span>
+              <h1 className="lms-lesson-page__title">
+                {activeMod.lessons[lessonIndex].title}
+              </h1>
+            </div>
+          ) : null}
+
           <main className="lms-player__main">
             {/* `reloadOutline` is what keeps the header percentage and the
                 rail's ticks honest. This layout fetches the outline once on
@@ -92,7 +130,7 @@ export default function PlayerLayout() {
                 course,
                 enrolment,
                 modules,
-                activeId: lessonId ?? quizId,
+                activeId,
                 reloadOutline: reload,
               }}
             />
@@ -100,7 +138,8 @@ export default function PlayerLayout() {
           <PlayerSidebar
             course={course}
             modules={modules}
-            activeId={lessonId ?? quizId}
+            enrolment={enrolment}
+            activeId={activeId}
             onNavigate={closeRail}
           />
         </div>

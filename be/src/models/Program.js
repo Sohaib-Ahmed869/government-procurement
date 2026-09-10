@@ -92,6 +92,26 @@ const programSchema = new mongoose.Schema(
       textColor: { type: String, default: '#1a1a1a' },
       showHours: { type: Boolean, default: true },
       showCredentialId: { type: Boolean, default: true },
+      // A scan of a handwritten signature, printed at the bottom LEFT of the
+      // certificate, directly above the signature rule and the signatory's name.
+      //
+      // Uploaded through its own endpoint and never settable from a PATCH, for
+      // the same reason `image` isn't: the URL a certificate prints has to be
+      // one the server derived from a key in our own bucket. See the note
+      // beside AUTHOR_FIELDS in authoring.controller.js.
+      signature: {
+        key: { type: String, default: '' },
+        url: { type: String, default: '' },
+      },
+      // Where the signature block sits along the foot. Three named places
+      // rather than free coordinates: this document is also drawn as a PDF and
+      // printed, and an arbitrary drag position would have to be re-derived in
+      // millimetres for print and would not survive a change of paper size.
+      signaturePosition: {
+        type: String,
+        enum: ['left', 'center', 'right'],
+        default: 'left',
+      },
     },
   },
   { timestamps: true },

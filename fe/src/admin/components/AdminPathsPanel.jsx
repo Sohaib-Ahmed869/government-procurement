@@ -150,8 +150,8 @@ export default function AdminPathsPanel({ isAdmin, query }) {
                     <h3 className="admin-course__title">{p.title}</h3>
                     <p className="admin-course__meta">
                       {p.author?.name ?? 'Unknown author'}
-                      {p.author?.email ? ` · ${p.author.email}` : ''}
-                      {p.submittedAt ? ` · submitted ${when(p.submittedAt)}` : ''}
+                      {p.author?.email ? ` | ${p.author.email}` : ''}
+                      {p.submittedAt ? ` | submitted ${when(p.submittedAt)}` : ''}
                     </p>
                   </div>
                   <span className={`admin-badge ${cls}`}>{label}</span>
@@ -159,7 +159,7 @@ export default function AdminPathsPanel({ isAdmin, query }) {
 
                 <p className="admin-course__meta">
                   {p.stepCount} {p.stepCount === 1 ? 'course' : 'courses'}
-                  {p.courses?.length ? ` · ${p.courses.map((c) => c.title).join(' → ')}` : ''}
+                  {p.courses?.length ? ` | ${p.courses.map((c) => c.title).join(' → ')}` : ''}
                 </p>
 
                 {p.summary ? <p className="admin-course__meta">{p.summary}</p> : null}
@@ -309,9 +309,9 @@ function PathSteps({ programId }) {
           <strong>{s.course?.title ?? 'Course unavailable'}</strong>
           <span className="admin-course__meta">
             {s.lessons} {s.lessons === 1 ? 'lesson' : 'lessons'}
-            {s.minutes ? ` · ${s.minutes} min` : ''}
-            {s.required === false ? ' · elective' : ''}
-            {s.course && s.course.status !== 'published' ? ' · NOT PUBLISHED' : ''}
+            {s.minutes ? ` | ${s.minutes} min` : ''}
+            {s.required === false ? ' | elective' : ''}
+            {s.course && s.course.status !== 'published' ? ' | NOT PUBLISHED' : ''}
           </span>
         </li>
       ))}

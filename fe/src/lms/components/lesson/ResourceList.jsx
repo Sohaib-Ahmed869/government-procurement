@@ -65,7 +65,7 @@ export default function ResourceList({
                 <span className="lms-resource__title">{r.title}</span>
                 <span className="lms-resource__meta">
                   {(r.kind ?? 'file').toUpperCase()}
-                  {r.sizeBytes ? ` · ${sizeLabel(r.sizeBytes)}` : ''}
+                  {r.sizeBytes ? ` | ${sizeLabel(r.sizeBytes)}` : ''}
                 </span>
               </span>
 

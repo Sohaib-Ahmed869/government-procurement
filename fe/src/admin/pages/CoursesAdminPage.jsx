@@ -302,8 +302,8 @@ export default function CoursesAdminPage() {
                     <h3 className="admin-course__title">{c.title}</h3>
                     <p className="admin-course__meta">
                       {c.author?.name ?? 'CMS-authored'}
-                      {c.author?.email ? ` · ${c.author.email}` : ''}
-                      {c.submittedAt ? ` · submitted ${when(c.submittedAt)}` : ''}
+                      {c.author?.email ? ` | ${c.author.email}` : ''}
+                      {c.submittedAt ? ` | submitted ${when(c.submittedAt)}` : ''}
                     </p>
                   </div>
                   <span className={`admin-badge ${cls}`}>{label}</span>
@@ -324,21 +324,6 @@ export default function CoursesAdminPage() {
                 ) : null}
 
                 <div className="admin-course__foot">
-                  {/* Featuring is separate from approving: a published course
-                      isn't automatically something the homepage should push. */}
-                  <label className="admin-course__feature">
-                    <input
-                      type="checkbox"
-                      checked={Boolean(c.featured)}
-                      disabled={!isAdmin || busy || c.status !== 'published'}
-                      onChange={(e) => act(c._id, () => reviewApi.setFeatured(c._id, e.target.checked))}
-                    />
-                    <span>
-                      Featured on homepage
-                      {c.status !== 'published' ? ' (publish first)' : ''}
-                    </span>
-                  </label>
-
                   <div className="admin-course__actions">
                     <button type="button" className="admin-btn admin-btn--sm" onClick={() => openDetail(c)}>
                       View curriculum

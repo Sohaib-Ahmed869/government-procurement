@@ -50,7 +50,6 @@ const EMPTY = {
   loginUrl: '',
   note: '',
   loginRequired: false,
-  order: 0,
   active: true,
 };
 
@@ -118,7 +117,6 @@ export default function TendersAdminPage() {
       loginUrl: row.loginUrl || '',
       note: row.note || '',
       loginRequired: Boolean(row.loginRequired),
-      order: row.order ?? 0,
       active: row.active !== false,
     });
     setLogoUrl(row.logo?.url || '');
@@ -144,7 +142,6 @@ export default function TendersAdminPage() {
       name: form.name,
       subtitle: form.subtitle,
       group,
-      order: Number(form.order) || 0,
       active: Boolean(form.active),
       // Only the selected section's fields are kept, so an entry moved between
       // sections doesn't hold on to links the page no longer draws.
@@ -234,7 +231,6 @@ export default function TendersAdminPage() {
       .join(', ') || '—';
 
   const columns = [
-    { key: 'order', header: '#', render: (r) => r.order ?? 0, width: 60 },
     {
       key: 'logo',
       header: 'Logo',
@@ -291,7 +287,7 @@ export default function TendersAdminPage() {
         <div className="admin-page__heading">
           <h2 className="admin-page__title">Tender Websites</h2>
           <p className="admin-page__subtitle">
-            The portals listed on the Tender Websites page, in the order shown.
+            The portals listed on the Tender Websites page, shown A–Z by name.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -484,15 +480,6 @@ export default function TendersAdminPage() {
               </p>
             )}
           </div>
-
-          <FormField
-            label="Order"
-            name="order"
-            type="number"
-            value={form.order}
-            onChange={onChange}
-            hint="Lowest first."
-          />
 
           <div className="admin-field">
             <div className="admin-checkgroup">

@@ -123,11 +123,11 @@ function MediaCard({ item, onCopy, copied, onDelete }) {
             </svg>
             {item.folder || 'general'}
           </span>
-          <span className="admin-mediacard__dot">·</span>
+          <span className="admin-mediacard__dot">|</span>
           <span>{formatBytes(item.sizeBytes)}</span>
           {formatDate(item.createdAt) && (
             <>
-              <span className="admin-mediacard__dot">·</span>
+              <span className="admin-mediacard__dot">|</span>
               <span>{formatDate(item.createdAt)}</span>
             </>
           )}
@@ -379,7 +379,7 @@ export default function MediaLibraryPage() {
         <>
           <p className="admin-media__count">
             {visible.length} item{visible.length === 1 ? '' : 's'}
-            {kind !== 'all' ? ` · ${kind}s` : ''}
+            {kind !== 'all' ? ` | ${kind}s` : ''}
           </p>
           <div className="admin-media__grid">
             {visible.map((m) => (

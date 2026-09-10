@@ -33,6 +33,8 @@ const PATH_CERTIFICATE_DEFAULTS = {
   textColor: '#1a1a1a',
   showHours: true,
   showCredentialId: true,
+  signature: { key: '', url: '' },
+  signaturePosition: 'left',
 };
 
 // The learning path builder (LMS 8.0). Same shape as the course builder on
@@ -136,7 +138,7 @@ export default function PathBuilderPage() {
 
       <h1 className="lms-page__title">{view.title}</h1>
       <p className="lms-page__subtitle">
-        {steps.length} {steps.length === 1 ? 'course' : 'courses'} · a learner who has already
+        {steps.length} {steps.length === 1 ? 'course' : 'courses'} | a learner who has already
         finished one keeps that credit.
       </p>
 
@@ -240,6 +242,11 @@ export default function PathBuilderPage() {
             minutes={totalMinutes}
             previewName={user?.name}
             onChange={(patch) => set(patch)}
+            onUploadSignature={async (file) => {
+              const saved = await authoringApi.uploadProgramSignature(programId, file);
+              return saved?.certificate?.signature;
+            }}
+            onRemoveSignature={() => authoringApi.removeProgramSignature(programId)}
           />
         </section>
       ) : null}

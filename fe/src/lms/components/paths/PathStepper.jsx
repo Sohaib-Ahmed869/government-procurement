@@ -59,8 +59,8 @@ export default function PathStepper({ steps }) {
 
               <p className="lms-step__meta">
                 {step.lessonsTotal} {step.lessonsTotal === 1 ? 'lesson' : 'lessons'}
-                {course.level ? ` · ${course.level}` : ''}
-                {step.required ? '' : ' · elective'}
+                {course.level ? ` | ${course.level}` : ''}
+                {step.required ? '' : ' | elective'}
               </p>
 
               {step.state === 'locked' ? (

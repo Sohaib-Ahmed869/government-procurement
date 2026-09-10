@@ -13,6 +13,7 @@ import { presignPut, uploadBuffer, deleteObject } from '../../config/s3.js';
 import { parseYouTubeId } from '../../utils/youtube.js';
 import { toSlug, uniqueSlug } from '../../utils/slugify.js';
 import { CONTENT_STATUS } from '../../constants/statuses.js';
+import { STAFF_ROLES } from '../../constants/roles.js';
 import { sanitizeRichTextFields } from '../../utils/richText.js';
 
 // Slugs that would collide with a route segment the app already owns,
@@ -55,6 +56,23 @@ const AUTHOR_FIELDS = [
 // from the account at creation, and the builder shows it as a read-only field.
 const BYLINE_FIELDS = ['role', 'avatarUrl'];
 
+/* The signature image inside `certificate` is NOT settable from a PATCH, for
+   the same reason `image` isn't: the URL a certificate prints has to be one the
+   server derived from a key in our own bucket. The builder round-trips the
+   whole certificate object as the author types, so the stored signature is put
+   back rather than the incoming one being trusted. */
+function keepStoredSignature(out, current) {
+  if (!out.certificate || typeof out.certificate !== 'object') return;
+  const stored = current?.certificate?.signature;
+  out.certificate = {
+    ...out.certificate,
+    signature: {
+      key: stored?.key || '',
+      url: stored?.url || '',
+    },
+  };
+}
+
 function pickAuthorFields(body, course) {
   const out = {};
   AUTHOR_FIELDS.forEach((f) => {
@@ -75,6 +93,8 @@ function pickAuthorFields(body, course) {
     });
     out.instructor = byline;
   }
+
+  keepStoredSignature(out, course);
 
   return out;
 }
@@ -102,7 +122,20 @@ async function recalcDuration(courseId) {
 // GET /lms/authoring/courses. The signed-in instructor's own courses.
 // Scoped server-side; a client-side filter is not access control.
 export const myCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ author: req.user._id }).sort({ updatedAt: -1 }).lean();
+  /* Staff see every course; an instructor sees the ones they wrote.
+
+     This used to filter on `author` for everybody, which put it out of step
+     with the two endpoints that consume the same list: mySessions and
+     createSession in liveSessions.controller.js both special-case STAFF_ROLES
+     and let staff act on any course. The result was a super admin who could
+     schedule a live session on any course through the API but was shown an
+     EMPTY course picker in the UI to choose from — the list said they had
+     nothing, while the action said otherwise.
+
+     A course authored through the CMS has no `author` at all, so it could never
+     appear here under the old rule no matter who asked. */
+  const scope = STAFF_ROLES.includes(req.user.role) ? {} : { author: req.user._id };
+  const courses = await Course.find(scope).sort({ updatedAt: -1 }).lean();
 
   const withCounts = await Promise.all(
     courses.map(async (c) => {
@@ -731,6 +764,59 @@ export const courseImage = asyncHandler(async (req, res) => {
 export const removeCourseImage = asyncHandler(async (req, res) => {
   const oldKey = req.course.image?.key;
   req.course.image = { key: '', url: '' };
+  await req.course.save();
+
+  if (oldKey) {
+    try {
+      await deleteObject(oldKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return ok(res, req.course);
+});
+
+// POST /lms/authoring/courses/:courseId/certificate-signature.
+//
+// A scan of the signatory's handwritten signature, printed at the bottom left
+// of every certificate this course issues from now on. Multipart through the
+// API rather than a presigned PUT, for the same two reasons the cover image is:
+// it is small, and the server has to be what decides the URL.
+//
+// Certificates already earned are untouched — they carry the signature that was
+// current when they were issued, snapshotted into their own design.
+export const certificateSignature = asyncHandler(async (req, res) => {
+  if (!req.file) throw ApiError.badRequest('An image file is required');
+
+  const oldKey = req.course.certificate?.signature?.key;
+  const { key, url } = await uploadBuffer({
+    buffer: req.file.buffer,
+    mimeType: req.file.mimetype,
+    folder: 'signatures',
+    originalName: req.file.originalname,
+  });
+
+  req.course.certificate.signature = { key, url };
+  await req.course.save();
+
+  // Best effort: an orphan in the bucket is cheaper than failing the request
+  // the author is waiting on.
+  if (oldKey && oldKey !== key) {
+    try {
+      await deleteObject(oldKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return ok(res, req.course);
+});
+
+// DELETE /lms/authoring/courses/:courseId/certificate-signature.
+export const removeCertificateSignature = asyncHandler(async (req, res) => {
+  const oldKey = req.course.certificate?.signature?.key;
+  req.course.certificate.signature = { key: '', url: '' };
   await req.course.save();
 
   if (oldKey) {

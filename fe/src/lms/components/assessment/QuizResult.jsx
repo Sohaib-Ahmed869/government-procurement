@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import LmsIcon from '../LmsIcon.jsx';
+import { lessonHref } from '../../utils/lessonHref.js';
 
 // Answer text for the review, whichever input type produced it. `given` and
 // `answer` both arrive from the server as arrays of option ids (or, for a short
@@ -21,8 +22,24 @@ function label(item, ids) {
 // because the attempt has already been marked — withholding it now would remove
 // the only part of a quiz that teaches anything. Before submission it isn't
 // sent at all.
-export default function QuizResult({ attempt, review = [], passMark, slug, onRetake }) {
+export default function QuizResult({
+  attempt,
+  review = [],
+  passMark,
+  slug,
+  next,
+  onRetake,
+  // Set once the course is finished. A quiz is often the LAST lesson, and
+  // passing it is what issues the certificate — so on that pass the thing the
+  // learner has earned is the certificate, not another lesson.
+  certificateId,
+}) {
   const { score, total, percent, passed } = attempt;
+  // Where a learner who has just passed actually wants to go. Offered only on a
+  // pass: sending somebody who scored 1/3 onward to the next lecture would be
+  // walking them past the thing they got wrong.
+  const onward = passed && next ? next : null;
+  const finished = passed && !next && certificateId;
 
   return (
     <div>
@@ -81,17 +98,43 @@ export default function QuizResult({ attempt, review = [], passMark, slug, onRet
         })}
       </ol>
 
+      {/* On a pass the primary action is FORWARD. Retake is still there — a
+          learner may want a cleaner score — but it stops being the green button,
+          because the thing they have earned is the next lesson. On a fail the
+          arrangement is unchanged: retaking is the only sensible next move. */}
       <div className="lms-lessonnav">
         <Link className="lms-btn" to={`/learn/courses/${slug}`}>
           Back to course
         </Link>
         <div className="lms-lessonnav__mid">
-          <button type="button" className="lms-btn lms-btn--primary" onClick={onRetake}>
+          <button
+            type="button"
+            className={`lms-btn${onward ? '' : ' lms-btn--primary'}`}
+            onClick={onRetake}
+          >
             <LmsIcon name="arrow" />
             Retake quiz
           </button>
         </div>
-        <span />
+        {onward ? (
+          <Link className="lms-btn lms-btn--primary" to={lessonHref(slug, onward)}>
+            {/* Just "Next", as it is at the foot of every lesson. It used to
+                name the kind it was going to, with a three-way check that fell
+                through to "Next video" for anything it did not recognise — so a
+                reading or a YouTube lesson was announced as a video. Naming the
+                kind was never worth the chance of naming it wrong, and the rail
+                beside this already says what is coming. */}
+            Next
+            <LmsIcon name="arrow" />
+          </Link>
+        ) : finished ? (
+          <Link className="lms-btn lms-btn--primary" to={`/learn/certificates/${certificateId}`}>
+            View certificate
+            <LmsIcon name="award" />
+          </Link>
+        ) : (
+          <span />
+        )}
       </div>
     </div>
   );

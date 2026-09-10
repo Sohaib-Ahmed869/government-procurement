@@ -142,7 +142,7 @@ export default function MediaUploader({ courseId, lessonId, video, onChange }) {
           <p className="lms-upload__meta">
             {[sizeLabel(video.sizeBytes), formatLabel(video.mimeType, video.name)]
               .filter(Boolean)
-              .join(' · ')}
+              .join(' | ')}
           </p>
         </div>
         <div className="lms-upload__actions">

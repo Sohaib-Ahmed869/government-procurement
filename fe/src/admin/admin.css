@@ -623,6 +623,49 @@
 .admin-table tbody tr:hover td { background: var(--admin-surface-2); }
 .admin-table__actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
 
+/* Position cell on an ordered list — the number, and the two arrows that set
+   it. The arrows sit BESIDE the number rather than under it so the row keeps
+   the height of every other row: a list whose first column is twice as tall as
+   its content is a list you have to scroll twice as far to read.
+
+   They stay at rest until the row is hovered or one of them has focus, because
+   twenty pairs of arrows down a page is a column of clutter competing with the
+   company names. Focus is in that list so the column is still usable from the
+   keyboard, where there is no hover to give. */
+.admin-order { display: flex; align-items: center; gap: 8px; }
+.admin-order__num {
+  min-width: 18px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+.admin-order__btns { display: inline-flex; flex-direction: column; gap: 2px; }
+.admin-order__btn {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 15px;
+  padding: 0;
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  background: var(--admin-surface);
+  color: var(--admin-text-2);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s var(--admin-ease), background 0.12s var(--admin-ease),
+    color 0.12s var(--admin-ease);
+}
+.admin-table tbody tr:hover .admin-order__btn,
+.admin-order__btn:focus-visible { opacity: 1; }
+.admin-order__btn:hover:not(:disabled) {
+  background: var(--admin-surface-2);
+  color: var(--admin-text);
+}
+/* An arrow with nowhere to go keeps its space so the pair never reflows — the
+   top row's "up" is simply spent. */
+.admin-order__btn:disabled { opacity: 0; pointer-events: none; }
+.admin-table tbody tr:hover .admin-order__btn:disabled { opacity: 0.28; }
+
 /* Skeleton loading rows */
 .admin-table__skeleton-row td { background: var(--admin-surface) !important; }
 .admin-skeleton {

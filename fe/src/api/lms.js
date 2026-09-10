@@ -40,6 +40,12 @@ export const authoringApi = {
   removeProgram: (programId) => api.del(`/lms/authoring/programs/${programId}`),
   submitProgram: (programId) => api.post(`/lms/authoring/programs/${programId}/submit`),
   withdrawProgram: (programId) => api.post(`/lms/authoring/programs/${programId}/withdraw`),
+  // The path certificate's signature scan. Same endpoint shape as a course's;
+  // both return the updated program.
+  uploadProgramSignature: (programId, file) =>
+    api.upload(`/lms/authoring/programs/${programId}/certificate-signature`, file),
+  removeProgramSignature: (programId) =>
+    api.del(`/lms/authoring/programs/${programId}/certificate-signature`),
 
   // Cohort analytics: how the assessments are performing, and who has stopped.
   // The per-quiz call takes a LESSON id — a quiz is a lesson of kind 'quiz'.
@@ -74,6 +80,13 @@ export const authoringApi = {
   uploadImage: (courseId, file) =>
     api.upload(`/lms/authoring/courses/${courseId}/image`, file),
   removeImage: (courseId) => api.del(`/lms/authoring/courses/${courseId}/image`),
+
+  // The certificate's signature scan, on exactly the same terms and for the
+  // same reason. Both return the updated course.
+  uploadCertificateSignature: (courseId, file) =>
+    api.upload(`/lms/authoring/courses/${courseId}/certificate-signature`, file),
+  removeCertificateSignature: (courseId) =>
+    api.del(`/lms/authoring/courses/${courseId}/certificate-signature`),
 
   addLesson: (courseId, moduleId, body) =>
     api.post(`/lms/authoring/courses/${courseId}/modules/${moduleId}/lessons`, body),

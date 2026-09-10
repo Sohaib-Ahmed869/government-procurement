@@ -70,7 +70,7 @@ export default function OrderRow({ order }) {
         <div className="lms-order__actions">
           {order.payment?.last4 ? (
             <span className="lms-order__card">
-              {order.payment.brand} ···· {order.payment.last4}
+              {order.payment.brand} •••• {order.payment.last4}
             </span>
           ) : null}
           {order.status === 'paid' ? (

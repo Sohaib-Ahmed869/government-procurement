@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import LmsIcon from '../../components/LmsIcon.jsx';
+import Select from '../../components/Select.jsx';
+import { useStudentAuth } from '../../context/StudentAuthContext.jsx';
 import ConfirmDialog from '../../components/ConfirmDialog.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import { liveApi } from '../../../api/lms.js';
@@ -56,6 +58,10 @@ function localToIso(value, timezone) {
 
 export default function InstructorLiveSessionsPage() {
   const { courses } = useAuthoredCourses();
+  // Named in the permission notice below. A 403 that does not say WHICH account
+  // it refused is a dead end: this browser can hold a staff session and a
+  // learner session at once, and the one that answers is decided by the URL.
+  const { user, logout } = useStudentAuth();
   const { sessions, status, error, reload } = useAuthoredSessions();
   const { live } = useLiveStatus();
   const { toast } = useToast();
@@ -72,10 +78,15 @@ export default function InstructorLiveSessionsPage() {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  // The server says 403 only when the role check refuses; anything else here is
+  // a genuine failure to load and should show its own message.
+  const deniedByRole = /permission|not authorised|forbidden/i.test(error ?? '');
+
   async function submit(e) {
     e.preventDefault();
     setFormError('');
     if (!form.courseId) return setFormError('Pick the course this session belongs to.');
+    if (!form.title.trim()) return setFormError('Give the session a title, so it is recognisable in a list.');
     if (!form.startsAt) return setFormError('Pick a date and time.');
 
     setBusy(true);
@@ -156,22 +167,37 @@ export default function InstructorLiveSessionsPage() {
         </div>
       ) : null}
 
+      {/* `noValidate` hands validation to `submit` below.
+
+          The browser's own bubbles ("Please select an item in the list.") are an
+          OS-drawn tooltip: they cannot be styled, they sit outside the page's
+          type and colour, and they point at a control the user may have had no
+          way of satisfying — on an empty course list, `required` simply blocked
+          the form with a message that read as a scolding. Our messages render in
+          the form, in the page's own voice. */}
       {open ? (
-        <form className="lms-card lms-profileform lms-live-form" onSubmit={submit}>
+        <form className="lms-card lms-profileform lms-live-form" onSubmit={submit} noValidate>
           <div className="lms-field">
-            <label className="lms-field__label" htmlFor="ls-course">Course</label>
-            <select
-              id="ls-course"
-              className="lms-input"
-              value={form.courseId}
-              onChange={set('courseId')}
-              required
-            >
-              <option value="">Choose a course…</option>
-              {courses.map((c) => (
-                <option key={c._id} value={c._id}>{c.title}</option>
-              ))}
-            </select>
+            <span className="lms-field__label" id="ls-course-label">Course</span>
+            {/* An empty picker is not a choice, it is a dead end — and it is
+                what an instructor with no courses of their own was given, with
+                no explanation. Say which it is. */}
+            {courses.length ? (
+              <Select
+                id="ls-course"
+                aria-label="Course"
+                value={form.courseId}
+                onChange={(courseId) => setForm((f) => ({ ...f, courseId }))}
+                options={courses.map((c) => ({ value: c._id, label: c.title }))}
+                placeholder="Choose a course…"
+              />
+            ) : (
+              <p className="lms-field__hint">
+                You have no courses to schedule against yet. A session hangs off a
+                course, so write one first — everyone enrolled on it is who gets
+                invited.
+              </p>
+            )}
           </div>
 
           <div className="lms-field">
@@ -182,7 +208,6 @@ export default function InstructorLiveSessionsPage() {
               value={form.title}
               onChange={set('title')}
               placeholder="Live Q&A: writing the executive summary"
-              required
             />
           </div>
 
@@ -209,16 +234,20 @@ export default function InstructorLiveSessionsPage() {
                 type="datetime-local"
                 value={form.startsAt}
                 onChange={set('startsAt')}
-                required
               />
             </div>
             <div className="lms-field">
-              <label className="lms-field__label" htmlFor="ls-tz">Timezone</label>
-              <select id="ls-tz" className="lms-input" value={form.timezone} onChange={set('timezone')}>
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>{tz.split('/')[1].replace('_', ' ')}</option>
-                ))}
-              </select>
+              <span className="lms-field__label">Timezone</span>
+              <Select
+                id="ls-tz"
+                aria-label="Timezone"
+                value={form.timezone}
+                onChange={(timezone) => setForm((f) => ({ ...f, timezone }))}
+                options={TIMEZONES.map((tz) => ({
+                  value: tz,
+                  label: tz.split('/')[1].replace('_', ' '),
+                }))}
+              />
             </div>
             <div className="lms-field">
               <label className="lms-field__label" htmlFor="ls-dur">Length (minutes)</label>
@@ -249,7 +278,43 @@ export default function InstructorLiveSessionsPage() {
       ) : null}
 
       {status === 'loading' ? <p className="lms-empty">Loading…</p> : null}
-      {status === 'error' ? <p className="lms-empty">{error}</p> : null}
+      {/* A permission failure here is not a broken page, it is the wrong
+          account — and the server's own wording ("You do not have permission to
+          perform this action") tells nobody which account or what to do about
+          it. Scheduling needs an INSTRUCTOR or super-admin session; a learner
+          token in this tab produces exactly this, while the page itself still
+          renders because the guard reads the signed-in user rather than the
+          token the requests actually carry. */}
+      {status === 'error' ? (
+        <div className="lms-card lms-notice">
+          <span className="lms-notice__icon"><LmsIcon name="lock" /></span>
+          <div className="lms-notice__body">
+            <p className="lms-notice__title">
+              {deniedByRole
+                ? 'This account cannot schedule sessions'
+                : 'Could not load your sessions'}
+            </p>
+            <p className="lms-notice__text">
+              {deniedByRole ? (
+                <>
+                  Teaching tools need an instructor or super-admin account.
+                  {user?.email ? <> This tab is signed in as <strong>{user.email}</strong>.</> : null}
+                  {' '}Sign out and back in with the account that owns these courses.
+                </>
+              ) : (
+                error
+              )}
+            </p>
+            {deniedByRole ? (
+              <p style={{ marginTop: 10 }}>
+                <button type="button" className="lms-btn lms-btn--sm" onClick={logout}>
+                  Sign out
+                </button>
+              </p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {status === 'ready' && !sessions.length ? (
         <div className="lms-card">
@@ -283,7 +348,7 @@ export default function InstructorLiveSessionsPage() {
                   <td>
                     {formatSessionTime(s.startsAt, s.timezone)}
                     {s.state === 'upcoming' ? (
-                      <span className="lms-dtable__muted"> · {relativeTo(s.startsAt)}</span>
+                      <span className="lms-dtable__muted"> | {relativeTo(s.startsAt)}</span>
                     ) : null}
                   </td>
                   <td>
@@ -291,7 +356,7 @@ export default function InstructorLiveSessionsPage() {
                       <span className="lms-dtable__ok">
                         <LmsIcon name="check" /> Ready
                         {s.passcode ? (
-                          <span className="lms-dtable__muted">· {s.passcode}</span>
+                          <span className="lms-dtable__muted">| {s.passcode}</span>
                         ) : null}
                       </span>
                     ) : s.state === 'cancelled' ? (

@@ -17,6 +17,8 @@ const EDITABLE = [
   'contactEmail',
   'contactPhone',
   'website',
+  'linkedinUrl',
+  'caseStudiesUrl',
   'officeState',
   'officeCity',
   'categories',
@@ -74,8 +76,10 @@ export const list = asyncHandler(async (req, res) => {
 
   const items = await BidWriter.find(filter)
     .collation({ locale: 'en' })
-    // Featured first, by explicit rank rather than by tier name — see TIER_RANK.
-    .sort('tierRank order company');
+    // The editor's order decides the page, top to bottom. Tier only settles two
+    // listings that share a number, and the name only settles those — see the
+    // note on `order` in the model.
+    .sort('order tierRank company');
 
   if (isStaff) return ok(res, items);
 
@@ -96,6 +100,14 @@ export const create = asyncHandler(async (req, res) => {
   const writer = new BidWriter();
   for (const field of EDITABLE) {
     if (req.body[field] !== undefined) writer[field] = req.body[field];
+  }
+  // A new listing goes to the BOTTOM unless someone said otherwise. The field
+  // defaults to 0, which is first — so without this every listing added would
+  // arrive at the top of the page and quietly push down the placements already
+  // arranged there.
+  if (req.body.order === undefined) {
+    const last = await BidWriter.findOne().sort('-order').select('order').lean();
+    writer.order = last ? (last.order ?? 0) + 1 : 0;
   }
   await writer.save();
 
@@ -127,6 +139,27 @@ export const update = asyncHandler(async (req, res) => {
     summary: `Updated bid writer listing "${writer.company}" (${writer.active ? 'active' : 'inactive'})`,
   });
   return ok(res, writer);
+});
+
+// PATCH /reorder — the whole ordered list of ids at once.
+//
+// One request for a whole arrangement rather than one per row: a nudge that
+// swaps two listings changes two numbers, and sending them separately can leave
+// the directory half-renumbered if the second call fails. The position IS the
+// index in the array, so the sequence that arrives is the sequence that shows.
+export const reorder = asyncHandler(async (req, res) => {
+  const { order } = req.body; // array of listing ids, first on the page first
+  if (!Array.isArray(order)) throw ApiError.badRequest('order must be an array of listing ids');
+
+  await Promise.all(order.map((id, i) => BidWriter.updateOne({ _id: id }, { order: i })));
+
+  recordAudit({
+    req,
+    action: 'bidWriter.reorder',
+    entity: 'BidWriter',
+    summary: `Reordered the bid writer directory (${order.length} listings)`,
+  });
+  return ok(res, { reordered: order.length });
 });
 
 export const uploadLogo = asyncHandler(async (req, res) => {

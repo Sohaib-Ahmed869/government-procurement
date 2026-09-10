@@ -131,7 +131,7 @@ export default function NotificationsMenu() {
                         <span className="lms-notif__detail">{item.detail}</span>
                       ) : null}
                       <span className="lms-notif__meta">
-                        {item.context ? `${item.context} · ` : ''}
+                        {item.context ? `${item.context} | ` : ''}
                         {when(item.at)}
                       </span>
                     </span>

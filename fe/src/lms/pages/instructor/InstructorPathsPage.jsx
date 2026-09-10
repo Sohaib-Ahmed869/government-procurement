@@ -116,7 +116,7 @@ export default function InstructorPathsPage() {
                       </h2>
                       <p className="lms-icourse__meta">
                         {p.stepCount} {p.stepCount === 1 ? 'course' : 'courses'}
-                        {p.courses?.length ? ` · ${p.courses.map((c) => c.title).join(' → ')}` : ''}
+                        {p.courses?.length ? ` | ${p.courses.map((c) => c.title).join(' → ')}` : ''}
                       </p>
                     </div>
                   </div>

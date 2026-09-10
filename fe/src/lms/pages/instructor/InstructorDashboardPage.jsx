@@ -393,7 +393,7 @@ export default function InstructorDashboardPage() {
                       <span className="lms-list__body">
                         <span className="lms-list__title">{c.title}</span>
                         <span className="lms-list__meta">
-                          {c.moduleCount} modules · {c.lessonCount} lessons · {c.learners.toLocaleString('en-AU')} enrolments
+                          {c.moduleCount} modules | {c.lessonCount} lessons | {c.learners.toLocaleString('en-AU')} enrolments
                         </span>
                       </span>
                       <span className="lms-list__trail">

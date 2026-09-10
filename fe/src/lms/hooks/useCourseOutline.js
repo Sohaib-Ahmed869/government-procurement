@@ -39,7 +39,19 @@ export function useCourseOutline(slug) {
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
-    setStatus('loading');
+    /* A REFRESH must not blank a shell that is already showing the course.
+
+       `reload` is called every time a lesson is marked complete, to keep the
+       header percentage and the rail's ticks honest. Dropping back to
+       'loading' made PlayerLayout render its "Loading…" placeholder instead of
+       the <Outlet>, which UNMOUNTED the lesson screen underneath — so finishing
+       a video threw away everything that screen was holding: the transcript's
+       scroll, the open tab, and the up-next countdown that had just been
+       started by the very event that triggered the refresh.
+
+       Only the first load has nothing to show. After that the old answer stays
+       on screen until the new one arrives. */
+    setStatus((current) => (current === 'ready' ? 'ready' : 'loading'));
     try {
       const res = await catalogApi.outline(slug);
       const course = res.course ?? {};
@@ -80,6 +92,19 @@ export function useCourseOutline(slug) {
       });
       setStatus('ready');
     } catch (err) {
+      // Same rule on the way out: a failed refresh leaves the course that is
+      // already on screen alone. The error states are for a shell with nothing
+      // in it, not for a background poll that missed.
+      let hadData = false;
+      setData((current) => {
+        hadData = current !== null;
+        return current;
+      });
+      if (hadData) {
+        setStatus('ready');
+        return;
+      }
+
       // 404 is a real answer. The course doesn't exist or isn't published,
       // and reads differently from the server being unreachable.
       if (err?.status === 404) {

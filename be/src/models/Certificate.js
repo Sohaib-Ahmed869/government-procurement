@@ -52,6 +52,11 @@ const certificateSchema = new mongoose.Schema(
       textColor: { type: String, default: '#1a1a1a' },
       showHours: { type: Boolean, default: true },
       showCredentialId: { type: Boolean, default: true },
+      // The signature image AS IT WAS at issue, kept as a plain URL rather than
+      // a key: this is a snapshot, and an instructor replacing their signature
+      // must not restamp certificates already earned.
+      signatureUrl: { type: String, default: '' },
+      signaturePosition: { type: String, enum: ['left', 'center', 'right'], default: 'left' },
     },
 
     issuedAt: { type: Date, default: Date.now },

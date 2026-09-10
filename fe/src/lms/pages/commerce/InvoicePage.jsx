@@ -90,7 +90,7 @@ export default function InvoicePage() {
             <p className="lms-invoice__party">{on(order.placedAt)}</p>
             {order.payment ? (
               <p>
-                Paid by {order.payment.brand} ···· {order.payment.last4}
+                Paid by {order.payment.brand} •••• {order.payment.last4}
               </p>
             ) : (
               <p>No payment required</p>

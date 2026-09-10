@@ -49,7 +49,7 @@ export default function QuizzesPage() {
           <h1 className="lms-page__title">Quizzes</h1>
           <p className="lms-page__subtitle">
             {quizzes.length
-              ? `${summary.total} quizzes · ${summary.questions} questions · ${summary.ready} ready to go.`
+              ? `${summary.total} quizzes | ${summary.questions} questions | ${summary.ready} ready to go.`
               : 'Assessments across your courses.'}
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function QuizzesPage() {
                           <Link to={`/learn/instructor/courses/${row.courseId}`}>
                             {row.courseTitle}
                           </Link>
-                          {' · '}
+                          {' | '}
                           {row.moduleTitle}
                         </p>
                       </div>

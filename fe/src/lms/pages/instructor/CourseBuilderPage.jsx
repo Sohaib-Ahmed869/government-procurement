@@ -207,7 +207,7 @@ export default function CourseBuilderPage() {
           </Link>
           <h1 className="lms-builder__title">{merged.title || 'Untitled course'}</h1>
           <p className="lms-builder__meta">
-            {readiness.counts.modules} modules · {readiness.counts.lessons} lessons ·{' '}
+            {readiness.counts.modules} modules | {readiness.counts.lessons} lessons |{' '}
             {readiness.counts.minutes} min
           </p>
         </div>
@@ -425,6 +425,13 @@ export default function CourseBuilderPage() {
             setDraft((d) => ({ ...d, ...patch }));
             courseSave.queue(patch);
           }}
+          // The signature is saved by the API the moment it is chosen, the same
+          // way the cover image is, and answers with the updated course.
+          onUploadSignature={async (file) => {
+            const saved = await authoringApi.uploadCertificateSignature(courseId, file);
+            return saved?.certificate?.signature;
+          }}
+          onRemoveSignature={() => authoringApi.removeCertificateSignature(courseId)}
         />
       ) : null}
 

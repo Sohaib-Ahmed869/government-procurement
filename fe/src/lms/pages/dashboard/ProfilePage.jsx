@@ -52,12 +52,12 @@ export default function ProfilePage() {
             <h2 className="lms-profile__name">{name}</h2>
             {profile.title || profile.organisation ? (
               <p className="lms-profile__role">
-                {[profile.title, profile.organisation].filter(Boolean).join(' · ')}
+                {[profile.title, profile.organisation].filter(Boolean).join(' | ')}
               </p>
             ) : null}
             <p className="lms-profile__level">
               <LmsIcon name="badge" />
-              {level.name} · {points} points
+              {level.name} | {points} points
             </p>
           </div>
         </div>

@@ -1,6 +1,27 @@
+import dns from 'node:dns';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+/* Resolver override, applied HERE rather than in server.js.
+
+   Every entry point imports this module — the API, `npm run seed`, and each of
+   the one-off scripts — and every one of them resolves the Mongo host before it
+   can do anything. Wiring it into the server's boot only fixed the server, and
+   left `node src/scripts/...` failing with the same `querySrv ECONNREFUSED` it
+   was meant to cure.
+
+   It has to run before the first lookup, which is why it sits at module scope
+   next to dotenv rather than behind a function anyone has to remember to call.
+   See the note on `dnsServers` below. */
+const configuredDns = (process.env.DNS_SERVERS || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+if (configuredDns.length) {
+  dns.setServers(configuredDns);
+}
 
 // Centralised, typed access to environment variables. Import `env` everywhere
 // instead of reading process.env directly, so defaults live in one place.
@@ -16,6 +37,23 @@ export const env = {
     .filter(Boolean),
 
   mongoUri: process.env.MONGO_URI || '',
+
+  /* DNS resolvers to use instead of the system's.
+
+     Node does not read the OS resolver configuration on every platform. Where
+     it can't, it falls back to 127.0.0.1 — and unless something is actually
+     listening there, every lookup Node makes fails while the same lookup from
+     the shell succeeds. `nslookup` works, the app does not, which is a
+     confusing place to start debugging.
+
+     It bites `mongodb+srv://` first, because that scheme resolves an SRV record
+     before it can connect at all: the server exits on boot with
+     `querySrv ECONNREFUSED` and the API never binds its port.
+
+     Empty (the normal case) leaves Node's resolution exactly as it was. This is
+     a local-development escape hatch, not something a deployed environment
+     should need. */
+  dnsServers: configuredDns,
 
   /* ---- Feature flags -------------------------------------------------------
 

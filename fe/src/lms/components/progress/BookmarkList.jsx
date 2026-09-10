@@ -18,7 +18,7 @@ export default function BookmarkList({ bookmarks }) {
               <span className="lms-bookmark__body">
                 <span className="lms-bookmark__title">{b.lessonTitle}</span>
                 <span className="lms-bookmark__meta">
-                  {b.moduleTitle} · {b.minutes}m
+                  {b.moduleTitle} | {b.minutes}m
                 </span>
               </span>
             </Link>

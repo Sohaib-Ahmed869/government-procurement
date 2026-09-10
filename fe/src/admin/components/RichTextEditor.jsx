@@ -203,7 +203,7 @@ export default function RichTextEditor({
 
       <div className="rte__footer">
         <span>{stats.words} words</span>
-        <span>·</span>
+        <span>|</span>
         <span>~{stats.minutes} min read</span>
         {uploading && <span className="rte__uploading">Uploading image…</span>}
       </div>

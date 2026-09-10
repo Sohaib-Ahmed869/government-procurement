@@ -47,7 +47,7 @@ export default function CatalogCourseCard({ course }) {
               </>
             ) : null}
             {course.rating != null && course.learners != null ? (
-              <span className="lms-course__dot" aria-hidden="true">·</span>
+              <span className="lms-course__dot" aria-hidden="true">|</span>
             ) : null}
             {course.learners != null ? (
               <span>{course.learners.toLocaleString('en-AU')} learners</span>
