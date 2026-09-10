@@ -1,5 +1,6 @@
 import { CERTIFICATE_DEFAULTS, certificateDuration } from '../components/certificates/CertificateDesign.jsx';
 import { gpMarkSvg } from '../components/certificates/gpMark.js';
+import { corsSafeUrl } from './corsUrl.js';
 
 /* ---------------------------------------------------------------------------
    The certificate, as a real PDF (LMS 12.0b).
@@ -68,7 +69,8 @@ async function loadImage(src, { crossOrigin = false, heightMm = 10, tint = null 
   try {
     const img = new Image();
     if (crossOrigin) img.crossOrigin = 'anonymous';
-    img.src = src;
+    // Its own cache entry for the CORS load — see utils/corsUrl.js.
+    img.src = crossOrigin ? corsSafeUrl(src) : src;
     await img.decode();
 
     const ratio = (img.naturalWidth || 1) / (img.naturalHeight || 1);
