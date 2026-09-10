@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { authApi } from '../../../api';
+import gpLogo from '../../../assets/icons/gp-02-dark.svg';
+import AuthAside from '../../components/auth/AuthAside.jsx';
 
 // Request a reset link (L6).
 //
@@ -30,7 +32,9 @@ export default function ForgotPasswordPage() {
     <div className="lms-auth">
       <div className="lms-auth__panel">
         <Link className="lms-auth__brand" to="/">
-          <span className="lms-auth__brand-mark">GP</span>
+          {/* The dark artwork, same as sign-in. This used to be the letters
+              "GP" in a tile, which is not the logo. */}
+          <img className="lms-auth__brand-mark" src={gpLogo} alt="" width="1153" height="1000" />
           <span>
             <strong>Government Procurement</strong>
             <span>Learning</span>
@@ -85,7 +89,7 @@ export default function ForgotPasswordPage() {
         )}
       </div>
 
-      <aside className="lms-auth__aside" aria-hidden="true" />
+      <AuthAside />
     </div>
   );
 }

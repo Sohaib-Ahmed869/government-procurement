@@ -1,7 +1,8 @@
 import { User } from '../../models/User.js';
 import { Notification, NOTIFICATION_KINDS } from '../../models/Notification.js';
 import { sendMail } from '../../utils/mailer.js';
-import { env } from '../../config/env.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
+import { env, siteUrl } from '../../config/env.js';
 
 /* ---------------------------------------------------------------------------
    Who gets told when something happens in a course discussion, and how.
@@ -55,7 +56,7 @@ function wants(user, key) {
 // Where a thread lives in the client. One place, because it is about to be
 // written into emails that outlive this deploy.
 const threadUrl = (threadId) =>
-  `${env.clientOrigins[0] || ''}/learn/discussions/${threadId}`;
+  `${siteUrl()}/learn/discussions/${threadId}`;
 
 /* Best-effort, and deliberately NOT awaited by the request that triggered it.
 
@@ -71,9 +72,12 @@ function email({ to, subject, lines, threadId }) {
   sendMail({
     to,
     subject,
-    html: `${body.map((l) => `<p>${l}</p>`).join('\n')}
-<p><a href="${url}">${cta}</a></p>`,
-    text: `${body.join('\n\n')}\n\n${cta}: ${url}`,
+    ...renderEmail({
+      heading: subject,
+      paragraphs: body,
+      cta: { label: cta, url },
+      preheader: body[0] || subject,
+    }),
   }).catch(() => {
     /* A notification that failed to send must not take the reply down with it.
        mailer.js already falls back to logging when SMTP is unconfigured, so

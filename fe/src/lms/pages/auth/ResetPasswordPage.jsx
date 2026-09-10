@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { authApi } from '../../../api';
+import gpLogo from '../../../assets/icons/gp-02-dark.svg';
+import AuthAside from '../../components/auth/AuthAside.jsx';
 
 // Set a new password from an emailed token (L6).
 export default function ResetPasswordPage() {
@@ -37,6 +39,15 @@ export default function ResetPasswordPage() {
     return (
       <div className="lms-auth">
         <div className="lms-auth__panel">
+          {/* The brand belongs here too — this is a page somebody lands on from
+              an email, so it is often the first thing they see of the site. */}
+          <Link className="lms-auth__brand" to="/">
+            <img className="lms-auth__brand-mark" src={gpLogo} alt="" width="1153" height="1000" />
+            <span>
+              <strong>Government Procurement</strong>
+              <span>Learning</span>
+            </span>
+          </Link>
           <h1 className="lms-auth__title">Link not valid</h1>
           <p className="lms-auth__sub">
             This reset link is missing its token. Request a fresh one and try again.
@@ -45,7 +56,7 @@ export default function ResetPasswordPage() {
             Request a new link
           </Link>
         </div>
-        <aside className="lms-auth__aside" aria-hidden="true" />
+        <AuthAside />
       </div>
     );
   }
@@ -54,7 +65,9 @@ export default function ResetPasswordPage() {
     <div className="lms-auth">
       <div className="lms-auth__panel">
         <Link className="lms-auth__brand" to="/">
-          <span className="lms-auth__brand-mark">GP</span>
+          {/* The dark artwork, same as sign-in. This used to be the letters
+              "GP" in a tile, which is not the logo. */}
+          <img className="lms-auth__brand-mark" src={gpLogo} alt="" width="1153" height="1000" />
           <span>
             <strong>Government Procurement</strong>
             <span>Learning</span>
@@ -115,7 +128,7 @@ export default function ResetPasswordPage() {
         </form>
       </div>
 
-      <aside className="lms-auth__aside" aria-hidden="true" />
+      <AuthAside />
     </div>
   );
 }

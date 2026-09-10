@@ -6,6 +6,7 @@ import { recordAudit } from '../../models/AuditLog.js';
 import { Consultation } from '../../models/Consultation.js';
 import { Setting } from '../../models/Setting.js';
 import { sendMail } from '../../utils/mailer.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
 
 const SERVICES = ['advisory', 'training', 'tender-support', 'other'];
 
@@ -53,27 +54,34 @@ export const submit = asyncHandler(async (req, res) => {
     const settings = await Setting.getSingleton();
     const to = settings?.contact?.email;
     if (to) {
-      const detail = [
-        doc.phone ? `<p><strong>Contact number:</strong> ${doc.phone}</p>` : '',
-        doc.organisation ? `<p><strong>Organisation:</strong> ${doc.organisation}</p>` : '',
-        doc.role ? `<p><strong>Role:</strong> ${doc.role}</p>` : '',
-        doc.service ? `<p><strong>Service:</strong> ${doc.service}</p>` : '',
-        doc.reason ? `<p><strong>Reason:</strong> ${doc.reason}</p>` : '',
-        doc.preferredDate
-          ? `<p><strong>Preferred date:</strong> ${new Date(doc.preferredDate).toDateString()}</p>`
-          : '',
-        doc.preferredTime ? `<p><strong>Preferred time:</strong> ${doc.preferredTime}</p>` : '',
+      /* The enquiry as a set of labelled facts. Same template as everything
+         else — this one goes to staff rather than a customer, but an inbox
+         alert that looks like the rest of the system is easier to trust and
+         easier to scan. `replyTo` is the enquirer, so hitting reply in the
+         inbox answers them rather than the no-reply mailbox. */
+      const facts = [
+        ['Contact number', doc.phone],
+        ['Organisation', doc.organisation],
+        ['Role', doc.role],
+        ['Service', doc.service],
+        ['Reason', doc.reason],
+        ['Preferred date', doc.preferredDate ? new Date(doc.preferredDate).toDateString() : ''],
+        ['Preferred time', doc.preferredTime],
       ]
-        .filter(Boolean)
-        .join('\n');
+        .filter(([, v]) => v)
+        .map(([k, v]) => `${k}: ${v}`);
 
       await sendMail({
         to,
+        replyTo: `${doc.name} <${doc.email}>`,
         subject: `New consultation request from ${doc.name}`,
-        html: `<p><strong>From:</strong> ${doc.name} &lt;${doc.email}&gt;</p>
-${detail}
-${doc.message ? `<p><strong>Message:</strong></p>\n<p>${doc.message}</p>` : ''}`,
-        text: `From: ${doc.name} <${doc.email}>\n\n${doc.message || '(no message)'}`,
+        ...renderEmail({
+          heading: 'New consultation request',
+          intro: `From ${doc.name} <${doc.email}>`,
+          paragraphs: doc.message ? [doc.message] : ['(no message was left)'],
+          bullets: facts,
+          preheader: `${doc.name}${doc.organisation ? ` — ${doc.organisation}` : ''}`,
+        }),
       });
     }
   } catch {
