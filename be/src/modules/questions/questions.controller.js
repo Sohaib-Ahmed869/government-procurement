@@ -6,7 +6,8 @@ import { uniqueSlug } from '../../utils/slugify.js';
 import { QUESTION_STATUS, QUESTION_STATUSES } from '../../constants/statuses.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { sendMail } from '../../utils/mailer.js';
-import { env } from '../../config/env.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
+import { env, siteUrl } from '../../config/env.js';
 import { Question } from '../../models/Question.js';
 
 // POST / — PUBLIC. The website forum submission form. Always born 'submitted';
@@ -183,37 +184,23 @@ export const sendAnswer = asyncHandler(async (req, res) => {
   if (paras.length === 0) throw ApiError.badRequest('Save an answer before sending it');
 
   const lessonList = question.answer?.lessons || [];
-  const origin = env.clientOrigins[0];
+  const origin = siteUrl();
   // Only published questions have a page to link to.
   const link =
     question.status === QUESTION_STATUS.PUBLISHED && question.slug
       ? `${origin}/qna/answers/${question.slug}`
       : '';
 
-  const html = [
-    `<p>Hi ${question.submitter?.name || 'there'},</p>`,
-    `<p>Your question has been answered:</p>`,
-    `<p><strong>${question.title}</strong></p>`,
-    ...paras.map((p) => `<p>${p}</p>`),
-    lessonList.length
-      ? `<p><strong>Key points</strong></p><ul>${lessonList.map((l) => `<li>${l}</li>`).join('')}</ul>`
-      : '',
-    link ? `<p><a href="${link}">Read it on the forum</a></p>` : '',
-    `<p>— Government Procurement</p>`,
-  ]
-    .filter(Boolean)
-    .join('\n');
+  const mail = renderEmail({
+    heading: 'Your question has been answered',
+    intro: `Hi ${question.submitter?.name || 'there'},`,
+    paragraphs: [question.title, ...paras],
+    bullets: lessonList,
+    ...(link ? { cta: { label: 'Read it on the forum', url: link } } : {}),
+    preheader: question.title,
+  });
 
-  const text = [
-    `Your question has been answered:`,
-    question.title,
-    '',
-    ...paras,
-    ...(lessonList.length ? ['', 'Key points:', ...lessonList.map((l) => `- ${l}`)] : []),
-    ...(link ? ['', link] : []),
-  ].join('\n');
-
-  await sendMail({ to, subject: 'Your question has been answered', html, text });
+  await sendMail({ to, subject: 'Your question has been answered', ...mail });
 
   recordAudit({
     req,

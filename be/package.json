@@ -24,6 +24,7 @@
     "hls:secret": "node src/scripts/package-hls.js --secret",
     "zoom:check": "node src/scripts/check-zoom.js",
     "quiz:passmark": "node src/scripts/set-pass-mark.js"
+    "mail:check": "node src/scripts/check-mail.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

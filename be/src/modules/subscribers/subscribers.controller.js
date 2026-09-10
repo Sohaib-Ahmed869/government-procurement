@@ -6,8 +6,9 @@ import { parsePaging, paginate } from '../../utils/pagination.js';
 import { SUBSCRIBER_STATUS } from '../../constants/statuses.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { Subscriber } from '../../models/Subscriber.js';
-import { sendMail } from '../../utils/mailer.js';
-import { env } from '../../config/env.js';
+import { sendMailSafe } from '../../utils/mailer.js';
+import { renderEmail } from '../../utils/emailTemplate.js';
+import { env, siteUrl } from '../../config/env.js';
 
 // Escape user input before using it inside a RegExp (admin search).
 function escapeRegex(str) {
@@ -47,16 +48,32 @@ export const submit = asyncHandler(async (req, res) => {
   if (!doc.unsubscribeToken) doc.unsubscribeToken = randomBytes(32).toString('hex');
   await doc.save();
 
-  const origin = env.clientOrigins[0];
+  const origin = siteUrl();
   const confirmUrl = `${origin}/subscribe/confirm?token=${doc.confirmToken}`;
-  await sendMail({
+  /* The confirm link is the whole point of this request — without it the row
+     sits PENDING for ever and the person has no way to finish. So the outcome
+     of the send is reported rather than swallowed, and rather than thrown:
+     throwing after doc.save() would leave them subscribed-but-unconfirmed AND
+     looking at a 500. */
+  const sent = await sendMailSafe({
     to: email,
     subject: 'Confirm your subscription',
-    html: `<p>Thanks for subscribing. Please confirm your subscription by clicking the link below:</p>
-<p><a href="${confirmUrl}">Confirm my subscription</a></p>
-<p>If you did not request this, you can ignore this email.</p>`,
-    text: `Confirm your subscription: ${confirmUrl}`,
+    ...renderEmail({
+      heading: 'Confirm your subscription',
+      paragraphs: [
+        'Thanks for subscribing to Government Procurement. One more step: confirm this address so we know it reached the right inbox.',
+      ],
+      cta: { label: 'Confirm my subscription', url: confirmUrl },
+      note: 'If you did not sign up, ignore this email and nothing further will be sent.',
+      preheader: 'One click to confirm your Government Procurement subscription.',
+    }),
   });
+
+  if (!sent.queued && !sent.logged) {
+    throw ApiError.unavailable(
+      'We could not send the confirmation email just now. Please try again shortly.',
+    );
+  }
 
   return ok(res, CONFIRM_PROMPT);
 });
