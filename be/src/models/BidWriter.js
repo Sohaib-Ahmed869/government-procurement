@@ -23,12 +23,13 @@ export const BID_WRITER_CATEGORIES = [
 // and there is no federal office to have one in.
 export const BID_WRITER_STATES = ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'];
 
-// What the advertiser is paying for. `featured` sorts above `standard` and is
-// marked on the card; the tier is never shown as a label, because "we paid more"
-// is not information a visitor benefits from.
+// What the advertiser is paying for. The tier is never shown as a label, because
+// "we paid more" is not information a visitor benefits from. It no longer
+// decides position on its own either — see `order` below — it only settles two
+// listings that were given the same position number.
 export const PLACEMENT_TIERS = ['standard', 'featured'];
 
-// Sort position per tier, lowest first. An explicit number rather than sorting
+// Tie-break rank per tier, lowest first. An explicit number rather than sorting
 // on the tier string: `featured` only sorts before `standard` alphabetically by
 // accident, and the first tier added that breaks that accident (a `premium`,
 // say) would silently drop paying advertisers down the page. That is the kind
@@ -43,6 +44,16 @@ const bidWriterSchema = new mongoose.Schema(
     contactEmail: { type: String, default: '', trim: true, lowercase: true },
     contactPhone: { type: String, default: '', trim: true },
     website: { type: String, default: '', trim: true },
+    // B7.5 — the rest of the contact row. Each one is its own button on the
+    // card, and an empty one simply has no button: a directory that renders a
+    // dead "LinkedIn" for every advertiser who hasn't given one is worse than
+    // one that shows four buttons for some listings and two for others.
+    //
+    // `caseStudies` points at the advertiser's OWN case studies page. Nothing
+    // is hosted here — it is a deep link into their site, which is why it sits
+    // beside the website link rather than replacing it.
+    linkedinUrl: { type: String, default: '', trim: true },
+    caseStudiesUrl: { type: String, default: '', trim: true },
 
     // B7.3 — the office. State drives the filter; the city is display only.
     officeState: { type: String, enum: BID_WRITER_STATES, required: true, index: true },
@@ -72,7 +83,18 @@ const bidWriterSchema = new mongoose.Schema(
     // Free text, internal only. Never served publicly.
     notes: { type: String, default: '', trim: true },
 
-    order: { type: Number, default: 0 },
+    // THE position on the public page, lowest first, and the only thing that
+    // decides it. It used to sit BELOW `tierRank`, which meant an editor could
+    // renumber a standard listing all day and never move it past a featured
+    // one — the number appeared to do nothing, because within its own tier
+    // nothing had changed. Whoever is selling the placements is the one who
+    // knows what order they were sold in, so the number they set is the answer
+    // and the tier is only consulted when two listings claim the same slot.
+    //
+    // Written as a dense 0..n-1 sequence by the reorder endpoint, so "first"
+    // is 0 and there are no gaps to reason about. A hand-typed number still
+    // works: it is just a position, and the next reorder tidies the sequence.
+    order: { type: Number, default: 0, index: true },
 
     // Derived from `placementTier` below. Stored so the sort happens in the
     // database rather than after the fact.
@@ -86,8 +108,9 @@ bidWriterSchema.pre('validate', function setTierRank() {
   this.tierRank = TIER_RANK[this.placementTier] ?? 1;
 });
 
-// Featured first, then the editor's order, then alphabetically — so an unranked
-// set still lands in a defensible order rather than by insertion.
-bidWriterSchema.index({ tierRank: 1, order: 1, company: 1 });
+// The editor's order first, then featured ahead of standard where two listings
+// share a number, then alphabetically — so a set nobody has ranked still lands
+// in a defensible order rather than by insertion.
+bidWriterSchema.index({ order: 1, tierRank: 1, company: 1 });
 
 export const BidWriter = mongoose.model('BidWriter', bidWriterSchema);

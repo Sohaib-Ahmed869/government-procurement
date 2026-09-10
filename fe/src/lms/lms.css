@@ -2806,30 +2806,43 @@ select.lms-input option:hover {
 }
 .lms-player__rail-toggle { display: none; }
 
+/* The reading column used to be `max-width: 900px; margin: 0 auto` inside a
+   `1fr` track, so on a wide screen it centred itself and left a band of empty
+   page between the lesson and the rail — the rail was nowhere near the video it
+   belongs to. The cap is on the TRACK now, and the pair is centred as one
+   block, so the two cards sit side by side whatever the window is doing.
+
+   Row 1 spans both columns and holds the lesson's heading, which is what makes
+   the video and the rail start on the same line. */
 .lms-player__body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 900px) 340px;
+  justify-content: center;
   align-items: start;
+  gap: 18px 20px;
   flex: 1;
+  padding: 22px 24px 60px;
 }
-.lms-player__main {
-  min-width: 0;
-  padding: 26px 28px 60px;
-  max-width: 900px;
-  margin: 0 auto;
-  width: 100%;
-}
+.lms-player__head { grid-column: 1 / -1; min-width: 0; }
+.lms-player__main { min-width: 0; width: 100%; }
 
 /* Curriculum rail */
+/* A card, not a column. The rail used to be `height: calc(100vh - 60px)` with
+   a border down the window edge, so a three-lesson course painted a full screen
+   of white with the curriculum in the top third of it and nothing under it. It
+   is now as tall as what it holds, and only scrolls on its own once it would
+   outgrow the viewport. Same radius as every other card in here. */
 .lms-player__rail {
   position: sticky;
-  top: 60px;
-  height: calc(100vh - 60px);
+  top: 80px;
+  max-height: calc(100vh - 104px);
   overflow-y: auto;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-lg);
   background: var(--lms-surface);
-  border-left: 1px solid var(--lms-border);
+  box-shadow: var(--lms-shadow);
 }
-.lms-player__rail-head { padding: 16px 18px; border-bottom: 1px solid var(--lms-border); }
+.lms-player__rail-head { padding: 16px 18px 15px; border-bottom: 1px solid var(--lms-border); }
 .lms-player__rail-label {
   display: block;
   font-size: 12px;
@@ -2842,12 +2855,47 @@ select.lms-input option:hover {
   margin-top: 4px;
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.35;
   color: var(--lms-text);
   text-decoration: none;
 }
 .lms-player__rail-course:hover { color: var(--lms-green-600); }
+.lms-player__rail-counts {
+  margin: 6px 0 12px;
+  font-size: 12.5px;
+  color: var(--lms-muted);
+}
+.lms-player__rail-head .lms-progress { height: 6px; margin-bottom: 7px; }
+.lms-player__rail-progress { margin: 0; font-size: 12px; color: var(--lms-muted); }
+
 .lms-player__mod + .lms-player__mod { border-top: 1px solid var(--lms-border); }
-.lms-player__mod-head { padding: 13px 18px 7px; }
+/* A real button now that the modules collapse: full width, no chrome, and the
+   chevron turns with `is-open` so the row says which way it goes. */
+.lms-player__mod-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 16px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lms-player__mod-head:hover { background: var(--lms-surface-2); }
+.lms-player__mod-head:focus-visible { outline: none; box-shadow: inset var(--lms-ring); }
+.lms-player__mod-chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--lms-muted);
+  transform: rotate(-90deg);
+  transition: transform 0.18s var(--lms-ease);
+}
+.lms-player__mod.is-open .lms-player__mod-chevron { transform: rotate(0deg); }
+.lms-player__mod-body { flex: 1; min-width: 0; }
 .lms-player__mod-label {
   display: block;
   font-size: 11.5px;
@@ -2855,16 +2903,34 @@ select.lms-input option:hover {
   letter-spacing: 0;
   color: var(--lms-muted);
 }
-.lms-player__mod-title { display: block; font-size: 13.5px; font-weight: 600; color: var(--lms-text); }
-.lms-player__lessons { margin: 0 0 8px; padding: 0; list-style: none; }
+.lms-player__mod-title {
+  display: block;
+  margin-top: 1px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--lms-text);
+}
+.lms-player__mod-bar { height: 4px; margin: 8px 0 0; }
+.lms-player__mod-count {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lms-muted);
+}
+
+.lms-player__lessons { margin: 0; padding: 0 0 8px; list-style: none; }
+/* Two lines: what kind of thing it is and how long it takes, then its name.
+   The title used to be truncated to a single line beside a duration, which
+   turned every lesson called "Safeguarding and..." into the same row. */
 .lms-player__lesson {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
-  padding: 8px 18px;
+  padding: 9px 16px 9px 13px;
   color: var(--lms-text-2);
   text-decoration: none;
-  font-size: 13px;
   border-left: 3px solid transparent;
   transition: background 0.15s var(--lms-ease);
 }
@@ -2873,22 +2939,43 @@ select.lms-input option:hover {
 .lms-player__lesson.is-active {
   background: var(--lms-mint-soft);
   border-left-color: var(--lms-green);
-  color: var(--lms-text);
-  font-weight: 600;
 }
 .lms-player__lesson.is-locked { color: var(--lms-muted); cursor: not-allowed; }
-.lms-player__lesson.is-complete .lms-player__lesson-title { color: var(--lms-muted); }
-.lms-player__lesson-icon { width: 15px; height: 15px; flex-shrink: 0; }
-.lms-player__lesson.is-complete .lms-player__lesson-icon { color: var(--lms-green); }
-.lms-player__lesson.is-locked .lms-player__lesson-icon { color: var(--lms-warning); }
-.lms-player__lesson-title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.lms-player__lesson-state {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--lms-border-strong);
 }
-.lms-player__lesson-time { flex-shrink: 0; font-size: 11.5px; color: var(--lms-muted); }
+.lms-player__lesson.is-complete .lms-player__lesson-state,
+.lms-player__lesson.is-active .lms-player__lesson-state { color: var(--lms-green); }
+.lms-player__lesson.is-locked .lms-player__lesson-state { color: var(--lms-warning); }
+.lms-player__lesson-body { flex: 1; min-width: 0; }
+.lms-player__lesson-kind {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lms-muted);
+}
+.lms-player__lesson-kind-icon { width: 13px; height: 13px; flex-shrink: 0; }
+.lms-player__lesson-title {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.4;
+  color: var(--lms-text);
+}
+.lms-player__lesson.is-complete .lms-player__lesson-title,
+.lms-player__lesson.is-locked .lms-player__lesson-title {
+  color: var(--lms-muted);
+  font-weight: 500;
+}
 .lms-player__backdrop { display: none; }
 
 /* Lesson page -------------------------------------------------------------- */
@@ -2908,6 +2995,7 @@ select.lms-input option:hover {
   line-height: 1.25;
   letter-spacing: -0.02em;
 }
+.lms-lesson-page__head > .lms-lesson-page__meta:first-child { margin-top: 0; }
 .lms-lesson-page__meta {
   display: flex;
   align-items: center;
@@ -2953,16 +3041,39 @@ select.lms-input option:hover {
 .lms-callout strong { display: block; margin-bottom: 3px; font-size: 14px; color: var(--lms-text); }
 .lms-callout p { margin: 0 !important; font-size: 14px !important; line-height: 1.6 !important; }
 
-/* Lesson nav */
+/* The end-of-reading marker. No height and nothing to see: it exists so an
+   IntersectionObserver has a box to watch at the foot of the lesson body, which
+   is what decides whether Next has been earned. */
+.lms-readend { height: 1px; margin: 0; }
+
+/* Lesson nav ---------------------------------------------------------------
+   Three columns rather than three flex children, so the middle stays centred
+   on the page whether or not there is a Previous or a Next to sit either side
+   of it. As a flex row it drifted left on the first lesson and right on the
+   last, which is exactly when the position counter matters most. */
 .lms-lessonnav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   margin-top: 20px;
+  padding: 13px 15px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-lg);
+  background: var(--lms-surface);
 }
-.lms-lessonnav__mid { display: flex; align-items: center; gap: 10px; }
+.lms-lessonnav__side { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.lms-lessonnav__side--end { justify-content: flex-end; flex-wrap: wrap; }
+.lms-lessonnav__mid { display: flex; justify-content: center; }
+.lms-lessonnav__count { font-size: 12.5px; color: var(--lms-muted); }
 .lms-lessonnav__prev-icon { transform: rotate(90deg); }
+
+@media (max-width: 620px) {
+  /* Previous keeps the left, the actions the right, and the count drops to its
+     own line under both rather than squeezing a third column out of nothing. */
+  .lms-lessonnav { grid-template-columns: auto 1fr; }
+  .lms-lessonnav__mid { grid-row: 2; grid-column: 1 / -1; }
+}
 
 /* Tabs */
 .lms-tabs {
@@ -5526,6 +5637,168 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   background: linear-gradient(transparent, rgba(6, 25, 12, 0.7));
 }
 
+/* Signature upload, in the certificate tab.
+
+   Wider than it is tall, and on a light panel whatever the app theme, because a
+   signature is nearly always dark ink: dropped straight onto the dark surface
+   the rest of the builder uses, a transparent PNG of one is invisible. The
+   checked ground is the standard way of saying "this part is transparent". */
+.lms-sigup { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.lms-sigup__preview {
+  flex: 0 1 260px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+  background:
+    linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.05) 75%) 0 0 / 14px 14px,
+    linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 25%, transparent 75%, rgba(0, 0, 0, 0.05) 75%) 7px 7px / 14px 14px,
+    #fff;
+}
+.lms-sigup__preview img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.lms-sigup__actions { display: flex; gap: 8px; }
+.lms-sigup__drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 380px;
+  height: 84px;
+  padding: 12px 18px;
+  border: 1px dashed var(--lms-border-strong);
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface-2);
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s var(--lms-ease), background 0.15s var(--lms-ease);
+}
+.lms-sigup__drop:hover { border-color: var(--lms-green); background: var(--lms-mint-soft); }
+.lms-sigup__drop:focus-visible { outline: none; box-shadow: var(--lms-ring); }
+.lms-sigup__drop:disabled { cursor: not-allowed; opacity: 0.6; }
+.lms-sigup__icon { width: 22px; height: 22px; color: var(--lms-green-600); opacity: 0.7; }
+.lms-sigup__title { font-size: 14px; font-weight: 600; color: var(--lms-text); }
+
+/* Where the signature prints. Three swatches rather than a select: the choice
+   is about a POSITION, and a little diagram of it is read faster than a word. */
+.lms-sigup__place { margin-top: 16px; }
+.lms-sigup__places { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.lms-sigup__place-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-surface);
+  font-size: 13px;
+  cursor: pointer;
+}
+.lms-sigup__place-opt:hover { border-color: var(--lms-green); }
+.lms-sigup__place-opt.is-active {
+  border-color: var(--lms-green);
+  background: var(--lms-mint-soft);
+  font-weight: 600;
+}
+/* The radio itself is the accessible control; the swatch beside it is the
+   picture. Hidden rather than removed, so keyboard focus still lands here. */
+.lms-sigup__place-opt input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.lms-sigup__place-opt:focus-within { box-shadow: var(--lms-ring); outline: none; }
+/* A miniature of the page with a stroke where the signature would fall. */
+.lms-sigup__place-mark {
+  position: relative;
+  width: 26px;
+  height: 19px;
+  border: 1px solid var(--lms-border-strong);
+  border-radius: 3px;
+  background: #fff;
+}
+.lms-sigup__place-mark::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  height: 2px;
+  width: 9px;
+  border-radius: 1px;
+  background: var(--lms-green);
+}
+.lms-sigup__place-mark.is-left::after { left: 3px; }
+.lms-sigup__place-mark.is-center::after { left: 50%; transform: translateX(-50%); }
+.lms-sigup__place-mark.is-right::after { right: 3px; }
+
+/* The signing pad ------------------------------------------------------------
+   A modal, because signing is a single deliberate act and the rest of the form
+   is not part of it. */
+.lms-sigpad__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(6, 25, 12, 0.55);
+}
+.lms-sigpad {
+  width: min(680px, 100%);
+  padding: 22px;
+  border-radius: var(--lms-radius);
+  background: var(--lms-surface);
+  box-shadow: 0 24px 60px rgba(6, 25, 12, 0.3);
+}
+.lms-sigpad__title { margin: 0; font-size: 18px; font-weight: 600; color: var(--lms-text); }
+.lms-sigpad__hint { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--lms-muted); }
+.lms-sigpad__stage {
+  position: relative;
+  margin-top: 16px;
+  border: 1px dashed var(--lms-border-strong);
+  border-radius: var(--lms-radius-sm);
+  /* White, whatever the app theme: signature ink is dark, and a dark pad would
+     be drawing black on black. */
+  background: #fff;
+  overflow: hidden;
+}
+/* `touch-action: none` is what stops a finger stroke scrolling the page instead
+   of drawing — without it the pad is unusable on a tablet. */
+.lms-sigpad__canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  cursor: crosshair;
+}
+.lms-sigpad__rule {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  bottom: 22%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.18);
+}
+.lms-sigpad__placeholder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12%;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.34);
+  pointer-events: none;
+}
+.lms-sigpad__actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+.lms-sigpad__spacer { flex: 1; }
+
 /* Who-should-take pair editor */
 .lms-pairfield { margin: 0 0 10px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .lms-pairfield li {
@@ -5762,21 +6035,6 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   aspect-ratio: 16 / 9;
 }
 .lms-video__el { display: block; width: 100%; height: 100%; }
-.lms-watermark {
-  position: absolute;
-  z-index: 2;
-  padding: 4px 9px;
-  border-radius: var(--gp-radius);
-  background: rgba(0, 0, 0, 0.32);
-  color: #fff;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  pointer-events: none;
-  user-select: none;
-  transition: top 1s var(--lms-ease), left 1s var(--lms-ease), right 1s var(--lms-ease),
-    bottom 1s var(--lms-ease);
-}
 .lms-video__meta {
   display: flex;
   align-items: center;
@@ -5789,6 +6047,67 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-video__meta > span { display: inline-flex; align-items: center; gap: 6px; }
 .lms-video__meta svg { width: 15px; height: 15px; }
 .lms-video__secure { color: var(--lms-green-600); font-weight: 600; }
+
+/* Up next, after a video plays out ---------------------------------------------
+   Sits directly under the player, which is where the eye already is when the
+   picture stops. */
+.lms-upnext {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--lms-green);
+  border-radius: var(--lms-radius-sm);
+  background: var(--lms-mint-soft);
+}
+.lms-upnext__ring { position: relative; flex: none; width: 38px; height: 38px; }
+.lms-upnext__ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.lms-upnext__track { fill: none; stroke: rgba(10, 49, 20, .14); stroke-width: 3; }
+.lms-upnext__sweep {
+  fill: none;
+  stroke: var(--lms-green);
+  stroke-width: 3;
+  stroke-linecap: round;
+  /* 2 * pi * r, r = 16. The dash IS the ring, and the offset empties it. */
+  stroke-dasharray: 100.5;
+  transition: stroke-dashoffset 1s linear;
+}
+.lms-upnext__count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lms-green-600);
+  font-variant-numeric: tabular-nums;
+}
+.lms-upnext__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lms-upnext__label {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--lms-green-600);
+}
+.lms-upnext__title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--lms-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lms-upnext__actions { margin-left: auto; display: flex; gap: 8px; flex: none; }
+@media (max-width: 560px) {
+  .lms-upnext { flex-wrap: wrap; }
+  .lms-upnext__actions { margin-left: 0; width: 100%; }
+  .lms-upnext__actions .lms-btn { flex: 1; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lms-upnext__sweep { transition: none; }
+}
 
 /* Transcript */
 .lms-transcript__head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -6020,15 +6339,22 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 @media (max-width: 1024px) {
   /* The rail becomes an overlay so the reading column keeps full width. */
-  .lms-player__body { grid-template-columns: minmax(0, 1fr); }
+  .lms-player__body { grid-template-columns: minmax(0, 1fr); justify-content: stretch; }
   .lms-player__rail-toggle { display: inline-flex; }
+  /* Off-canvas, so it is a full-height panel against the window edge again
+     rather than the free-standing card it is beside the lesson. */
   .lms-player__rail {
     position: fixed;
     top: 60px;
     right: 0;
-    width: 320px;
+    width: 340px;
     max-width: 88vw;
+    height: calc(100vh - 60px);
+    max-height: none;
     z-index: 35;
+    border: 0;
+    border-left: 1px solid var(--lms-border);
+    border-radius: 0;
     transform: translateX(100%);
     transition: transform 0.24s var(--lms-ease);
     box-shadow: var(--lms-shadow-lg, 0 12px 40px -12px rgba(16, 40, 24, 0.3));
@@ -6041,7 +6367,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
     z-index: 34;
     background: rgba(6, 25, 12, 0.45);
   }
-  .lms-player__main { padding: 20px 16px 48px; }
+  .lms-player__body { padding: 20px 16px 48px; }
   .lms-player__bar-progress { display: none; }
 }
 
@@ -6461,28 +6787,91 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 
 .lms-doc__modes { margin-bottom: 14px; }
 
-/* The document a learner opens. Same shape as the upload row so the builder and
-   the lesson page read as the same object. */
-.lms-docview {
+/* The document, read in the lesson.
+
+   This used to be a single row — icon, name, "Open document" — because the file
+   was read in another tab. It is a reader now: a title bar, and the pages drawn
+   into a box that scrolls on its own. The card around it loses its padding, so
+   the reader meets the card's edges the way the video player does. */
+.lms-docview__card { padding: 0; overflow: hidden; }
+.lms-docview { display: flex; flex-direction: column; min-width: 0; }
+/* Everything in this bar sits on one line, so everything in it carries the SAME
+   font-size and line-height. Centring items of different type sizes lines up
+   their boxes and not their text, which is what left the file name reading a
+   couple of pixels below the page count beside it. */
+.lms-docview__bar {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--lms-border);
+  background: var(--lms-surface-2);
+  font-size: 13px;
+  line-height: 1.2;
 }
-.lms-docview__icon {
+.lms-docview__name {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: var(--gp-radius);
-  background: var(--lms-mint-soft);
-  color: var(--lms-green);
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: 600;
+  color: var(--lms-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.lms-docview__icon svg { width: 22px; height: 22px; }
-.lms-docview__body { flex: 1; min-width: 0; }
-.lms-docview__name { margin: 0; font-size: 15px; font-weight: 600; color: var(--lms-text); }
-.lms-docview__meta { margin: 2px 0 0; font-size: 12.5px; color: var(--lms-muted); }
+.lms-docview__name svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--lms-green-600); }
+.lms-docview__pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--lms-muted);
+}
+.lms-docview__bar .lms-btn { font-size: inherit; line-height: inherit; }
+
+/* Tall enough to read in, short enough that the page around it — and the Next
+   button the reading unlocks — is still reachable without leaving the document.
+   The grey ground is what separates one page from the next. */
+.lms-docview__scroller {
+  max-height: 70vh;
+  min-height: 320px;
+  overflow-y: auto;
+  padding: 14px;
+  background: var(--lms-surface-3);
+}
+.lms-docview__scroller:focus-visible { outline: none; box-shadow: inset var(--lms-ring); }
+.lms-docview__page {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 14px;
+  border: 1px solid var(--lms-border);
+  border-radius: var(--lms-radius-sm);
+  background: #fff;
+  box-shadow: var(--lms-shadow);
+}
+.lms-docview__page:last-of-type { margin-bottom: 0; }
+/* The marker the end-of-document check watches. Nothing to see; it just has to
+   be the last thing in the scroller and have a box. */
+.lms-docview__end { height: 1px; }
+
+/* The fallback: whatever the browser can make of a file we can't draw. */
+.lms-docview__frame {
+  display: block;
+  width: 100%;
+  height: 70vh;
+  min-height: 320px;
+  border: 0;
+  background: var(--lms-surface-3);
+}
 
 /* Certificate designer --------------------------------------------------------
    Form on the left, live preview on the right. The preview is the SAME
@@ -6564,7 +6953,10 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   height: 100%;
   border: 2px solid var(--cert-accent);
   border-radius: var(--gp-radius);
-  padding: 5cqw 6cqw;
+  /* Tighter top and bottom than the sides. An A4 landscape sheet is short, and
+     the worst realistic certificate — a course title that wraps to two lines
+     with a footnote under it — spends every millimetre of it. */
+  padding: 4.4cqw 6cqw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6574,6 +6966,25 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   font-size: 2.1cqw;
   color: var(--cert-text);
 }
+/* The masthead: the GP monogram and the issuer's name as one centred lockup.
+   Sized in em so it scales with the rest of the document — the whole
+   certificate is typeset off one font-size, which is what keeps the preview and
+   the printed page the same design.
+
+   Side by side rather than stacked because the paper has no height to spare:
+   see the note on the component. */
+.lms-certdoc__masthead {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+.lms-certdoc__mark {
+  flex: none;
+  height: 2.2em;
+  width: auto;
+  color: var(--cert-accent);
+}
 .lms-certdoc__issuer {
   margin: 0;
   font-size: 1.15em;
@@ -6582,7 +6993,7 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   color: var(--cert-accent);
 }
 .lms-certdoc__heading {
-  margin: 0.7em 0 0;
+  margin: 0.45em 0 0;
   font-size: 2.3em;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -6599,6 +7010,17 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* SAFE centring. The tallest realistic certificate — a course title that
+     wraps to two lines with a footnote under it — is taller than the space the
+     masthead and the foot leave it. Centred, the overflow goes BOTH ways and
+     the first line rides up over the heading, which is the one collision that
+     makes the document look broken.
+
+     `safe` falls back to flex-start the moment the content doesn't fit, so it
+     starts under the heading and runs down into the padding above the signature
+     instead. Declared after the plain value so a browser that doesn't know the
+     keyword keeps the old behaviour rather than dropping the rule. */
+  justify-content: safe center;
 }
 .lms-certdoc__preamble,
 .lms-certdoc__statement { margin: 1em 0 0; font-size: 1em; color: var(--cert-muted); }
@@ -6630,7 +7052,75 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
   gap: 2em;
   text-align: left;
 }
+/* Where the signature block sits along the foot, and the meta block with it.
+
+   The default is the conventional one: signature bottom LEFT, the date and
+   credential id at the opposite end. `row-reverse` swaps the pair rather than
+   restyling either, so a right-placed signature keeps its own internal
+   alignment and only the two blocks trade ends. Centred, the foot becomes a
+   column: the signature over the meta, both centred, because a centred
+   signature with the date pushed out to one side reads as a mistake. */
+.lms-certdoc__foot.is-sig-right { flex-direction: row-reverse; }
+.lms-certdoc__foot.is-sig-right .lms-certdoc__sig { text-align: left; }
+.lms-certdoc__foot.is-sig-right .lms-certdoc__meta { align-items: flex-start; }
+.lms-certdoc__foot.is-sig-center {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7em;
+  text-align: center;
+}
+.lms-certdoc__foot.is-sig-center .lms-certdoc__sig { align-items: center; min-width: 46%; }
+.lms-certdoc__foot.is-sig-center .lms-certdoc__sig-mark { justify-content: center; }
+.lms-certdoc__foot.is-sig-center .lms-certdoc__rule { align-self: stretch; }
+.lms-certdoc__foot.is-sig-center .lms-certdoc__meta { align-items: center; }
+
 .lms-certdoc__sig { display: flex; flex-direction: column; min-width: 34%; }
+/* The signature scan. Fixed height whether or not an image is set, so the foot
+   sits at the same place on a certificate that has one and one that doesn't —
+   otherwise uploading a signature shifts the whole document up. The image sits
+   ON the rule, overlapping it slightly, the way a real one is written across
+   the line rather than parked above it. */
+.lms-certdoc__sig-mark {
+  height: 2.6em;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: -0.35em;
+}
+/* The ink.
+
+   `--cert-sig` is the uploaded file, set inline by the component. The box is
+   painted in the certificate's own text colour and shows only where that file
+   has pixels — so the signature takes the document's ink whatever paper colour
+   the instructor chose, with no pixel readback and therefore no CORS to fail.
+
+   `mask-size: contain` with a left-bottom origin keeps it sitting ON the rule
+   at whatever aspect ratio it was drawn or scanned at. The width cap is the
+   same 62% the <img> had, so the foot's proportions do not change. */
+.lms-certdoc__sig-ink {
+  display: block;
+  width: 62%;
+  height: 100%;
+  background-color: var(--cert-text);
+  -webkit-mask-image: var(--cert-sig);
+  mask-image: var(--cert-sig);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: left bottom;
+  mask-position: left bottom;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.lms-certdoc__foot.is-sig-center .lms-certdoc__sig-ink {
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
+}
+/* The fallback, for anything without mask support: the file as uploaded. */
+.lms-certdoc__sig-mark img {
+  max-height: 100%;
+  max-width: 62%;
+  width: auto;
+  object-fit: contain;
+}
 .lms-certdoc__rule {
   height: 1px;
   background: color-mix(in srgb, var(--cert-text) 45%, transparent);
@@ -7188,6 +7678,13 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 /* ---- Instructor scheduling ---- */
 
 .lms-live-form { margin-bottom: 20px; }
+/* The themed Select is `inline-block` by default, so it shrinks to whatever
+   its longest option happens to be. In a form it has to match the inputs it is
+   stacked with — a Course picker half the width of the Title field beneath it
+   reads as a different kind of control, which is what the native <select> it
+   replaced never did. Full width of its field, and of its grid cell for the
+   timezone. */
+.lms-live-form .lms-sel { display: block; width: 100%; }
 .lms-live-form__actions { display: flex; justify-content: flex-end; gap: 10px; }
 
 /* Small helpers the shared table did not have a name for yet. */
@@ -7929,48 +8426,80 @@ button.lms-answer__accepted:hover { filter: brightness(0.96); }
 .lms-authside__anim {
   position: relative;
   order: 2;
-  /* Left edge, under the start of the copy rather than trailing off the right.
-     The lede and the proof row are both left-aligned, so the art now shares
-     their margin and the panel reads as one column instead of a block of text
-     with a picture drifting away from it. The gradient's mint bloom moved with
-     it (see .lms-authside) — the light has to come from where the subject is,
-     or the panel looks lit from the empty half. */
+  /* Left edge, sharing the copy's margin, so the panel reads as one column
+     rather than a block of text with a picture drifting away from it. The
+     gradient's mint bloom sits over here with it (see .lms-authside) — the
+     light has to come from where the subject is, or the panel looks lit from
+     the empty half. */
   align-self: flex-start;
-  /* SIZED FROM HEIGHT, not width, and this is the whole point.
 
-     It used to be `width: min(460px, 92%)` with a `@media (max-height: 800px)`
-     rule that set `display: none`. Browser zoom divides the CSS viewport, so a
-     laptop window with ~820px of usable height loses the illustration entirely
-     at 110% zoom — 820/1.1 = 745 — and a shorter window loses it at 100%. It
-     read as the animation being broken.
+  /* SIZED FROM WIDTH, and this is the whole point.
 
-     The rule it replaces was protecting the right thing: the three proof points
-     have to stay readable, and they lose to a fixed-height illustration below
-     them. But scaling protects them just as well as deleting does. Driving the
-     height off the viewport and letting `aspect-ratio` derive the width means
-     the art shrinks with the space instead of falling off a cliff.
+     It was driven off the viewport HEIGHT — `min(320px, calc(100vh - 390px))`
+     with `aspect-ratio` deriving the width — which is why on almost every
+     window the art came out about two-thirds the measure of the copy above it.
+     The lede, the hairline and the three proof points all run the full column
+     and the illustration stopped short of them, so it read as a picture
+     floating inside the panel rather than as part of it.
 
-     Sized from what is LEFT, not from a flat percentage. The copy above it is
-     a fixed ~277px whatever the window does, plus the panel's padding and gap;
-     390px covers that. A plain `38vh` ignored it and so overflowed the panel's
-     floor on a short window — clipping the bottom of the illustration, which
-     is the one thing this rule exists to stop. */
-  height: min(320px, calc(100vh - 390px));
+     It now takes the same measure as the copy, edge to edge, from "The rules"
+     across to "review", at every width.
+
+     That height formula was protecting something real, though: the three proof
+     points have to stay readable, and a tall illustration under them pushes
+     them off a short window. `max-height` keeps exactly that protection. When
+     it bites, lottie-web's own preserveAspectRatio scales the drawing down
+     inside the box instead of cropping it, so the art is never clipped — which
+     is the one failure this rule has always existed to prevent. An earlier
+     version of it used `display: none` below a height breakpoint, and browser
+     zoom (which divides the CSS viewport) made the illustration vanish outright
+     on an ordinary laptop at 110%. Scaling protects the copy just as well as
+     deleting did, and degrades far better. */
+  width: 100%;
+  /* The same measure as .lms-authside__body, so the two line up exactly. */
+  max-width: 42ch;
   aspect-ratio: 3 / 2;
-  width: auto;
-  max-width: 92%;
-  /* Nothing here should shrink past the ratio; the height formula above is
-     what responds to a short viewport. */
+  height: auto;
+  max-height: calc(100vh - 380px);
+  /* Nothing here should shrink past the ratio; max-height is what responds to
+     a short viewport. */
   flex: 0 0 auto;
-  margin-left: clamp(-40px, -2vw, 0px);
   opacity: 0;
   transition: opacity .5s ease-out;
   pointer-events: none;
 }
 /* lottie-web sizes its <svg> to the container, and the animation is authored
    750x500 — the same 3:2 the container is locked to, so it fills it exactly
-   rather than letterboxing inside it. */
-.lms-authside__anim svg { display: block; width: 100%; height: 100%; }
+   rather than letterboxing inside it.
+
+   THE TRANSFORM CROPS THE COMPOSITION'S OWN PADDING.
+
+   The 750x500 artboard is not filled edge to edge: the drawing sits inside it
+   with roughly 7.8% of empty canvas down the left, 4.2% down the right and 7%
+   across the top. The <svg> box therefore lines up with the hairline above it
+   perfectly while the picture inside it visibly does not — which is the gap
+   that reads as the illustration being narrower than the copy.
+
+   Scaling by 1/0.8794 makes the DRAWING the full width of the box, and the
+   translate pulls its top-left corner back onto the box's own, so the artwork
+   starts and ends exactly where the divider does.
+
+   The numbers are proportions of the container, not pixels, so they hold at
+   every size. They are specific to this Lottie file: replace the animation and
+   re-measure (the painted bounds are the union of the <svg>'s leaf path/image
+   rects — groups carry lottie's full-canvas clip and will report the whole
+   artboard instead). */
+.lms-authside__anim svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  /* !important because lottie-web writes `transform: translate3d(0,0,0)` as an
+     INLINE style on the <svg> it creates, and an inline style beats a rule from
+     a stylesheet. This is the one case the keyword is actually for: overriding
+     a third party's inline declaration on an element we do not render. */
+  transform: translate(-8.89%, -7.98%) scale(1.1371) !important;
+}
 
 /* Below this the leftover is under ~70px and the art is a smear rather than an
    illustration, so it goes and the copy takes the room. Deliberately lower than

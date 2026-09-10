@@ -15,7 +15,7 @@ export default function CartLineItem({ item, onRemove }) {
           {item.title}
         </Link>
         <span className="lms-line__meta">
-          {item.instructor} · {item.levelLabel} · {item.durationLabel}
+          {item.instructor} | {item.levelLabel} | {item.durationLabel}
         </span>
       </span>
 

@@ -8,8 +8,7 @@ import './EditorShell.css';
 //        onSave, saveLabel, onPublish, publishLabel, sidebar, children.
 //
 // `error` is a failure; `notice` is for something the editor did on the author's
-// behalf that they need to know about (e.g. dropping a featured flag because the
-// homepage slots filled up while the draft sat unpublished).
+// behalf that they need to know about.
 export default function EditorShell({
   eyebrow,
   title,

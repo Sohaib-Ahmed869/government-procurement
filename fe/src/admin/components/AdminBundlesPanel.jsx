@@ -311,7 +311,7 @@ export default function AdminBundlesPanel({ isAdmin, query }) {
                         onChange={() => toggleCourse(c._id)}
                       />
                       <span>
-                        {c.title} · {money(c.price, c.currency)}
+                        {c.title} | {money(c.price, c.currency)}
                       </span>
                     </label>
                   ))}

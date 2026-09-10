@@ -97,7 +97,7 @@ export default function AdvisorResult({ result, rules, answers = {}, onRestart, 
       </div>
 
       <header className="adv-result__head">
-        <p className="adv-result__eyebrow">{rules.label} · rules as at {rules.asAt}</p>
+        <p className="adv-result__eyebrow">{rules.label} | rules as at {rules.asAt}</p>
         {headline ? (
           <>
             <h2 className="adv-result__title">{headline.title}</h2>

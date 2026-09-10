@@ -56,10 +56,10 @@ try {
   bad(String(err?.message ?? err));
   console.log(
     '\n  Common causes, in the order worth checking:\n' +
-      '    · the app was never Activated (Activation tab)\n' +
-      '    · missing meeting write scopes (Scopes tab)\n' +
-      '    · ZOOM_USER_ID names a user who is not on this account\n' +
-      '    · Account ID / Client ID / Client Secret copied from the wrong app\n',
+      '    - the app was never Activated (Activation tab)\n' +
+      '    - missing meeting write scopes (Scopes tab)\n' +
+      '    - ZOOM_USER_ID names a user who is not on this account\n' +
+      '    - Account ID / Client ID / Client Secret copied from the wrong app\n',
   );
   process.exit(1);
 }

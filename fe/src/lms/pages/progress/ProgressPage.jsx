@@ -297,7 +297,7 @@ export default function ProgressPage() {
                       {q.title}
                     </Link>
                     <span className="lms-result-row__meta">
-                      {q.courseTitle} · {q.attempts} attempt{q.attempts === 1 ? '' : 's'} · last{' '}
+                      {q.courseTitle} | {q.attempts} attempt{q.attempts === 1 ? '' : 's'} | last{' '}
                       {when(q.submittedAt)}
                     </span>
                   </span>

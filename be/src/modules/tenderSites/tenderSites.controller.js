@@ -15,7 +15,6 @@ const EDITABLE = [
   'createAccountUrl',
   'loginUrl',
   'note',
-  'order',
   'active',
 ];
 
@@ -39,7 +38,16 @@ export const list = asyncHandler(async (req, res) => {
   const isStaff = Boolean(req.user);
   if (!(isStaff && req.query.all === '1')) filter.active = true;
 
-  const items = await TenderSite.find(filter).sort('order createdAt');
+  // Alphabetical by name, within whichever section the entry belongs to. The
+  // page used to render whatever hand-kept `order` number the CMS carried,
+  // which meant every new portal needed a number picked for it and the list
+  // drifted out of order as soon as one was missed. A name sort needs nothing
+  // maintained and is the order a visitor scanning for their jurisdiction
+  // expects. Collation strength 1 so "eTender" files next to "Etender" rather
+  // than after every capitalised name.
+  const items = await TenderSite.find(filter)
+    .collation({ locale: 'en', strength: 1 })
+    .sort('name');
   return ok(res, items);
 });
 

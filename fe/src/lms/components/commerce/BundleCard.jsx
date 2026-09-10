@@ -20,7 +20,7 @@ export default function BundleCard({ bundle }) {
           Bundle
         </span>
         {saving > 0 ? (
-          <span className="lms-bundlecard__save">Save {formatMoney(saving)}{percent ? ` · ${percent}%` : ''}</span>
+          <span className="lms-bundlecard__save">Save {formatMoney(saving)}{percent ? ` | ${percent}%` : ''}</span>
         ) : null}
       </div>
 

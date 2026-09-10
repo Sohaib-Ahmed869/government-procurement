@@ -1,6 +1,11 @@
 // Generic table for admin list screens. Pass `columns` as
-// [{ key, header, render?(row), width? }] and `rows`. Handles loading / error /
-// empty states so every list screen looks and behaves consistently.
+// [{ key, header, render?(row, index), width? }] and `rows`. Handles loading /
+// error / empty states so every list screen looks and behaves consistently.
+//
+// `index` is the row's position in `rows` as rendered. A column that only wants
+// the row ignores it, which is all of them but the ordered lists — a screen
+// where the sequence IS the content needs to know where a row sits to draw its
+// number and to say whether it can move up.
 export default function DataTable({
   columns,
   rows,
@@ -75,10 +80,10 @@ export default function DataTable({
 
           {!loading &&
             !error &&
-            rows.map((row) => (
+            rows.map((row, i) => (
               <tr key={rowKey(row)}>
                 {columns.map((c) => (
-                  <td key={c.key}>{c.render ? c.render(row) : row[c.key]}</td>
+                  <td key={c.key}>{c.render ? c.render(row, i) : row[c.key]}</td>
                 ))}
               </tr>
             ))}

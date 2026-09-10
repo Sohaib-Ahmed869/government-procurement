@@ -1,3 +1,5 @@
+import { GP_MARK_PATHS, GP_MARK_VIEWBOX } from './gpMark.js';
+
 // One renderer for a certificate, used by both the instructor's preview and the
 // issued document a learner opens.
 //
@@ -22,7 +24,68 @@ export const CERTIFICATE_DEFAULTS = {
   textColor: '#1a1a1a',
   showHours: true,
   showCredentialId: true,
+  // The signatory's uploaded signature. A course template carries it as
+  // `signature: { key, url }`; an ISSUED certificate carries the flat
+  // `signatureUrl` it was stamped with. Both are read below, because this one
+  // component renders both.
+  signature: { key: '', url: '' },
+  signatureUrl: '',
+  // Where the signature block sits along the foot: left, center or right.
+  signaturePosition: 'left',
 };
+
+// The GP monogram, set BESIDE the issuer's name rather than above it. Inline
+// rather than an <img> so it takes the certificate's accent colour, and so it is
+// part of the document when the page is printed rather than a separate request
+// that may not have landed.
+//
+// Beside, because an A4 landscape certificate has very little height to spare:
+// a long course title that wraps to two lines and a footnote underneath it
+// already fill the paper. Stacked above the name the mark cost most of a line
+// and pushed the body up into the heading; in a lockup it costs only the
+// difference between its own height and the line it shares.
+function GpMark() {
+  return (
+    <svg
+      className="lms-certdoc__mark"
+      viewBox={GP_MARK_VIEWBOX}
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {GP_MARK_PATHS.map((d) => <path key={d.slice(0, 24)} d={d} />)}
+    </svg>
+  );
+}
+
+/* The signature, recoloured to the certificate's own ink.
+
+   It is drawn in one fixed colour the signatory never chose, so there is no
+   colour intent to preserve — and an instructor may set any paper colour they
+   like. Dark ink on a dark certificate is simply invisible.
+
+   Done with a CSS MASK: the signature file becomes the shape, and the
+   certificate's text colour is painted through it. The element is a coloured
+   box that only shows where the file has pixels.
+
+   This replaces a canvas that read the image back with `toDataURL` and refilled
+   it with `source-in`. Reading pixels back is the one thing the browser guards:
+   it needs the file fetched as a CORS request, and any hiccup in that — a cache
+   entry stored from an ordinary <img> for the same URL, a bucket whose headers
+   arrive on some responses and not others — makes the read throw, at which
+   point the code fell back to the file as uploaded and the signature came out
+   navy on dark green. A mask reads nothing back, so there is nothing to guard
+   and no CORS involved at all: it works on the same file the plain <img> was
+   already displaying.
+
+   `maskSupported` is checked once rather than per render. Everything current
+   supports it, prefixed or not; anything that does not falls back to the file
+   as uploaded, which is what the whole document did before any of this. */
+const maskSupported =
+  typeof CSS !== 'undefined' && typeof CSS.supports === 'function'
+    ? CSS.supports('mask-image', 'url("a.png")') ||
+      CSS.supports('-webkit-mask-image', 'url("a.png")')
+    : false;
 
 // Secondary text (the "this is to certify that" lines, the date, the role) is
 // derived from the body colour rather than being a fourth thing to choose.
@@ -66,6 +129,13 @@ export default function CertificateDesign({
 }) {
   const d = { ...CERTIFICATE_DEFAULTS, ...(design ?? {}) };
   const durationLine = d.showHours ? certificateDuration({ minutes, hours }) : '';
+  // A template being previewed carries the uploaded object; an issued
+  // certificate carries the URL snapshotted at the moment it was earned.
+  const signatureImage = d.signatureUrl || d.signature?.url || '';
+  const signaturePosition = ['left', 'center', 'right'].includes(d.signaturePosition)
+    ? d.signaturePosition
+    : 'left';
+
 
   return (
     <article
@@ -80,7 +150,13 @@ export default function CertificateDesign({
       }}
     >
       <div className="lms-certdoc__frame">
-        <p className="lms-certdoc__issuer">{issuerName || d.issuerName}</p>
+        {/* Title case, as the brand is written. It used to print in the PDF as
+            GOVERNMENT PROCUREMENT — the screen and the file disagreed, and the
+            shout was never the mark. */}
+        <div className="lms-certdoc__masthead">
+          <GpMark />
+          <p className="lms-certdoc__issuer">{issuerName || d.issuerName}</p>
+        </div>
         <h2 className="lms-certdoc__heading">{d.heading}</h2>
 
         {/* The body is its own block so it can sit CENTRED in the space between
@@ -99,8 +175,30 @@ export default function CertificateDesign({
           {d.footnote ? <p className="lms-certdoc__footnote">{d.footnote}</p> : null}
         </div>
 
-        <div className="lms-certdoc__foot">
+        {/* The foot's arrangement follows where the signature is meant to
+            print. The issue date and credential always take the opposite end
+            from the signature — they are the two things down here, and putting
+            them on the same side leaves half the foot empty. With the signature
+            centred they sit under it, on their own line. */}
+        <div className={`lms-certdoc__foot is-sig-${signaturePosition}`}>
           <div className="lms-certdoc__sig">
+            {/* The signature scan, sitting ON the rule the way a signed document
+                does. The box holds its height whether or not an image is set, so
+                adding one doesn't shove the foot up the page. */}
+            {/* The signature, painted in the certificate's own text colour
+                through a mask of the uploaded file. See the note above. */}
+            <span className="lms-certdoc__sig-mark">
+              {!signatureImage ? null : maskSupported ? (
+                <span
+                  className="lms-certdoc__sig-ink"
+                  style={{ '--cert-sig': `url("${signatureImage}")` }}
+                  role="img"
+                  aria-label=""
+                />
+              ) : (
+                <img src={signatureImage} alt="" />
+              )}
+            </span>
             {/* The rule sits above the name whether or not one is set, so the
                 layout doesn't jump as the instructor types. */}
             <span className="lms-certdoc__rule" />

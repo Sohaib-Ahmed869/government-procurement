@@ -126,7 +126,7 @@ export const cohortAnalytics = asyncHandler(async (req, res) => {
         ? { _id: course._id, title: course.title, slug: course.slug }
         : null,
       questionCount: q.quiz?.questions?.length ?? 0,
-      passMark: q.quiz?.passMark ?? 70,
+      passMark: q.quiz?.passMark ?? 100,
       lastAttemptAt: own[0]?.submittedAt ?? null,
       ...summarise(own),
     };
@@ -294,7 +294,7 @@ export const quizAnalytics = asyncHandler(async (req, res) => {
   return ok(res, {
     course: { _id: course._id, title: course.title, slug: course.slug },
     lesson: { _id: lesson._id, title: lesson.title },
-    passMark: lesson.quiz?.passMark ?? 70,
+    passMark: lesson.quiz?.passMark ?? 100,
     ...summarise(attempts),
     questions,
   });

@@ -91,7 +91,7 @@ export default function PathStepsEditor({ steps, catalogue, onChange }) {
                     <strong>{course?.title ?? 'Course unavailable'}</strong>
                     <span className="lms-pathstep__meta">
                       {course?.status === 'published' ? 'Published' : 'Not published yet'}
-                      {course?.level ? ` · ${course.level}` : ''}
+                      {course?.level ? ` | ${course.level}` : ''}
                     </span>
                   </div>
                   <div className="lms-pathstep__tools">

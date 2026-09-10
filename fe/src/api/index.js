@@ -55,6 +55,10 @@ export const promptsApi = createResource('prompts');
 export const bidWritersApi = {
   ...createResource('bid-writers'),
   uploadLogo: (id, file) => api.upload(`/bid-writers/${id}/logo`, file),
+  // The whole arrangement in one call — `ids` in the order they should appear
+  // on the page, first first. See the reorder handler for why it is not one
+  // request per row.
+  reorder: (ids) => api.patch('/bid-writers/reorder', { order: ids }),
 };
 
 // B6 — the Templates library: sourced, licence-checked, downloadable documents.

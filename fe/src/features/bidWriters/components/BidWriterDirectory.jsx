@@ -254,57 +254,98 @@ export default function BidWriterDirectory() {
 // No detail page. Everything a visitor needs to make contact is on the card,
 // and a separate page per advertiser would be a thin page whose only content is
 // somebody else's contact details.
+/* Every way to reach an advertiser, as one row of buttons.
+
+   They used to be a green "Visit website" followed by two bare links, which
+   made the website look like the offer and the email and phone look like
+   footnotes. A visitor choosing between five listings is choosing a CONTACT
+   METHOD as much as a company, so each one is a target of the same weight.
+
+   Built from a list rather than five hand-written blocks: an empty field must
+   produce no button at all — a dead "LinkedIn" on every listing that hasn't
+   given one is worse than an uneven row — and one `filter` is harder to get
+   wrong five times than five conditionals are.
+
+   `external` marks the ones leaving the site, which is what earns the
+   target/rel pair. `mailto:` and `tel:` hand off to the device instead, and
+   opening those in a new tab leaves an empty window behind.
+
+   The labels are FIXED. They used to be written from the record — "Email Sarah
+   Chen" on one listing and "Email" on the next, and the phone button captioned
+   with the number itself — which meant the row of buttons was a different
+   length and a different shape on every card, and a visitor comparing five
+   listings had to read each row before they could find the one they wanted.
+   Five constant words down the page are scanned once. */
+function contactActions(writer) {
+  const tel = writer.contactPhone ? writer.contactPhone.replace(/\s+/g, '') : '';
+  return [
+    { key: 'website', label: 'Visit Website', href: writer.website, external: true },
+    {
+      key: 'email',
+      label: 'Email',
+      href: writer.contactEmail ? `mailto:${writer.contactEmail}` : '',
+    },
+    { key: 'phone', label: 'Contact Number', href: tel ? `tel:${tel}` : '' },
+    { key: 'linkedin', label: 'Linkedin', href: writer.linkedinUrl, external: true },
+    { key: 'cases', label: 'Case Studies', href: writer.caseStudiesUrl, external: true },
+  ].filter((a) => a.href);
+}
+
 function BidWriterCard({ writer }) {
   const state = STATE_BY_VALUE[writer.officeState];
   const location = [writer.officeCity, state?.label].filter(Boolean).join(', ');
+  const actions = contactActions(writer);
 
   // `placementTier` no longer changes how a card looks. It decides where the
   // card sits and nothing else, which is the quietest a paid tier can be.
   return (
     <li className="bw-card">
-      <div className="bw-card__head">
-        <span className="bw-card__logo">
-          {writer.logo?.url && <img src={writer.logo.url} alt="" loading="lazy" />}
-        </span>
-
-        <div className="bw-card__id">
+      {/* Two columns: everything the advertiser says on the left, their image
+          on the right. The small tile that used to sit to the LEFT of the
+          company name is gone — at 56px it could only ever hold a logo, and it
+          drew a box on every listing that had not supplied one. */}
+      <div className="bw-card__grid">
+        <div className="bw-card__main">
           <h2 className="bw-card__name">{writer.company}</h2>
           {location && <p className="bw-card__location">{location}</p>}
+
+          {writer.blurb && <p className="bw-card__blurb">{writer.blurb}</p>}
+
+          {(writer.categories || []).length > 0 && (
+            <ul className="bw-card__tags">
+              {writer.categories.map((c) => (
+                <li className="bw-tag" key={c}>
+                  {CATEGORY_BY_VALUE[c]?.label || c}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {actions.length > 0 && (
+            <div className="bw-card__contact">
+              {actions.map((a) => (
+                <a
+                  key={a.key}
+                  className="bw-card__btn"
+                  href={a.href}
+                  {...(a.external
+                    ? { target: '_blank', rel: 'noopener noreferrer nofollow' }
+                    : null)}
+                >
+                  {a.label}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
 
-      {writer.blurb && <p className="bw-card__blurb">{writer.blurb}</p>}
-
-      {(writer.categories || []).length > 0 && (
-        <ul className="bw-card__tags">
-          {writer.categories.map((c) => (
-            <li className="bw-tag" key={c}>
-              {CATEGORY_BY_VALUE[c]?.label || c}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="bw-card__contact">
-        {writer.website && (
-          <a
-            className="bw-card__link bw-card__link--primary"
-            href={writer.website}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-          >
-            Visit website
-          </a>
-        )}
-        {writer.contactEmail && (
-          <a className="bw-card__link" href={`mailto:${writer.contactEmail}`}>
-            Email{writer.contactName ? ` ${writer.contactName}` : ''}
-          </a>
-        )}
-        {writer.contactPhone && (
-          <a className="bw-card__link" href={`tel:${writer.contactPhone.replace(/\s+/g, '')}`}>
-            {writer.contactPhone}
-          </a>
+        {/* Only drawn when there is something to draw. An empty frame here
+            would be the same box on the right that was just removed from the
+            left, and the copy simply takes the full width without it. */}
+        {writer.logo?.url && (
+          <div className="bw-card__media">
+            <img src={writer.logo.url} alt="" loading="lazy" />
+          </div>
         )}
       </div>
     </li>

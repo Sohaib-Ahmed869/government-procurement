@@ -24,7 +24,7 @@ export default function InstructorProfilePage() {
   const [editing, setEditing] = useState(false);
 
   const name = user?.name ?? 'Your name';
-  const byline = [instructor?.headline, instructor?.organisation].filter(Boolean).join(' · ');
+  const byline = [instructor?.headline, instructor?.organisation].filter(Boolean).join(' | ');
 
   // A dash, not a zero, until the numbers land. A profile that renders "0
   // learners" for a second and then corrects itself has already told the author

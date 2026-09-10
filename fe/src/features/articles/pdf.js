@@ -118,7 +118,7 @@ export async function downloadArticlePdf(article) {
 
   const meta = [formatDate(article?.publishedAt), article?.category?.name, article?.author?.name || article?.author]
     .filter(Boolean)
-    .join('   ·   ');
+    .join('   |   ');
   if (meta) write(meta, { size: 9, colour: [110, 110, 110], gapAfter: 5 });
 
   // A rule under the title, the paper equivalent of the bar on screen.

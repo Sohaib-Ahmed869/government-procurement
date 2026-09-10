@@ -64,7 +64,7 @@ function SessionCard({ session, onJoin, joining, error }) {
         <p className="lms-live-card__meta">
           <LmsIcon name="clock" />
           {session.durationMinutes} minutes
-          {session.host ? <> · with {session.host.name}</> : null}
+          {session.host ? <> | with {session.host.name}</> : null}
         </p>
       </div>
 

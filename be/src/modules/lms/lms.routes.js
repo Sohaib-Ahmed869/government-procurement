@@ -144,6 +144,17 @@ router.patch('/authoring/programs/:programId', ...ownsPath, programs.updateProgr
 router.delete('/authoring/programs/:programId', ...ownsPath, programs.deleteProgram);
 router.post('/authoring/programs/:programId/submit', ...ownsPath, programs.submitProgramForReview);
 router.post('/authoring/programs/:programId/withdraw', ...ownsPath, programs.withdrawProgram);
+router.post(
+  '/authoring/programs/:programId/certificate-signature',
+  ...ownsPath,
+  uploadImage.single('file'),
+  programs.certificateSignature,
+);
+router.delete(
+  '/authoring/programs/:programId/certificate-signature',
+  ...ownsPath,
+  programs.removeCertificateSignature,
+);
 
 router.get('/authoring/courses', ...teach, authoring.myCourses);
 router.post('/authoring/courses', ...teach, authoring.createCourse);
@@ -201,6 +212,20 @@ router.post(
   authoring.courseImage,
 );
 router.delete('/authoring/courses/:courseId/image', ...owns, authoring.removeCourseImage);
+
+// The certificate's signature scan, on the same terms as the cover image and
+// for the same reason: the printed URL must be one the server derived.
+router.post(
+  '/authoring/courses/:courseId/certificate-signature',
+  ...owns,
+  uploadImage.single('file'),
+  authoring.certificateSignature,
+);
+router.delete(
+  '/authoring/courses/:courseId/certificate-signature',
+  ...owns,
+  authoring.removeCertificateSignature,
+);
 
 router.post('/authoring/courses/:courseId/modules', ...owns, authoring.createModule);
 router.patch('/authoring/courses/:courseId/modules/reorder', ...owns, authoring.reorderModules);

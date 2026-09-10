@@ -21,6 +21,8 @@ const EMPTY = {
   contactEmail: '',
   contactPhone: '',
   website: '',
+  linkedinUrl: '',
+  caseStudiesUrl: '',
   officeState: STATES[0].value,
   officeCity: '',
   categories: [],
@@ -48,6 +50,7 @@ export default function BidWritersAdminPage() {
   const [confirmId, setConfirmId] = useState(null);
   const [logoUrl, setLogoUrl] = useState('');
   const [logoBusy, setLogoBusy] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const fileRef = useRef(null);
 
   const load = () => {
@@ -61,6 +64,38 @@ export default function BidWritersAdminPage() {
       .catch(() => setStatus('error'));
   };
   useEffect(load, []);
+
+  /* Move one listing up or down the page.
+
+     The table is served in the same order the website is, so what is on screen
+     here IS the arrangement — moving a row up here moves the listing up there,
+     and there is nothing to reconcile between the two.
+
+     The new order is applied to the table BEFORE the request goes out. A nudge
+     that only lands once the server has answered feels broken at any real
+     latency: you press the arrow, nothing moves, you press it again, and now
+     the row has jumped two places. On failure the reload puts the saved order
+     back and says so. */
+  const move = async (index, delta) => {
+    const target = index + delta;
+    if (reordering || target < 0 || target >= rows.length) return;
+
+    const next = [...rows];
+    [next[index], next[target]] = [next[target], next[index]];
+    setRows(next);
+    setReordering(true);
+    try {
+      await bidWritersApi.reorder(next.map((r) => r._id || r.id));
+    } catch {
+      // Only a FAILED nudge reloads. Reloading after a successful one would
+      // drop the table back to skeleton rows on every press to fetch the order
+      // already on screen, and nudging four listings into place would mean
+      // watching the page rebuild itself four times.
+      load();
+    } finally {
+      setReordering(false);
+    }
+  };
 
   const onChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -92,6 +127,8 @@ export default function BidWritersAdminPage() {
       contactEmail: row.contactEmail || '',
       contactPhone: row.contactPhone || '',
       website: row.website || '',
+      linkedinUrl: row.linkedinUrl || '',
+      caseStudiesUrl: row.caseStudiesUrl || '',
       officeState: row.officeState || STATES[0].value,
       officeCity: row.officeCity || '',
       categories: row.categories || [],
@@ -160,6 +197,54 @@ export default function BidWritersAdminPage() {
   };
 
   const columns = [
+    /* B7.4 — the position on the public page, and the control for it.
+
+       The number is not editable here on purpose: two people typing numbers
+       into a list is how you end up with three listings all claiming to be
+       fourth. The arrows can only ever produce a valid sequence, and the
+       number beside them is there so the arrangement can be read at a glance
+       and talked about ("put them third") rather than counted down the page.
+
+       Inactive listings are counted too, because they are part of the
+       arrangement — one going live must not shuffle everything below it. */
+    {
+      key: 'position',
+      header: '#',
+      width: 92,
+      render: (r, i) => (
+        <div className="admin-order">
+          <span className="admin-order__num">{i + 1}</span>
+          <span className="admin-order__btns">
+            <button
+              type="button"
+              className="admin-order__btn"
+              onClick={() => move(i, -1)}
+              disabled={reordering || i === 0}
+              aria-label={`Move ${r.company} up`}
+              title="Move up"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="6 15 12 9 18 15" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="admin-order__btn"
+              onClick={() => move(i, 1)}
+              disabled={reordering || i === rows.length - 1}
+              aria-label={`Move ${r.company} down`}
+              title="Move down"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+          </span>
+        </div>
+      ),
+    },
     {
       key: 'logo',
       header: 'Logo',
@@ -227,7 +312,8 @@ export default function BidWritersAdminPage() {
           <p className="admin-page__subtitle">
             Paid placements in the bid writer directory, which is also the general
             business advertising space. A listing only appears once “Placement is paid
-            and live” is ticked.
+            and live” is ticked. The order below is the order visitors see — use the
+            arrows to set which listing comes first.
           </p>
         </div>
         <div className="admin-page__actions">
@@ -268,7 +354,7 @@ export default function BidWritersAdminPage() {
         open={drawerOpen}
         title={editingId ? 'Edit listing' : 'New listing'}
         subtitle={
-          editingId ? 'Update this placement.' : 'Create the listing, then add the logo.'
+          editingId ? 'Update this placement.' : 'Create the listing, then add the image.'
         }
         onClose={closeDrawer}
         busy={saving}
@@ -344,9 +430,26 @@ export default function BidWritersAdminPage() {
           <FormField label="Contact name" name="contactName" value={form.contactName} onChange={onChange} />
           <FormField label="Contact email" name="contactEmail" type="email" value={form.contactEmail} onChange={onChange} />
           <FormField label="Contact phone" name="contactPhone" value={form.contactPhone} onChange={onChange} />
+          {/* Each of these becomes its own button on the listing. Left blank,
+              no button is drawn — a dead "LinkedIn" on every listing that
+              hasn't supplied one is worse than an uneven row. */}
+          <FormField
+            label="LinkedIn"
+            name="linkedinUrl"
+            value={form.linkedinUrl}
+            onChange={onChange}
+            hint="The company page. Shown as a LinkedIn button."
+          />
+          <FormField
+            label="Case studies"
+            name="caseStudiesUrl"
+            value={form.caseStudiesUrl}
+            onChange={onChange}
+            hint="A link to their own case studies page. Nothing is hosted here."
+          />
 
           <div className="admin-field">
-            <span className="admin-field__label">Logo</span>
+            <span className="admin-field__label">Listing image</span>
             {editingId ? (
               <>
                 {logoUrl && (
@@ -365,12 +468,14 @@ export default function BidWritersAdminPage() {
                   disabled={logoBusy}
                 />
                 <p className="admin-field__hint" style={{ marginLeft: 0 }}>
-                  {logoBusy ? 'Uploading…' : 'Optional. Without one the listing shows an empty tile, and the names still line up.'}
+                  {logoBusy
+                    ? 'Uploading…'
+                    : 'Shown large on the right of the listing. A photograph or a logo on white both work — it is fitted, not cropped. Without one the listing is copy only, full width.'}
                 </p>
               </>
             ) : (
               <p className="admin-field__hint" style={{ marginLeft: 0 }}>
-                Create the listing first, then add the logo.
+                Create the listing first, then add the image.
               </p>
             )}
           </div>
@@ -382,15 +487,15 @@ export default function BidWritersAdminPage() {
             options={TIER_OPTIONS}
             value={form.placementTier}
             onChange={onChange}
-            hint="Featured listings sort above standard ones and carry a rule down their edge. The tier itself is never labelled on the page."
+            hint="What the advertiser bought. It no longer decides position on its own — the arrows on the list do that — it only settles two listings sharing a position. The tier is never labelled on the page."
           />
           <FormField
-            label="Order"
+            label="Position"
             name="order"
             type="number"
             value={form.order}
             onChange={onChange}
-            hint="Within the tier. Lowest first; ties fall back to company name."
+            hint="Lowest first. You normally won't touch this — use the up and down arrows on the list instead, which keep the numbering tidy for you."
           />
           <FormField
             label="Internal notes"
@@ -421,7 +526,7 @@ export default function BidWritersAdminPage() {
       <ConfirmDialog
         open={Boolean(confirmId)}
         title="Delete listing"
-        message="Delete this listing? The logo is removed from storage as well. This cannot be undone."
+        message="Delete this listing? The image is removed from storage as well. This cannot be undone."
         confirmLabel="Delete"
         onConfirm={onDelete}
         onCancel={() => setConfirmId(null)}

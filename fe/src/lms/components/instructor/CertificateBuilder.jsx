@@ -1,5 +1,6 @@
 import LmsIcon from '../LmsIcon.jsx';
 import CertificateDesign, { CERTIFICATE_DEFAULTS } from '../certificates/CertificateDesign.jsx';
+import SignatureUploader from './SignatureUploader.jsx';
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -48,6 +49,11 @@ function contrast(a, b) {
 //
 // `subject` is whatever is being certified. `noun` is what to call it in the
 // copy, and `defaults` lets a path start from its own wording.
+//
+// `onUploadSignature` / `onRemoveSignature` are the host's, because a course and
+// a path keep their certificate on different documents behind different
+// ownership checks. Given neither, the signature control is simply absent —
+// which is what a caller with nothing to attach an upload to should get.
 export default function CertificateBuilder({
   course,
   subject,
@@ -56,6 +62,8 @@ export default function CertificateBuilder({
   minutes,
   previewName,
   onChange,
+  onUploadSignature,
+  onRemoveSignature,
 }) {
   const item = subject ?? course ?? {};
   const c = { ...defaults, ...(item.certificate ?? {}) };
@@ -133,6 +141,29 @@ export default function CertificateBuilder({
               {field('signatoryName', 'Signed by', `Left blank, the ${noun} byline is used.`)}
               {field('signatoryRole', 'Their role')}
               {field('issuerName', 'Issued by')}
+
+              {/* The scan itself, saved on upload rather than with the rest of
+                  this form — see the note in SignatureUploader. */}
+              {onUploadSignature ? (
+                <SignatureUploader
+                  signature={c.signature}
+                  position={c.signaturePosition}
+                  noun={noun}
+                  onUpload={async (file) => {
+                    const saved = await onUploadSignature(file);
+                    // The server has already stored it; the copy on screen just
+                    // has to catch up with what came back.
+                    set({ signature: saved ?? { key: '', url: '' } });
+                  }}
+                  onRemove={async () => {
+                    await onRemoveSignature();
+                    set({ signature: { key: '', url: '' } });
+                  }}
+                  // Placement rides the ordinary debounced save — it is a
+                  // setting, not a file.
+                  onPositionChange={(signaturePosition) => set({ signaturePosition })}
+                />
+              ) : null}
             </section>
 
             <section className="lms-card" style={{ marginTop: 16 }}>

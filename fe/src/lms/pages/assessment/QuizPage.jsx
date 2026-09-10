@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useOutletContext, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import QuizRunner from '../../components/assessment/QuizRunner.jsx';
 import AttemptHistory from '../../components/assessment/AttemptHistory.jsx';
@@ -16,8 +16,6 @@ import { useQuiz } from '../../hooks/useQuiz.js';
 // point of keeping attempts.
 export default function QuizPage() {
   const { slug, quizId } = useParams();
-  // PlayerLayout has already loaded the course for the rail beside this.
-  const { course } = useOutletContext() ?? {};
   /* `ticket` is the signed proof of when this attempt was opened. useQuiz has
      always returned it and this line never took it, so the reference below was
      to nothing — pressing Start threw "ticket is not defined" and the runner
@@ -48,10 +46,10 @@ export default function QuizPage() {
 
     return (
       <div className="lms-lesson-page">
-        <div className="lms-lesson-page__head">
-          <h1 className="lms-lesson-page__title">{title}</h1>
-        </div>
         <div className="lms-card">
+          <p className="lms-empty">
+            <strong>{title}</strong>
+          </p>
           <p className="lms-empty">
             {status === 'notfound'
               ? 'This lesson isn’t a quiz, or it has been removed from the course.'
@@ -77,10 +75,6 @@ export default function QuizPage() {
   if (!questionCount) {
     return (
       <div className="lms-lesson-page">
-        <div className="lms-lesson-page__head">
-          <span className="lms-lesson-page__crumb">{course?.title}</span>
-          <h1 className="lms-lesson-page__title">{lesson.title}</h1>
-        </div>
         <div className="lms-card">
           <p className="lms-empty">
             No questions have been added to this quiz yet.
@@ -92,11 +86,6 @@ export default function QuizPage() {
 
   return (
     <div className="lms-lesson-page">
-      <div className="lms-lesson-page__head">
-        <span className="lms-lesson-page__crumb">{course?.title}</span>
-        <h1 className="lms-lesson-page__title">{lesson.title}</h1>
-      </div>
-
       <div className="lms-card">
         {started ? (
           <QuizRunner

@@ -180,7 +180,7 @@ export default function LessonEditor({ lesson, moduleTitle, courseId, onChange, 
 
       {lesson.kind === 'quiz' ? (
         <QuizBuilder
-          quiz={lesson.quiz ?? { passMark: 70, timeLimitMins: 10, questions: [] }}
+          quiz={lesson.quiz ?? { passMark: 100, timeLimitMins: 10, questions: [] }}
           onChange={(quiz) => set({ quiz })}
         />
       ) : null}

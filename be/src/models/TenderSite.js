@@ -51,7 +51,10 @@ const tenderSiteSchema = new mongoose.Schema(
       key: { type: String, default: '' },
       url: { type: String, default: '' },
     },
-    // Lowest first; ties fall back to creation order.
+    // DEPRECATED. The page and the CMS list are both sorted A-Z by name, so
+    // nothing reads this any more and the CMS no longer offers it. Kept on the
+    // schema only so the numbers already stored on existing entries are not
+    // stripped on the next save.
     order: { type: Number, default: 0 },
     active: { type: Boolean, default: true, index: true },
   },

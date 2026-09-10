@@ -44,7 +44,7 @@ export default function CertificateCard({ certificate }) {
         </h3>
         <p className="lms-certcard__meta">
           Issued {issuedOn(certificate.issuedAt)}
-          {certificate.hours ? ` · ${certificate.hours} hours` : ''}
+          {certificate.hours ? ` | ${certificate.hours} hours` : ''}
         </p>
         <p className="lms-certcard__id">{certificate.credentialId}</p>
       </div>

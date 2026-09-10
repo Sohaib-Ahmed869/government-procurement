@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import WatermarkOverlay from './WatermarkOverlay.jsx';
 import { attachHls } from '../../utils/hlsAttach.js';
 
 // Protected video playback (L2).
@@ -23,15 +22,15 @@ import { attachHls } from '../../utils/hlsAttach.js';
 // claiming the video cannot be copied.
 //
 // Native controls rather than a custom control bar: they bring keyboard access,
-// captions and screen-reader support for free, and a hand-rolled bar reliably
-// loses at least one of those.
+// captions, screen-reader support and the playback-speed menu for free, and a
+// hand-rolled bar reliably loses at least one of those.
 export default function SecureVideoPlayer({
   videoRef,
   src,
   poster,
-  watermark,
   onTimeUpdate,
   onLoadedMetadata,
+  onEnded,
   // 'mp4' (a signed file) or 'hls' (an encrypted playlist).
   kind = 'mp4',
   // Where to start the first time this lesson loads: the position the learner
@@ -109,15 +108,19 @@ export default function SecureVideoPlayer({
         poster={poster}
         controls
         preload="metadata"
-        controlsList="nodownload noremoteplayback noplaybackrate"
+        /* `noplaybackrate` is deliberately absent. The browser's own speed
+           menu is the speed control now — it is where people already look for
+           one, it is reachable by keyboard and screen reader for free, and a
+           second control beside it was two answers to the same question. */
+        controlsList="nodownload noremoteplayback"
         disablePictureInPicture
         onContextMenu={(e) => e.preventDefault()}
         onTimeUpdate={(e) => onTimeUpdate?.(e.currentTarget.currentTime)}
         onLoadedMetadata={(e) => onLoadedMetadata?.(e.currentTarget.duration)}
+        onEnded={() => onEnded?.()}
       >
         Your browser can’t play this video.
       </video>
-      <WatermarkOverlay label={watermark} />
       {hlsError ? <p className="lms-video__error">{hlsError}</p> : null}
     </div>
   );

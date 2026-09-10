@@ -98,7 +98,7 @@ export default function QuizAnalyticsPage() {
           {back}
           <h1 className="lms-page__title">{data.lesson.title}</h1>
           <p className="lms-page__subtitle">
-            {data.course.title} · pass at {data.passMark}%
+            {data.course.title} | pass at {data.passMark}%
           </p>
         </div>
         <div className="lms-page__actions">
@@ -164,7 +164,7 @@ export default function QuizAnalyticsPage() {
                         <p className="lms-item__prompt">{q.prompt}</p>
                         <p className="lms-item__meta">
                           {TYPE_LABEL[q.type] ?? q.type}
-                          {q.skipped ? ` · skipped by ${q.skipped}` : ''}
+                          {q.skipped ? ` | skipped by ${q.skipped}` : ''}
                         </p>
                       </div>
                       <div className="lms-item__score">

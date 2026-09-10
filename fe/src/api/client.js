@@ -39,9 +39,36 @@ export function currentScope() {
   return window.location.pathname.startsWith('/admin') ? SCOPES.ADMIN : SCOPES.LEARN;
 }
 
+/* Whether this path is the LMS proper, as opposed to the public site. Both
+   resolve to the LEARN scope, but only one of them has staff screens on it. */
+function onLearnApp() {
+  return typeof window !== 'undefined' && window.location.pathname.startsWith('/learn');
+}
+
 export function getToken(scope = currentScope()) {
   try {
-    return localStorage.getItem(TOKEN_KEYS[scope] ?? TOKEN_KEYS[SCOPES.LEARN]);
+    const own = localStorage.getItem(TOKEN_KEYS[scope] ?? TOKEN_KEYS[SCOPES.LEARN]);
+    if (own) return own;
+
+    /* A super admin's token is filed under ADMIN by scopeForRole, because they
+       are a staff role. But the teaching side of the LMS lives under /learn,
+       which reads the LEARN slot — so a super admin browsing it sent no
+       credential at all, and every authoring request came back 401 or, with a
+       stale learner token still in the slot, 403 from the role check.
+
+       That contradicted the guard on those very screens: InstructorRoute lets
+       super admins through, on purpose, "so staff can look at an instructor's
+       course without a second account". This is what makes that true.
+
+       FALLBACK, not a merge: a real learner session in this browser still wins
+       on /learn, which is what keeps a signed-in student from being served as
+       the admin who was also using this machine. It only applies inside the LMS
+       — the public site keeps sending nothing when nobody is signed in as a
+       learner, rather than quietly browsing as staff. */
+    if (scope === SCOPES.LEARN && onLearnApp()) {
+      return localStorage.getItem(TOKEN_KEYS[SCOPES.ADMIN]);
+    }
+    return null;
   } catch {
     return null;
   }

@@ -1198,7 +1198,7 @@ export const getAttemptById = asyncHandler(async (req, res) => {
       durationSeconds: attempt.durationSeconds,
     },
     title: lesson.title,
-    passMark: lesson.quiz?.passMark ?? 70,
+    passMark: lesson.quiz?.passMark ?? 100,
     // Safe: this attempt is already marked, so the explanations teach rather
     // than leak. See the note on reviewFor().
     review: reviewFor(lesson.quiz, attempt),
@@ -1250,6 +1250,8 @@ async function issueCertificate({ user, courseId }) {
       textColor: c.textColor,
       showHours: c.showHours,
       showCredentialId: c.showCredentialId,
+      signatureUrl: c.signature?.url || '',
+      signaturePosition: c.signaturePosition || 'left',
     },
   });
 }
@@ -1318,6 +1320,8 @@ async function issueProgramCertificates({ user, courseId }) {
         textColor: c.textColor,
         showHours: c.showHours,
         showCredentialId: c.showCredentialId,
+        signatureUrl: c.signature?.url || '',
+        signaturePosition: c.signaturePosition || 'left',
       },
     });
     issued.push(cert);

@@ -32,7 +32,7 @@ function CourseRow({ course }) {
         <span className="lms-progrow__body">
           <span className="lms-progrow__title">{course.title}</span>
           <span className="lms-progrow__meta">
-            {course.lessonsDone} of {course.lessonsTotal} lessons · {duration(course.minutes)} learned
+            {course.lessonsDone} of {course.lessonsTotal} lessons | {duration(course.minutes)} learned
           </span>
         </span>
         <span className="lms-progrow__right">

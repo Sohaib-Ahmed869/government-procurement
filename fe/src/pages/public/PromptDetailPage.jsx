@@ -163,7 +163,7 @@ export default function PromptDetailPage() {
               other page's; here they read as what they are, the prompt's filing
               details, at the top of the prompt itself. */}
           <p className="pd__meta">
-            {[topic?.label, prompt.useCase].filter(Boolean).join(' · ')}
+            {[topic?.label, prompt.useCase].filter(Boolean).join(' | ')}
             {tool || prompt.tool ? (
               <span
                 className={`pl-tool pl-tool--${prompt.tool}`}

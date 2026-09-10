@@ -7,24 +7,9 @@ import EditorShell from '../components/EditorShell.jsx';
 
 const BLANK = {
   title: '', author: '', overview: '', body: '',
-  category: '', featured: 'false', status: 'draft',
+  category: '', status: 'draft',
   seoTitle: '', seoDescription: '',
 };
-
-// The homepage insights band has five slots (InsightsBand.jsx asks for 5,
-// featured first: one lead article and four beside it). Only a *published*
-// insight occupies one — a featured draft isn't on the homepage yet, so it
-// doesn't hold a slot open. Publishing is where that's reconciled: see the
-// publish handler below.
-const MAX_FEATURED = 5;
-
-// Message shown when a featured draft can't take a slot because the live ones
-// filled up while it sat unpublished. The flag is dropped for the author, so the
-// next Publish click goes through.
-const NO_SLOT_NOTICE =
-  `No space in featured insights. All ${MAX_FEATURED} homepage slots are taken by ` +
-  'published insights, so this one has been changed to not featured on homepage. ' +
-  'Click Publish again to publish it.';
 
 function slugify(s) {
   return String(s || '')
@@ -52,10 +37,6 @@ export default function ArticleEditorPage() {
   const [heroUrl, setHeroUrl] = useState('');
   const [dragging, setDragging] = useState(false);
   const [readMinutes, setReadMinutes] = useState(0);
-  // How many *other* published insights hold a homepage slot — the featured
-  // control locks once they fill all MAX_FEATURED of them.
-  const [featuredElsewhere, setFeaturedElsewhere] = useState(0);
-  const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -70,25 +51,6 @@ export default function ArticleEditorPage() {
     teamApi.list({ limit: 100 }).then((list) => setTeam(list || [])).catch(() => setTeam([]));
   }, []);
 
-  // Published + featured only: those are the ones actually on the homepage.
-  // Re-counted after every save, so unfeaturing another insight in a second tab
-  // and coming back here doesn't leave the control stuck.
-  useEffect(() => {
-    let alive = true;
-    articlesApi
-      .list({ featured: true, status: 'published', limit: 100 })
-      .then((items) => {
-        if (!alive) return;
-        const others = (items || []).filter((a) => (a._id || a.id) !== currentId);
-        setFeaturedElsewhere(others.length);
-      })
-      .catch(() => {
-        // Can't tell — leave the control open rather than blocking on a hiccup.
-        if (alive) setFeaturedElsewhere(0);
-      });
-    return () => { alive = false; };
-  }, [currentId, justSaved]);
-
   useEffect(() => {
     if (!currentId) return;
     setLoading(true);
@@ -99,7 +61,7 @@ export default function ArticleEditorPage() {
           title: a.title ?? '', author: a.author ?? '',
           overview: a.overview ?? '', body: a.body ?? '',
           category: a.category?._id ?? a.category ?? '',
-          featured: a.featured ? 'true' : 'false', status: a.status ?? 'draft',
+          status: a.status ?? 'draft',
           seoTitle: a.seo?.title ?? '', seoDescription: a.seo?.description ?? '',
         };
         setForm(next);
@@ -133,7 +95,6 @@ export default function ArticleEditorPage() {
     title: form.title, author: form.author,
     overview: form.overview, body: form.body,
     category: form.category || undefined,
-    featured: form.featured === 'true',
     status: statusOverride || form.status,
     // publishedAt is deliberately not sent — the API stamps it when the insight
     // first goes live, and that one date is what both the CMS card and the site
@@ -142,19 +103,10 @@ export default function ArticleEditorPage() {
     seo: { title: form.seoTitle, description: form.seoDescription },
   });
 
-  // Drop the featured flag and explain why, leaving the insight otherwise
-  // untouched. The author's next Publish click then goes through.
-  const releaseFeatured = () => {
-    set('featured', 'false');
-    setError(null);
-    setNotice(NO_SLOT_NOTICE);
-  };
-
   const save = async (statusOverride) => {
     if (!form.title.trim()) { setError('Please add a title before saving.'); return; }
     setSaving(true);
     setError(null);
-    setNotice(null);
     try {
       const body = payload(statusOverride);
       let savedId = currentId;
@@ -179,45 +131,19 @@ export default function ArticleEditorPage() {
         navigate(`/admin/articles/${savedId}`, { replace: true });
       }
     } catch (err) {
-      // The API refused because the homepage slots are full — the same case the
-      // pre-flight check below catches, but reached when the count went stale
-      // (another editor published a featured insight in the meantime). Handle it
-      // the same way rather than showing a dead end.
-      if (err?.errors?.featured === 'no-free-slot') releaseFeatured();
-      else setError(err.message || 'Failed to save');
+      setError(err.message || 'Failed to save');
       setSaving(false);
     }
   };
 
-  // Publishing a featured draft is the moment it would actually claim a homepage
-  // slot. If they're all taken by live insights, unfeature it and say so instead
-  // of publishing — the author clicks Publish again to go ahead. Unpublishing
-  // never needs a slot, so it passes straight through.
   const onPublishClick = () => {
-    const goingLive = form.status !== 'published';
-    if (goingLive && form.featured === 'true' && featuredElsewhere >= MAX_FEATURED) {
-      releaseFeatured();
-      return;
-    }
-    save(goingLive ? 'published' : 'draft');
+    save(form.status !== 'published' ? 'published' : 'draft');
   };
 
   if (loading) return <p className="admin-tablestate">Loading insight…</p>;
 
   const isPublished = form.status === 'published';
   const slug = slugify(form.title);
-
-  // All the live slots are taken and this insight isn't one of them, so it can't
-  // be added until another insight gives its slot up. Already-featured insights
-  // keep the control live — that's how a slot is released.
-  const isFeatured = form.featured === 'true';
-  const slotsFull = featuredElsewhere >= MAX_FEATURED;
-  const featureLocked = slotsFull && !isFeatured;
-  // Slots in use right now, counting this insight only if it's actually live.
-  const slotsUsed = featuredElsewhere + (isFeatured && isPublished ? 1 : 0);
-  // A featured draft with nowhere to land: warn before they hit Publish, since
-  // that's the click that will drop the flag.
-  const willLoseSlotOnPublish = isFeatured && !isPublished && slotsFull;
 
   return (
     <EditorShell
@@ -228,7 +154,6 @@ export default function ArticleEditorPage() {
       saving={saving}
       justSaved={justSaved}
       error={error}
-      notice={notice}
       onBack={() => navigate('/admin/articles')}
       onSave={() => save()}
       // Saving a live insight isn't saving a draft — it pushes the edit straight
@@ -244,29 +169,6 @@ export default function ArticleEditorPage() {
               <span className={`editor-publish__dot${isPublished ? ' is-live' : ''}`} />
               <span>{isPublished ? 'Published, live on the site' : 'Draft, not visible yet'}</span>
             </div>
-            <FormField
-              label="Featured" name="featured" as="select" value={form.featured} onChange={onChange}
-              options={[{ value: 'false', label: 'No' }, { value: 'true', label: 'Featured on homepage' }]}
-              disabled={featureLocked}
-              hint={`(${slotsUsed} of ${MAX_FEATURED} slots used)`}
-            />
-            {/* Suppressed while the notice banner is up — it already explains
-                that the slots are full and what was done about it. */}
-            {featureLocked && !notice && (
-              <p className="editor-hint">
-                All {MAX_FEATURED} homepage slots are taken by published insights. Remove
-                one from the homepage first, then this one can take its place.
-              </p>
-            )}
-            {willLoseSlotOnPublish && (
-              <p className="editor-hint">
-                All {MAX_FEATURED} homepage slots have been taken since this draft was
-                marked featured. Publishing it will change it to not featured on homepage.
-              </p>
-            )}
-            {isFeatured && !isPublished && !slotsFull && (
-              <p className="editor-hint">Takes a homepage slot once published.</p>
-            )}
           </div>
 
           <div className="editor-panel">

@@ -23,7 +23,7 @@ import { env } from '../../../../config/env.js';
    Every lesson goes in as its own `document` block with citations enabled, so
    each sentence of the answer comes back tied to the lesson it came from, with
    the source text and its character offsets. That is what lets the screen show
-   "— Module 2 · Writing the evaluation plan" under an answer and link to it.
+   "— Module 2 | Writing the evaluation plan" under an answer and link to it.
 
    It is also the honest answer to "can this be trusted": the learner checks the
    lesson rather than the model. The Procurement Advisor (A6) makes the same

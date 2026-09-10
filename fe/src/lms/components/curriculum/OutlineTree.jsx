@@ -18,7 +18,7 @@ export default function OutlineTree({ slug, modules, nextLessonId }) {
     <div className="lms-outline">
       <div className="lms-outline__head">
         <p className="lms-outline__summary">
-          {modules.length} modules · {totalLessons} lessons ·{' '}
+          {modules.length} modules | {totalLessons} lessons |{' '}
           {Math.floor(totalMinutes / 60)}h {totalMinutes % 60}m total
         </p>
         <button

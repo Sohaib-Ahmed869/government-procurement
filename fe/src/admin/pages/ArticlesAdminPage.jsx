@@ -15,7 +15,7 @@ function formatDate(value) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-// A single insight card: cover thumbnail, status/featured markers, meta, actions.
+// A single insight card: cover thumbnail, status marker, meta, actions.
 function ArticleCard({ article, onDelete }) {
   const cover = article.heroImage?.url;
   // The publish date — the same field the public Insights page and homepage rail
@@ -41,7 +41,6 @@ function ArticleCard({ article, onDelete }) {
         )}
         <div className="admin-libcard__badges">
           <StatusBadge status={article.status} />
-          {article.featured && <span className="admin-libcard__star">★ Featured</span>}
         </div>
       </div>
 

@@ -53,7 +53,7 @@ export function markAttempt(quiz, submitted = []) {
   const total = quiz.questions.length;
   const percent = total ? Math.round((score / total) * 100) : 0;
 
-  return { answers, score, total, percent, passed: percent >= (quiz.passMark ?? 70) };
+  return { answers, score, total, percent, passed: percent >= (quiz.passMark ?? 100) };
 }
 
 // The per-question review shown AFTER marking. Safe to send back because the

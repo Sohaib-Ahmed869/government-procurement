@@ -10,7 +10,7 @@ const POLL_MS = 250;
 // A YouTube lesson's player.
 //
 // Deliberately NOT dressed up to look like the secure player. That one carries
-// a watermark and a "Protected playback" badge because its source is a signed,
+// a "Protected playback" badge because its source is a signed,
 // expiring URL; this is a public video anyone can open on YouTube. Borrowing
 // the same chrome would imply a protection that isn't there.
 //
@@ -28,15 +28,22 @@ export default function YouTubeEmbed({
   startSeconds = 0,
   title,
   onTimeUpdate,
+  // Fires when the video runs out, so an embed lesson finishes the same way an
+  // uploaded one does: the tick, then the up-next countdown. The <video>
+  // element has a real `ended` event; an iframe has a player state, so this is
+  // where the two are made to mean the same thing.
+  onEnded,
   // Filled with the live player so the page can seek into it.
   playerRef,
 }) {
   const hostRef = useRef(null);
   const [fallback, setFallback] = useState(false);
-  // Held in a ref so the polling loop always calls the current handler without
+  // Held in refs so the API callbacks always reach the current handler without
   // being torn down and rebuilt every time the page re-renders.
   const onTimeRef = useRef(onTimeUpdate);
   onTimeRef.current = onTimeUpdate;
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
 
   useEffect(() => {
     if (!videoId) return undefined;
@@ -71,6 +78,13 @@ export default function YouTubeEmbed({
                 onTimeRef.current?.(player.getCurrentTime() ?? 0, player.getDuration?.() ?? 0);
               }, POLL_MS);
             },
+            // 0 is YT.PlayerState.ENDED. Read off the YT namespace rather
+            // than hard-coded, with the literal as the fallback for the case
+            // where the constants aren't on the object we were handed.
+            onStateChange: (e) => {
+              if (cancelled) return;
+              if (e?.data === (YT.PlayerState?.ENDED ?? 0)) onEndedRef.current?.();
+            },
             onError: () => setFallback(true),
           },
         });
@@ -94,6 +108,9 @@ export default function YouTubeEmbed({
   }, [videoId, startSeconds, playerRef]);
 
   if (fallback) {
+    // No player API here, so no playhead and no end event: the transcript stops
+    // following and the up-next countdown doesn't fire. The video still plays,
+    // which is the point of the fallback, and the Next button is still below.
     return (
       <div className="lms-video lms-video--embed">
         <iframe

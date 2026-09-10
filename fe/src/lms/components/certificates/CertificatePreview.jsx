@@ -61,7 +61,7 @@ export default function CertificatePreview({ certificate, recipient }) {
         </div>
 
         <p className="lms-cert__id">
-          Credential ID {certificate.credentialId} · verify at
+          Credential ID {certificate.credentialId} | verify at
           {' '}government-procurement.com.au/verify/{certificate.credentialId}
         </p>
       </div>

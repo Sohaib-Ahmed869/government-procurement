@@ -108,7 +108,7 @@ export async function courseDocuments(courseId) {
 
     documents.push({
       lessonId: String(lesson._id),
-      title: moduleTitle ? `${moduleTitle} · ${lesson.title}` : lesson.title,
+      title: moduleTitle ? `${moduleTitle} | ${lesson.title}` : lesson.title,
       moduleTitle,
       context: `Lesson ${documents.length + 1} of this course${moduleTitle ? `, in the module "${moduleTitle}"` : ''}.`,
       text: text.slice(0, MAX_CHARS_PER_LESSON),

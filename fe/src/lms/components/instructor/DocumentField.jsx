@@ -108,8 +108,10 @@ export default function DocumentField({ courseId, document: doc, onChange }) {
             onChange={(e) => onChange({ ...doc, url: e.target.value, key: '' })}
           />
           <span className="lms-field__hint">
-            Opens in a new tab. A linked document is public, so it isn’t gated on
-            enrolment the way an uploaded one is.
+            A linked document is public, so it isn’t gated on enrolment the way an
+            uploaded one is. It is also read in the lesson only if the host allows
+            it — otherwise the learner gets a plain embed, and the rule that holds
+            Next until the document has been read to the end can’t be applied.
           </span>
         </label>
       ) : progress !== null ? (
@@ -127,7 +129,7 @@ export default function DocumentField({ courseId, document: doc, onChange }) {
           <div className="lms-upload__body">
             <p className="lms-upload__name">{doc.name}</p>
             <p className="lms-upload__meta">
-              {sizeLabel(doc.sizeBytes)} · served through an expiring link
+              {sizeLabel(doc.sizeBytes)} | served through an expiring link
             </p>
           </div>
           <div className="lms-upload__actions">

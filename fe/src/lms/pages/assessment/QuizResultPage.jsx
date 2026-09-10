@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import QuizResult from '../../components/assessment/QuizResult.jsx';
 import AttemptHistory from '../../components/assessment/AttemptHistory.jsx';
 import { quizzesApi } from '../../../api/lms.js';
+import { isLocked } from '../../utils/gating.js';
 
 // A marked attempt at its own URL (L3).
 //
@@ -18,7 +19,24 @@ export default function QuizResultPage() {
   const { slug, quizId, attemptId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { course } = useOutletContext() ?? {};
+  // `enrolment` carries the certificate once the course is finished. The
+  // runner refreshes the outline before it lands here, so by now it is there.
+  const { modules, enrolment } = useOutletContext() ?? {};
+
+  /* What comes after this quiz, read off the outline the player shell already
+     holds. Derived here rather than added to the submit response, because the
+     shell has the whole course in memory and a second source for "what is next"
+     is a second thing that can disagree with the rail. `null` when this quiz is
+     the last lesson, or when the next one is still gated — an onward button
+     that lands on a lock is worse than no button. */
+  const next = useMemo(() => {
+    const flat = (modules ?? []).flatMap((m) =>
+      (m.lessons ?? []).map((l) => ({ ...l, id: l._id ?? l.id })),
+    );
+    const i = flat.findIndex((l) => String(l.id) === String(quizId));
+    const candidate = i === -1 ? null : flat[i + 1];
+    return candidate && !isLocked(candidate.gate) ? candidate : null;
+  }, [modules, quizId]);
 
   const handed = location.state?.result;
   const [data, setData] = useState(
@@ -68,10 +86,10 @@ export default function QuizResultPage() {
   if (status !== 'ready' || !data?.attempt) {
     return (
       <div className="lms-lesson-page">
-        <div className="lms-lesson-page__head">
-          <h1 className="lms-lesson-page__title">Attempt not found</h1>
-        </div>
         <div className="lms-card">
+          <p className="lms-empty">
+            <strong>Attempt not found</strong>
+          </p>
           <p className="lms-empty">
             This attempt isn’t available. It may belong to a different account, or the
             quiz it was taken on has been removed.
@@ -88,17 +106,14 @@ export default function QuizResultPage() {
 
   return (
     <div className="lms-lesson-page">
-      <div className="lms-lesson-page__head">
-        <span className="lms-lesson-page__crumb">{course?.title} · Result</span>
-        <h1 className="lms-lesson-page__title">{data.title || 'Quiz result'}</h1>
-      </div>
-
       <div className="lms-card">
         <QuizResult
           attempt={data.attempt}
           review={data.review}
           passMark={data.passMark}
           slug={slug}
+          next={next}
+          certificateId={enrolment?.certificate?.id}
           onRetake={() => navigate(`/learn/courses/${slug}/quiz/${quizId}`)}
         />
       </div>

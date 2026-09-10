@@ -44,34 +44,43 @@
 
 .bw-card:hover { border-color: var(--gp-brand); }
 
-.bw-card__head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+/* Copy on the left, the advertiser's image on the right.
 
-/* The tile shows whether or not a logo has been uploaded, so names line up down
-   the list. White when filled: an advertiser's mark is drawn for white. */
-.bw-card__logo {
-  flex: none;
+   `minmax(0, 1fr)` on the copy column, not plain `1fr`: a grid track's default
+   minimum is its content, so one long unbroken word in a blurb would push the
+   image off the card instead of wrapping. */
+.bw-card__grid {
   display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  overflow: hidden;
-  background: var(--gp-paper-deep);
-  border-radius: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 24px;
 }
 
-.bw-card__logo:has(img) { background: #fff; }
+.bw-card__main { min-width: 0; }
 
-.bw-card__logo img {
+/* The image, at a size worth uploading something for. It replaces the 56px
+   tile that used to sit left of the company name — big enough to carry a real
+   picture of the work rather than only a mark.
+
+   `object-fit: contain` on white, because what advertisers actually supply is a
+   logo drawn for a white background as often as it is a photograph, and
+   `cover` would crop the sides off a wordmark. */
+.bw-card__media {
+  flex: none;
+  width: clamp(150px, 22vw, 230px);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--gp-line);
+  border-radius: 12px;
+}
+
+.bw-card__media img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-
-.bw-card__id { min-width: 0; }
 
 .bw-card__name {
   margin: 0;
@@ -114,42 +123,53 @@
   border-radius: 999px;
 }
 
+/* One row of equal-weight buttons. Every contact route is a target of the same
+   size, because choosing between listings is partly choosing how to get in
+   touch — the old arrangement made the website the offer and the email and
+   phone footnotes beside it. */
 .bw-card__contact {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 14px;
-  margin-top: 16px;
+  gap: 10px;
+  margin-top: 18px;
 }
 
-.bw-card__link {
+.bw-card__btn {
+  padding: 9px 16px;
   font-size: 13.5px;
   font-weight: 600;
+  line-height: 1.2;
   color: var(--gp-accent-ink);
+  background: var(--gp-paper);
+  border: 1px solid var(--gp-line);
+  border-radius: var(--gp-radius);
   text-decoration: none;
+  transition: border-color 160ms var(--gp-ease), background 160ms var(--gp-ease),
+    color 160ms var(--gp-ease);
 }
 
-.bw-card__link:hover { text-decoration: underline; }
-
-.bw-card__link--primary {
-  padding: 9px 16px;
+.bw-card__btn:hover {
   color: var(--gp-paper);
   background: var(--gp-brand);
-  border-radius: var(--gp-radius);
+  border-color: var(--gp-brand);
 }
 
-.bw-card__link--primary:hover {
-  background: var(--gp-brand-soft);
-  text-decoration: none;
-}
-
-.bw-card__link:focus-visible {
+.bw-card__btn:focus-visible {
   outline: 2px solid var(--gp-accent-ink);
   outline-offset: 3px;
-  border-radius: 4px;
 }
 
+/* The image goes UNDER the copy rather than shrinking with it: below this the
+   two-column split leaves the blurb about twenty characters wide. */
+@media (max-width: 720px) {
+  .bw-card__grid { grid-template-columns: minmax(0, 1fr); }
+  .bw-card__media { width: 100%; max-width: 320px; aspect-ratio: 16 / 9; order: -1; }
+}
+
+/* Full-width buttons, stacked. Side by side at this size they wrap to one per
+   line anyway, at ragged widths — this just makes that deliberate. */
 @media (max-width: 560px) {
-  .bw-card__contact { flex-direction: column; align-items: flex-start; }
-  .bw-card__link--primary { width: 100%; text-align: center; }
+  .bw-card__contact { flex-direction: column; align-items: stretch; }
+  .bw-card__btn { text-align: center; }
 }

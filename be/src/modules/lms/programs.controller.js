@@ -11,6 +11,7 @@ import { Certificate } from '../../models/Certificate.js';
 import { CONTENT_STATUS } from '../../constants/statuses.js';
 import { toSlug, uniqueSlug } from '../../utils/slugify.js';
 import { sanitizeRichTextFields } from '../../utils/richText.js';
+import { uploadBuffer, deleteObject } from '../../config/s3.js';
 
 /* ---------------------------------------------------------------------------
    Learning paths (LMS 8.0): instructor authoring, admin review, learner view.
@@ -35,15 +36,75 @@ async function makeProgramSlug(title) {
   return uniqueSlug(Program, safe);
 }
 
-function pickAuthorFields(body) {
+function pickAuthorFields(body, program) {
   const out = {};
   AUTHOR_FIELDS.forEach((f) => {
     if (body[f] !== undefined) out[f] = body[f];
   });
+
+  /* The certificate's signature image is NOT settable from a PATCH — it comes
+     in through the upload endpoint, which puts the file in our bucket and
+     derives the URL from the key it got back. The builder round-trips the whole
+     certificate object as the author types, so the stored value is put back
+     rather than the incoming one being trusted. */
+  if (out.certificate && typeof out.certificate === 'object') {
+    const stored = program?.certificate?.signature;
+    out.certificate = {
+      ...out.certificate,
+      signature: { key: stored?.key || '', url: stored?.url || '' },
+    };
+  }
+
   // `body` is rich text and reaches the public site as HTML, so it goes
   // through the same cleaning a course description does.
   return sanitizeRichTextFields(out);
 }
+
+// POST /lms/authoring/programs/:programId/certificate-signature — the same
+// upload a course certificate takes, on the path's own certificate. Shared
+// endpoint shape rather than a shared handler, because the two hang off
+// different ownership middleware and different documents.
+export const certificateSignature = asyncHandler(async (req, res) => {
+  if (!req.file) throw ApiError.badRequest('An image file is required');
+
+  const oldKey = req.program.certificate?.signature?.key;
+  const { key, url } = await uploadBuffer({
+    buffer: req.file.buffer,
+    mimeType: req.file.mimetype,
+    folder: 'signatures',
+    originalName: req.file.originalname,
+  });
+
+  req.program.certificate.signature = { key, url };
+  await req.program.save();
+
+  if (oldKey && oldKey !== key) {
+    try {
+      await deleteObject(oldKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return ok(res, req.program);
+});
+
+// DELETE /lms/authoring/programs/:programId/certificate-signature.
+export const removeCertificateSignature = asyncHandler(async (req, res) => {
+  const oldKey = req.program.certificate?.signature?.key;
+  req.program.certificate.signature = { key: '', url: '' };
+  await req.program.save();
+
+  if (oldKey) {
+    try {
+      await deleteObject(oldKey);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return ok(res, req.program);
+});
 
 /* Steps are replaced wholesale rather than patched, because their meaning is
    positional: reordering, removing a step and repointing a prerequisite are all
@@ -175,7 +236,7 @@ export const getProgram = asyncHandler(async (req, res) => {
 
 // PATCH /lms/authoring/programs/:programId
 export const updateProgram = asyncHandler(async (req, res) => {
-  Object.assign(req.program, pickAuthorFields(req.body));
+  Object.assign(req.program, pickAuthorFields(req.body, req.program));
 
   const steps = await normaliseSteps(req.body.steps, { author: req.user._id });
   if (steps) req.program.steps = steps;

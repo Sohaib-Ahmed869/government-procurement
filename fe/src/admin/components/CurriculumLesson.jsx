@@ -135,7 +135,7 @@ export default function CurriculumLesson({ lesson, flags }) {
               <p className="admin-curric__kv">
                 {lesson.video.name || 'Uploaded video'}
                 {lesson.video.sizeBytes
-                  ? ` · ${(lesson.video.sizeBytes / 1e6).toFixed(1)} MB`
+                  ? ` | ${(lesson.video.sizeBytes / 1e6).toFixed(1)} MB`
                   : ''}
               </p>
             </div>
@@ -179,7 +179,7 @@ export default function CurriculumLesson({ lesson, flags }) {
 
           {lesson.transcript?.length ? (
             <div className="admin-curric__block">
-              <h5>Transcript · {lesson.transcript.length} cues</h5>
+              <h5>Transcript | {lesson.transcript.length} cues</h5>
               {/* The first stretch only. A full transcript can run to hundreds
                   of cues and would bury everything below it. */}
               <div className="admin-curric__cues">
@@ -198,8 +198,8 @@ export default function CurriculumLesson({ lesson, flags }) {
           {lesson.quiz ? (
             <div className="admin-curric__block">
               <h5>
-                Quiz · {lesson.quiz.passMark}% to pass
-                {lesson.quiz.timeLimitMins ? ` · ${lesson.quiz.timeLimitMins} min limit` : ''}
+                Quiz | {lesson.quiz.passMark}% to pass
+                {lesson.quiz.timeLimitMins ? ` | ${lesson.quiz.timeLimitMins} min limit` : ''}
               </h5>
               <ol className="admin-curric__questions">
                 {lesson.quiz.questions.map((q) => (
