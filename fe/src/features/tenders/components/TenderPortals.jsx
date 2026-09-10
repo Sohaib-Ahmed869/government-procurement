@@ -143,13 +143,22 @@ export default function TenderPortals() {
   // Reveal on mount, and again each time the audience toggle changes.
   const mounted = useMountReveal();
 
+  // A-Z by name, sorted here as well as in the API so the page never depends on
+  // which backend it is talking to — an older deploy still returns the CMS's
+  // hand-kept `order`. `sensitivity: 'base'` ignores case, matching the API's
+  // collation, so "eProcure" files among the E's rather than after every
+  // capitalised name.
+  const sorted = [...sites].sort((a, b) =>
+    (a.name || '').localeCompare(b.name || '', 'en', { sensitivity: 'base' }),
+  );
+
   // The CMS marks each entry as 'australian' or 'other'; entries saved before
   // that field existed carry no group and belong to the Australian list.
-  const australian = sites.filter((s) => (s.group || 'australian') === 'australian');
+  const australian = sorted.filter((s) => (s.group || 'australian') === 'australian');
   // B3 — councils and local-government buying groups, between the government
   // list above and the paywalled sites below.
-  const local = sites.filter((s) => s.group === 'local');
-  const other = sites.filter((s) => s.group === 'other');
+  const local = sorted.filter((s) => s.group === 'local');
+  const other = sorted.filter((s) => s.group === 'other');
 
   return (
     <div className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>

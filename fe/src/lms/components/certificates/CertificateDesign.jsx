@@ -1,4 +1,5 @@
 import { GP_MARK_PATHS, GP_MARK_VIEWBOX } from './gpMark.js';
+import { corsSafeUrl } from '../../utils/corsUrl.js';
 
 // One renderer for a certificate, used by both the instructor's preview and the
 // issued document a learner opens.
@@ -69,14 +70,14 @@ function GpMark() {
    box that only shows where the file has pixels.
 
    This replaces a canvas that read the image back with `toDataURL` and refilled
-   it with `source-in`. Reading pixels back is the one thing the browser guards:
-   it needs the file fetched as a CORS request, and any hiccup in that — a cache
-   entry stored from an ordinary <img> for the same URL, a bucket whose headers
-   arrive on some responses and not others — makes the read throw, at which
-   point the code fell back to the file as uploaded and the signature came out
-   navy on dark green. A mask reads nothing back, so there is nothing to guard
-   and no CORS involved at all: it works on the same file the plain <img> was
-   already displaying.
+   it with `source-in`. When that read threw, the code fell back to the file as
+   uploaded and the signature came out navy on dark green.
+
+   A mask is still a CORS request, though: browsers fetch a cross-origin
+   mask-image in CORS mode, exactly as they do an <img crossorigin>. The URL
+   goes through `corsSafeUrl` so the mask gets its own cache entry — otherwise
+   the builder's plain <img> preview of the same file leaves a copy without the
+   CORS header in the cache, and the mask is blocked on it. See utils/corsUrl.js.
 
    `maskSupported` is checked once rather than per render. Everything current
    supports it, prefixed or not; anything that does not falls back to the file
@@ -191,7 +192,7 @@ export default function CertificateDesign({
               {!signatureImage ? null : maskSupported ? (
                 <span
                   className="lms-certdoc__sig-ink"
-                  style={{ '--cert-sig': `url("${signatureImage}")` }}
+                  style={{ '--cert-sig': `url("${corsSafeUrl(signatureImage)}")` }}
                   role="img"
                   aria-label=""
                 />

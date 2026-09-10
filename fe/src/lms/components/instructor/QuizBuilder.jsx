@@ -100,6 +100,20 @@ export default function QuizBuilder({ quiz, onChange }) {
           />
           <span className="lms-field__hint">0 for no limit.</span>
         </label>
+        {/* The server has always enforced `maxAttempts` on open and on submit,
+            but nothing here set it, so every quiz was saved with the schema's
+            0 — unlimited — and a learner could sit it as often as they liked. */}
+        <label className="lms-field">
+          <span className="lms-field__label">Attempts allowed</span>
+          <input
+            className="lms-input"
+            type="number"
+            min="0"
+            value={quiz.maxAttempts ?? 0}
+            onChange={(e) => set({ maxAttempts: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+          />
+          <span className="lms-field__hint">0 for unlimited.</span>
+        </label>
       </div>
 
       {quiz.questions.length === 0 ? (

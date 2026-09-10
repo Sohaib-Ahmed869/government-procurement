@@ -25,7 +25,7 @@ const KIND_ICON = {
 
 function kicker(lesson) {
   const label = KIND_LABEL[lesson.kind] ?? 'Reading';
-  return lesson.minutes ? `${label} · ${lesson.minutes}m` : label;
+  return lesson.minutes ? `${label} | ${lesson.minutes}m` : label;
 }
 
 function pct(done, total) {
@@ -82,7 +82,7 @@ export default function PlayerSidebar({ course, modules, enrolment, activeId, on
           {course.title}
         </Link>
         <p className="lms-player__rail-counts">
-          {modules.length} {modules.length === 1 ? 'module' : 'modules'} · {totalLessons}{' '}
+          {modules.length} {modules.length === 1 ? 'module' : 'modules'} | {totalLessons}{' '}
           {totalLessons === 1 ? 'lesson' : 'lessons'}
         </p>
         <span
@@ -98,7 +98,7 @@ export default function PlayerSidebar({ course, modules, enrolment, activeId, on
           />
         </span>
         <p className="lms-player__rail-progress">
-          {lessonsDone}/{totalLessons} completed · {percent}%
+          {lessonsDone}/{totalLessons} completed | {percent}%
         </p>
       </div>
 
