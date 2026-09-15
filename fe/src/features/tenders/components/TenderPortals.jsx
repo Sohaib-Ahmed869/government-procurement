@@ -14,34 +14,58 @@ const CACHE_KEY = 'tender-sites';
 // subtitle, a logo and its destinations — a button appears only for the links
 // that have been filled in.
 //
-// The three sections offer different destinations.
+// ONE LIST, AND EVERY SECTION USES IT.
 //
-// The federal/state portals carry three: the open tender search, the
-// upcoming/forecast notices, and where to register. `gated` marks the labels
-// that pick up "(Login Required)" — the two that lead into listings. Creating
-// an account is the thing you do *because* of the wall, so it never carries the
-// suffix. Whether it shows at all is the per-entry tick in the CMS, not
-// something assumed of a whole section: today that is South Australia and
-// nothing else.
+// Each section used to carry its own: three buttons for the federal and state
+// portals, one "Website Link" for councils, one "Login (Paid wall)" for the
+// paywalled sites. The result was three visibly different cards on one page,
+// and — worse — the CMS enforced the split by BLANKING the fields a section did
+// not use, so a council could never be given an upcoming-tenders link even
+// where one existed. The shape of the card was deciding what the data was
+// allowed to be, which is backwards.
 //
-// Local government carries ONE: the council's own site. A council does not
-// publish a forecast pipeline or run a supplier registration the way a state
-// portal does, so two of the three buttons were always going to be empty on
-// these cards. The single link reuses `openTendersUrl` — the field the entries
-// already store their address in — under the label that describes what it
-// actually is.
+// A button still only draws when its URL is filled in, so nothing renders an
+// empty slot or a dead control. What changed is that every entry may now have
+// any of them, and the CMS offers all four on every section.
 //
-// The 'other' sites are paywalled and carry a single sign-in link plus the note
-// printed under it.
-const DESTINATIONS = {
-  australian: [
-    { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
-    { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
-    { key: 'createAccountUrl', label: 'Create Free Account' },
-  ],
-  local: [{ key: 'openTendersUrl', label: 'Website Link' }],
-  other: [{ key: 'loginUrl', label: 'Login (Paid wall)' }],
-};
+// `gated` marks the labels that pick up "(Login Required)" — the two that lead
+// into listings. Creating an account is the thing you do *because* of the wall,
+// so it never carries the suffix; whether it shows at all is the per-entry tick
+// in the CMS.
+// The three every card carries, in this order, whether or not its own link has
+// been filled in — a council card is the same card as a federal one.
+//
+// A slot with no URL of its own falls back to the entry's main address rather
+// than going dead (see `mainLinkFor`), so every button on the page goes
+// somewhere. Refining them one at a time is a CMS job, and the CMS now offers
+// all of them on every section.
+const DESTINATIONS = [
+  { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
+  { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
+  { key: 'createAccountUrl', label: 'Create Free Account' },
+];
+
+/* The paywalled extra, and the one button that is NOT on every card.
+
+   It draws only where a loginUrl exists, which today is the four aggregator
+   sites under "Other Useful Websites". Rendering it empty on the other
+   twenty-odd cards would advertise a paywall that does not exist for them. */
+const PAYWALL = { key: 'loginUrl', label: 'Login (Paid wall)' };
+
+/* The entry's main address — what a button points at until it is given one of
+   its own.
+
+   Every entry has at least one of these filled in (checked against the live
+   data: 22 of 22), so in practice this always resolves. It returns '' rather
+   than throwing if one day an entry has none, and the render below treats that
+   as the one case where a slot cannot be a link.
+
+   Order matters: openTendersUrl is the address a federal or state portal is
+   really identified by, and the field councils already store their website in.
+   loginUrl comes next because it is the only one the paywalled aggregators
+   have. */
+const MAIN_LINK_ORDER = ['openTendersUrl', 'loginUrl', 'upcomingTendersUrl', 'createAccountUrl'];
+const mainLinkFor = (site) => MAIN_LINK_ORDER.map((k) => site[k]).find(Boolean) || '';
 
 // A band of cards, revealed as it is scrolled to rather than on mount.
 //
@@ -52,8 +76,7 @@ const DESTINATIONS = {
 //
 // threshold 0: a band of cards is taller than a phone viewport, so waiting for
 // 15% of it to be on screen can never fire. Same trap the article body hit.
-function TenderList({ sites, group = 'australian', audience }) {
-  const destinations = DESTINATIONS[group] || DESTINATIONS.australian;
+function TenderList({ sites, group = 'australian' }) {
   const { ref, inView } = useInView({ threshold: 0 });
 
   if (sites.length === 0) {
@@ -66,7 +89,9 @@ function TenderList({ sites, group = 'australian', audience }) {
 
   return (
     <ul ref={ref} className={`tp__list tp__list--${group}${inView ? ' is-in' : ''}`}>
-      {sites.map((site) => (
+      {sites.map((site) => {
+        const mainLink = mainLinkFor(site);
+        return (
         <li className="tp__row" key={site._id || site.id || site.name}>
           {/* The tile shows whether or not a logo has been uploaded, so the
               names line up across a row of cards. */}
@@ -80,19 +105,42 @@ function TenderList({ sites, group = 'australian', audience }) {
           </span>
 
           <span className="tp__links">
-            {destinations
-              .filter(({ key }) => site[key])
-              .map(({ key, label, gated }) => (
+            {DESTINATIONS.map(({ key, label, gated }) => {
+              // Its own link where there is one; the entry's main address
+              // otherwise, so no button is ever a dead end.
+              const href = site[key] || mainLink;
+              const text = gated && site.loginRequired ? `${label} (Login Required)` : label;
+              /* The only case left with nothing to point at is an entry that
+                 has no address at all anywhere. Then the slot draws at the same
+                 size but as a <span>, not a disabled <a> — out of the tab order
+                 and unannounced, because a control a keyboard user can reach
+                 and cannot use is worse than no control. */
+              return href ? (
                 <a
                   key={key}
                   className="tp__explore"
-                  href={site[key]}
+                  href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {gated && site.loginRequired ? `${label} (Login Required)` : label}
+                  {text}
                 </a>
-              ))}
+              ) : (
+                <span key={key} className="tp__explore tp__explore--empty" aria-hidden="true">
+                  {text}
+                </span>
+              );
+            })}
+            {site[PAYWALL.key] && (
+              <a
+                className="tp__explore"
+                href={site[PAYWALL.key]}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {PAYWALL.label}
+              </a>
+            )}
           </span>
 
           {/* The fee disclaimer for paywalled sites, a sibling of the buttons
@@ -103,7 +151,8 @@ function TenderList({ sites, group = 'australian', audience }) {
               it. */}
           {site.note && <span className="tp__note">{site.note}</span>}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }
@@ -162,10 +211,18 @@ export default function TenderPortals() {
 
   return (
     <div className={`tp${mounted ? ' is-in' : ''}`} data-audience={audience}>
-      {/* Each section is a full-bleed band, alternating dark and light the way
-          the homepage and Service Offering pages do — the shades come from the
-          shared .hm-band--* set in styles/bands.css, so this page is built from
-          the same grounds rather than its own private ramp.
+      {/* One ground for all three lists.
+
+          They used to alternate — light, dark, paper-alt — the way the homepage
+          and Service Offering pages do. It reads differently here, because
+          those pages alternate between DIFFERENT KINDS of content, and these
+          three sections are one kind: a directory of tender websites, split
+          only by who runs them. Recolouring the middle third made the same card
+          look like a different component, so a council portal and a federal one
+          appeared to be different sorts of thing when they are not.
+
+          The h2s carry the grouping now, which is what headings are for. The
+          shades still come from the shared .hm-band--* set in styles/bands.css.
 
           The h1 no longer names one of the lists. It used to read "Explore
           Federal, State and Territory Tender Websites", which was the page
@@ -206,7 +263,7 @@ export default function TenderPortals() {
           <section className="tp__band tp__band--gov hm-band--light">
             <div className="tp__inner">
               <h2 className="tp__group-title">Federal, State and Territory Government</h2>
-              <TenderList sites={australian} audience={audience} />
+              <TenderList sites={australian} />
             </div>
           </section>
 
@@ -215,19 +272,19 @@ export default function TenderPortals() {
               been filed under it, so the page never carries an empty heading —
               and never an empty stripe of colour either. */}
           {local.length > 0 && (
-            <section className="tp__band tp__band--local hm-band--dark">
+            <section className="tp__band tp__band--local hm-band--light">
               <div className="tp__inner">
                 <h2 className="tp__group-title">Local Government (Council)</h2>
-                <TenderList sites={local} group="local" audience={audience} />
+                <TenderList sites={local} group="local" />
               </div>
             </section>
           )}
 
           {other.length > 0 && (
-            <section className="tp__band tp__band--other hm-band--light-2">
+            <section className="tp__band tp__band--other hm-band--light">
               <div className="tp__inner">
                 <h2 className="tp__group-title">Other Useful Websites</h2>
-                <TenderList sites={other} group="other" audience={audience} />
+                <TenderList sites={other} group="other" />
               </div>
             </section>
           )}

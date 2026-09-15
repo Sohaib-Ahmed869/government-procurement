@@ -143,35 +143,23 @@ export default function TendersAdminPage() {
       subtitle: form.subtitle,
       group,
       active: Boolean(form.active),
-      // Only the selected section's fields are kept, so an entry moved between
-      // sections doesn't hold on to links the page no longer draws.
-      ...(group === 'other'
-        ? {
-            loginUrl: form.loginUrl,
-            note: form.note,
-            loginRequired: false,
-            openTendersUrl: '',
-            upcomingTendersUrl: '',
-            createAccountUrl: '',
-          }
-        : group === 'local'
-          ? {
-              // The council's website, in the field the page reads for it.
-              openTendersUrl: form.openTendersUrl,
-              upcomingTendersUrl: '',
-              createAccountUrl: '',
-              loginRequired: false,
-              loginUrl: '',
-              note: '',
-            }
-          : {
-              openTendersUrl: form.openTendersUrl,
-              upcomingTendersUrl: form.upcomingTendersUrl,
-              createAccountUrl: form.createAccountUrl,
-              loginRequired: Boolean(form.loginRequired),
-              loginUrl: '',
-              note: '',
-            }),
+      /* Every link is saved, whatever section the entry is in.
+
+         This used to keep only the selected section's fields and blank the
+         rest, so an entry moved between sections did not hold links the page no
+         longer drew. That stopped applying when the page began drawing the same
+         four buttons everywhere: the wipe had become the reason a council could
+         not be given an upcoming-tenders link even where one existed, because
+         the save silently erased whatever had been typed.
+
+         A button still only appears where its URL is filled in, so an unused
+         field costs nothing on the page — and a link that was typed is kept. */
+      openTendersUrl: form.openTendersUrl,
+      upcomingTendersUrl: form.upcomingTendersUrl,
+      createAccountUrl: form.createAccountUrl,
+      loginUrl: form.loginUrl,
+      note: form.note,
+      loginRequired: Boolean(form.loginRequired),
     };
     try {
       if (editingId) {
@@ -215,18 +203,17 @@ export default function TendersAdminPage() {
   };
 
   // A tick per destination that's filled in, so the table shows at a glance
-  // which entries are still missing a link.
+  // which entries are still missing a link. Not split by section any more: the
+  // page draws the same four buttons everywhere, so the same four are worth
+  // reporting on everywhere — that is how you spot the council that could carry
+  // an upcoming-tenders link and does not.
   const linkSummary = (r) =>
-    (r.group === 'other'
-      ? [r.loginUrl ? 'Login' : null]
-      : r.group === 'local'
-        ? [r.openTendersUrl ? 'Website' : null]
-        : [
-            r.openTendersUrl ? 'Open' : null,
-            r.upcomingTendersUrl ? 'Upcoming' : null,
-            r.createAccountUrl ? 'Account' : null,
-          ]
-    )
+    [
+      r.openTendersUrl ? 'Open' : null,
+      r.upcomingTendersUrl ? 'Upcoming' : null,
+      r.createAccountUrl ? 'Account' : null,
+      r.loginUrl ? 'Login' : null,
+    ]
       .filter(Boolean)
       .join(', ') || '—';
 
@@ -362,16 +349,38 @@ export default function TendersAdminPage() {
             options={GROUPS}
             hint="Which list on the Tender Websites page this appears under."
           />
-          {/* Each section lists different destinations, so each shows only its
-              own links. */}
-          {form.group === 'other' ? (
-            <>
+          {/* Every section offers every link. The page draws a button only
+              where one has been filled in, so an entry with no forecast
+              pipeline just leaves that field empty — rather than the form
+              deciding on its behalf that it cannot have one. */}
+          <>
+              <FormField
+                label="Open Tenders"
+                name="openTendersUrl"
+                value={form.openTendersUrl}
+                onChange={onChange}
+                hint="The open tender search — or, for a council, its own tenders page. Leave empty to hide the button."
+              />
+              <FormField
+                label="Upcoming Tenders"
+                name="upcomingTendersUrl"
+                value={form.upcomingTendersUrl}
+                onChange={onChange}
+                hint="Forecast or upcoming notices. Leave empty to hide the button."
+              />
+              <FormField
+                label="Create Free Account"
+                name="createAccountUrl"
+                value={form.createAccountUrl}
+                onChange={onChange}
+                hint="Registration or sign-in. Leave empty to hide the button."
+              />
               <FormField
                 label="Login (Paid wall)"
                 name="loginUrl"
                 value={form.loginUrl}
                 onChange={onChange}
-                hint="Link to the paid sign-in. Leave empty to hide the button."
+                hint="Paid sign-in, for a site behind a wall. Leave empty to hide the button."
               />
               <FormField
                 label="Note"
@@ -380,43 +389,7 @@ export default function TendersAdminPage() {
                 rows={3}
                 value={form.note}
                 onChange={onChange}
-                hint="Printed under the Login button. Name the operator this entry links to."
-              />
-            </>
-          ) : form.group === 'local' ? (
-            /* One destination, not three. A council has a website; it does not
-               run a forecast pipeline or a supplier registration of its own, so
-               the other two fields were always left blank on these entries and
-               drew nothing on the card. */
-            <FormField
-              label="Website Link"
-              name="openTendersUrl"
-              value={form.openTendersUrl}
-              onChange={onChange}
-              hint="Link to the council's own tenders page. Leave empty to hide the button."
-            />
-          ) : (
-            <>
-              <FormField
-                label="Open Tenders"
-                name="openTendersUrl"
-                value={form.openTendersUrl}
-                onChange={onChange}
-                hint="Link to the portal's open tender search. Leave empty to hide the button."
-              />
-              <FormField
-                label="Upcoming Tenders"
-                name="upcomingTendersUrl"
-                value={form.upcomingTendersUrl}
-                onChange={onChange}
-                hint="Link to forecast or upcoming notices. Leave empty to hide the button."
-              />
-              <FormField
-                label="Create Free Account"
-                name="createAccountUrl"
-                value={form.createAccountUrl}
-                onChange={onChange}
-                hint="Link to registration or sign-in. Leave empty to hide the button."
+                hint="Printed under the buttons. Used to disclaim affiliation with a paywalled operator; leave empty otherwise."
               />
 
               <div className="admin-field">
@@ -441,7 +414,6 @@ export default function TendersAdminPage() {
                 </p>
               </div>
             </>
-          )}
 
           <div className="admin-field">
             <span className="admin-field__label">Logo</span>
