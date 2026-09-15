@@ -44,6 +44,10 @@ const AUTHOR_FIELDS = [
   // The certificate wording is the instructor's to set. `status`, `featured`
   // and `reviewStatus` are still absent from this list, and must stay so.
   'certificate',
+  // Course-wide reading material (R1) — a syllabus, references, a reading
+  // pack — as opposed to a lesson's own `resources`, which stays on the
+  // lesson's own PATCH route.
+  'resources',
 ];
 
 // `image` is deliberately NOT in the list above and is not settable from a

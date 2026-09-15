@@ -15,11 +15,10 @@ const ICON = {
   doc: 'doc',
 };
 
-// Downloadable resources attached to ONE lesson (L1 / R1).
-//
-// Deliberately per-lesson rather than per-course: the slide deck belongs beside
-// the video it was presented with, and a learner looking for it should find it
-// on that lesson rather than in a single course-wide pile.
+// Downloadable resources (L1 / R1). Used both per-lesson (a slide deck beside
+// the video it was presented with) and course-wide (a syllabus or reading pack
+// that isn't tied to any one lecture) — the caller decides which list it's
+// editing and how the change gets saved; this component only owns the list UI.
 //
 // A resource is either an uploaded file or a link to something already
 // published. An upload goes browser → S3 on a presigned PUT, exactly like

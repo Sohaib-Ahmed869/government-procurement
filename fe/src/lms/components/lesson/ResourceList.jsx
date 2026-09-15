@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import LmsIcon from '../LmsIcon.jsx';
-import { videoApi } from '../../../api/lms.js';
+import { catalogApi, videoApi } from '../../../api/lms.js';
 import { sizeLabel } from '../../utils/s3Upload.js';
 
 // The icon each kind gets. Matches the instructor's list, so a handout looks
@@ -27,6 +27,9 @@ const ICON = {
 export default function ResourceList({
   resources,
   enrolled,
+  // Present when this list is a course's own reading material rather than one
+  // lesson's handouts (each item there already carries its own `lessonId`).
+  courseId,
   // The course page shows this same list for the course's own materials, where
   // "attached to this lesson" would be the wrong thing to say.
   emptyLabel = 'No downloads attached to this lesson.',
@@ -42,7 +45,9 @@ export default function ResourceList({
     setError('');
     setBusyId(r.id);
     try {
-      const { url } = await videoApi.resourceUrl(r.lessonId, r.id);
+      const { url } = r.lessonId
+        ? await videoApi.resourceUrl(r.lessonId, r.id)
+        : await catalogApi.resourceUrl(courseId, r.id);
       window.open(url, '_blank', 'noopener,noreferrer');
     } catch (err) {
       setError(err?.message ?? 'Could not open that download.');

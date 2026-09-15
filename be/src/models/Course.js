@@ -102,6 +102,22 @@ const courseSchema = new mongoose.Schema(
         order: { type: Number, default: 0 },
       },
     ],
+    // Course-wide reading material (R1): a syllabus, a set of readings, a
+    // reference pack — not tied to any one lecture, unlike a Lesson's own
+    // `resources`. Same shape and same S3-key-never-public-URL rule as a
+    // lesson resource: the key stays server-side and the file is fetched
+    // through a signed-GET endpoint gated on enrolment.
+    resources: [
+      {
+        title: { type: String, default: '' },
+        key: { type: String, default: '' },
+        url: { type: String, default: '' },
+        name: { type: String, default: '' },
+        kind: { type: String, default: 'pdf' },
+        mimeType: { type: String, default: '' },
+        sizeBytes: { type: Number, default: 0 },
+      },
+    ],
     durationLabel: { type: String, default: '' }, // e.g. "6 weeks"
     availability: { type: String, enum: COURSE_STATES, default: COURSE_STATE.COMING_SOON },
     startDate: { type: Date },

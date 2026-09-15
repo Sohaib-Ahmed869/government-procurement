@@ -18,6 +18,7 @@ import { markAttempt, reviewFor } from '../../utils/grading.js';
 import { issueQuizTicket, checkQuizTiming, GRACE_SECONDS } from '../../utils/quizTicket.js';
 import { getObject, presignGet } from '../../config/s3.js';
 import { env } from '../../config/env.js';
+import { entryAssessmentLockFor, hasRequiredEntryAssessment } from './entryAssessment.controller.js';
 import { deriveKey, issuePlaybackToken, readPlaybackToken } from './hlsKeys.js';
 import { resolvePlaylist } from './hlsPackage.js';
 import { CONTENT_STATUS, COURSE_STATE } from '../../constants/statuses.js';
@@ -100,9 +101,13 @@ async function prereqLockFor({ user, courseId }) {
   return { needs: unmet.map((id) => ({ title: byId.get(id)?.title ?? 'another course', slug: byId.get(id)?.slug ?? '' })) };
 }
 
-function gateFor({ lesson, module: mod, enrolment, prereq = null, now = new Date() }) {
+function gateFor({ lesson, module: mod, enrolment, prereq = null, entryLock = null, now = new Date() }) {
   if (lesson.preview) return { reason: 'preview' };
   if (!grantsAccess(enrolment)) return { reason: 'locked-enrolment' };
+  /* A required entry assessment, ungraded or failed, blocks every lesson —
+     checked before prereq/drip since it is the very first thing a learner
+     must clear, ahead of anything else the course gates on. */
+  if (entryLock) return { reason: 'locked-entry-assessment', ...entryLock };
   /* After enrolment, before drip: being enrolled is not the same as having
      earned your way to this course through a path. */
   if (prereq) return { reason: 'locked-prereq', needs: prereq.needs };
@@ -208,11 +213,38 @@ export const outline = asyncHandler(async (req, res) => {
      database question about the course, and every lesson in it gets the same
      answer. */
   const prereq = await prereqLockFor({ user: req.user, courseId: course._id });
+  const entryLock = await entryAssessmentLockFor({ userId: req.user?._id, courseId: course._id });
+  const hasEntryAssessment = await hasRequiredEntryAssessment(course._id);
+
+  // Course-wide reading material (R1), not tied to any one lecture. Same rule
+  // as a lesson resource: the S3 key never leaves the server, so it is pulled
+  // off `course` here and replaced with the safe list the client renders,
+  // exactly like a lesson's resources are mapped down before being sent.
+  const courseObj = course.toObject();
+  const rawResources = courseObj.resources ?? [];
+  delete courseObj.resources;
+  const resources = rawResources.map((r) => ({
+    id: r._id,
+    title: r.title,
+    kind: r.kind ?? 'pdf',
+    sizeBytes: r.sizeBytes ?? 0,
+    signed: Boolean(r.key),
+    url: r.key ? undefined : r.url ?? '',
+  }));
 
   return ok(res, {
-    course,
+    course: courseObj,
+    resources,
     enrolled: Boolean(enrolment?.isActive()),
     enrolment: rollup,
+    // Whether a required entry assessment still blocks the course content,
+    // and its lodgement status, so the player can send the learner to it
+    // first instead of a locked lesson.
+    entryAssessment: entryLock,
+    // Independent of `entryAssessment` above, which goes back to null the
+    // moment this learner has passed — the course page uses this instead to
+    // decide whether "Start course" should stop at the result screen first.
+    hasEntryAssessment,
     // Told plainly rather than left to be inferred. Whoever is seeing this is
     // seeing something the site no longer offers, and the page says so instead
     // of showing an enrol button for a course nobody can enrol in.
@@ -231,7 +263,7 @@ export const outline = asyncHandler(async (req, res) => {
       lessons: lessons
         .filter((l) => String(l.module) === String(m._id))
         .map((l) => {
-          const gate = gateFor({ lesson: l, module: m, enrolment, prereq });
+          const gate = gateFor({ lesson: l, module: m, enrolment, prereq, entryLock });
           return {
             _id: l._id,
             title: l.title,
@@ -299,6 +331,7 @@ export const getLesson = asyncHandler(async (req, res) => {
         module: mod,
         enrolment,
         prereq: await prereqLockFor({ user: req.user, courseId: lesson.course }),
+        entryLock: await entryAssessmentLockFor({ userId: req.user?._id, courseId: lesson.course }),
       });
 
   if (isLocked(gate)) {
@@ -398,6 +431,29 @@ export const resourceUrl = asyncHandler(async (req, res) => {
     const prereq = await prereqLockFor({ user: req.user, courseId: lesson.course });
   const gate = gateFor({ lesson, module: mod, enrolment, prereq });
     if (isLocked(gate)) throw ApiError.forbidden('You need to be enrolled to download this');
+  }
+
+  const url = await presignGet(resource.key, VIDEO_URL_TTL_SECONDS);
+  return ok(res, {
+    url,
+    name: resource.name || resource.title,
+    expiresAt: new Date(Date.now() + VIDEO_URL_TTL_SECONDS * 1000),
+  });
+});
+
+// GET /lms/courses/:courseId/resources/:resourceId/url. Course-wide reading
+// material (R1) rather than a lecture handout — gated on the course itself
+// instead of any one lesson's gate, since it isn't attached to a lesson.
+export const courseResourceUrl = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.courseId);
+  if (!course) throw ApiError.notFound('Course not found');
+
+  const resource = course.resources?.id?.(req.params.resourceId);
+  if (!resource?.key) throw ApiError.notFound('No such download on this course');
+
+  const enrolment = await enrolmentFor(req.user, course._id);
+  if (!mayBypassGate({ user: req.user, course }) && !enrolment?.isActive()) {
+    throw ApiError.forbidden('You need to be enrolled to download this');
   }
 
   const url = await presignGet(resource.key, VIDEO_URL_TTL_SECONDS);

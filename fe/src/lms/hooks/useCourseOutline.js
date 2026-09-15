@@ -82,13 +82,16 @@ export function useCourseOutline(slug) {
           whoShouldTake: course.whoShouldTake ?? [],
           includes: course.includes ?? [],
         },
-        // Course-wide downloads are gone: a course's materials are the
-        // LESSONS' materials now, each gated by the lesson it hangs off. The
-        // course record's `media` was a public marketing gallery — an
-        // unexpiring /files link — and listing it here put it in the same card
-        // as gated lesson downloads, where it was the one row that always
-        // opened. Nothing to merge, so the card renders its empty state.
-        resources: [],
+        // Course-wide reading material (R1) — a syllabus, a reference pack —
+        // separate from a lesson's own resources. The deprecated `media`
+        // gallery this replaced was a public, unexpiring /files link; this is
+        // the safe list the server already stripped S3 keys out of.
+        resources: res.resources ?? [],
+        // Whether this course has a required entry assessment at all — used to
+        // send a first-time "Start course" through the result screen once
+        // instead of straight into lesson one, even after the learner has
+        // already passed it.
+        hasEntryAssessment: Boolean(res.hasEntryAssessment),
       });
       setStatus('ready');
     } catch (err) {

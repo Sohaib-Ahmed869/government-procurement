@@ -162,6 +162,7 @@ export const api = {
   get: (path, params, opts) => unwrap(request(path, { method: 'GET', params, ...opts })),
   post: (path, body, opts) => unwrap(request(path, { method: 'POST', body, ...opts })),
   patch: (path, body, opts) => unwrap(request(path, { method: 'PATCH', body, ...opts })),
+  put: (path, body, opts) => unwrap(request(path, { method: 'PUT', body, ...opts })),
   del: (path, opts) => unwrap(request(path, { method: 'DELETE', ...opts })),
   // Returns the full envelope so callers can read `meta` for pagination.
   page: (path, params, opts) => request(path, { method: 'GET', params, ...opts }),

@@ -6,7 +6,35 @@
 // ApiError) is identical.
 //
 // Paths here mirror be/src/modules/lms/lms.routes.js exactly.
-import { api } from './client.js';
+import { api, request } from './client.js';
+
+// ---- Course entry assessment -------------------------------------------------
+// Shown before the rest of a course when its instructor has made one required
+// (LMS entry-assessment). Learner side reads/lodges against a course id;
+// grading lives under authoringApi below since it's an instructor action.
+export const entryAssessmentApi = {
+  get: (courseId) => api.get(`/lms/courses/${courseId}/entry-assessment`),
+  fileUrl: (courseId, fileId) =>
+    api.get(`/lms/courses/${courseId}/entry-assessment/files/${fileId}/url`),
+  // The instructor's brief or marking-criteria attachment, on the same
+  // signed-URL terms as the learner's own lodged files.
+  attachmentUrl: (courseId, attachmentId) =>
+    api.get(`/lms/courses/${courseId}/entry-assessment/attachments/${attachmentId}/url`),
+  // Multipart: several files plus JSON-encoded answers and the integrity tick.
+  // Not api.upload() — that helper sends one file under one field name; a
+  // lodgement can carry several, each a peer of the answers and the tick.
+  submit: async (courseId, { answers, files = [], integrityAck }) => {
+    const form = new FormData();
+    form.append('answers', JSON.stringify(answers));
+    form.append('integrityAck', integrityAck ? 'true' : 'false');
+    files.forEach((f) => form.append('files', f));
+    const body = await request(`/lms/courses/${courseId}/entry-assessment/submit`, {
+      method: 'POST',
+      body: form,
+    });
+    return body?.data;
+  },
+};
 
 // ---- L6 · Accounts ----------------------------------------------------------
 // Self-service signup. Separate from /auth/register, which is admin-only staff
@@ -96,6 +124,31 @@ export const authoringApi = {
     api.del(`/lms/authoring/courses/${courseId}/lessons/${lessonId}`),
   reorderLessons: (courseId, order) =>
     api.patch(`/lms/authoring/courses/${courseId}/lessons/reorder`, { order }),
+
+  // Entry assessment authoring + marking (LMS entry-assessment). One
+  // assessment per course; grading works from the submission queue.
+  getEntryAssessment: (courseId) => api.get(`/lms/authoring/courses/${courseId}/entry-assessment`),
+  saveEntryAssessment: (courseId, body) =>
+    api.put(`/lms/authoring/courses/${courseId}/entry-assessment`, body),
+  addEntryAssessmentAttachment: (courseId, file, target = 'brief') =>
+    api.upload(`/lms/authoring/courses/${courseId}/entry-assessment/attachments`, file, {
+      fields: { target },
+    }),
+  removeEntryAssessmentAttachment: (courseId, attachmentId) =>
+    api.del(`/lms/authoring/courses/${courseId}/entry-assessment/attachments/${attachmentId}`),
+  entryAssessmentSubmissions: (courseId, params) =>
+    api.get(`/lms/authoring/courses/${courseId}/entry-assessment/submissions`, params),
+  entryAssessmentSubmission: (courseId, submissionId) =>
+    api.get(`/lms/authoring/courses/${courseId}/entry-assessment/submissions/${submissionId}`),
+  entryAssessmentSubmissionFileUrl: (courseId, submissionId, fileId) =>
+    api.get(
+      `/lms/authoring/courses/${courseId}/entry-assessment/submissions/${submissionId}/files/${fileId}/url`,
+    ),
+  gradeEntryAssessmentSubmission: (courseId, submissionId, body) =>
+    api.post(
+      `/lms/authoring/courses/${courseId}/entry-assessment/submissions/${submissionId}/grade`,
+      body,
+    ),
 };
 
 // ---- CMS · Review -----------------------------------------------------------
@@ -150,6 +203,10 @@ export const catalogApi = {
   // additionally gets their progress and each lesson's gate resolved.
   outline: (slug) => api.get(`/lms/courses/${slug}/outline`),
   lesson: (slug, lessonId) => api.get(`/lms/courses/${slug}/lessons/${lessonId}`),
+  // A course-wide download (R1) — reading material that isn't attached to any
+  // one lesson. Takes the course id (the outline already has it), not the slug.
+  resourceUrl: (courseId, resourceId) =>
+    api.get(`/lms/courses/${courseId}/resources/${resourceId}/url`),
 };
 
 // ---- L2 · Secure video ------------------------------------------------------

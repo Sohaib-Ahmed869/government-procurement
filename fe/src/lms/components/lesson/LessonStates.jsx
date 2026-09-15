@@ -27,6 +27,22 @@ export default function LessonStates({ slug, status, gate, error, onRetry }) {
   }
 
   if (status === 'locked') {
+    // A required entry assessment sends the learner to lodge or check on it,
+    // rather than back to a course page whose lessons are all shut anyway.
+    if (gate?.reason === 'locked-entry-assessment') {
+      return (
+        <div className="lms-lesson-page">
+          <div className="lms-locked">
+            <LmsIcon name="lock" className="lms-locked__icon" />
+            <h1>Entry assessment required</h1>
+            <p>{gateLabel(gate)}</p>
+            <Link className="lms-btn lms-btn--primary" to={`/learn/courses/${slug}/entry-assessment`}>
+              Go to entry assessment
+            </Link>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="lms-lesson-page">
         <div className="lms-locked">
