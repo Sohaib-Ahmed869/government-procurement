@@ -15,19 +15,22 @@
 
 /* --- the bands -----------------------------------------------------------
 
-   The page alternates dark and light the way the homepage and Service Offering
-   pages do, using the shared shades in styles/bands.css rather than a ramp of
-   its own. Everything below the band is written against the --band-* roles
+   The page uses the shared shades in styles/bands.css rather than a ramp of its
+   own. Everything below the band is written against the --band-* roles
    those classes set, so a card, a button and a caption all recolour by changing
    one class on the wrapper.
 
      head   --gp-head-bg     dark   the shared page-heading colour every other
                                     page uses, so this title sits where they do
      gov    .hm-band--light  paper
-     local  .hm-band--dark   dark
-     other  .hm-band--light-2 paper-alt, which hands off to the footer's
-                                    subscribe band (paper-deep) and then the
-                                    dark footer — a ramp, not a cliff
+     local  .hm-band--light  paper — the same, deliberately
+     other  .hm-band--light  paper
+
+   The three lists shared one ground as of Sep 2026. They used to alternate
+   (light / dark / paper-alt), which made the middle third read as a different
+   component rather than as the same directory under a different heading. The
+   headings do the grouping instead. The head band above them is still dark, so
+   the page still opens on a contrast rather than a flat sheet.
 
    The head band borrows .hm-band--dark for its roles and overrides only the
    ground. The two-class selector is deliberate: .tp__band--head and
@@ -415,8 +418,10 @@
 .tp__row {
   display: grid;
   grid-template-rows: subgrid;
-  /* Logo, name, buttons. */
-  grid-row: span 3;
+  /* Logo, name, buttons, note — four tracks on every card in every list, so a
+     council card and a federal one are the same shape. See the note lower down
+     on why this is not conditional any more. */
+  grid-row: span 4;
   align-items: start;
   gap: 14px;
   padding: 20px;
@@ -501,12 +506,16 @@
   margin-top: 4px;
 }
 
-/* The paywalled cards carry the fee note as a fourth slot. Only this list does,
-   so only this list spans the extra track — a government card spanning four
-   would pay a gap for an empty row at its foot. */
-.tp__list--other .tp__row {
-  grid-row: span 4;
-}
+/* Every card spans the same four tracks — logo, name, buttons, note — whichever
+   list it is in.
+
+   Only the paywalled list used to span four, on the reasoning that a government
+   card spanning four would pay a gap for an empty row at its foot. True in
+   isolation, but it made a card in one section a different shape from a card in
+   another, and the note is no longer exclusive to one section: any entry may
+   carry one now. An empty track costs nothing when nothing is in it, because
+   the subgrid sizes it from the tallest content in the row — which is zero when
+   no card in that row has a note. */
 
 /* Fee disclaimer under the paywalled sign-in button. Quieter and smaller than
    the card's own copy — it qualifies the button rather than selling it. */
@@ -559,6 +568,29 @@
   color: var(--gp-paper);
   background: var(--gp-brand);
   border-color: var(--gp-brand);
+}
+
+/* A slot with no link behind it yet.
+
+   Every card carries the same three destinations so that a council card and a
+   federal one are the same object, which means some of them have nothing to
+   point at until the link is filled in from the CMS. Those draw at the same
+   size and in the same place — that is the whole point — but faded, and with no
+   hover and no pointer, so they read as "not available here" rather than as a
+   button somebody broke.
+
+   The element is a <span> in the markup, not a disabled <a>, so it is out of
+   the tab order and unannounced. This is the visual half of the same idea. */
+.tp__explore--empty {
+  opacity: 0.4;
+  cursor: default;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.tp__explore--empty:hover {
+  color: var(--band-ink);
+  background: var(--band-surface-hover);
+  border-color: var(--band-line);
 }
 
 /* The dark band's ground IS --gp-brand, so the rule above would hover a button
