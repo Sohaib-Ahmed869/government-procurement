@@ -240,12 +240,28 @@
 }
 
 /* The three are told apart by fill as well as by name, so a visitor scanning
-   for "the Claude ones" can do it without reading every tag. Drawn from the
-   segment ramp rather than each vendor's brand colour: three outside palettes
-   dropped into this page would fight both segments at once. */
-.pl-tool--chatgpt { background: var(--gp-brand); }
-.pl-tool--claude  { background: var(--gp-accent-ink); }
-.pl-tool--gemini  { background: var(--gp-brand-alt); }
+   for "the Claude ones" can do it without reading every tag. These are each
+   vendor's own brand colour, fixed rather than drawn from the segment ramp —
+   the ramp's --gp-brand/--gp-accent-ink/--gp-brand-alt resolve differently
+   per [data-audience], which used to leave Claude's pill reading green on
+   the Win ramp (--gp-accent-ink is win-warm-ink there) and both other marks
+   drifting with the toggle. A vendor's mark has to stay that vendor's colour
+   on both Award and Win, so these are hex, not tokens.
+
+   ChatGPT and Gemini are both white discs — neither vendor's own mark is a
+   colour-on-a-tint badge the way Claude's is; ChatGPT's knot is single-colour
+   black and Gemini's mark (assets/images/gemini-color.svg, an <img> rather
+   than a drawn path — see toolMarks.jsx) is already multicoloured on its
+   own, so a second colour from the pill under either would be this page's
+   invention, not theirs. No border on either: .pl-card's own paper-alt
+   ground is already a shade off white, which is enough edge for a white disc
+   to read against it. */
+.pl-tool--chatgpt {
+  background: #ffffff;
+  color: #0d0d0d;
+}
+.pl-tool--claude { background: #d97757; }
+.pl-tool--gemini { background: #ffffff; }
 
 /* Two lines of the prompt's opening, clamped. Enough to tell two prompts apart
    without turning the list back into pages of monospace. Proportional, not
