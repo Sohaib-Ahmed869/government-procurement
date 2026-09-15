@@ -70,7 +70,7 @@ export default function CourseOverviewPage() {
     );
   }
 
-  const { course, enrolment, modules, detail, resources, offline } = data;
+  const { course, enrolment, modules, detail, resources, offline, hasEntryAssessment } = data;
   const enrolled = Boolean(enrolment);
   // A course with no lessons yet is not a finished one, without the guard,
   // 0 >= 0 marks an empty course complete and offers a certificate for it.
@@ -81,7 +81,17 @@ export default function CourseOverviewPage() {
   // One place decides where a lesson opens. This screen used to have its own
   // copy that knew about video and quizzes but not YouTube or documents, so
   // "Start course" on either of those opened the text screen.
-  const nextHref = lessonHref(course.slug, enrolment?.next);
+  //
+  // A course with a required entry assessment sends the very first "Start
+  // course" click to the result screen instead of straight into lesson one —
+  // even once the learner has already passed it, so they see their grade and
+  // feedback before going in, not only the moment they submitted it. Once
+  // they've started (lessonsDone > 0), later visits go straight back to where
+  // they left off, same as any other course.
+  const startAtAssessment = hasEntryAssessment && enrolled && enrolment.lessonsDone === 0;
+  const nextHref = startAtAssessment
+    ? `/learn/courses/${course.slug}/entry-assessment`
+    : lessonHref(course.slug, enrolment?.next);
 
   return (
     <div className="lms-detail">
@@ -237,6 +247,19 @@ export default function CourseOverviewPage() {
                     ) : (
                       <span className="lms-pill lms-pill--done">Course complete</span>
                     )
+                  ) : enrolment.next?.gate?.reason === 'locked-entry-assessment' ? (
+                    // Actionable, unlike the other locks below: there's
+                    // somewhere for the learner to go do something about it,
+                    // rather than just wait for a schedule or a prerequisite.
+                    <Link
+                      className="lms-btn lms-btn--primary lms-btn--block"
+                      to={`/learn/courses/${course.slug}/entry-assessment`}
+                    >
+                      <LmsIcon name="quiz" />
+                      {enrolment.next.gate.submissionStatus === 'submitted'
+                        ? 'View your entry assessment'
+                        : 'Take the entry assessment'}
+                    </Link>
                   ) : nextLocked ? (
                     <>
                       <button className="lms-btn lms-btn--block" type="button" disabled>
@@ -315,6 +338,7 @@ export default function CourseOverviewPage() {
             <ResourceList
               resources={resources}
               enrolled={enrolled}
+              courseId={course.id}
               emptyLabel="No course-wide downloads. Lessons carry their own."
             />
           </div>

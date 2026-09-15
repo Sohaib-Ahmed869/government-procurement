@@ -5,6 +5,8 @@ import ConfirmDialog from '../../components/ConfirmDialog.jsx';
 import { useToast } from '../../context/ToastContext.jsx';
 import CourseBuilder from '../../components/instructor/CourseBuilder.jsx';
 import CertificateBuilder from '../../components/instructor/CertificateBuilder.jsx';
+import EntryAssessmentBuilder from '../../components/instructor/EntryAssessmentBuilder.jsx';
+import ResourcesEditor from '../../components/instructor/ResourcesEditor.jsx';
 import ModuleEditor from '../../components/instructor/ModuleEditor.jsx';
 import LessonEditor from '../../components/instructor/LessonEditor.jsx';
 import { authoringApi } from '../../../api/lms.js';
@@ -20,6 +22,8 @@ const TABS = [
   { value: 'curriculum', label: 'Curriculum', icon: 'modules' },
   { value: 'details', label: 'Details', icon: 'book' },
   { value: 'certificate', label: 'Certificate', icon: 'award' },
+  { value: 'resources', label: 'Resources', icon: 'download' },
+  { value: 'assessment', label: 'Entry assessment', icon: 'quiz' },
   { value: 'publish', label: 'Publish', icon: 'check' },
 ];
 
@@ -434,6 +438,34 @@ export default function CourseBuilderPage() {
           onRemoveSignature={() => authoringApi.removeCertificateSignature(courseId)}
         />
       ) : null}
+
+      {tab === 'resources' ? (
+        <div className="lms-builder">
+          <div className="lms-card">
+            <div className="lms-card__head">
+              <h2 className="lms-card__title">
+                <LmsIcon name="download" />
+                Course resources
+              </h2>
+            </div>
+            <p className="lms-page__subtitle">
+              Reading material for the whole course — a syllabus, a reference pack, background
+              readings — rather than a slide deck that belongs beside one lecture. Shown to a
+              learner on the course page once they're enrolled.
+            </p>
+            <ResourcesEditor
+              courseId={courseId}
+              resources={merged.resources ?? []}
+              onChange={(next) => {
+                setDraft((d) => ({ ...d, resources: next }));
+                courseSave.queue({ resources: next });
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {tab === 'assessment' ? <EntryAssessmentBuilder courseId={courseId} /> : null}
 
       {tab === 'publish' ? (
         <div className="lms-publish">

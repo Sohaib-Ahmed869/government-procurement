@@ -1,8 +1,14 @@
 import { Router } from 'express';
 import { protect, optionalAuth } from '../../middleware/auth.js';
 import { authorize } from '../../middleware/rbac.js';
-import { loadCourse, ownsCourse, loadProgram, ownsProgram } from '../../middleware/ownership.js';
-import { uploadImage } from '../../middleware/upload.js';
+import {
+  loadCourse,
+  ownsCourse,
+  loadProgram,
+  ownsProgram,
+  isEnrolled,
+} from '../../middleware/ownership.js';
+import { uploadImage, uploadDocument } from '../../middleware/upload.js';
 import { ADMIN_ONLY, CONTENT_ROLES, TEACHING_ROLES } from '../../constants/roles.js';
 import * as authoring from './authoring.controller.js';
 import * as learning from './learning.controller.js';
@@ -15,6 +21,7 @@ import * as gamification from './gamification.controller.js';
 import * as programs from './programs.controller.js';
 import * as study from './study.controller.js';
 import * as live from './liveSessions.controller.js';
+import * as entryAssessment from './entryAssessment.controller.js';
 
 const router = Router();
 
@@ -31,6 +38,32 @@ router.get('/courses/:slug/lessons/:lessonId', optionalAuth, loadCourse, learnin
 /* ---- Learner --------------------------------------------------------------- */
 router.post('/enrollments', protect, learning.enrol);
 router.get('/enrollments', protect, learning.myEnrollments);
+
+/* Course entry assessment (LMS entry-assessment). Shown before the rest of
+   the course when the instructor has made one required — see
+   entryAssessmentLockFor in learning.controller.js for the gate itself. */
+const entryAssessmentAccess = [protect, loadCourse, isEnrolled];
+router.get(
+  '/courses/:courseId/entry-assessment',
+  ...entryAssessmentAccess,
+  entryAssessment.getEntryAssessment,
+);
+router.post(
+  '/courses/:courseId/entry-assessment/submit',
+  ...entryAssessmentAccess,
+  uploadDocument.array('files', 5),
+  entryAssessment.submitEntryAssessment,
+);
+router.get(
+  '/courses/:courseId/entry-assessment/files/:fileId/url',
+  ...entryAssessmentAccess,
+  entryAssessment.learnerFileUrl,
+);
+router.get(
+  '/courses/:courseId/entry-assessment/attachments/:attachmentId/url',
+  ...entryAssessmentAccess,
+  entryAssessment.briefAttachmentUrl,
+);
 
 router.get('/progress', protect, learning.myProgress);
 
@@ -66,6 +99,7 @@ router.patch('/progress/lessons/:lessonId/position', protect, learning.setPositi
 router.get('/lessons/:lessonId/video-url', optionalAuth, learning.videoUrl);
 router.get('/lessons/:lessonId/document-url', optionalAuth, learning.documentUrl);
 router.get('/lessons/:lessonId/resources/:resourceId/url', optionalAuth, learning.resourceUrl);
+router.get('/courses/:courseId/resources/:resourceId/url', optionalAuth, learning.courseResourceUrl);
 router.get('/lessons/:lessonId/transcript', optionalAuth, learning.transcript);
 
 // Encrypted HLS (LMS 3.0). Optional-auth for the same reason the rest of the
@@ -236,6 +270,51 @@ router.post('/authoring/courses/:courseId/modules/:moduleId/lessons', ...owns, a
 router.patch('/authoring/courses/:courseId/lessons/reorder', ...owns, authoring.reorderLessons);
 router.patch('/authoring/courses/:courseId/lessons/:lessonId', ...owns, authoring.updateLesson);
 router.delete('/authoring/courses/:courseId/lessons/:lessonId', ...owns, authoring.deleteLesson);
+
+/* Entry assessment authoring + marking. Same `owns` guard as the rest of a
+   course's authoring surface: only its instructor (or a super admin) may set
+   the brief, marking criteria, or grade a lodgement. */
+router.get(
+  '/authoring/courses/:courseId/entry-assessment',
+  ...owns,
+  entryAssessment.getEntryAssessmentForAuthoring,
+);
+router.put(
+  '/authoring/courses/:courseId/entry-assessment',
+  ...owns,
+  entryAssessment.upsertEntryAssessment,
+);
+router.post(
+  '/authoring/courses/:courseId/entry-assessment/attachments',
+  ...owns,
+  uploadDocument.single('file'),
+  entryAssessment.addEntryAssessmentAttachment,
+);
+router.delete(
+  '/authoring/courses/:courseId/entry-assessment/attachments/:attachmentId',
+  ...owns,
+  entryAssessment.removeEntryAssessmentAttachment,
+);
+router.get(
+  '/authoring/courses/:courseId/entry-assessment/submissions',
+  ...owns,
+  entryAssessment.listSubmissions,
+);
+router.get(
+  '/authoring/courses/:courseId/entry-assessment/submissions/:submissionId',
+  ...owns,
+  entryAssessment.getSubmission,
+);
+router.get(
+  '/authoring/courses/:courseId/entry-assessment/submissions/:submissionId/files/:fileId/url',
+  ...owns,
+  entryAssessment.submissionFileUrl,
+);
+router.post(
+  '/authoring/courses/:courseId/entry-assessment/submissions/:submissionId/grade',
+  ...owns,
+  entryAssessment.gradeSubmission,
+);
 
 /* ---- Admin review (CMS) ---------------------------------------------------
    Approving is the only path to published, and only a super admin walks it. */

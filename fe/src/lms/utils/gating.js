@@ -13,6 +13,7 @@ export const GATE = {
   DRIP: 'locked-drip',
   PREREQ: 'locked-prereq',
   ENROLMENT: 'locked-enrolment',
+  ENTRY_ASSESSMENT: 'locked-entry-assessment',
 };
 
 export function isLocked(gate) {
@@ -40,6 +41,10 @@ export function gateLabel(gate) {
       return gate.requires ? `Complete ${gate.requires} first` : 'Prerequisite not met';
     case GATE.ENROLMENT:
       return 'Enrol to unlock';
+    case GATE.ENTRY_ASSESSMENT:
+      return gate.submissionStatus === 'submitted'
+        ? 'Waiting on your entry assessment to be marked'
+        : 'Complete the entry assessment first';
     default:
       return 'Locked';
   }

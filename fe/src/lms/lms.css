@@ -2719,6 +2719,30 @@ select.lms-input option:hover {
 .lms-resource__lock { width: 16px; height: 16px; flex-shrink: 0; color: var(--lms-muted); }
 .lms-resource.is-locked .lms-resource__title { color: var(--lms-muted); }
 
+/* A downloadable file link inside plain text — e.g. a lodged answer file in
+   the grading view — styled in the brand green instead of the browser's
+   default link blue, matching the rest of the LMS's use of green as the
+   accent colour. */
+.lms-doc-link {
+  color: var(--lms-green-600);
+  font-weight: 550;
+  text-decoration: underline;
+  text-decoration-color: var(--lms-mint-soft);
+  text-underline-offset: 2px;
+}
+.lms-doc-link:hover,
+.lms-doc-link:focus-visible { color: var(--lms-green); text-decoration-color: currentColor; }
+/* Same look from a <button>, for an attachment fetched via a signed URL
+   rather than linked directly. */
+.lms-doc-link--btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.lms-doc-link--btn:disabled { cursor: default; opacity: 0.7; }
+
 /* Instructor --------------------------------------------------------------- */
 .lms-instructor { display: flex; align-items: center; gap: 12px; }
 .lms-instructor__avatar {

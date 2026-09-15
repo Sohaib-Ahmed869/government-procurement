@@ -25,6 +25,7 @@ import InstructorReviewsPage from '../lms/pages/instructor/InstructorReviewsPage
 import InstructorLiveSessionsPage from '../lms/pages/instructor/InstructorLiveSessionsPage.jsx';
 import QuizAnalyticsPage from '../lms/pages/instructor/QuizAnalyticsPage.jsx';
 import StudentRosterPage from '../lms/pages/instructor/StudentRosterPage.jsx';
+import EntryAssessmentSubmissionsPage from '../lms/pages/instructor/EntryAssessmentSubmissionsPage.jsx';
 import LmsLayout from '../lms/layout/LmsLayout.jsx';
 import DashboardPage from '../lms/pages/dashboard/DashboardPage.jsx';
 import CoachPage from '../lms/pages/coach/CoachPage.jsx';
@@ -35,6 +36,7 @@ import CourseOverviewPage from '../lms/pages/catalog/CourseOverviewPage.jsx';
 import CourseStartPage from '../lms/pages/catalog/CourseStartPage.jsx';
 import PlayerLayout from '../lms/layout/PlayerLayout.jsx';
 import LessonPage from '../lms/pages/learn/LessonPage.jsx';
+import EntryAssessmentPage from '../lms/pages/learn/EntryAssessmentPage.jsx';
 import VideoLessonPage from '../lms/pages/learn/VideoLessonPage.jsx';
 import DocLessonPage from '../lms/pages/learn/DocLessonPage.jsx';
 import QuizPage from '../lms/pages/assessment/QuizPage.jsx';
@@ -142,6 +144,7 @@ export default function LmsRoutes() {
         {/* In-course screens use the distraction-free player shell instead of
             the app chrome, so they sit outside the LmsLayout branch. */}
         <Route element={<PlayerLayout />}>
+          <Route path="courses/:slug/entry-assessment" element={me(<EntryAssessmentPage />)} />
           <Route path="courses/:slug/lessons/:lessonId" element={me(<LessonPage />)} />
           {/* Free previews: the same three screens, without the sign-in
               requirement, because a sample that needs an account is not a
@@ -174,6 +177,7 @@ export default function LmsRoutes() {
               picked, not a screen of its own. Kept as a redirect because the
               path was linked to before the page existed. */}
           <Route path="instructor/courses/:courseId/students" element={<InstructorRoute><CourseStudentsRedirect /></InstructorRoute>} />
+          <Route path="instructor/courses/:courseId/entry-assessment/submissions" element={<InstructorRoute><EntryAssessmentSubmissionsPage /></InstructorRoute>} />
           <Route path="instructor/quizzes" element={<InstructorRoute><QuizzesPage /></InstructorRoute>} />
 
           {/* Learning paths (LMS 8.0). A path curates published courses, so it
