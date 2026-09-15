@@ -1,30 +1,32 @@
-/* The three assistants' marks, as inline SVG.
+import geminiMark from '../../assets/images/gemini-color.svg';
+
+/* The three assistants' marks.
 
    The library used to name them in words — a pill reading "ChatGPT", "Claude"
    or "Gemini" on every card. The marks are what a visitor recognises at a
    glance, and they scan far faster down a column of thirty cards than three
    words of similar length and colour do.
 
-   Drawn here rather than shipped as image files so all three share one box, one
-   `currentColor` fill and one set of metrics. That is what "the same size"
-   actually requires: the three brands' own artwork is drawn to different
-   optical weights and margins, so three <img> tags at 16px would look like
-   three different sizes. Each path below is normalised into the same 24×24
-   viewBox and given a per-mark scale (see MARKS) that evens out the optical
-   weight — Gemini's four-point star reads large for its box and OpenAI's knot
-   reads small, so they are pulled toward each other rather than left at their
-   native proportions.
+   ChatGPT and Claude are drawn here as inline SVG, single-colour, taking the
+   colour of the pill they sit in (see PromptsBrowser.css) — that's what makes
+   "the same size" possible for artwork drawn at different optical weights and
+   margins: both paths are normalised into one 24×24 viewBox and given a
+   per-mark `scale` (see MARKS) that evens the two out, rather than three
+   <img> tags at 16px reading as three different sizes.
 
-   Single-colour, taking the colour of the pill they sit in. A full-colour
-   Gemini gradient on a green pill would be the only piece of another brand's
-   palette on the site, and the pill's own fill is already what tells the three
-   apart.
+   Gemini is the one mark of the three that IS multicoloured in the vendor's
+   own artwork, so flattening it to the pill's single fill would misrepresent
+   it rather than simplify it — it's the pre-built, already-on-brand
+   assets/images/gemini-color.svg instead of a hand-drawn path, sized to the
+   same box as the other two (see .tool-mark--gemini in PromptsBrowser.css)
+   so it still reads as "the same size" alongside them.
 
    Trademark note: these are the assistants' own marks, used to identify which
    assistant a prompt was written for. That is what they are for. */
 
-// value → { label, path, scale }. `label` is the accessible name; the mark is
-// aria-hidden and the label is what a screen reader gets.
+// value → { label, path?, scale? }. `label` is the accessible name; the mark
+// is aria-hidden and the label is what a screen reader gets. `path`/`scale`
+// drive the inline-SVG marks; Gemini has neither — see ToolMark below.
 const MARKS = {
   chatgpt: {
     label: 'ChatGPT',
@@ -38,8 +40,6 @@ const MARKS = {
   },
   gemini: {
     label: 'Gemini',
-    scale: 1.08,
-    path: 'M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81',
   },
 };
 
@@ -55,10 +55,25 @@ export function toolLabel(value) {
    that box, around its centre, so the three still occupy identical squares —
    the artwork is what changes, never the footprint, which is what keeps a
    column of pills exactly the same width and height whichever assistant a
-   prompt was written for. */
+   prompt was written for. Gemini goes through the same `size`-driven box via
+   .tool-mark's shared sizing rules (see PromptsBrowser.css), it just has no
+   `path`/`scale` to draw. */
 export default function ToolMark({ tool, size = 16 }) {
   const mark = MARKS[tool];
   if (!mark) return null;
+
+  if (tool === 'gemini') {
+    return (
+      <img
+        className="tool-mark"
+        src={geminiMark}
+        width={size}
+        height={size}
+        alt=""
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <svg
