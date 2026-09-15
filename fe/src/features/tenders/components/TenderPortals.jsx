@@ -32,11 +32,13 @@ const CACHE_KEY = 'tender-sites';
 // into listings. Creating an account is the thing you do *because* of the wall,
 // so it never carries the suffix; whether it shows at all is the per-entry tick
 // in the CMS.
-// The three every card carries, in this order, whether or not a link has been
-// filled in — a council card is the same card as a federal one. Where the URL
-// is missing the slot still draws, but as inert text rather than a link: see
-// the render below. Filling them in is a CMS job, and the CMS now offers all of
-// them on every section.
+// The three every card carries, in this order, whether or not its own link has
+// been filled in — a council card is the same card as a federal one.
+//
+// A slot with no URL of its own falls back to the entry's main address rather
+// than going dead (see `mainLinkFor`), so every button on the page goes
+// somewhere. Refining them one at a time is a CMS job, and the CMS now offers
+// all of them on every section.
 const DESTINATIONS = [
   { key: 'openTendersUrl', label: 'Open Tenders', gated: true },
   { key: 'upcomingTendersUrl', label: 'Upcoming Tenders', gated: true },
@@ -49,6 +51,21 @@ const DESTINATIONS = [
    sites under "Other Useful Websites". Rendering it empty on the other
    twenty-odd cards would advertise a paywall that does not exist for them. */
 const PAYWALL = { key: 'loginUrl', label: 'Login (Paid wall)' };
+
+/* The entry's main address — what a button points at until it is given one of
+   its own.
+
+   Every entry has at least one of these filled in (checked against the live
+   data: 22 of 22), so in practice this always resolves. It returns '' rather
+   than throwing if one day an entry has none, and the render below treats that
+   as the one case where a slot cannot be a link.
+
+   Order matters: openTendersUrl is the address a federal or state portal is
+   really identified by, and the field councils already store their website in.
+   loginUrl comes next because it is the only one the paywalled aggregators
+   have. */
+const MAIN_LINK_ORDER = ['openTendersUrl', 'loginUrl', 'upcomingTendersUrl', 'createAccountUrl'];
+const mainLinkFor = (site) => MAIN_LINK_ORDER.map((k) => site[k]).find(Boolean) || '';
 
 // A band of cards, revealed as it is scrolled to rather than on mount.
 //
@@ -72,7 +89,9 @@ function TenderList({ sites, group = 'australian' }) {
 
   return (
     <ul ref={ref} className={`tp__list tp__list--${group}${inView ? ' is-in' : ''}`}>
-      {sites.map((site) => (
+      {sites.map((site) => {
+        const mainLink = mainLinkFor(site);
+        return (
         <li className="tp__row" key={site._id || site.id || site.name}>
           {/* The tile shows whether or not a logo has been uploaded, so the
               names line up across a row of cards. */}
@@ -87,13 +106,15 @@ function TenderList({ sites, group = 'australian' }) {
 
           <span className="tp__links">
             {DESTINATIONS.map(({ key, label, gated }) => {
-              const href = site[key];
+              // Its own link where there is one; the entry's main address
+              // otherwise, so no button is ever a dead end.
+              const href = site[key] || mainLink;
               const text = gated && site.loginRequired ? `${label} (Login Required)` : label;
-              /* No URL yet: the slot still draws, so every card is the same
-                 shape, but as a <span> rather than an <a>. A disabled-looking
-                 anchor with no href is still in the tab order and still
-                 announced as a link — this is neither, so a keyboard or screen
-                 reader user is not sent to a control that cannot do anything. */
+              /* The only case left with nothing to point at is an entry that
+                 has no address at all anywhere. Then the slot draws at the same
+                 size but as a <span>, not a disabled <a> — out of the tab order
+                 and unannounced, because a control a keyboard user can reach
+                 and cannot use is worse than no control. */
               return href ? (
                 <a
                   key={key}
@@ -130,7 +151,8 @@ function TenderList({ sites, group = 'australian' }) {
               it. */}
           {site.note && <span className="tp__note">{site.note}</span>}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 }

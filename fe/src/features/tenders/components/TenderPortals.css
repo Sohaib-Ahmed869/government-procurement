@@ -570,14 +570,14 @@
   border-color: var(--gp-brand);
 }
 
-/* A slot with no link behind it yet.
+/* The last resort: an entry with no address anywhere.
 
-   Every card carries the same three destinations so that a council card and a
-   federal one are the same object, which means some of them have nothing to
-   point at until the link is filled in from the CMS. Those draw at the same
-   size and in the same place — that is the whole point — but faded, and with no
-   hover and no pointer, so they read as "not available here" rather than as a
-   button somebody broke.
+   Every card carries the same three destinations, and a slot without a link of
+   its own falls back to the entry's main address, so in practice every button
+   on the page goes somewhere and this style is never reached — all 22 live
+   entries have at least one URL. It exists for the one case the fallback cannot
+   cover, an entry saved with no address at all, where drawing a live-looking
+   button would be a lie.
 
    The element is a <span> in the markup, not a disabled <a>, so it is out of
    the tab order and unannounced. This is the visual half of the same idea. */
