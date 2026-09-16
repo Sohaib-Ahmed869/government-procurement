@@ -110,6 +110,7 @@ export default function QuizResultPage() {
         <QuizResult
           attempt={data.attempt}
           review={data.review}
+          reviewLocked={data.reviewLocked}
           passMark={data.passMark}
           slug={slug}
           next={next}

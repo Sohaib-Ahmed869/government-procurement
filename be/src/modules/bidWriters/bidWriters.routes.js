@@ -7,13 +7,12 @@ import { list, create, update, remove, uploadLogo, reorder } from './bidWriters.
 
 const router = Router();
 
-// B7.8 — the public read is gated by FEATURE_BID_WRITERS inside the controller,
-// not here: staff must keep access at every flag setting so the directory can be
-// built and checked before anything is switched on.
+// B7.8 — public, unconditionally. Whether the page is advertised is the
+// Site Navigation toggle (see navPages.controller.js), not a route gate.
 router.get('/', optionalAuth, list);
 
-// Admin CRUD is never flag-gated. Listings have to be prepared and paid for
-// before go-live, which is the whole point of holding the page back.
+// Admin CRUD, as ever — listings still have to be prepared and paid for
+// before an editor switches the page on in Site Navigation.
 router.post('/', protect, authorize(CONTENT_ROLES), create);
 router.post('/:id/logo', protect, authorize(CONTENT_ROLES), uploadImage.single('file'), uploadLogo);
 // Above `/:id`, or Express reads "reorder" as the id of a listing to update.

@@ -43,23 +43,23 @@ export default function QuizPage() {
         : status === 'forbidden'
           ? 'This quiz isn’t open to you'
           : 'Couldn’t load this quiz';
+    const icon = status === 'notfound' ? 'quiz' : 'lock';
 
+    // Same treatment as a locked lesson (LessonStates.jsx): an icon, the
+    // headline, and the reason, rather than two stacked plain paragraphs.
     return (
       <div className="lms-lesson-page">
-        <div className="lms-card">
-          <p className="lms-empty">
-            <strong>{title}</strong>
-          </p>
-          <p className="lms-empty">
+        <div className="lms-locked">
+          <LmsIcon name={icon} className="lms-locked__icon" />
+          <h1>{title}</h1>
+          <p>
             {status === 'notfound'
               ? 'This lesson isn’t a quiz, or it has been removed from the course.'
               : error}
           </p>
-          <div style={{ textAlign: 'center' }}>
-            <Link className="lms-btn lms-btn--primary" to={`/learn/courses/${slug}`}>
-              Back to the course
-            </Link>
-          </div>
+          <Link className="lms-btn lms-btn--primary" to={`/learn/courses/${slug}`}>
+            Back to the course
+          </Link>
         </div>
       </div>
     );
@@ -137,7 +137,7 @@ export default function QuizPage() {
             <p className="lms-quiz__start-note">
               {passedAlready
                 ? 'You’ve already passed this one. Retaking it won’t remove your earlier result.'
-                : `Marked as soon as you submit, with an explanation for every question.${
+                : `Marked as soon as you submit. The correct answers and explanations unlock once you pass or run out of attempts.${
                     attemptsLeft === null
                       ? ' You can retake it as many times as you need.'
                       : ''

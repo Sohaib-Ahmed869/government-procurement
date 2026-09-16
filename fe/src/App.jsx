@@ -39,7 +39,6 @@ import LmsRoutes from './routes/LmsRoutes.jsx';
 import ScrollToTop from './components/shared/ScrollToTop.jsx';
 import SiteLoader from './components/shared/SiteLoader.jsx';
 import { AudienceProvider } from './context/AudienceContext.jsx';
-import { bidWritersEnabled } from './config/features.js';
 
 export default function App() {
   return (
@@ -106,12 +105,9 @@ function PublicSite() {
           <Route path="/prompt-library/:id" element={<PromptDetailPage />} />
           {/* B6 — sourced, licence-checked downloadable documents. */}
           <Route path="/templates" element={<TemplatesPage />} />
-          {/* B7.8 — held from production. The route is not registered at all
-              when the flag is off, so /find-a-bid-writer falls through to the
-              404 catch-all: there is no page to find, not an empty one. */}
-          {bidWritersEnabled && (
-            <Route path="/find-a-bid-writer" element={<FindBidWriterPage />} />
-          )}
+          {/* B7.8 — always routed now. Whether it's advertised is the Site
+              Navigation toggle, not a build flag holding the route back. */}
+          <Route path="/find-a-bid-writer" element={<FindBidWriterPage />} />
           <Route path="/courses" element={<CoursesPage />} />
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           {/* Bundles are their own resource, not a course with a flag, so they

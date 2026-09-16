@@ -615,6 +615,14 @@ function normaliseDocument(patch) {
   return { ...patch, document: doc };
 }
 
+// A quiz's pass mark is not an instructor's call: 100% is the only pass mark
+// this LMS grades against (see be/src/utils/grading.js), so it is pinned here
+// rather than trusted from the builder, which no longer exposes it as a field.
+function normaliseQuiz(patch) {
+  if (!patch.quiz) return patch;
+  return { ...patch, quiz: { ...patch.quiz, passMark: 100 } };
+}
+
 export const createLesson = asyncHandler(async (req, res) => {
   const mod = await Module.findOne({ _id: req.params.moduleId, course: req.course._id });
   if (!mod) throw ApiError.notFound('Module not found');
@@ -637,7 +645,7 @@ export const updateLesson = asyncHandler(async (req, res) => {
   const lesson = await Lesson.findOne({ _id: req.params.lessonId, course: req.course._id });
   if (!lesson) throw ApiError.notFound('Lesson not found');
 
-  const patch = normaliseDocument(normaliseYouTube(req.body));
+  const patch = normaliseQuiz(normaliseDocument(normaliseYouTube(req.body)));
   LESSON_FIELDS.forEach((f) => {
     if (patch[f] !== undefined) lesson[f] = patch[f];
   });

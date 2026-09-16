@@ -25,6 +25,7 @@ import SubscribersPage from '../admin/pages/SubscribersPage.jsx';
 import ConsultationQueuePage from '../admin/pages/ConsultationQueuePage.jsx';
 import AnnouncementPage from '../admin/pages/AnnouncementPage.jsx';
 import LinksManagerPage from '../admin/pages/LinksManagerPage.jsx';
+import NavPagesAdminPage from '../admin/pages/NavPagesAdminPage.jsx';
 import MediaLibraryPage from '../admin/pages/MediaLibraryPage.jsx';
 import UsersRolesPage from '../admin/pages/UsersRolesPage.jsx';
 import SettingsPage from '../admin/pages/SettingsPage.jsx';
@@ -84,6 +85,7 @@ export default function AdminRoutes() {
           {/* Site */}
           <Route path="announcements" element={<AnnouncementPage />} />
           <Route path="links" element={<LinksManagerPage />} />
+          <Route path="nav-pages" element={<NavPagesAdminPage />} />
           <Route path="media" element={<MediaLibraryPage />} />
 
           {/* Admin-only */}

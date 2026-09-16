@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import LmsIcon from './LmsIcon.jsx';
 
+// Matches .lms-sel__list's own max-height, so the decision to flip is made
+// against the same box the CSS actually renders.
+const LIST_MAX_HEIGHT = 264;
+
 /* A dropdown that is ours all the way down.
 
    `.lms-select` styled a native <select> and got most of the way: the closed
@@ -40,6 +44,13 @@ export default function Select({
   const [open, setOpen] = useState(false);
   // The row the keyboard is on, which is NOT the selection until it is taken.
   const [active, setActive] = useState(-1);
+  // Which side of the control the list opens on. A control low on a long page
+  // — the last field in a form, say — could have less room below it than the
+  // list needs, so the list rendered there anyway and ran off the bottom of
+  // the screen: the browser doesn't scroll a page to reveal an absolutely
+  // positioned box the way it would a native <select>'s popup. Flipping it
+  // above the control when that happens is what a native select does for free.
+  const [openUp, setOpenUp] = useState(false);
   const rootRef = useRef(null);
   const listRef = useRef(null);
   const typed = useRef({ text: '', at: 0 });
@@ -57,6 +68,15 @@ export default function Select({
 
   const openList = useCallback(() => {
     if (disabled) return;
+    const rect = rootRef.current?.getBoundingClientRect();
+    if (rect) {
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      // Flip only when below truly doesn't fit AND above is the better side —
+      // never flip into a worse fit than the one it started with, e.g. a
+      // control sitting near the vertical middle of a short viewport.
+      setOpenUp(spaceBelow < LIST_MAX_HEIGHT && spaceAbove > spaceBelow);
+    }
     setOpen(true);
     setActive(selected >= 0 ? selected : 0);
   }, [disabled, selected]);
@@ -179,7 +199,10 @@ export default function Select({
   }
 
   return (
-    <div className={`lms-sel${open ? ' is-open' : ''} ${className}`.trim()} ref={rootRef}>
+    <div
+      className={`lms-sel${open ? ' is-open' : ''}${open && openUp ? ' is-open-up' : ''} ${className}`.trim()}
+      ref={rootRef}
+    >
       <button
         type="button"
         id={baseId}

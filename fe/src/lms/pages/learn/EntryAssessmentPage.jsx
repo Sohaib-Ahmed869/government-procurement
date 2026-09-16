@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import LmsIcon from '../../components/LmsIcon.jsx';
 import { entryAssessmentApi } from '../../../api/lms.js';
 import { useCourseOutline } from '../../hooks/useCourseOutline.js';
 import { lessonHref } from '../../utils/lessonHref.js';
+import { sizeLabel } from '../../utils/s3Upload.js';
 
 // A brief or marking-criteria attachment. Not a plain link because the file
 // itself is gated on enrolment (same S3-key-never-public-URL rule as
@@ -27,33 +28,44 @@ function AttachmentLink({ courseId, attachment }) {
   };
 
   return (
-    <button type="button" className="lms-doc-link lms-doc-link--btn" onClick={open} disabled={busy}>
-      {busy ? 'Opening…' : attachment.name}
-    </button>
+    <li className="lms-attachlist__item">
+      <LmsIcon name="doc" />
+      <button
+        type="button"
+        className="lms-doc-link--btn lms-attachlist__name lms-attachlist__name--link"
+        onClick={open}
+        disabled={busy}
+      >
+        {busy ? 'Opening…' : attachment.name}
+      </button>
+    </li>
   );
 }
 
-// The brief and marking criteria — shown at every stage (form, waiting on a
-// mark, or already graded). These used to live only in the form branch, so
-// they vanished the moment a submission existed; a learner checking back on
-// what they were marked against, or resubmitting weeks later, couldn't see it.
-function AssessmentReference({ assessment, courseId }) {
+// The brief and marking criteria. The brief is shown at every stage. The
+// marking criteria is not: it says exactly what the instructor is grading
+// against, so the server withholds it from `assessment` until a lodgement
+// exists — it only ever arrives here once the learner has submitted (waiting
+// on a mark, or already graded), never while they are still writing answers.
+function AssessmentReference({ assessment, courseId, showMarkingCriteria = true }) {
   return (
     <>
       {assessment.attachments?.length ? (
         <div className="lms-card" style={{ marginTop: 16 }}>
-          <h2 className="lms-card__title">Brief</h2>
-          <ul>
+          <h2 className="lms-card__title">
+            <LmsIcon name="pdf" />
+            Brief
+          </h2>
+          <ul className="lms-attachlist">
             {assessment.attachments.map((a) => (
-              <li key={a._id}>
-                <AttachmentLink courseId={courseId} attachment={a} />
-              </li>
+              <AttachmentLink key={a._id} courseId={courseId} attachment={a} />
             ))}
           </ul>
         </div>
       ) : null}
 
-      {assessment.markingCriteria?.text || assessment.markingCriteria?.attachments?.length ? (
+      {showMarkingCriteria &&
+      (assessment.markingCriteria?.text || assessment.markingCriteria?.attachments?.length) ? (
         <div className="lms-card" style={{ marginTop: 16 }}>
           <h2 className="lms-card__title">
             <LmsIcon name="doc" />
@@ -63,11 +75,9 @@ function AssessmentReference({ assessment, courseId }) {
             <p style={{ whiteSpace: 'pre-wrap' }}>{assessment.markingCriteria.text}</p>
           ) : null}
           {assessment.markingCriteria.attachments?.length ? (
-            <ul style={{ marginTop: 10 }}>
+            <ul className="lms-attachlist" style={{ marginTop: 10 }}>
               {assessment.markingCriteria.attachments.map((a) => (
-                <li key={a._id}>
-                  <AttachmentLink courseId={courseId} attachment={a} />
-                </li>
+                <AttachmentLink key={a._id} courseId={courseId} attachment={a} />
               ))}
             </ul>
           ) : null}
@@ -192,6 +202,10 @@ export default function EntryAssessmentPage() {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
   const [editing, setEditing] = useState(false);
+  // One hidden <input type="file"> per file-type question, clicked by its
+  // styled "Choose file" button — the same indirection ImageUploader and
+  // DocumentField use, so the native picker never has to render on screen.
+  const fileInputs = useRef({});
 
   const load = useCallback(async () => {
     if (!courseId) return;
@@ -254,10 +268,12 @@ export default function EntryAssessmentPage() {
     return (
       <div className="lms-lesson-page">
         <h1 className="lms-lesson-page__title">{assessment.title}</h1>
-        <div className="lms-card">
-          <p className="lms-empty">
-            Submitted {new Date(submission.submittedAt).toLocaleDateString('en-AU')} — waiting
-            on your instructor to mark it.
+        <div className="lms-locked">
+          <LmsIcon name="clock" className="lms-locked__icon" />
+          <h2>Lodged, waiting on a mark</h2>
+          <p>
+            Submitted {new Date(submission.submittedAt).toLocaleDateString('en-AU')}. Your
+            instructor hasn’t marked it yet — check back soon.
           </p>
         </div>
         <AssessmentReference assessment={assessment} courseId={courseId} />
@@ -305,58 +321,119 @@ export default function EntryAssessmentPage() {
         </article>
       ) : null}
 
-      <AssessmentReference assessment={assessment} courseId={courseId} />
+      {/* Marking criteria is withheld here: this is the "doing it" branch —
+          first attempt or a resubmission — and showing it while the learner is
+          still writing answers is an answer key by another name. */}
+      <AssessmentReference assessment={assessment} courseId={courseId} showMarkingCriteria={false} />
 
-      <form className="lms-card" style={{ marginTop: 16 }} onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
         {assessment.questions.map((q, i) => (
-          <div key={q._id} className="lms-field" style={{ marginBottom: 18 }}>
-            <label className="lms-field__label">
-              {i + 1}. {q.prompt}
-            </label>
-            {q.type === 'file' ? (
-              <input
-                type="file"
-                onChange={(e) => setFiles((f) => ({ ...f, [q._id]: e.target.files[0] }))}
-              />
-            ) : q.type === 'mcq' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 6 }}>
-                {(q.options ?? []).map((o) => (
-                  <label key={o._id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="radio"
-                      name={`q-${q._id}`}
-                      value={o._id}
-                      checked={selected[q._id] === o._id}
-                      onChange={() => setSelected((s) => ({ ...s, [q._id]: o._id }))}
-                    />
-                    <span>{o.text}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <textarea
-                className="lms-textarea"
-                rows={4}
-                value={answers[q._id] ?? ''}
-                onChange={(e) => setAnswers((a) => ({ ...a, [q._id]: e.target.value }))}
-              />
-            )}
+          <div key={q._id} className="lms-eaq">
+            <div className="lms-eaq__head">
+              <span className="lms-eaq__num">{i + 1}</span>
+              <p className="lms-eaq__prompt">{q.prompt}</p>
+            </div>
+
+            <div className="lms-eaq__body">
+              {q.type === 'file' ? (
+                <div
+                  className={`lms-upload${files[q._id] ? ' is-done' : ''}`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) setFiles((s) => ({ ...s, [q._id]: f }));
+                  }}
+                >
+                  <span className="lms-upload__icon">
+                    <LmsIcon name="doc" />
+                  </span>
+                  <div className="lms-upload__body">
+                    <p className="lms-upload__name">
+                      {files[q._id]?.name ?? 'Drop a file here, or choose one'}
+                    </p>
+                    <p className="lms-upload__meta">
+                      {files[q._id] ? sizeLabel(files[q._id].size) : 'Any file your instructor asked for.'}
+                    </p>
+                  </div>
+                  <div className="lms-upload__actions">
+                    <button
+                      type="button"
+                      className="lms-btn lms-btn--sm lms-btn--primary"
+                      onClick={() => fileInputs.current[q._id]?.click()}
+                    >
+                      {files[q._id] ? 'Replace' : 'Choose file'}
+                    </button>
+                    {files[q._id] ? (
+                      <button
+                        type="button"
+                        className="lms-btn lms-btn--sm lms-btn--danger"
+                        onClick={() =>
+                          setFiles((s) => {
+                            const next = { ...s };
+                            delete next[q._id];
+                            return next;
+                          })
+                        }
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                  <input
+                    ref={(el) => {
+                      fileInputs.current[q._id] = el;
+                    }}
+                    type="file"
+                    className="lms-sr-only"
+                    onChange={(e) => setFiles((s) => ({ ...s, [q._id]: e.target.files[0] }))}
+                  />
+                </div>
+              ) : q.type === 'mcq' ? (
+                <div className="lms-q__options">
+                  {(q.options ?? []).map((o) => (
+                    <label
+                      key={o._id}
+                      className={`lms-option${selected[q._id] === o._id ? ' is-selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name={`q-${q._id}`}
+                        value={o._id}
+                        checked={selected[q._id] === o._id}
+                        onChange={() => setSelected((s) => ({ ...s, [q._id]: o._id }))}
+                      />
+                      <span>{o.text}</span>
+                    </label>
+                  ))}
+                </div>
+              ) : (
+                <textarea
+                  className="lms-textarea"
+                  rows={4}
+                  value={answers[q._id] ?? ''}
+                  onChange={(e) => setAnswers((a) => ({ ...a, [q._id]: e.target.value }))}
+                />
+              )}
+            </div>
           </div>
         ))}
 
-        <label className="lms-terms">
-          <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
-          <span>
-            I confirm this submission is my own independent work and accept the course’s
-            academic integrity policy.
-          </span>
-        </label>
+        <div className="lms-card" style={{ marginTop: 14 }}>
+          <label className="lms-terms">
+            <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
+            <span>
+              I confirm this submission is my own independent work and accept the course’s
+              academic integrity policy.
+            </span>
+          </label>
 
-        {err ? <p className="lms-field__error">{err}</p> : null}
+          {err ? <p className="lms-field__error">{err}</p> : null}
 
-        <button type="submit" className="lms-btn lms-btn--primary" disabled={saving} style={{ marginTop: 14 }}>
-          {saving ? 'Submitting…' : 'Submit assessment'}
-        </button>
+          <button type="submit" className="lms-btn lms-btn--primary" disabled={saving} style={{ marginTop: 14 }}>
+            {saving ? 'Submitting…' : 'Submit assessment'}
+          </button>
+        </div>
       </form>
     </div>
   );

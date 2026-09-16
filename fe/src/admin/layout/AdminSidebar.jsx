@@ -93,6 +93,7 @@ const NAV = [
       { to: '/admin/categories', label: 'Dropdown List', icon: 'tag' },
       { to: '/admin/announcements', label: 'Announcements', icon: 'megaphone' },
       { to: '/admin/links', label: 'Links', icon: 'link' },
+      { to: '/admin/nav-pages', label: 'Site Navigation', icon: 'link' },
       { to: '/admin/media', label: 'Media library', icon: 'media' },
     ],
   },

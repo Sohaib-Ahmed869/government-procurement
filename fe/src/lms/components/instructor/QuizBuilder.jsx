@@ -77,18 +77,11 @@ export default function QuizBuilder({ quiz, onChange }) {
 
   return (
     <div className="lms-quizbuild">
+      <p className="lms-field__hint" style={{ marginBottom: 12 }}>
+        A learner must answer every question correctly (100%) to pass — this isn't
+        configurable.
+      </p>
       <div className="lms-formgrid">
-        <label className="lms-field">
-          <span className="lms-field__label">Pass mark (%)</span>
-          <input
-            className="lms-input"
-            type="number"
-            min="0"
-            max="100"
-            value={quiz.passMark}
-            onChange={(e) => set({ passMark: Number(e.target.value) })}
-          />
-        </label>
         <label className="lms-field">
           <span className="lms-field__label">Time limit (minutes)</span>
           <input

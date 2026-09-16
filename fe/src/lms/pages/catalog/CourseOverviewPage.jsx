@@ -145,8 +145,31 @@ export default function CourseOverviewPage() {
       <div className="lms-detail__cols">
         {/* Main column -------------------------------------------------- */}
         <div className="lms-detail__main">
+          {/* Always the first card here, never after "What you'll learn" — the
+              sidebar's "Your progress"/purchase box is always the first thing
+              in its own column, and .lms-detail__cols top-aligns both columns
+              independently. A card ahead of this one in the main column would
+              push it down while the sidebar box stayed put, so the two never
+              lined up on a course with learn points to show. */}
+          <section className="lms-card">
+            <div className="lms-card__head">
+              <h2 className="lms-card__title">
+                <LmsIcon name="modules" />
+                Course content
+              </h2>
+              {!enrolled ? (
+                <span className="lms-card__note">Preview lessons are free to open</span>
+              ) : null}
+            </div>
+            <OutlineTree
+              slug={course.slug}
+              modules={modules}
+              nextLessonId={enrolment?.next?.id}
+            />
+          </section>
+
           {detail?.learnPoints?.length ? (
-            <section className="lms-card">
+            <section className="lms-card" style={{ marginTop: 18 }}>
               <div className="lms-card__head">
                 <h2 className="lms-card__title">
                   <LmsIcon name="check" />
@@ -163,23 +186,6 @@ export default function CourseOverviewPage() {
               </ul>
             </section>
           ) : null}
-
-          <section className="lms-card" style={{ marginTop: 18 }}>
-            <div className="lms-card__head">
-              <h2 className="lms-card__title">
-                <LmsIcon name="modules" />
-                Course content
-              </h2>
-              {!enrolled ? (
-                <span className="lms-card__note">Preview lessons are free to open</span>
-              ) : null}
-            </div>
-            <OutlineTree
-              slug={course.slug}
-              modules={modules}
-              nextLessonId={enrolment?.next?.id}
-            />
-          </section>
 
           {detail?.requirements?.length ? (
             <section className="lms-card" style={{ marginTop: 18 }}>

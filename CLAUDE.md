@@ -61,9 +61,13 @@ One SPA, three independent route trees mounted in `App.jsx`: `/admin/*`
   list/page/get/getBySlug/create/update/remove/uploadTo client for a REST
   resource; feature modules under `src/features/<name>/` extend it with
   resource-specific calls, wired up in `src/api/index.js`.
-- Build-time feature flags live in `src/config/features.js` (e.g.
-  `VITE_FEATURE_BID_WRITERS`, mirrored on the backend as `FEATURE_BID_WRITERS` —
-  both sides must be flipped together, see `docs/GO-LIVE-BID-WRITERS.md`).
+- Whether a top-level site page is advertised (shown in the header/footer nav)
+  is a runtime DB toggle, not a build-time flag: `be/src/constants/navPages.js`
+  is the registry, `be/src/modules/navPages/` the API, and
+  `fe/src/hooks/useNavVisibility.js` is what `Header.jsx`/`Footer.jsx` (and any
+  page that needs to noindex itself while hidden) read it through. Managed from
+  Admin → Site → Site Navigation. Hiding a page only removes its nav link —
+  the page and its API stay reachable at their own URL either way.
 
 `src/features/<name>/` holds page-specific logic per site area (articles, courses,
 tenders, forum, panels, prompts, templates, etc.); `src/pages/public/` and
