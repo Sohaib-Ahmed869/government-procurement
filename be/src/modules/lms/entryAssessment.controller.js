@@ -77,7 +77,13 @@ export const getEntryAssessment = asyncHandler(async (req, res) => {
     user: req.user._id,
   }).lean();
 
-  return ok(res, { assessment: stripAnswerKey(assessment), submission });
+  const safe = stripAnswerKey(assessment);
+  // The marking criteria says exactly what the instructor is grading against —
+  // fine to see once a lodgement is in and being (or already) marked, but an
+  // answer key by another name while the learner is still writing their answers.
+  if (!submission) delete safe.markingCriteria;
+
+  return ok(res, { assessment: safe, submission });
 });
 
 // mcq questions are marked right here, at submission, rather than waiting on

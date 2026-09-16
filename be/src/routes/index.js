@@ -30,6 +30,7 @@ import subscriberRoutes from '../modules/subscribers/subscribers.routes.js';
 import consultationRoutes from '../modules/consultations/consultations.routes.js';
 import registerInterestRoutes from '../modules/registerInterest/registerInterest.routes.js';
 import linkRoutes from '../modules/links/links.routes.js';
+import navPageRoutes from '../modules/navPages/navPages.routes.js';
 import tenderSiteRoutes from '../modules/tenderSites/tenderSites.routes.js';
 import mediaRoutes from '../modules/media/media.routes.js';
 import settingRoutes from '../modules/settings/settings.routes.js';
@@ -68,7 +69,8 @@ router.use('/engage-services', engageServiceRoutes);
 router.use('/prompts', promptRoutes);
 // B6 — the Templates library: sourced, licence-checked, downloadable documents.
 router.use('/templates', templateRoutes);
-// B7 — Find a Bid Writer. Public reads are held behind FEATURE_BID_WRITERS.
+// B7 — Find a Bid Writer. Whether it's advertised is the Site Navigation
+// toggle now, not a feature flag — see /nav-pages below.
 router.use('/bid-writers', bidWriterRoutes);
 router.use('/home-hero', homeHeroRoutes);
 router.use('/capabilities-hero', capabilitiesHeroRoutes);
@@ -81,6 +83,7 @@ router.use('/subscribers', subscriberRoutes);
 router.use('/consultations', consultationRoutes);
 router.use('/register-interest', registerInterestRoutes);
 router.use('/links', linkRoutes);
+router.use('/nav-pages', navPageRoutes);
 router.use('/tender-sites', tenderSiteRoutes);
 router.use('/media', mediaRoutes);
 router.use('/settings', settingRoutes);

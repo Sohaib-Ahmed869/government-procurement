@@ -49,8 +49,6 @@ function auditQuiz(quiz) {
     if (!q.explanation?.trim()) issues.push(`Q${n} has no explanation`);
   });
 
-  if (quiz.passMark < 1 || quiz.passMark > 100) issues.push('Pass mark should be 1–100');
-
   return issues;
 }
 

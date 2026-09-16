@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { bidWritersApi } from '../../api';
 import {
   CATEGORIES,
@@ -8,7 +9,7 @@ import {
   STATE_OPTIONS,
   TIER_OPTIONS,
 } from '../../features/bidWriters/data.js';
-import { BID_WRITERS } from '../../config/features.js';
+import { useNavVisibility } from '../../hooks/useNavVisibility.js';
 import DataTable from '../components/DataTable.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import ConfirmDialog from '../components/ConfirmDialog.jsx';
@@ -35,11 +36,12 @@ const EMPTY = {
 
 // B7.6 — the directory's management screen.
 //
-// This screen is NOT feature-flagged. Listings have to be prepared, and paid
-// for, before the page goes live, which is the whole reason the page is held
-// back — so the CMS side works at every flag setting. What the banner at the
-// top does is make sure nobody edits here believing the public can see it.
+// Listings can always be prepared and paid for here regardless of whether the
+// page is advertised — that switch now lives in Site Navigation, not a
+// feature flag, and this screen just reads its current state to warn whoever
+// is editing that the public can't see any of this yet.
 export default function BidWritersAdminPage() {
+  const hiddenPages = useNavVisibility();
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState('loading');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -330,15 +332,14 @@ export default function BidWritersAdminPage() {
       {/* The state of the switch, said plainly and without mentioning files or
           settings the client cannot reach: this screen is used through a browser
           by someone who does not have the code. What they need to know is
-          whether the public can see any of this, and who to ask to change it. */}
-      {BID_WRITERS !== 'live' && (
+          whether the public can see any of this, and where to go change it. */}
+      {hiddenPages.has('find-a-bid-writer') && (
         <div className="admin-alert" style={{ marginBottom: 16 }}>
           <strong>Visitors cannot see this directory yet.</strong>{' '}
-          {BID_WRITERS === 'off'
-            ? 'The page is switched off, so nothing you add here appears on the website. You can prepare listings now and they will all go live together.'
-            : 'The page is in preview. It can be opened by anyone with the direct link, but it is kept out of the site menu and hidden from search engines.'}{' '}
-          Ask your web developer to switch the directory on once placements are paid
-          for and you are ready for it to go live.
+          It's hidden from the site menu and search engines, though anyone with the
+          direct link can still open it. You can prepare listings now and they will
+          all be ready the moment it's switched on in{' '}
+          <Link to="/admin/nav-pages">Site → Site Navigation</Link>.
         </div>
       )}
 

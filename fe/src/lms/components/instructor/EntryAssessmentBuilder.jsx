@@ -30,10 +30,82 @@ function withStableKeys(questions, prev = []) {
 // marking criteria and whether it gates the course. One document per course,
 // loaded and saved as a whole — there's no reason to debounce a form this
 // small the way the course's own fields are.
+// A brief/marking-criteria attachment picker: the same styled drop zone and
+// green "Choose file" button as ImageUploader and DocumentField, in place of
+// a bare native <input type="file">, which renders in the browser's own
+// unstyled control and looks like it belongs to a different app.
+function AttachmentUploader({ hint, attachments = [], busy, onPick, onRemove }) {
+  const inputRef = useRef(null);
+
+  return (
+    <div>
+      {attachments.length ? (
+        <ul className="lms-attachlist">
+          {attachments.map((a) => (
+            <li key={a._id} className="lms-attachlist__item">
+              <LmsIcon name="doc" />
+              <span className="lms-attachlist__name">{a.name}</span>
+              <button
+                type="button"
+                className="lms-btn lms-btn--ghost lms-btn--sm"
+                onClick={() => onRemove(a._id)}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      <div
+        className="lms-upload"
+        style={{ marginTop: attachments.length ? 10 : 6 }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          const f = e.dataTransfer.files?.[0];
+          if (f) onPick(f);
+        }}
+      >
+        <span className="lms-upload__icon">
+          <LmsIcon name="doc" />
+        </span>
+        <div className="lms-upload__body">
+          <p className="lms-upload__name">
+            {busy ? 'Uploading…' : 'Drop a file here, or choose one'}
+          </p>
+          <p className="lms-upload__meta">{hint}</p>
+        </div>
+        <button
+          type="button"
+          className="lms-btn lms-btn--sm lms-btn--primary"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+        >
+          {busy ? 'Uploading…' : 'Choose file'}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          className="lms-sr-only"
+          onChange={(e) => {
+            const f = e.target.files[0];
+            if (f) onPick(f);
+            e.target.value = '';
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function EntryAssessmentBuilder({ courseId }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
+  // Keyed by upload target ('brief' | 'criteria') so replacing one attachment
+  // doesn't show a spinner on the other's button.
+  const [uploading, setUploading] = useState({});
   const [form, setForm] = useState({
     title: 'Entry assessment',
     instructions: '',
@@ -98,11 +170,14 @@ export default function EntryAssessmentBuilder({ courseId }) {
 
   async function uploadAttachment(file, target) {
     setErr('');
+    setUploading((u) => ({ ...u, [target]: true }));
     try {
       const saved = await authoringApi.addEntryAssessmentAttachment(courseId, file, target);
       setForm((prev) => ({ ...saved, questions: withStableKeys(saved.questions, prev.questions) }));
     } catch (e) {
       setErr(e?.message ?? 'Could not upload that file');
+    } finally {
+      setUploading((u) => ({ ...u, [target]: false }));
     }
   }
 
@@ -181,27 +256,26 @@ export default function EntryAssessmentBuilder({ courseId }) {
           />
         </div>
 
-        <div style={{ marginTop: 14 }}>
-          <span className="lms-field__label">Brief attachments (e.g. a PPT)</span>
-          <ul>
-            {(form.attachments ?? []).map((a) => (
-              <li key={a._id}>
-                {a.name}{' '}
-                <button
-                  type="button"
-                  className="lms-btn lms-btn--ghost lms-btn--sm"
-                  onClick={() => removeAttachment(a._id)}
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-          <input
-            type="file"
-            onChange={(e) => e.target.files[0] && uploadAttachment(e.target.files[0], 'brief')}
-          />
-        </div>
+      </div>
+
+      {/* Its own card, the same as the learner sees it on the result screen
+          (AssessmentReference in EntryAssessmentPage.jsx) — a "Brief" card
+          with its file list, not a field buried inside the main form. */}
+      <div className="lms-card" style={{ marginTop: 16 }}>
+        <h2 className="lms-card__title">
+          <LmsIcon name="pdf" />
+          Brief
+        </h2>
+        <p className="lms-page__subtitle">
+          What you hand the learner to work from — e.g. a PPT brief.
+        </p>
+        <AttachmentUploader
+          hint="PDF, Word or PowerPoint."
+          attachments={form.attachments}
+          busy={Boolean(uploading.brief)}
+          onPick={(file) => uploadAttachment(file, 'brief')}
+          onRemove={removeAttachment}
+        />
       </div>
 
       <div className="lms-card" style={{ marginTop: 16 }}>
@@ -371,7 +445,14 @@ export default function EntryAssessmentBuilder({ courseId }) {
       </div>
 
       <div className="lms-card" style={{ marginTop: 16 }}>
-        <h2 className="lms-card__title">Marking criteria</h2>
+        <h2 className="lms-card__title">
+          <LmsIcon name="doc" />
+          Marking criteria
+        </h2>
+        <p className="lms-page__subtitle">
+          Only shown to a learner once they’ve lodged a submission — never while they’re
+          still answering.
+        </p>
         <textarea
           className="lms-textarea"
           rows={5}
@@ -381,24 +462,15 @@ export default function EntryAssessmentBuilder({ courseId }) {
           }
           onBlur={() => save()}
         />
-        <ul style={{ marginTop: 10 }}>
-          {(form.markingCriteria?.attachments ?? []).map((a) => (
-            <li key={a._id}>
-              {a.name}{' '}
-              <button
-                type="button"
-                className="lms-btn lms-btn--ghost lms-btn--sm"
-                onClick={() => removeAttachment(a._id)}
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-        <input
-          type="file"
-          onChange={(e) => e.target.files[0] && uploadAttachment(e.target.files[0], 'criteria')}
-        />
+        <div style={{ marginTop: 10 }}>
+          <AttachmentUploader
+            hint="A marking rubric or model answer."
+            attachments={form.markingCriteria?.attachments}
+            busy={Boolean(uploading.criteria)}
+            onPick={(file) => uploadAttachment(file, 'criteria')}
+            onRemove={removeAttachment}
+          />
+        </div>
       </div>
 
       {saving ? <p className="lms-empty">Saving…</p> : null}

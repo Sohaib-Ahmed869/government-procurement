@@ -53,7 +53,10 @@ export function markAttempt(quiz, submitted = []) {
   const total = quiz.questions.length;
   const percent = total ? Math.round((score / total) * 100) : 0;
 
-  return { answers, score, total, percent, passed: percent >= (quiz.passMark ?? 100) };
+  // Passing always means every question right. Compared as score === total
+  // rather than percent >= 100: with a large question count, rounding a
+  // near-miss (e.g. 999/1000) up to 100% would wrongly pass it.
+  return { answers, score, total, percent, passed: total > 0 && score === total };
 }
 
 // The per-question review shown AFTER marking. Safe to send back because the

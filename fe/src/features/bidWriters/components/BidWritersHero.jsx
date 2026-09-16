@@ -4,13 +4,15 @@ import './BidWritersHero.css';
 
 // B7 — the Find a Bid Writer hero.
 //
-// The title alone, like every other page's heading band. Three things have gone
-// from under it: the "Preview only" flag, the lede describing the directory that
-// starts immediately below, and the paid-placement note. The flag is the one
-// worth recording — it was drawn whenever BID_WRITERS was 'preview', which is
-// what local and staging run, so anyone reviewing the page saw a badge across
-// the top of it. The page is still marked noindex on that setting; the page
-// simply no longer says so on itself (see FindBidWriterPage.jsx).
+// The title alone, like every other page's heading band. Three things have
+// gone from under it: a "Preview only" flag, the lede describing the
+// directory that starts immediately below, and the paid-placement note. The
+// flag is the one worth recording — it used to be drawn whenever the page's
+// old build-time feature flag was set to its "preview" position, so anyone
+// reviewing the unadvertised page saw a badge across the top of it. That flag
+// is gone; whether the page is advertised is a Site Navigation toggle now,
+// and while it's off the page is still marked noindex (FindBidWriterPage.jsx)
+// without needing to say so on itself.
 export default function BidWritersHero() {
   const { audience } = useAudience();
   const mounted = useMountReveal();

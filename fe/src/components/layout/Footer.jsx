@@ -12,7 +12,6 @@ import { resolveFooterLinks } from '../../constants/footerLinks.js';
 import { useAudience } from '../../context/AudienceContext.jsx';
 import SubscribeForm from '../forms/SubscribeForm.jsx';
 import WeChatQrDialog from './WeChatQrDialog.jsx';
-import { bidWritersPublic } from '../../config/features.js';
 import './Footer.css';
 
 // The two segment columns carry the header nav IN ITS ORDER, with Home ahead of
@@ -34,8 +33,9 @@ const AUDIENCE_LINKS = [
   { label: 'How to Engage Us', href: '/government-panels' },
   { label: 'AI Prompt Library', href: '/prompt-library' },
   { label: 'Templates', href: '/templates' },
-  // B7.8 — footer entry appears with the nav entry, at `live` only.
-  ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
+  // B7.8 — whether this is shown is the Site Navigation toggle (isPageVisible
+  // below, same as every other entry here), not a build flag.
+  { label: 'Find a Bid Writer', href: '/find-a-bid-writer' },
   { label: 'Careers', href: '/careers' },
   { label: 'Request a Consultation', href: '/book-a-consultation' },
 ];
@@ -52,37 +52,37 @@ const AUDIENCE_LINKS = [
    Careers below "Win Contracts" and arriving with the site still in Award reads
    as the toggle being broken, because the heading was a promise. The column the
    visitor chose is a stated intent, and it wins. */
-function audienceColumn(heading, audience) {
+// `links` is the AUDIENCE_LINKS list, filtered for what's currently visible —
+// passed in rather than read from the module constant so the two columns can
+// be rebuilt against the CMS's nav-visibility toggle inside the component.
+function audienceColumn(heading, audience, links) {
   return {
     heading,
-    links: AUDIENCE_LINKS.map(({ label, href }) => ({
+    links: links.map(({ label, href }) => ({
       label,
       href: `${href}?audience=${audience}`,
     })),
   };
 }
 
-// Left to right across the row: the brand column carries the Government
-// Procurement wordmark, then the two segments, then Policies last.
+// The Policies column is not a NAV_PAGES entry — it has its own publish
+// status on the Page model already — so it is never filtered by the site-nav
+// toggle and stays a plain constant.
 //
 // The three documents, and no "All policies" link — the index page that used to
 // collect them has gone, so each one is reached directly.
-const LINK_COLUMNS = [
-  audienceColumn('Award Contracts', 'award'),
-  audienceColumn('Win Contracts', 'win'),
-  {
-    heading: 'Policies',
-    links: [
-      { label: 'Privacy', href: '/policies/privacy' },
-      // Next to Privacy, which is where somebody looking for what we track
-      // will start, and because the Cookie Policy says it must be reachable
-      // "from the footer of every page".
-      { label: 'Cookies', href: '/policies/cookies' },
-      { label: 'Terms', href: '/policies/terms' },
-      { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
-    ],
-  },
-];
+const POLICY_COLUMN = {
+  heading: 'Policies',
+  links: [
+    { label: 'Privacy', href: '/policies/privacy' },
+    // Next to Privacy, which is where somebody looking for what we track
+    // will start, and because the Cookie Policy says it must be reachable
+    // "from the footer of every page".
+    { label: 'Cookies', href: '/policies/cookies' },
+    { label: 'Terms', href: '/policies/terms' },
+    { label: 'Conflicts of Interest', href: '/policies/conflicts-of-interest' },
+  ],
+};
 
 // On small screens the headed columns collapse into a flat run of links, laid
 // out as six fixed rows (2 / 4 / 3 / 3 / 4 / 4). The rows are explicit rather
@@ -116,7 +116,7 @@ const FLAT_ROWS = [
   ],
   [
     { label: 'Templates', href: '/templates' },
-    ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
+    { label: 'Find a Bid Writer', href: '/find-a-bid-writer' },
     { label: 'Careers', href: '/careers' },
     { label: 'Request a Consultation', href: '/book-a-consultation' },
   ],
@@ -159,9 +159,15 @@ function FooterLink({ href, className, children }) {
 // below already carries the same address, phone and email, so the band was
 // saying it twice on a page with nothing between them. Every other page keeps
 // it, where there is a page's worth of content in between.
-export default function Footer({ audience: audienceProp, showContactBand = true }) {
+export default function Footer({ audience: audienceProp, showContactBand = true, hiddenPages }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
+
+  // A page switched off in the CMS (Site → Site Navigation) drops out of both
+  // the headed columns and the flat mobile rows below — same key as Header.jsx
+  // uses, href with the leading slash stripped. `Home` and the consultation
+  // CTA have no such key and are never filtered: see the note on NAV_PAGES.
+  const isPageVisible = (href) => !hiddenPages?.has(href.replace(/^\//, '').split('?')[0]);
 
   // Whether the WeChat QR dialog is showing.
   const [qrOpen, setQrOpen] = useState(false);
@@ -194,11 +200,19 @@ export default function Footer({ audience: audienceProp, showContactBand = true 
   // "Explore Tender Websites" is shown to both audiences (Win and Award).
   const showTenderPortals = true;
 
+  const visibleAudienceLinks = AUDIENCE_LINKS.filter((l) => isPageVisible(l.href));
+  const linkColumns = [
+    audienceColumn('Award Contracts', 'award', visibleAudienceLinks),
+    audienceColumn('Win Contracts', 'win', visibleAudienceLinks),
+    POLICY_COLUMN,
+  ];
+
   // Re-flow the remaining links into rows using the full layout's row sizes as
   // the target line lengths, so when the tender link is removed the links below
-  // pull up to fill its line rather than leaving a short, gappy row.
+  // pull up to fill its line rather than leaving a short, gappy row. A page
+  // switched off in the CMS is removed the same way.
   const links = FLAT_ROWS.flat().filter(
-    ({ href }) => href !== '/aus-list' || showTenderPortals,
+    ({ href }) => (href !== '/aus-list' || showTenderPortals) && isPageVisible(href),
   );
   const flatRows = [];
   let cursor = 0;
@@ -291,7 +305,7 @@ export default function Footer({ audience: audienceProp, showContactBand = true 
         </div>
 
         <nav className="site-footer__links" aria-label="Footer">
-          {LINK_COLUMNS.map(({ heading, links }) => (
+          {linkColumns.map(({ heading, links }) => (
             <div className="site-footer__col" key={heading}>
               <h2 className="site-footer__heading">{heading}</h2>
               <hr className="site-footer__rule" />

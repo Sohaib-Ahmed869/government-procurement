@@ -50,8 +50,9 @@ export const engageServicesApi = createResource('engage-services');
 // B4 — the AI Prompt Library: master prompts by topic, use case and tool.
 export const promptsApi = createResource('prompts');
 
-// B7 — Find a Bid Writer. The public read is held behind FEATURE_BID_WRITERS on
-// the server; admin CRUD is always available so placements can be prepared.
+// B7 — Find a Bid Writer. Whether it's advertised is the Site Navigation
+// toggle (navPagesApi below), not a feature flag; the public read and the
+// admin CRUD are both always available.
 export const bidWritersApi = {
   ...createResource('bid-writers'),
   uploadLogo: (id, file) => api.upload(`/bid-writers/${id}/logo`, file),
@@ -172,6 +173,12 @@ export const subscribersApi = {
 
 // ---- Config / platform -----------------------------------------------------
 export const linksApi = createResource('links');
+// Whether a top-level nav page is shown on the site. Public: the header and
+// footer read this on every page load, signed in or not.
+export const navPagesApi = {
+  list: () => api.get('/nav-pages', undefined, { auth: false }),
+  setVisible: (key, visible) => api.patch(`/nav-pages/${key}`, { visible }),
+};
 export const mediaApi = {
   ...createResource('media'),
   upload: (file, fields) => api.upload('/media', file, { fields }),

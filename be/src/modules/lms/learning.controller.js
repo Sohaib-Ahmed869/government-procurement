@@ -26,6 +26,21 @@ import { STAFF_ROLES } from '../../constants/roles.js';
 
 const VIDEO_URL_TTL_SECONDS = 300;
 
+/* Answers and explanations are the part of a quiz that teaches, but they are
+   also the answer key: showing them after every attempt let a learner solve a
+   quiz by trial and error one question at a time. They unlock once there is
+   nothing left for that to spoil — the learner has passed (on this attempt or
+   an earlier one), or has no attempts left to spend on what it would reveal.
+   An author/reviewer sitting their own quiz (`bypass`) always sees it, same
+   exemption as the attempt cap and timer. */
+async function quizReviewUnlocked({ lesson, userId, bypass, passedNow }) {
+  if (bypass || passedNow) return true;
+  const max = lesson.quiz.maxAttempts;
+  if (max <= 0) return false;
+  const used = await QuizAttempt.countDocuments({ user: userId, lesson: lesson._id });
+  return used >= max;
+}
+
 /* ---- Gating (L1/L4/L6) ----------------------------------------------------
    One function decides whether a lesson is open, so no endpoint can disagree
    with another about it. The client has a mirror of this for display, but this
@@ -1132,6 +1147,13 @@ export const submitQuiz = asyncHandler(async (req, res) => {
     });
   }
 
+  const unlocked = await quizReviewUnlocked({
+    lesson,
+    userId: req.user._id,
+    bypass,
+    passedNow: attempt.passed,
+  });
+
   return created(res, {
     // What the course looks like now, so the player's rail and its percentage
     // can be refreshed from the same response that reports the mark. Null when
@@ -1145,8 +1167,10 @@ export const submitQuiz = asyncHandler(async (req, res) => {
       passed: attempt.passed,
       submittedAt: attempt.submittedAt,
     },
-    // Safe now: the attempt is marked, so the explanations teach rather than leak.
-    review: reviewFor(lesson.quiz, attempt),
+    // Withheld until the learner has passed or run out of attempts to spend on
+    // what it would reveal. See quizReviewUnlocked().
+    review: unlocked ? reviewFor(lesson.quiz, attempt) : undefined,
+    reviewLocked: !unlocked,
     passMark: lesson.quiz.passMark,
     // Same shape as GET /quizzes/attempts/:id, so the result screen reads one
     // object whether it arrived here from a submission or from a bookmark.
@@ -1242,6 +1266,20 @@ export const getAttemptById = asyncHandler(async (req, res) => {
   const lesson = await Lesson.findById(attempt.lesson);
   if (!lesson) throw ApiError.notFound('Attempt not found');
 
+  const course = await Course.findById(lesson.course);
+  const bypass = mayBypassGate({ user: req.user, course });
+  // A later, passing attempt unlocks the review for every earlier one too —
+  // there is nothing left for it to spoil once the learner has passed.
+  const passedAny = attempt.passed
+    ? true
+    : Boolean(await QuizAttempt.exists({ user: req.user._id, lesson: lesson._id, passed: true }));
+  const unlocked = await quizReviewUnlocked({
+    lesson,
+    userId: req.user._id,
+    bypass,
+    passedNow: passedAny,
+  });
+
   return ok(res, {
     attempt: {
       _id: attempt._id,
@@ -1255,9 +1293,10 @@ export const getAttemptById = asyncHandler(async (req, res) => {
     },
     title: lesson.title,
     passMark: lesson.quiz?.passMark ?? 100,
-    // Safe: this attempt is already marked, so the explanations teach rather
-    // than leak. See the note on reviewFor().
-    review: reviewFor(lesson.quiz, attempt),
+    // Withheld until the learner has passed or run out of attempts. See
+    // quizReviewUnlocked().
+    review: unlocked ? reviewFor(lesson.quiz, attempt) : undefined,
+    reviewLocked: !unlocked,
   });
 });
 

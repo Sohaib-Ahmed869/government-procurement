@@ -8,7 +8,6 @@ import {
   HOME_SECTIONS_ENABLED,
   SECTION_BY_NAV_LABEL,
 } from '../../features/home/sections.js';
-import { bidWritersPublic } from '../../config/features.js';
 import AudienceToggle from './AudienceToggle.jsx';
 import './Header.css';
 
@@ -60,12 +59,11 @@ const NAV_LINKS = [
   { label: 'AI Prompt Library', href: '/prompt-library' },
   // B6 — the Templates library, on the top ribbon as the brief asks.
   { label: 'Templates', href: '/templates' },
-  // B7.8 — only on the ribbon once the directory is live. On `preview` the page
-  // works but must not be advertised; on `off` it does not exist.
-  ...(bidWritersPublic ? [{ label: 'Find a Bid Writer', href: '/find-a-bid-writer' }] : []),
-  // Last, and after the conditional above so it stays last whether or not the
-  // bid-writer directory is switched on. It is the one item aimed at somebody
-  // who wants to work here rather than to buy or bid.
+  // B7.8 — whether this is shown is the Site Navigation toggle now (filtered
+  // below with every other entry), not a build flag.
+  { label: 'Find a Bid Writer', href: '/find-a-bid-writer' },
+  // Last. It is the one item aimed at somebody who wants to work here rather
+  // than to buy or bid.
   { label: 'Careers', href: '/careers' },
 ];
 
@@ -101,12 +99,17 @@ function scrollToSection(event, id, onDone) {
   window.history.pushState(null, '', `#${id}`);
 }
 
-export default function Header({ showToggle = true, audience: audienceProp }) {
+export default function Header({ showToggle = true, audience: audienceProp, hiddenPages }) {
   const { audience: ctxAudience } = useAudience();
   const audience = audienceProp ?? ctxAudience;
 
-  // "Tender websites" is shown to both audiences (Win and Award).
-  const navLinks = NAV_LINKS;
+  // "Tender websites" is shown to both audiences (Win and Award). A page
+  // switched off in the CMS (Site → Site Navigation) is filtered out here —
+  // `hiddenPages` is keyed by href with the leading slash stripped, which is
+  // exactly what's left of `href` after that.
+  const navLinks = hiddenPages?.size
+    ? NAV_LINKS.filter((item) => !hiddenPages.has(item.href.slice(1)))
+    : NAV_LINKS;
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
 

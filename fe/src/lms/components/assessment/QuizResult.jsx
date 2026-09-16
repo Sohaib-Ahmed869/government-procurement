@@ -25,6 +25,10 @@ function label(item, ids) {
 export default function QuizResult({
   attempt,
   review = [],
+  // True while the answers and explanations are still withheld: the learner
+  // hasn't passed yet and still has attempts left to spend on what they'd
+  // reveal. See quizReviewUnlocked() on the server.
+  reviewLocked = false,
   passMark,
   slug,
   next,
@@ -40,6 +44,7 @@ export default function QuizResult({
   // walking them past the thing they got wrong.
   const onward = passed && next ? next : null;
   const finished = passed && !next && certificateId;
+  const showReview = !reviewLocked && review.length > 0;
 
   return (
     <div>
@@ -55,48 +60,59 @@ export default function QuizResult({
           <p className="lms-result__note">
             {passed
               ? 'This assessment counts towards your course completion.'
-              : `You need ${passMark}% to pass. Review the answers below and try again.`}
+              : reviewLocked
+                ? `You need ${passMark}% to pass — every question correct. Try again.`
+                : `You need ${passMark}% to pass. Review the answers below and try again.`}
           </p>
         </div>
       </div>
 
-      <ol className="lms-review">
-        {review.map((item, i) => {
-          const given = Array.isArray(item.given) ? item.given : [];
-          const answered = given.length > 0;
-          return (
-            <li
-              key={item.question ?? i}
-              className={`lms-review__item${item.correct ? ' is-correct' : ''}`}
-            >
-              <div className="lms-review__head">
-                <span className="lms-review__num">{i + 1}</span>
-                <p className="lms-review__prompt">{item.prompt}</p>
-                <span className={`lms-pill ${item.correct ? 'lms-pill--done' : 'lms-pill--due'}`}>
-                  {item.correct ? 'Correct' : answered ? 'Incorrect' : 'Skipped'}
-                </span>
-              </div>
+      {reviewLocked ? (
+        <p className="lms-empty" style={{ margin: '18px 0' }}>
+          The correct answers and explanations unlock once you pass or run out of
+          attempts on this quiz.
+        </p>
+      ) : null}
 
-              <dl className="lms-review__answers">
-                <div>
-                  <dt>Your answer</dt>
-                  <dd className={item.correct ? '' : 'is-wrong'}>{label(item, given)}</dd>
+      {showReview ? (
+        <ol className="lms-review">
+          {review.map((item, i) => {
+            const given = Array.isArray(item.given) ? item.given : [];
+            const answered = given.length > 0;
+            return (
+              <li
+                key={item.question ?? i}
+                className={`lms-review__item${item.correct ? ' is-correct' : ''}`}
+              >
+                <div className="lms-review__head">
+                  <span className="lms-review__num">{i + 1}</span>
+                  <p className="lms-review__prompt">{item.prompt}</p>
+                  <span className={`lms-pill ${item.correct ? 'lms-pill--done' : 'lms-pill--due'}`}>
+                    {item.correct ? 'Correct' : answered ? 'Incorrect' : 'Skipped'}
+                  </span>
                 </div>
-                {!item.correct ? (
-                  <div>
-                    <dt>{item.type === 'text' ? 'Accepted answers' : 'Correct answer'}</dt>
-                    <dd className="is-right">{label(item, item.answer)}</dd>
-                  </div>
-                ) : null}
-              </dl>
 
-              {item.explanation ? (
-                <p className="lms-review__why">{item.explanation}</p>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
+                <dl className="lms-review__answers">
+                  <div>
+                    <dt>Your answer</dt>
+                    <dd className={item.correct ? '' : 'is-wrong'}>{label(item, given)}</dd>
+                  </div>
+                  {!item.correct ? (
+                    <div>
+                      <dt>{item.type === 'text' ? 'Accepted answers' : 'Correct answer'}</dt>
+                      <dd className="is-right">{label(item, item.answer)}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+
+                {item.explanation ? (
+                  <p className="lms-review__why">{item.explanation}</p>
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
 
       {/* On a pass the primary action is FORWARD. Retake is still there — a
           learner may want a cleaner score — but it stops being the green button,

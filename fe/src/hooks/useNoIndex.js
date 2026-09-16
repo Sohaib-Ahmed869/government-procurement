@@ -6,11 +6,11 @@ import { useEffect } from 'react';
 // The app has no head manager, and adding one for a single tag would be a
 // dependency for a two-line effect. This is that effect.
 //
-// It is a real belt-and-braces measure rather than the main protection: with the
-// feature flag off the page is not routed at all, so there is nothing to crawl.
-// This covers the preview setting, where the page does exist and must not be
-// indexed — a staging URL that leaks into a search result is exactly the kind of
-// thing nobody notices until a client does.
+// A page hidden from the site nav (see useNavVisibility) still routes and
+// still serves — it is only unlisted, not gone — so this is what keeps an
+// unlisted page out of search results too. Recomputes whenever `active`
+// changes, which matters here specifically because that visibility check
+// starts `false` and can flip to `true` once the fetch resolves.
 export function useNoIndex(active = true) {
   useEffect(() => {
     if (!active) return undefined;

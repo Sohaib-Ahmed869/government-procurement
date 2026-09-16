@@ -1,7 +1,6 @@
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { ok, created, noContent } from '../../utils/apiResponse.js';
-import { env } from '../../config/env.js';
 import { recordAudit } from '../../models/AuditLog.js';
 import { uploadBuffer, deleteObject } from '../../config/s3.js';
 import {
@@ -52,18 +51,14 @@ function validate(body, { partial = false } = {}) {
 
 // GET / — the public directory.
 //
-// B7.8 — held from production. With the flag off this endpoint does not exist
-// as far as an anonymous caller is concerned: a 404, not an empty list, because
-// an empty list still tells you the feature is coming.
-//
-// Staff keep access at every flag setting so the directory can be built and
-// checked from the CMS before anything is switched on.
+// B7.8 — no longer held behind a feature flag. Whether the page is
+// advertised is now the same "Site Navigation" toggle (be/src/constants/
+// navPages.js, key 'find-a-bid-writer') every other nav page uses: turning it
+// off removes the link, not the page or this endpoint. An anonymous caller
+// only ever sees paid, active placements regardless — an empty directory (no
+// placements marked active yet) is what "not ready" looks like now.
 export const list = asyncHandler(async (req, res) => {
   const isStaff = Boolean(req.user);
-
-  if (!isStaff && env.features.bidWriters === 'off') {
-    throw ApiError.notFound('Not found');
-  }
 
   const filter = {};
   // Anonymous callers only ever see paid, active placements.

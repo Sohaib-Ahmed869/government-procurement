@@ -12,7 +12,13 @@
      back, and the ribbon no longer fitted: "Templates" dropped to a second row.
      One value removes the mismatch. */
   --nav-gutter: 24px;
-  --nav-cell-pad: 16px;
+  /* 13px, not 16px. Find a Bid Writer made this a thirteenth cell, and at
+     16px thirteen cells need 1456px against the 1440px the row is ever laid
+     out at (design width above 1441px, real width at or below it — see the
+     note on .site-header__nav-link) — enough to wrap "Careers" onto its own
+     row on every screen size, not just narrow ones. 13px brings the row back
+     under 1440px with room to spare, without touching the type size. */
+  --nav-cell-pad: 13px;
 
   /* Segment colours are the only thing that changes between the two variants. */
   --header-bg: var(--gp-ink-900);
@@ -713,6 +719,26 @@
   }
 }
 
+/* --- the gap below the 1440px design width, above the hamburger swap ---
+   Above 1441px the row is always laid out at a fixed 1440px (see the note on
+   --nav-cell-pad above) and the base metrics fit thirteen cells there with
+   room to spare. Real, unzoomed viewports from 1420px down to 1301px — an
+   ordinary laptop window, not a narrow one — have less than that and nothing
+   tightened for them until the "narrow desktop" tier below kicks in at
+   1105px, so the row wrapped in that gap on an otherwise everyday width.
+   Bounded rather than a plain max-width so it cannot fight the tier below on
+   overlap: only the nav's own two metrics move here, the toggle and CTA are
+   untouched until their own breakpoint. */
+@media (max-width: 1420px) and (min-width: 1106px) {
+  .site-header {
+    --nav-cell-pad: 10px;
+  }
+
+  .site-header__nav-link {
+    font-size: 12.5px;
+  }
+}
+
 /* --- narrow desktop / tablet ---
    The nav has a row of its own now, so the bar no longer has to be squeezed in
    stages to keep brand + nav + actions on one line. What's left is a gentle
@@ -726,7 +752,10 @@
     /* Steps down with the type, so three equal cells still fit the bar here. */
     --control-width: 172px;
     --nav-gutter: 18px;
-    --nav-cell-pad: 13px;
+    /* Same as the gap tier above, not a further step down — thirteen cells
+       already need every bit of this to clear 1105px, and going tighter still
+       reads cramped for no remaining width problem. */
+    --nav-cell-pad: 10px;
   }
 
   .site-header__nav-link {

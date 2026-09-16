@@ -139,10 +139,12 @@ const lessonSchema = new mongoose.Schema(
 
     // kind: 'quiz' (L3)
     quiz: {
-      // Every question right. A partial pass on an assessment that certifies
-      // procurement practice was the wrong default: the certificate says the
-      // learner completed the course, and 2-out-of-3 is not that.
-      passMark: { type: Number, default: 100, min: 0, max: 100 },
+      // Every question right, always. A partial pass on an assessment that
+      // certifies procurement practice was the wrong default: the certificate
+      // says the learner completed the course, and 2-out-of-3 is not that. Not
+      // an instructor setting — grading.js hardcodes the same 100% and
+      // authoring.controller.js pins any incoming value to it.
+      passMark: { type: Number, default: 100, min: 100, max: 100 },
       timeLimitMins: { type: Number, default: 0, min: 0 },
       maxAttempts: { type: Number, default: 0, min: 0 }, // 0 = unlimited
       shuffle: { type: Boolean, default: false },
